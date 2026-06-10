@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Join Discord — Design Picker (Dev)</title>
+    <link rel="icon" type="image/gif" href="https://i.ibb.co/WW3G6H2j/Nombre-del-proyecto.gif">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .design-picker {
+            max-width: 900px;
+            margin: 48px auto 60px;
+            padding: 0 20px;
+        }
+        .design-picker h1 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 0 #000;
+        }
+        .design-picker > p {
+            text-align: center;
+            color: #94a3b8;
+            margin-bottom: 28px;
+        }
+        .design-cards {
+            display: grid;
+            gap: 16px;
+        }
+        .design-card {
+            display: block;
+            padding: 20px 22px;
+            background: #141d28;
+            border: 2px solid #2a3945;
+            border-radius: 12px;
+            text-decoration: none;
+            color: inherit;
+            transition: border-color 0.2s, transform 0.15s;
+        }
+        .design-card:hover {
+            border-color: #33cce6;
+            transform: translateY(-2px);
+        }
+        .design-card h2 {
+            margin: 0 0 6px;
+            font-size: 1.2rem;
+            color: #33cce6;
+        }
+        .design-card p {
+            margin: 0;
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .design-card-tag {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(51, 204, 230, 0.15);
+            color: #7dd3fc;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+        .design-back {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #33cce6;
+            text-decoration: none;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+<nav class="top-navbar">
+  <div class="nav-container-full">
+    <div class="nav-left">
+      <a href="index.html" class="nav-brand">
+        <img src="https://i.ibb.co/gZQzvDp1/qu-Ohyw-V8.webp" alt="BlockSpin Values Logo" class="nav-logo-img">
+        <span class="nav-title">Block<span style="color: #ff1a1a;">Spin</span> <span style="color: #33cce6;">Values</span></span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<div class="design-picker">
+    <a href="index.html" class="design-back">← Back to Home</a>
+    <h1>Join Discord page — pick a design</h1>
+    <p>Dev preview only. Open each version and choose your favourite.</p>
+    <div class="design-cards">
+    <a href="x-join-discord-designs.html" class="design-card">
+            <h2>Compare all designs</h2>
+            <p>Open the design picker to preview every version side by side.</p>
+            <span class="design-card-tag">Start here</span>
+        </a>
+        <a href="blockspin-discord.html" class="design-card">
+            <h2>Version A — Classic</h2>
+            <p>Matches the current site: dark card, cyan accents, benefit grid, FAQ accordion.</p>
+            <span class="design-card-tag">Current default</span>
+        </a>
+        <a href="x-join-discord-v2.html" class="design-card">
+            <h2>Version B — Hero Banner</h2>
+            <p>Full-width gradient hero, side-by-side layout, stat chips, pill-style perks.</p>
+            <span class="design-card-tag">Bold &amp; modern</span>
+        </a>
+        <a href="x-join-discord-v3.html" class="design-card">
+            <h2>Version C — Minimal</h2>
+            <p>Clean typography, lots of whitespace, numbered list, soft borders.</p>
+            <span class="design-card-tag">Simple &amp; readable</span>
+        </a>
+        <a href="x-join-discord-v4.html" class="design-card">
+            <h2>Version D — Cartoon</h2>
+            <p>Chunky borders and shadows — same vibe as the farming pot planner.</p>
+            <span class="design-card-tag">Playful / bold</span>
+        </a>
+    </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

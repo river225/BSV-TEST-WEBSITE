@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Join Discord — Hero Banner (Dev v2)</title>
+    <link rel="icon" type="image/gif" href="https://i.ibb.co/WW3G6H2j/Nombre-del-proyecto.gif">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="join-discord-shared.css">
+    <style>
+        .v2-wrap { max-width: 1100px; margin: 0 auto 60px; padding: 0 16px; }
+        .v2-hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            align-items: center;
+            margin: 28px 0 40px;
+            padding: 36px 32px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #5865f2 0%, #33cce6 50%, #141d28 100%);
+            border: 3px solid #000;
+            box-shadow: 0 8px 0 #000;
+        }
+        .v2-hero h1 {
+            margin: 0 0 14px;
+            font-size: clamp(1.85rem, 4vw, 2.5rem);
+            line-height: 1.12;
+            text-shadow: 2px 2px 0 #000;
+        }
+        .v2-hero-lead {
+            margin: 0 0 20px;
+            color: rgba(255,255,255,0.92);
+            line-height: 1.6;
+            font-size: 1.05rem;
+        }
+        .v2-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 26px;
+            background: #fff;
+            color: #5865f2;
+            font-weight: 800;
+            text-decoration: none;
+            border-radius: 10px;
+            border: 3px solid #000;
+            box-shadow: 0 4px 0 #000;
+        }
+        .v2-cta:hover { transform: translateY(-2px); }
+        .v2-stat-card {
+            background: rgba(15, 23, 42, 0.75);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 14px;
+            padding: 24px;
+            text-align: center;
+        }
+        .v2-stat-num {
+            font-size: 2.75rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+        .v2-stat-label { color: #cbd5e1; font-size: 0.95rem; }
+        .v2-stat-list {
+            margin-top: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            text-align: left;
+        }
+        .v2-stat-list span {
+            display: block;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 8px;
+            font-size: 0.88rem;
+            color: #e2e8f0;
+        }
+        .v2-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 32px;
+        }
+        .v2-pill {
+            padding: 10px 16px;
+            border-radius: 999px;
+            background: #1f2a38;
+            border: 2px solid #5865f2;
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .v2-section h2 {
+            text-align: center;
+            color: #33cce6;
+            margin-bottom: 18px;
+            font-size: 1.5rem;
+        }
+        .v2-faq details {
+            background: #141d28;
+            border: 2px solid #2a3945;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            padding: 14px 18px;
+        }
+        .v2-faq summary {
+            cursor: pointer;
+            font-weight: 700;
+            color: #33cce6;
+        }
+        .v2-faq p { margin: 12px 0 0; color: #cbd5e1; line-height: 1.6; font-size: 0.95rem; }
+        .v2-back {
+            display: inline-block;
+            margin: 20px 0 0;
+            color: #33cce6;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        @media (max-width: 768px) {
+            .v2-hero { grid-template-columns: 1fr; padding: 24px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="top-navbar">
+  <div class="nav-container-full">
+    <div class="nav-left">
+      <a href="index.html" class="nav-brand">
+        <img src="https://i.ibb.co/gZQzvDp1/qu-Ohyw-V8.webp" alt="BlockSpin Values Logo" class="nav-logo-img">
+        <span class="nav-title">Block<span style="color: #ff1a1a;">Spin</span> <span style="color: #33cce6;">Values</span></span>
+      </a>
+      <a href="x-about.html">About Us</a>
+      <a href="x-faq.html">FAQ</a>
+      <a href="blockspin-discord.html">Join Discord</a>
+    </div>
+    <div class="nav-right">
+      <a href="https://discord.gg/QbapryYUUx" target="_blank" rel="noopener noreferrer" class="nav-discord">
+        <img src="https://i.ibb.co/Tq7DLCJt/dsfbvbvxcxbvn.png" alt="Discord" width="22" height="22" class="nav-discord-img">
+      </a>
+    </div>
+  </div>
+</nav>
+
+<div class="join-design-bar" aria-label="Design version picker">
+  <span>Dev designs:</span>
+  <a href="x-join-discord-designs.html" class="join-design-bar__gallery">All</a>
+  <a href="blockspin-discord.html">A Classic</a>
+  <a href="x-join-discord-v2.html" class="is-active">B Hero</a>
+  <a href="x-join-discord-v3.html">C Minimal</a>
+  <a href="x-join-discord-v4.html">D Cartoon</a>
+</div>
+
+<div class="v2-wrap">
+    <a href="index.html" class="v2-back">← Back to Home</a>
+
+    <section class="v2-hero">
+        <div>
+            <h1>Join the BlockSpin Values Discord</h1>
+            <p class="v2-hero-lead">The official trading hub for BlockSpin — live values, middleman service, giveaways, and a community of thousands of traders.</p>
+            <a href="https://discord.gg/QbapryYUUx" target="_blank" rel="noopener noreferrer" class="v2-cta">Join Discord Server</a>
+        </div>
+        <div class="v2-stat-card">
+            <div class="v2-stat-num" id="join-member-count">—</div>
+            <div class="v2-stat-label">members &amp; growing</div>
+            <div class="v2-stat-list">
+                <span>📊 Official value list community</span>
+                <span>🛡️ Free middleman service</span>
+                <span>🎁 Exclusive giveaways</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="v2-section">
+        <h2>What you get</h2>
+        <div class="v2-pills">
+            <span class="v2-pill">📊 Value list updates</span>
+            <span class="v2-pill">🛡️ Middleman service</span>
+            <span class="v2-pill">🎁 Giveaways</span>
+            <span class="v2-pill">💬 Value suggestions</span>
+            <span class="v2-pill">🤝 Trading community</span>
+            <span class="v2-pill">✅ Scammer reports</span>
+        </div>
+    </section>
+
+    <section class="v2-section v2-faq">
+        <h2>FAQ</h2>
+        <details>
+            <summary>What is BlockSpin Values?</summary>
+            <p>A community-driven value list for BlockSpin on Roblox — accurate trades, tax calculator, and an active Discord server.</p>
+        </details>
+        <details>
+            <summary>How do I get a middleman?</summary>
+            <p>Join Discord and press <strong>Get a Middleman</strong> to open a ticket. Our MM team will walk you through a safe trade.</p>
+        </details>
+        <details>
+            <summary>How can I suggest value changes?</summary>
+            <p>Use the Value Suggestions channel in the Website Portal category after joining.</p>
+        </details>
+    </section>
+</div>
+
+<script>
+fetch("https://discord.com/api/v10/invites/QbapryYUUx?with_counts=true")
+  .then(function (r) { return r.json(); })
+  .then(function (d) {
+    var n = d.approximate_member_count;
+    if (Number.isFinite(n)) {
+      var el = document.getElementById("join-member-count");
+      if (el) el.textContent = n.toLocaleString("en-US");
+    }
+  }).catch(function () {});
+</script>
+<script src="script.js"></script>
+</body>
+</html>

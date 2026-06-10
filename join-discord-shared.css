@@ -1,0 +1,43 @@
+/* Floating design switcher — dev join page variants */
+.join-design-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: rgba(10, 14, 20, 0.92);
+    border-bottom: 2px solid #33cce6;
+    backdrop-filter: blur(8px);
+}
+.join-design-bar span {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-right: 4px;
+}
+.join-design-bar a {
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: #cbd5e1;
+    border: 2px solid #334155;
+    background: #1e293b;
+}
+.join-design-bar a:hover { border-color: #33cce6; color: #fff; }
+.join-design-bar a.is-active {
+    background: #33cce6;
+    border-color: #000;
+    color: #000;
+}
+.join-design-bar a.join-design-bar__gallery {
+    border-color: #5865f2;
+    color: #c7d2fe;
+}

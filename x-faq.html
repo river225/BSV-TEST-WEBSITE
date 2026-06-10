@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="canonical" href="https://blockspinvalues.com/x-faq.html" />
+    <link rel="icon" type="image/gif" href="https://i.ibb.co/WW3G6H2j/Nombre-del-proyecto.gif">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/gZQzvDp1/qu-Ohyw-V8.webp">
+    <title>FAQ</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .faq-container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 40px;
+            background: #141d28;
+            border: 3px solid #000000;
+            border-radius: 12px;
+            position: relative;
+        }
+        
+        .back-btn-top {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: #33cce6;
+            color: #000;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .back-btn-top:hover {
+            background: #5bc5de;
+        }
+        
+        .faq-header {
+            font-size: 4rem;
+            color: #33cce6;
+            text-align: center;
+            margin-bottom: 40px;
+            margin-top: 20px;
+            text-shadow: 2px 2px 0 #000, -2px 2px 0 #000, 2px -2px 0 #000, -2px -2px 0 #000;
+        }
+        
+        .faq-intro {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #ccc;
+            margin-bottom: 50px;
+            line-height: 1.6;
+        }
+        
+        .faq-item {
+            background: #1f2a38;
+            border: 2px solid #33cce6;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .faq-item:hover {
+            border-color: #5bc5de;
+        }
+        
+        .faq-question {
+            padding: 20px 25px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        
+        .faq-question h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #33cce6;
+            font-weight: 600;
+        }
+        
+        .faq-icon {
+            font-size: 1.5rem;
+            color: #33cce6;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+        
+        .faq-item.active .faq-icon {
+            transform: rotate(45deg);
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                        padding 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        opacity 0.3s ease;
+            padding: 0 25px;
+            opacity: 0;
+        }
+        
+        .faq-item.active .faq-answer {
+            max-height: 800px;
+            padding: 0 25px 20px 25px;
+            opacity: 1;
+        }
+        
+        .faq-answer p {
+            margin: 0;
+            color: #fff;
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            margin: 30px auto;
+            padding: 12px 30px;
+            background: #33cce6;
+            color: #000;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .back-btn:hover {
+            background: #5bc5de;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="top-navbar">
+  <div class="nav-container-full">
+    <div class="nav-left">
+      <a href="index.html" class="nav-brand">
+        <img src="https://i.ibb.co/gZQzvDp1/qu-Ohyw-V8.webp" alt="BlockSpin Values Logo" class="nav-logo-img">
+        <span class="nav-title">Block<span style="color: #ff1a1a;">Spin</span> <span style="color: #33cce6;">Values</span></span>
+      </a>
+      <a href="x-about.html">About Us</a>
+      <a href="x-faq.html">FAQ</a>
+      <a href="blockspin-discord.html">Join Discord</a>
+    </div>
+    
+    <div class="nav-right">
+      <div class="theme-switcher" id="theme-switcher" aria-label="Theme">
+        <button type="button" class="theme-switcher-btn active" data-theme="default" title="Original theme" aria-label="Original theme"></button>
+        <button type="button" class="theme-switcher-btn" data-theme="red" title="Red theme" aria-label="Red theme"></button>
+        <button type="button" class="theme-switcher-btn" data-theme="pink" title="Pink theme" aria-label="Pink theme"></button>
+        <button type="button" class="theme-switcher-btn" data-theme="purple" title="Purple theme" aria-label="Purple theme"></button>
+      </div>
+      <div class="nav-login" id="nav-login"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="mobile-subnav" aria-label="Secondary navigation">
+  <a href="x-about.html">About Us</a>
+  <a href="x-faq.html">FAQ</a>
+  <a href="blockspin-discord.html">Join Discord</a>
+</div>
+
+    <div class="faq-container">
+        <a href="index.html" class="back-btn-top">← Back</a>
+        
+        <h1 class="faq-header">FAQ</h1>
+        <p class="faq-intro">Have questions? We've got answers! Click on any question below to expand.</p>
+        
+        <div class="faq-item">
+            <div class="faq-question">
+                <h3>How often are item values updated?</h3>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                <p>We aim to constantly update our values based on market trends and in-game changes such as new content that can affect a items value.</p>
+            </div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question">
+                <h3>Are the values accurate for trading?</h3>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                <p>Yes, Our value list team is always working hard to ensure they are providing the best item values for you!</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <h3>How can I suggest a value change?</h3>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                <p>To suggest changes to values, Join our Discord server and locate the 'Value Suggestions' channel in our Website Portal Category.</p>
+            </div>
+        </div>
+        
+         <div class="faq-item">
+            <div class="faq-question">
+                <h3>Who maintains this website?</h3>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                <p>This website was founded and maintained by river, a BlockSpin QA Tester and Content Creator.</p>
+            </div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question">
+                <h3>What does "Demand" mean?</h3>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                <p>An items demand refers to how sought after the item is, this is a important factor of items as it can help determine if you will be able to easily sell something. Demand can also add to a items value.</p>
+            </div>
+        </div>
+
+         <div class="faq-item">
+            <div class="faq-question">
+                <h3>What does "Average Value" mean?</h3>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                <p>Average Value refers to the typical and standard pricing for a item.</p>
+            </div>
+        </div>
+    
+          <div class="faq-item">
+            <div class="faq-question">
+                <h3>What does "Ranged Value" mean?</h3>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                <p>Often placing a Average Value can be difficult for a item as different players sell & buy it for different pricing. Thus Ranged Value tries to cover more ground and is an extra depth to Average Value.</p>
+            </div>
+        </div>
+
+         <div class="faq-item">
+            <div class="faq-question">
+                <h3>What does "After Tax Value" mean?</h3>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                <p>After Tax Value refers to the additional amount of cash you need to give someone to cover the game's tax. Each time a player drops money, the game takes a small cut as tax.</p>
+            </div>
+        </div>
+
+         <div class="faq-item">
+            <div class="faq-question">
+                <h3>How do I use the Tax Calculator?</h3>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                <p>Simply enter the amount of cash you want the other person to receive. The Tax Calculator automatically adds the extra amount lost to the game's tax and shows you the total you need to give, ensuring they receive the exact amount you intended.</p>
+            </div>
+        </div>
+
+   
+         <div class="faq-item">
+            <div class="faq-question">
+                <h3>How much tax does BlockSpin take on trades?</h3>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                <p>Upon death, 72% of your cash is dropped, 8% is taken by the game and 20% is kept and will be on your character upon respawn.</p>
+            </div>
+        </div>
+
+    
+
+         <div class="faq-item">
+            <div class="faq-question">
+                <h3>How do I add my crew logo to the website?</h3>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                <p>To suggest your own crew logo for the website, please locate the 'Value Suggestions' channel, Within this channel a tag to suggest crew logos is also offered.</p>
+            </div>
+        </div>
+
+     
+    
+        <div style="text-align: center;">
+            <a href="index.html" class="back-btn">← Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        const faqItems = document.querySelectorAll('.faq-item');
+        
+        faqItems.forEach(item => {
+            const question = item.querySelector('.faq-question');
+            
+            question.addEventListener('click', () => {
+                item.classList.toggle('active');
+            });
+        });
+    </script>
+
+<footer class="site-footer">
+  <div class="footer-content">
+    <p>© 2026 BlockSpin Values</p>
+    <div class="footer-links">
+      <a href="blockspin-discord.html">Join Discord</a>
+      <span>•</span>
+      <a href="z-contact.html">Contact Us</a>
+      <span>•</span>
+      <a href="z-terms.html">Terms of Service</a>
+      <span>•</span>
+      <a href="z-privacy.html">Privacy Policy</a>
+    </div>
+  </div>
+</footer>
+<script src="auth.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
