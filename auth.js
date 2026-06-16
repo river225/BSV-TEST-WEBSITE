@@ -1,5 +1,7 @@
 (function () {
   var AUTH_TOKEN_KEY = "bsv-discord-auth";
+  var OAUTH_RETURN_KEY = "bsv-oauth-return-to";
+  var logoutTestObserver = null;
 
   function apiBase() {
     if (typeof window.bsvBotApiUrl === "function") return window.bsvBotApiUrl("");
@@ -40,29 +42,74 @@
     } catch (_) {}
   }
 
+  function saveOAuthReturnTo() {
+    var url = window.location.href.split("#")[0];
+    try {
+      sessionStorage.setItem(OAUTH_RETURN_KEY, url);
+      localStorage.setItem(OAUTH_RETURN_KEY, url);
+    } catch (_) {}
+  }
+
+  function clearOAuthReturnTo() {
+    try {
+      sessionStorage.removeItem(OAUTH_RETURN_KEY);
+      localStorage.removeItem(OAUTH_RETURN_KEY);
+    } catch (_) {}
+  }
+
+  function isDevSite() {
+    if (document.documentElement && document.documentElement.dataset.bsvEnv === "test") return true;
+    return !!document.querySelector('meta[name="bsv-env"][content="test"]');
+  }
+
+  function warnIfLoggedInOnWrongSite() {
+    if (isDevSite()) return;
+    var token = getAuthToken();
+    if (!token) return;
+    var banner = document.getElementById("auth-wrong-site-banner");
+    if (banner) return;
+    banner = document.createElement("div");
+    banner.id = "auth-wrong-site-banner";
+    banner.setAttribute("role", "alert");
+    banner.style.cssText =
+      "position:fixed;top:0;left:0;right:0;z-index:100000;padding:14px 18px;background:#7a1f1f;color:#fff;text-align:center;font:600 0.95rem/1.4 system-ui,sans-serif;border-bottom:2px solid #ff6b6b;";
+    banner.textContent =
+      "You are on the live site, not the dev copy. Open http://localhost:5500 for your latest changes.";
+    document.documentElement.appendChild(banner);
+  }
+
   function parseAuthHash() {
     var hash = window.location.hash || "";
     var justLoggedIn = false;
+
+    if (hash.indexOf("bsv_auth_error=") !== -1) {
+      clearOAuthReturnTo();
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+      return false;
+    }
+
     if (hash.indexOf("bsv_auth=") !== -1) {
       var match = hash.match(/bsv_auth=([^&]+)/);
       if (match && match[1]) {
         setAuthToken(decodeURIComponent(match[1]));
         justLoggedIn = true;
       }
-    }
-    if (hash.indexOf("bsv_auth") !== -1) {
       history.replaceState(null, "", window.location.pathname + window.location.search);
     }
+
+    if (justLoggedIn) clearOAuthReturnTo();
     return justLoggedIn;
   }
 
   function startDiscordLogin() {
+    saveOAuthReturnTo();
     var returnTo = window.location.href.split("#")[0];
     window.location.href = authUrl("api/auth/discord?return_to=" + encodeURIComponent(returnTo));
   }
 
   function logoutDiscord() {
     setAuthToken(null);
+    clearOAuthReturnTo();
     dismissWelcomeBanner();
     fetch(authUrl("api/auth/logout"), { method: "POST" }).catch(function () {});
     renderNavLogin(null);
@@ -96,6 +143,23 @@
     if (menu) menu.hidden = true;
   }
 
+  function removeLogoutTestButton() {
+    document.querySelectorAll("#nav-logout-test, .nav-logout-test").forEach(function (el) {
+      el.remove();
+    });
+    document.querySelectorAll(".top-navbar .nav-container-full button").forEach(function (btn) {
+      if (/^\s*logout\s+test\s*$/i.test(String(btn.textContent || ""))) btn.remove();
+    });
+  }
+
+  function watchForLogoutTestButton() {
+    if (logoutTestObserver || typeof MutationObserver === "undefined") return;
+    var container = document.querySelector(".top-navbar .nav-container-full");
+    if (!container) return;
+    logoutTestObserver = new MutationObserver(removeLogoutTestButton);
+    logoutTestObserver.observe(container, { childList: true, subtree: true });
+  }
+
   function dismissWelcomeBanner() {
     var banner = document.getElementById("auth-welcome-banner");
     if (!banner) return;
@@ -113,7 +177,7 @@
     banner.className = "auth-welcome-banner";
     banner.setAttribute("role", "status");
     banner.innerHTML =
-      '<span class="auth-welcome-banner__text">Welcome ' + escapeHtml(displayName) + "</span>";
+      '<span class="auth-welcome-banner__text">' + escapeHtml(window.bsvI18n ? window.bsvI18n.t("auth.welcome", { name: displayName }) : ("Welcome " + displayName)) + "</span>";
     document.body.appendChild(banner);
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
@@ -126,14 +190,19 @@
   }
 
   function renderNavLogin(user) {
+    removeLogoutTestButton();
     var slot = document.getElementById("nav-login");
     if (!slot) return;
 
+    document.dispatchEvent(new CustomEvent("bsv:authchange", { detail: { user: user || null } }));
+
     if (!user) {
+      var loginLabel = window.bsvI18n ? window.bsvI18n.t("auth.login") : "Log In";
+      var loginTitle = window.bsvI18n ? window.bsvI18n.t("auth.loginTitle") : "Log in with Discord";
+      var loginAria = window.bsvI18n ? window.bsvI18n.t("auth.loginAria") : "Log in with Discord";
       slot.innerHTML =
-        '<button type="button" class="nav-login-btn nav-login-btn--signin" id="nav-login-btn" title="Log in with Discord" aria-label="Log in with Discord">' +
-          '<img src="https://i.ibb.co/Tq7DLCJt/dsfbvbvxcxbvn.png" alt="" width="22" height="22" class="nav-login-btn__icon" decoding="async">' +
-          '<span class="nav-login-btn__label">Log In</span>' +
+        '<button type="button" class="nav-login-btn nav-login-btn--signin" id="nav-login-btn" title="' + escapeAttr(loginTitle) + '" aria-label="' + escapeAttr(loginAria) + '">' +
+          '<span class="nav-login-btn__label">' + escapeHtml(loginLabel) + '</span>' +
         "</button>";
       var loginBtn = document.getElementById("nav-login-btn");
       if (loginBtn) loginBtn.addEventListener("click", startDiscordLogin);
@@ -142,9 +211,11 @@
 
     var name = user.displayName || user.username || "Discord user";
     var avatar = user.avatarUrl || "https://i.ibb.co/Tq7DLCJt/dsfbvbvxcxbvn.png";
+    var accountMenuLabel = window.bsvI18n ? window.bsvI18n.t("auth.accountMenu") : "Account menu";
+    var logoutLabel = window.bsvI18n ? window.bsvI18n.t("auth.logout") : "Log out";
     slot.innerHTML =
       '<div class="nav-login-user">' +
-        '<button type="button" class="nav-login-btn nav-login-btn--signedin" id="nav-login-btn" title="' + escapeAttr(name) + '" aria-label="Account menu" aria-expanded="false">' +
+        '<button type="button" class="nav-login-btn nav-login-btn--signedin" id="nav-login-btn" title="' + escapeAttr(name) + '" aria-label="' + escapeAttr(accountMenuLabel) + '" aria-expanded="false">' +
           '<span class="nav-login-btn__name">' + escapeHtml(name) + "</span>" +
           '<span class="nav-login-btn__avatar-wrap">' +
             '<img src="' + escapeAttr(avatar) + '" alt="" width="44" height="44" class="nav-login-btn__avatar" decoding="async">' +
@@ -152,7 +223,7 @@
         "</button>" +
         '<div class="nav-login-menu" id="nav-login-menu" hidden>' +
           '<p class="nav-login-menu__name">' + escapeHtml(name) + "</p>" +
-          '<button type="button" class="nav-login-menu__logout" id="nav-login-logout">Log out</button>' +
+          '<button type="button" class="nav-login-menu__logout" id="nav-login-logout">' + escapeHtml(logoutLabel) + '</button>' +
         "</div>" +
       "</div>";
 
@@ -177,32 +248,30 @@
     }
   }
 
-  function mountLogoutTestButton() {
-    var container = document.querySelector(".top-navbar .nav-container-full");
-    if (!container || document.getElementById("nav-logout-test")) return;
-    var btn = document.createElement("button");
-    btn.type = "button";
-    btn.id = "nav-logout-test";
-    btn.className = "nav-logout-test";
-    btn.textContent = "Logout test";
-    btn.addEventListener("click", function () {
-      closeLoginMenu();
-      logoutDiscord();
-    });
-    container.appendChild(btn);
-  }
-
   function initDiscordAuth() {
+    removeLogoutTestButton();
+    watchForLogoutTestButton();
     var justLoggedIn = parseAuthHash();
-    mountLogoutTestButton();
     fetchAuthUser().then(function (user) {
       renderNavLogin(user);
+      removeLogoutTestButton();
+      warnIfLoggedInOnWrongSite();
       if (justLoggedIn && user) {
         showWelcomeBanner(user.displayName || user.username || "back");
+        setTimeout(removeLogoutTestButton, 0);
       }
     });
     document.addEventListener("click", function (e) {
       if (!e.target.closest(".nav-login-user")) closeLoginMenu();
+    });
+    document.addEventListener("bsv:languagechange", function () {
+      fetchAuthUser().then(function (user) {
+        renderNavLogin(user);
+      });
+    });
+    window.addEventListener("pageshow", function () {
+      removeLogoutTestButton();
+      watchForLogoutTestButton();
     });
   }
 
@@ -214,4 +283,5 @@
 
   window.initDiscordAuth = initDiscordAuth;
   window.startDiscordLogin = startDiscordLogin;
+  window.bsvGetAuthToken = getAuthToken;
 })();

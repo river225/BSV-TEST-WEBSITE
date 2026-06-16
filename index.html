@@ -1,5 +1,5 @@
 <!DOCTYPE html> 
-<html lang="en" data-bsv-env="test"> 
+<html lang="en" data-bsv-env="test" data-sidenav-style="glass"> 
 <head> 
 
 
@@ -9,16 +9,54 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="robots" content="noindex, nofollow" />
 <meta name="bsv-env" content="test" /> 
+<script src="auth-oauth-bounce.js?v=20260614-auth-fix"></script>
 <title>BlockSpin Values — Dev</title>
 <meta name="description" content="Development copy of BlockSpin Values — not the public site." />
 <link rel="icon" type="image/gif" href="https://i.ibb.co/WW3G6H2j/Nombre-del-proyecto.gif">
 <meta property="og:image" content="https://i.ibb.co/WW3G6H2j/Nombre-del-proyecto.gif">
 <meta property="og:title" content="BlockSpin Values (Dev / staging)">
 <meta property="og:description" content="Development / staging build — not the public BlockSpin Values site.">
-<link rel="stylesheet" href="style.css?v=20260602-pot-controls-smaller" />
+<link rel="stylesheet" href="style.css?v=20260618-discord-banner-sm" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Nunito+Sans:ital,wght@0,600;0,700;1,600&amp;display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Inter:wght@400;600;700&amp;family=Nunito+Sans:ital,wght@0,600;0,700;1,600&amp;family=Oswald:wght@500;600;700&amp;family=Poppins:wght@400;600;700&amp;family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet" />
+<script>
+(function () {
+  try {
+    var fonts = {
+      default: "system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif",
+      paytone: "'Paytone One', sans-serif",
+      nunito: "'Nunito Sans', sans-serif",
+      bebas: "'Bebas Neue', sans-serif",
+      inter: "'Inter', sans-serif",
+      roboto: "'Roboto', sans-serif",
+      poppins: "'Poppins', sans-serif",
+      oswald: "'Oswald', sans-serif"
+    };
+    var f = localStorage.getItem("bsv-font") || "default";
+    var root = document.documentElement;
+    root.style.setProperty("--bsv-site-font", fonts[f] || fonts.default);
+    if (f && f !== "default") root.setAttribute("data-bsv-font", f);
+    if (localStorage.getItem("bsv-card-effects") === "off") root.classList.add("bsv-card-effects-off");
+  } catch (e) {}
+})();
+</script>
+<script>
+(function () {
+  function stripLogoutTest() {
+    document.querySelectorAll("#nav-logout-test, .nav-logout-test").forEach(function (el) {
+      el.remove();
+    });
+    var container = document.querySelector(".top-navbar .nav-container-full");
+    if (!container) return;
+    container.querySelectorAll("button").forEach(function (btn) {
+      if (/^\s*logout\s+test\s*$/i.test(String(btn.textContent || ""))) btn.remove();
+    });
+  }
+  document.addEventListener("DOMContentLoaded", stripLogoutTest);
+  window.addEventListener("pageshow", stripLogoutTest);
+})();
+</script>
 <style> 
 
 .bottom-buttons { 
@@ -57,23 +95,13 @@
     color: white; 
 } 
 
-#search {
-    width: 400px; 
-    max-width: 90%;
-    padding: 12px; 
-    border-radius: 10px; 
-    background: #141d28;
-border: 2px solid #000000;
-    color: #fff;
-    text-align: left; 
-}
 </style> 
 </head> 
 <body> 
 
   
 
-<button class="hamburger-menu" id="hamburger-btn" aria-label="Menu">
+<button class="hamburger-menu" id="hamburger-btn" data-i18n-aria="nav.menu" aria-label="Menu">
   <span></span>
   <span></span>
   <span></span>
@@ -88,32 +116,88 @@ border: 2px solid #000000;
         <img src="https://i.ibb.co/gZQzvDp1/qu-Ohyw-V8.webp" alt="BlockSpin Values Logo" class="nav-logo-img">
         <span class="nav-title">Block<span style="color: #ff1a1a;">Spin</span> <span style="color: #33cce6;">Values</span></span>
       </a>
-      <a href="x-about.html">About Us</a>
-      <a href="x-faq.html">FAQ</a>
-      <a href="blockspin-discord.html">Join Discord</a>
+      <a href="x-about.html" data-i18n="nav.about">About Us</a>
+      <a href="x-faq.html" data-i18n="nav.faq">FAQ</a>
+    </div>
+
+    <div class="search-container is-hidden" id="header-search">
+      <input id="search" type="text" data-i18n-placeholder="search.placeholder" data-i18n-aria="search.label" placeholder="Search items…" aria-label="Search items" />
     </div>
     
     <div class="nav-right">
-      <div class="theme-switcher" id="theme-switcher" aria-label="Theme">
-        <button type="button" class="theme-switcher-btn active" data-theme="default" title="Original theme" aria-label="Original theme"></button>
-        <button type="button" class="theme-switcher-btn" data-theme="red" title="Red theme" aria-label="Red theme"></button>
-        <button type="button" class="theme-switcher-btn" data-theme="pink" title="Pink theme" aria-label="Pink theme"></button>
-        <button type="button" class="theme-switcher-btn" data-theme="purple" title="Purple theme" aria-label="Purple theme"></button>
+      <div class="theme-switcher" id="theme-switcher" data-i18n-aria="nav.theme" aria-label="Theme">
+        <button type="button" class="theme-switcher-btn active" data-theme="default" data-i18n-title="theme.default" data-i18n-aria="theme.default" title="Original theme" aria-label="Original theme"></button>
+        <button type="button" class="theme-switcher-btn" data-theme="red" data-i18n-title="theme.red" data-i18n-aria="theme.red" title="Red theme" aria-label="Red theme"></button>
+        <button type="button" class="theme-switcher-btn" data-theme="pink" data-i18n-title="theme.pink" data-i18n-aria="theme.pink" title="Pink theme" aria-label="Pink theme"></button>
+        <button type="button" class="theme-switcher-btn" data-theme="purple" data-i18n-title="theme.purple" data-i18n-aria="theme.purple" title="Purple theme" aria-label="Purple theme"></button>
+      </div>
+      <a href="https://discord.gg/QbapryYUUx" target="_blank" rel="noopener noreferrer" class="nav-discord" data-i18n-title="nav.discordTip" data-i18n-aria="nav.discordTip" title="Join our Discord server!" aria-label="Join our Discord server!">
+        <svg class="nav-social-link__icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.445.865-.608 1.25-1.845-.276-3.68-.276-5.487 0-.164-.393-.406-.874-.618-1.25a.077.077 0 0 0-.078-.037 19.736 19.736 0 0 0-4.885 1.515.07.07 0 0 0-.032.028C.533 9.046-.319 13.58.099 18.058a.082.082 0 0 0 .031.056c2.053 1.508 4.041 2.423 5.993 3.029a.078.078 0 0 0 .084-.028c.462-.63.873-1.295 1.226-1.994a.076.076 0 0 0-.042-.106c-.653-.248-1.274-.55-1.872-.892a.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.099.246.198.373.292a.077.077 0 0 1-.007.128 12.299 12.299 0 0 1-1.873.891.077.077 0 0 0-.041.107c.36.698.772 1.363 1.225 1.993a.076.076 0 0 0 .084.028c1.961-.607 3.95-1.522 6.002-3.029a.077.077 0 0 0 .031-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.029zM8.02 15.331c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.211 0 2.176 1.095 2.157 2.419 0 1.333-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.211 0 2.176 1.095 2.157 2.419 0 1.333-.946 2.419-2.157 2.419z"/>
+        </svg>
+      </a>
+      <a href="https://www.roblox.com/communities/754565168/BlockSpin-Values#!/about" target="_blank" rel="noopener noreferrer" class="nav-roblox" data-i18n-title="nav.robloxTip" data-i18n-aria="nav.robloxTip" title="Join our Roblox community!" aria-label="Join our Roblox community!">
+        <svg class="nav-social-link__icon nav-social-link__icon--roblox" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M18.926 23.998 0 18.892 5.075.002 24 5.108ZM15.348 10.09l-5.282-1.453-1.414 5.273 5.282 1.453z"/>
+        </svg>
+      </a>
+      <a href="https://www.tiktok.com/@river1_0_?is_from_webapp=1&amp;sender_device=pc" target="_blank" rel="noopener noreferrer" class="nav-tiktok" data-i18n-title="nav.tiktokTip" data-i18n-aria="nav.tiktokTip" title="Check out River's TikTok!" aria-label="Check out River's TikTok!">
+        <svg class="nav-social-link__icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+        </svg>
+      </a>
+      <span class="nav-right-divider" aria-hidden="true"></span>
+      <div class="nav-tools" id="nav-tools">
+        <button type="button" class="nav-settings-btn" id="nav-settings-btn" data-i18n-aria="nav.settings" data-i18n-title="nav.settings" aria-label="Settings" aria-expanded="false" title="Settings">
+          <svg class="nav-settings-btn__icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97 0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1 0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
+          </svg>
+        </button>
       </div>
       <div class="nav-login" id="nav-login"></div>
     </div>
   </div>
 </nav>
 
-<div class="mobile-subnav" aria-label="Secondary navigation">
-  <a href="x-about.html">About Us</a>
-  <a href="x-faq.html">FAQ</a>
-  <a href="blockspin-discord.html">Join Discord</a>
+<div class="site-settings-modal" id="site-settings-modal" hidden>
+  <div class="site-settings-modal__backdrop" id="site-settings-backdrop"></div>
+  <div class="site-settings-modal__box" role="dialog" aria-modal="true" aria-labelledby="site-settings-title">
+    <div class="site-settings-modal__head">
+      <h2 class="site-settings-modal__title" id="site-settings-title" data-i18n="settings.title">Settings</h2>
+      <button type="button" class="site-settings-modal__close" id="site-settings-close" data-i18n-aria="settings.close" aria-label="Close settings">&times;</button>
+    </div>
+    <div class="site-settings-modal__body">
+      <section class="site-settings-section">
+        <h3 class="site-settings-section__title" data-i18n="settings.language">Language</h3>
+        <div class="site-settings-segmented site-settings-segmented--lang" role="group" data-i18n-aria="settings.ariaLanguage" aria-label="Language">
+          <button type="button" class="site-settings-segment" data-lang="en">English</button>
+          <button type="button" class="site-settings-segment" data-lang="fr">Français</button>
+          <button type="button" class="site-settings-segment" data-lang="es">Español</button>
+        </div>
+      </section>
+      <section class="site-settings-section">
+        <h3 class="site-settings-section__title" data-i18n="settings.font">Font</h3>
+        <div class="site-settings-font-grid" id="font-picker-grid" role="listbox" data-i18n-aria="settings.ariaFont" aria-label="Font"></div>
+      </section>
+      <section class="site-settings-section">
+        <h3 class="site-settings-section__title" data-i18n="settings.cardEffects">Card hover effect</h3>
+        <div class="site-settings-segmented" role="group" data-i18n-aria="settings.ariaCardEffects" aria-label="Item card effect">
+          <button type="button" class="site-settings-segment" data-card-effects="on" data-i18n="settings.enable">On</button>
+          <button type="button" class="site-settings-segment" data-card-effects="off" data-i18n="settings.disable">Off</button>
+        </div>
+      </section>
+    </div>
+  </div>
 </div>
 
-<div id="loading-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, #16202c 0%, #1f2d3d 50%, #16202c 100%); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+<div class="mobile-subnav" data-i18n-aria="misc.secondaryNav" aria-label="Secondary navigation">
+  <a href="x-about.html" data-i18n="nav.about">About Us</a>
+  <a href="x-faq.html" data-i18n="nav.faq">FAQ</a>
+</div>
+
+<div id="loading-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(160deg, #1a2740 0%, #0f1724 100%); display: flex; align-items: center; justify-content: center; z-index: 9999;">
   <div style="text-align: center; width: 400px; max-width: 90%;">
-    <h2 style="color: #33cce6; font-size: 2rem; margin-bottom: 30px;">Loading BlockSpin Values...</h2>
+    <h2 style="color: #33cce6; font-size: 2rem; margin-bottom: 30px;" data-i18n="loading.title">Loading BlockSpin Values...</h2>
     <div style="width: 100%; height: 8px; background: #1a2532; border-radius: 10px; overflow: hidden; border: 2px solid #33cce6;">
       <div id="progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #33cce6, #5bc5de); transition: width 0.3s ease;"></div>
     </div>
@@ -125,15 +209,9 @@ border: 2px solid #000000;
 
     <div class="sections-sidebar">
       <nav class="sections-nav" id="sections-nav"></nav>
-      <p class="sections-nav-suggest">
-        <a href="https://discord.gg/QbapryYUUx" target="_blank" rel="noopener noreferrer" class="sections-nav-suggest-link">Want to suggest value changes? click here</a>
-      </p>
     </div>
 
     <main id="sections" class="sections">
-     <div class="search-container"> 
-       <input id="search" type="text" placeholder="Search items…" aria-label="Search items" /> 
-     </div>
      <section id="home" style="display: block;">
   
   <div class="home-page-clean">
@@ -145,11 +223,11 @@ border: 2px solid #000000;
         <span class="welcome-title-line"><span style="color: #fff;">Block</span><span style="color: #ff1a1a;">Spin</span></span>
         <span class="welcome-title-line" style="color: #33cce6;">Values</span>
       </h1>
-      <p class="subtitle welcome-subtitle-with-icon">The Most Trusted BlockSpin Value List</p>
-      <p class="founder-credit">Founded and maintained by <a href="#" onclick="openRiverLinks(event)" style="color: #33cce6; text-decoration: underline;">river</a></p>
+      <p class="subtitle welcome-subtitle-with-icon" data-i18n="home.tagline">The Most Trusted BlockSpin Value List</p>
+      <p class="founder-credit"><span data-i18n="home.founderPrefix">Founded and maintained by</span> <a href="#" onclick="openRiverLinks(event)" style="color: #33cce6; text-decoration: underline;">river</a></p>
     </div>
 
-    <div id="home-discord-promo-slot"></div>
+    <div id="home-discord-promo-slot" class="home-hero-mount"></div>
 
     <div class="home-humvee-banner-wrap"></div>
 
@@ -157,39 +235,39 @@ border: 2px solid #000000;
 
     <div class="home-two-columns">
       
-      <div class="home-column">
-        <h2>Announcements</h2>
+      <div class="home-column home-column--announcements">
+        <div class="home-announcements-box__title-row">
+          <img class="home-announcements-box__icon" src="https://i.ibb.co/20SshwSg/dfsawefsvdbsadfsv.png" alt="" width="32" height="32" loading="lazy">
+          <h2 data-i18n="home.announcements">Announcements</h2>
+        </div>
         <div class="announcement-list">
 
              <div class="announcement-item-clean">
-  <p class="announcement-date">April 17, 2025</p>
-  <p class="announcement-text">Website Update is now live! The Tax Calculator is finally back and more advanced 🔥 It shows exactly how much to trade and in what order to avoid overpaying. New Recent Changes box lets you track all value list updates. (On mobile click blue arrow in a gun section to access tax calculator.)</p>
+  <p class="announcement-date" data-i18n="announce.1.date">April 17, 2025</p>
+  <p class="announcement-text" data-i18n="announce.1.text">Website Update is now live! The Tax Calculator is finally back and more advanced 🔥 It shows exactly how much to trade and in what order to avoid overpaying. New Recent Changes box lets you track all value list updates. (On mobile click blue arrow in a gun section to access tax calculator.)</p>
 </div>
 
           <div class="announcement-item-clean">
-  <p class="announcement-date">Dec 3, 2025</p>
-  <p class="announcement-text">BlockSpin recently changed how many is dropped in-game, thus we have removed the tax calculator as its not accurate anymore. we will adapt to new changes shortly.</p>
+  <p class="announcement-date" data-i18n="announce.2.date">Dec 3, 2025</p>
+  <p class="announcement-text" data-i18n="announce.2.text">BlockSpin recently changed how many is dropped in-game, thus we have removed the tax calculator as its not accurate anymore. we will adapt to new changes shortly.</p>
 </div>
 
           <div class="announcement-item-clean">
-  <p class="announcement-date">Dec 2, 2025</p>
-  <p class="announcement-text">Our richest player sections search bar now works for mobile, check out your rank!</p>
+  <p class="announcement-date" data-i18n="announce.3.date">Dec 2, 2025</p>
+  <p class="announcement-text" data-i18n="announce.3.text">Our richest player sections search bar now works for mobile, check out your rank!</p>
 </div>
           <div class="announcement-item-clean">
-            <p class="announcement-date">Nov 29, 2025</p>
-            <p class="announcement-text">Our latest website update is now live!
+            <p class="announcement-date" data-i18n="announce.4.date">Nov 29, 2025</p>
+            <p class="announcement-text" data-i18n="announce.4.text">Our latest website update is now live!
 We’ve launched a complete site redesign, and items will now display both their repair prices and pawn values across all durability levels. This update is designed to give you clearer, more detailed information and an overall better user experience.</p>
           </div>
         </div>
       </div>
 
-
-
-      <div class="home-column">
-        <h2>💰 Top Donators</h2>
-        <p class="donator-subtitle">Thank you to our generous supporters! Join our Discord to support!</p>
-        <div class="donator-list-clean" id="donator-list">
-          <div class="donator-loading">Loading donators...</div>
+      <div class="home-column home-column--value-changes">
+        <h2 class="value-changes-heading" data-i18n="home.recentChanges">Recent Value Changes</h2>
+        <div class="value-changes-list" id="home-main-value-changes-list">
+          <div class="value-changes-loading" data-i18n="loading.changes">Loading value changes...</div>
         </div>
       </div>
 
@@ -198,19 +276,8 @@ We’ve launched a complete site redesign, and items will now display both their
     <div class="home-divider"></div>
 
     <div class="what-is-section">
-      <h2>What is BlockSpin Values?</h2>
-      <p>BlockSpin Values is the trusted value list for all items in the Roblox game BlockSpin. Our dedicated team of top traders keeps values updated daily to help you make fair trades and avoid scams. Whether you're looking for weapon values, checking crew logos, or calculating taxes, we've got everything you need to trade with confidence.</p>
-    </div>
-
-    <div class="home-divider"></div>
-
-    <div class="home-bottom-promo-row" id="home-bottom-promo-row">
-      <div class="home-shark-promo">
-        <a href="https://attackshark.com/?ref=RIVER" target="_blank" rel="noopener noreferrer sponsored" class="home-shark-promo-link">
-          <p class="home-shark-promo-text">CLICK HERE TO GET THE BEST GAMING MICE!</p>
-          <img src="https://i.ibb.co/0pM24HZ9/ph-11134207-7rasi-m9tr2cfmioxw1c.jpg" alt="Attack Shark gaming mice" class="home-shark-promo-img" loading="lazy" />
-        </a>
-      </div>
+      <h2 data-i18n="home.whatIsTitle">What is BlockSpin Values?</h2>
+      <p data-i18n="home.whatIsBody">BlockSpin Values is the trusted value list for all items in the Roblox game BlockSpin. Our dedicated team of top traders keeps values updated daily to help you make fair trades and avoid scams. Whether you're looking for weapon values, checking crew logos, or calculating taxes, we've got everything you need to trade with confidence.</p>
     </div>
 
   </div>
@@ -227,64 +294,65 @@ We’ve launched a complete site redesign, and items will now display both their
     <aside class="tax-calculator">
         <div class="tax-badge-wrapper">
             <div class="tax-badge"></div>
-            <div class="tax-badge-tooltip">
+            <div class="tax-badge-tooltip" data-i18n="tax.tooltip">
                 Our Tax Calculator has been carefully tested to ensure accuracy. If you find an issue, please let us know.
             </div>
         </div>
-        <h2>Tax Calculator</h2>
+        <h2 data-i18n="tax.title">Tax Calculator</h2>
         <div class="tax-result">
             <div class="amount">$<span id="tax-amount">0</span></div>
             <div id="tax-breakdown" class="tax-breakdown"></div>
         </div>
-        <input type="number" id="taxInput" placeholder="Enter cash amount to drop" />
+        <input type="number" id="taxInput" data-i18n-placeholder="tax.placeholder" placeholder="Enter cash amount to drop" />
         <div class="tax-reminders">
-            <h3 class="tax-reminders-heading">How does it work?</h3>
-            <p class="tax-reminders-intro">Tax Calculator shows exactly how much cash to drop and in what order to avoid losing money to the game's cash tax system.</p>
-            <p class="tax-reminders-bullets">- <strong>You NEED BlockSpin Plus</strong> for this Calculator<br>
+            <h3 class="tax-reminders-heading" data-i18n="tax.howTitle">How does it work?</h3>
+            <p class="tax-reminders-intro" data-i18n="tax.howIntro">Tax Calculator shows exactly how much cash to drop and in what order to avoid losing money to the game's cash tax system.</p>
+            <p class="tax-reminders-bullets" data-i18n-html="tax.bullets">- <strong>You NEED BlockSpin Plus</strong> for this Calculator<br>
             - <span class="tax-warning-line">Never reset with more than 60,000 cash on you</span><br>
             - <strong>NEVER</strong> leave the game in combat after resetting<br>
             - Wait 1 min in between cash drops</p>
         </div>
     </aside>
-    <a href="https://discord.gg/SBBpSGhCyf" target="_blank" rel="noopener noreferrer" class="discord-mm-promo discord-mm-promo--sidebar">Tired of getting scammed during trades?<br>Our Middleman service can help you never get scammed again!<br>Join our discord server and get a Middleman today!<br><span class="discord-mm-promo-cta">Click here to join our Discord</span></a>
     <aside class="home-value-changes" id="home-value-changes">
-        <h2 class="value-changes-heading">Value Changes</h2>
+        <h2 class="value-changes-heading" data-i18n="home.valueChanges">Value Changes</h2>
         <div class="value-changes-list" id="value-changes-list">
-            <div class="value-changes-loading">Loading value changes...</div>
+            <div class="value-changes-loading" data-i18n="loading.changes">Loading value changes...</div>
         </div>
     </aside>
     </div>
 
 </div>
 
-<script src="auth.js"></script>
-<script src="section-config.js?v=20260530-pot-size"></script>
-<script src="script.js?v=20260530-pot-size"></script> 
+<script src="auth.js?v=20260614-login-no-icon"></script>
+<script src="saved-cards.js?v=20260618-saved-empty-copy"></script>
+<script src="site-i18n.js?v=20260618-discord-flash"></script>
+<script src="site-settings.js?v=20260614-i18n-full"></script>
+<script src="section-config.js?v=20260618-no-test"></script>
+<script src="quest-guide-i18n.js?v=20260618-quest-intro"></script>
+<script src="script.js?v=20260618-no-test"></script> 
 
 
 <footer class="site-footer">
   <section class="footer-boosters" id="footer-boosters" aria-label="Current Discord boosters" hidden>
-    <h3 class="footer-boosters-title">Special Thanks to our Discord Server Boosters</h3>
+    <h3 class="footer-boosters-title" data-i18n="footer.boosters">Special Thanks to our Discord Server Boosters</h3>
     <div class="footer-boosters-viewport">
       <div class="footer-boosters-track" id="footer-boosters-track"></div>
     </div>
   </section>
   <div class="footer-content">
-    <p>© 2026 BlockSpin Values · Dev site</p>
+    <p data-i18n="footer.copyright">© 2026 BlockSpin Values · Dev site</p>
     <div class="footer-links">
-      <a href="blockspin-discord.html">Join Discord</a>
+      <a href="z-contact.html" data-i18n="footer.contact">Contact Us</a>
 <span>•</span>
-      <a href="z-contact.html">Contact Us</a>
+<a href="z-terms.html" data-i18n="footer.terms">Terms of Service</a>
 <span>•</span>
-<a href="z-terms.html">Terms of Service</a>
-<span>•</span>
-<a href="z-privacy.html">Privacy Policy</a>
+<a href="z-privacy.html" data-i18n="footer.privacy">Privacy Policy</a>
     </div>
   </div>
 </footer>
 
 <div class="mobile-calc-backdrop" id="mobile-calc-backdrop" aria-hidden="true"></div>
-<button class="mobile-calc-arrow" id="mobile-calc-arrow" type="button" aria-label="Open tax calculator">
+<button class="mobile-calc-arrow" id="mobile-calc-arrow" type="button" data-i18n-aria="tax.openMobile" aria-label="Open tax calculator">
   <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
     <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
   </svg>
@@ -296,32 +364,30 @@ We’ve launched a complete site redesign, and items will now display both their
   <div class="mobile-tax-content" id="mobile-tax-content">
     <div class="tax-badge-wrapper">
       <div class="tax-badge"></div>
-      <div class="tax-badge-tooltip">
+      <div class="tax-badge-tooltip" data-i18n="tax.tooltip">
         Our Tax Calculator has been carefully tested to ensure accuracy. If you find an issue, please let us know.
       </div>
     </div>
-    <h2>Tax Calculator</h2>
+    <h2 data-i18n="tax.title">Tax Calculator</h2>
     <div class="tax-result">
       <div class="amount">$<span id="mobile-tax-amount">0</span></div>
       <div id="mobile-tax-breakdown" class="tax-breakdown"></div>
     </div>
-    <input type="number" id="mobile-tax-input" placeholder="Enter cash amount to drop" />
+    <input type="number" id="mobile-tax-input" data-i18n-placeholder="tax.placeholder" placeholder="Enter cash amount to drop" />
     <div class="tax-reminders">
-      <h3 class="tax-reminders-heading">How does it work?</h3>
-      <p class="tax-reminders-intro">Tax Calculator shows exactly how much cash to drop and in what order to avoid losing money to the game's cash tax system.</p>
-      <p class="tax-reminders-bullets">- <strong>You NEED BlockSpin Plus</strong> for this Calculator<br>
+      <h3 class="tax-reminders-heading" data-i18n="tax.howTitle">How does it work?</h3>
+      <p class="tax-reminders-intro" data-i18n="tax.howIntro">Tax Calculator shows exactly how much cash to drop and in what order to avoid losing money to the game's cash tax system.</p>
+      <p class="tax-reminders-bullets" data-i18n-html="tax.bullets">- <strong>You NEED BlockSpin Plus</strong> for this Calculator<br>
       - <span class="tax-warning-line">Never reset with more than 60,000 cash on you</span><br>
       - <strong>NEVER</strong> leave the game in combat after resetting<br>
       - Wait 1 min in between cash drops</p>
     </div>
   </div>
   <div class="mobile-recent-changes" id="mobile-recent-changes">
-    <h2 class="value-changes-heading">Value Changes</h2>
+    <h2 class="value-changes-heading" data-i18n="home.valueChanges">Value Changes</h2>
     <div class="value-changes-list" id="mobile-value-changes-list">
-      <div class="value-changes-loading">Loading value changes...</div>
+      <div class="value-changes-loading" data-i18n="loading.changes">Loading value changes...</div>
     </div>
-  </div>
-  <a href="https://discord.gg/SBBpSGhCyf" target="_blank" rel="noopener noreferrer" class="discord-mm-promo discord-mm-promo--mobile-panel">Tired of getting scammed during trades?<br>Our Middleman service can help you never get scammed again!<br>Join our discord server and get a Middleman today!<br><span class="discord-mm-promo-cta">Click here to join our Discord</span></a>
   </div>
 </aside>
 </body> 

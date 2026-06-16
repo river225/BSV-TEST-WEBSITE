@@ -19,10 +19,10 @@
       dataSource: "none",
       search: "hide",
       mobileSearchInSection: false,
-      sidebarColumn: "show",
+      sidebarColumn: "hide",
       taxCalc: "hide",
-      middlemanPromo: "show",
-      homeValueChanges: true,
+      middlemanPromo: "hide",
+      homeValueChanges: false,
       accessoriesFastNav: false,
       mobileTaxArrow: false
     },

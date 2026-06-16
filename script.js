@@ -3,6 +3,7 @@ const SECTION_NAMES = typeof getSectionTitles === "function" ? getSectionTitles(
 
 const GA_MEASUREMENT_ID = "G-XXXXXXXXXX";
 const ACCESSORIES_SECTION_NAME = "Untradable Items";
+const MONEY_GAME_GUIDE_SECTION = "Money & Game Guide";
 const MONEY_GUIDE_SHEETS = {
   fishingItems: "Fishing Item",
   fishingTypes: "Fishing Types of fishing ",
@@ -53,24 +54,74 @@ const FISH_WEIGHT_MAX = 3.6;
 const FISH_WEIGHT_STEP = 0.1;
 
 const GIVEAWAY_CAROUSEL_INTERVAL_MS = 10000;
+const DISCORD_CARD_CAROUSEL_INTERVAL_MS = 9000;
 const ANACONDA_GIVEAWAY_IMAGE_URL = "https://i.ibb.co/QqD6BSd/j-Sn2mv-Y-1-removebg-preview.png";
 const ANACONDA_GIVEAWAY_DISCORD_URL = "https://discord.gg/nKKkXyqCsv";
 const ROBUX_GIVEAWAY_IMAGE_URL = "https://i.ibb.co/7fC16qY/Screenshot-2026-05-06-at-02-28-05-removebg-preview.png";
 const ROBUX_GIVEAWAY_DISCORD_URL = "https://discord.gg/GufVWmACAh";
 const BSV_DISCORD_GUILD_ID = "1402820361539817554";
 const BSV_DISCORD_INVITE_URL = "https://discord.gg/QbapryYUUx";
+const BSV_BOT_PUBLIC_BASE_DEFAULT = "https://bsv-bot-production.up.railway.app";
+
+function normalizeApiBase(url) {
+  return String(url || "")
+    .trim()
+    .replace(/\/+$/, "");
+}
+
+function resolveBsvBotPublicBase() {
+  const fallback = normalizeApiBase(BSV_BOT_PUBLIC_BASE_DEFAULT);
+  if (typeof window === "undefined") return fallback;
+  const fromWindow = window.__BSV_BOT_PUBLIC_BASE__;
+  if (fromWindow && String(fromWindow).trim()) return normalizeApiBase(fromWindow);
+  if (typeof document !== "undefined" && document.querySelector) {
+    const meta = document.querySelector('meta[name="bsv-bot-api-base"]');
+    const content = meta && meta.getAttribute("content");
+    if (content && String(content).trim()) return normalizeApiBase(content);
+  }
+  return fallback;
+}
+
+const BSV_BOT_PUBLIC_BASE = resolveBsvBotPublicBase();
+const BOOSTERS_API_URL = `${BSV_BOT_PUBLIC_BASE}/api/boosters`;
+
+if (typeof window !== "undefined") {
+  window.BSV_BOT_PUBLIC_BASE = BSV_BOT_PUBLIC_BASE;
+  window.bsvBotApiUrl = function (path) {
+    const p = String(path || "").trim().replace(/^\/+/, "");
+    return p ? `${BSV_BOT_PUBLIC_BASE}/${p}` : BSV_BOT_PUBLIC_BASE;
+  };
+}
+
 const DISCORD_JOIN_NUDGE_DELAY_MS = 45000;
 const DISCORD_JOIN_NUDGE_STORAGE_KEY = "bsv-discord-nudge-dismissed";
 const ROBUX_GIVEAWAY_SECTION_TITLES = new Set(["Common / Uncommon", "Rare", "Epic", "Omega", "Misc"]);
-const bannerVisibility = { anaconda: false, firework: false, humvee: true, robux: true };
+const bannerVisibility = { anaconda: false, firework: false, humvee: false, robux: false };
 
 function isBsvTestEnvironment() {
   if (document.documentElement && document.documentElement.dataset.bsvEnv === "test") return true;
   return !!document.querySelector('meta[name="bsv-env"][content="test"]');
 }
 
+function i18n(key, vars) {
+  if (window.bsvI18n && typeof window.bsvI18n.t === "function") {
+    return window.bsvI18n.t(key, vars);
+  }
+  return key;
+}
+
+function i18nSection(title) {
+  if (window.bsvI18n && typeof window.bsvI18n.tSection === "function") {
+    return window.bsvI18n.tSection(title);
+  }
+  return title;
+}
+
+var _renderedSectionCache = [];
+var _activeSectionName = "Home";
+
 function shouldShowGiveawayCarousel() {
-  return isBsvTestEnvironment() || bannerVisibility.humvee || bannerVisibility.robux;
+  return false;
 }
 
 function applyStripGiveawayBannerVisibility() {
@@ -158,74 +209,194 @@ function buildRotatingGiveawayCarouselHtml(bannerId) {
 }
 
 function buildHumveeGiveawayBannerHtml(bannerId) {
-  return buildRotatingGiveawayCarouselHtml(bannerId);
+  return "";
 }
 
 function getDiscordPromoSectionCopy(sectionTitle) {
   var map = {
-    "Common / Uncommon": { tags: "Values · Middleman · Giveaways" },
-    "Rare": { tags: "Middleman · Values · Giveaways" },
-    "Epic": { tags: "Giveaways · Values · Middleman" },
-    "Legendary": { tags: "Giveaways · Middleman · Values" },
-    "Omega": { tags: "Values · Giveaways · Middleman" },
-    "Misc": { tags: "Middleman · Values · Giveaways" },
-    "Vehicles": { tags: "Giveaways · Values · Middleman" },
-    "Untradable Items": { tags: "Values · Community · Giveaways" }
+    "Common / Uncommon": { tags: "Trading · Middleman · Giveaways" },
+    "Rare": { tags: "Middleman · Trading · Giveaways" },
+    "Epic": { tags: "Giveaways · Trading · Middleman" },
+    "Legendary": { tags: "Giveaways · Middleman · Trading" },
+    "Omega": { tags: "Trading · Giveaways · Middleman" },
+    "Misc": { tags: "Middleman · Trading · Giveaways" },
+    "Vehicles": { tags: "Giveaways · Trading · Middleman" },
+    "Untradable Items": { tags: "Trading · Community · Giveaways" }
   };
-  return map[sectionTitle] || { tags: "Values · Middleman · Giveaways" };
+  return map[sectionTitle] || { tags: "Trading · Middleman · Giveaways" };
+}
+
+function buildDiscordCardExplainerSlideHtml(kind) {
+  var isGiveaways = kind === "giveaways";
+  var modClass = isGiveaways ? "home-discord-promo__offer--giveaways" : "home-discord-promo__offer--middleman";
+  var icon = isGiveaways ? "🎁" : "🛡️";
+  var title = isGiveaways ? i18n("discord.card.giveawaysTitle") : i18n("discord.card.middlemanTitle");
+  var text = isGiveaways ? i18n("discord.card.giveawaysDesc") : i18n("discord.card.middlemanDesc");
+  var tags = isGiveaways
+    ? [i18n("discord.card.giveawaysTag1"), i18n("discord.card.giveawaysTag2"), i18n("discord.card.giveawaysTag3")].join(" · ")
+    : [i18n("discord.card.middlemanStep1"), i18n("discord.card.middlemanStep2"), i18n("discord.card.middlemanStep3")].join(" · ");
+  var actions =
+    '<div class="home-discord-promo__card-actions">' +
+      '<a href="' + BSV_DISCORD_INVITE_URL + '" target="_blank" rel="noopener noreferrer" class="home-discord-promo__card-btn home-discord-promo__card-btn--join">' + escapeHtml(i18n("discord.card.joinNow")) + '</a>' +
+      '<a href="blockspin-discord.html" class="home-discord-promo__card-btn home-discord-promo__card-btn--more">' + escapeHtml(i18n("discord.card.learnMore")) + '</a>' +
+    '</div>';
+
+  return (
+    '<div class="home-discord-promo__offer ' + modClass + '">' +
+      '<span class="home-discord-promo__offer-emoji" aria-hidden="true">' + icon + '</span>' +
+      '<p class="home-discord-promo__card-title home-discord-promo__offer-title">' + escapeHtml(title) + '</p>' +
+      '<p class="home-discord-promo__offer-text">' + escapeHtml(text) + '</p>' +
+      '<p class="home-discord-promo__card-tags home-discord-promo__offer-tags">' + escapeHtml(tags) + '</p>' +
+      actions +
+    '</div>'
+  );
 }
 
 function buildDiscordPromoCardSlotHtml(sectionTitle) {
   var copy = getDiscordPromoSectionCopy(sectionTitle);
+  var joinSlide =
+    '<div class="home-discord-promo__carousel-slide is-active" data-slide="join" aria-hidden="false">' +
+      '<img src="https://i.ibb.co/Tq7DLCJt/dsfbvbvxcxbvn.png" alt="" width="48" height="48" class="home-discord-promo__card-logo">' +
+      '<p class="home-discord-promo__card-title">Join Our Discord Server</p>' +
+      '<p class="home-discord-promo__card-stat"><span class="discord-member-count">—</span>+ traders</p>' +
+      '<p class="home-discord-promo__card-tags">' + escapeHtml(copy.tags) + '</p>' +
+      '<div class="home-discord-promo__card-actions">' +
+        '<a href="' + BSV_DISCORD_INVITE_URL + '" target="_blank" rel="noopener noreferrer" class="home-discord-promo__card-btn home-discord-promo__card-btn--join">' + escapeHtml(i18n("discord.card.joinNow")) + '</a>' +
+        '<button type="button" class="home-discord-promo__card-btn home-discord-promo__card-btn--more home-discord-promo__card-btn--show-offers">' + escapeHtml(i18n("discord.card.whatWeOffer")) + '</button>' +
+      '</div>' +
+    '</div>';
+
   return (
     '<div class="home-discord-promo home-discord-promo--card-slot" role="complementary" aria-label="Join BlockSpin Discord">' +
       '<div class="home-discord-promo__card-inner">' +
-        '<img src="https://i.ibb.co/Tq7DLCJt/dsfbvbvxcxbvn.png" alt="" width="48" height="48" class="home-discord-promo__card-logo">' +
-        '<p class="home-discord-promo__card-title">Join Our Discord Server</p>' +
-        '<p class="home-discord-promo__card-stat"><span class="discord-member-count">—</span>+ traders</p>' +
-        '<p class="home-discord-promo__card-tags">' + escapeHtml(copy.tags) + '</p>' +
-        '<div class="home-discord-promo__card-actions">' +
-          '<a href="' + BSV_DISCORD_INVITE_URL + '" target="_blank" rel="noopener noreferrer" class="home-discord-promo__card-btn home-discord-promo__card-btn--join">Join now</a>' +
-          '<a href="blockspin-discord.html" class="home-discord-promo__card-btn home-discord-promo__card-btn--more">What we offer</a>' +
+        '<div class="home-discord-promo__carousel" data-rotate="1" aria-live="polite">' +
+          '<div class="home-discord-promo__carousel-viewport">' +
+            joinSlide +
+            '<div class="home-discord-promo__carousel-slide" data-slide="giveaways" aria-hidden="true">' +
+              buildDiscordCardExplainerSlideHtml("giveaways") +
+            '</div>' +
+            '<div class="home-discord-promo__carousel-slide" data-slide="middleman" aria-hidden="true">' +
+              buildDiscordCardExplainerSlideHtml("middleman") +
+            '</div>' +
+          '</div>' +
+          '<div class="home-discord-promo__carousel-dots" aria-hidden="true">' +
+            '<span class="home-discord-promo__carousel-dot is-active"></span>' +
+            '<span class="home-discord-promo__carousel-dot"></span>' +
+            '<span class="home-discord-promo__carousel-dot"></span>' +
+          '</div>' +
         '</div>' +
       '</div>' +
     '</div>'
   );
 }
 
+function goToDiscordCardCarouselSlide(carousel, targetIndex) {
+  if (!carousel) return;
+  var slides = carousel.querySelectorAll(".home-discord-promo__carousel-slide");
+  if (!slides.length) return;
+  var dots = carousel.querySelectorAll(".home-discord-promo__carousel-dot");
+  var idx = Number(carousel.dataset.activeIndex || "0");
+  if (idx >= 0 && idx < slides.length) {
+    slides[idx].classList.remove("is-active");
+    slides[idx].setAttribute("aria-hidden", "true");
+    if (dots[idx]) dots[idx].classList.remove("is-active");
+  }
+  var next = ((targetIndex % slides.length) + slides.length) % slides.length;
+  slides[next].classList.add("is-active");
+  slides[next].setAttribute("aria-hidden", "false");
+  if (dots[next]) dots[next].classList.add("is-active");
+  carousel.dataset.activeIndex = String(next);
+}
+
+function initDiscordPromoCardCarousels(root) {
+  var scope = root || document;
+  scope.querySelectorAll(".home-discord-promo__carousel[data-rotate='1']").forEach(function (carousel) {
+    if (carousel._discordCarouselTimer) {
+      clearInterval(carousel._discordCarouselTimer);
+      carousel._discordCarouselTimer = null;
+    }
+    var slides = carousel.querySelectorAll(".home-discord-promo__carousel-slide");
+    if (slides.length < 2) return;
+
+    var dots = carousel.querySelectorAll(".home-discord-promo__carousel-dot");
+    var activeIdx = 0;
+    slides.forEach(function (slide, i) {
+      if (slide.classList.contains("is-active")) activeIdx = i;
+    });
+    carousel.dataset.activeIndex = String(activeIdx);
+
+    function advance() {
+      var idx = Number(carousel.dataset.activeIndex || "0");
+      goToDiscordCardCarouselSlide(carousel, idx + 1);
+    }
+
+    dots.forEach(function (dot, i) {
+      dot.onclick = function () {
+        goToDiscordCardCarouselSlide(carousel, i);
+      };
+    });
+
+    var card = carousel.closest(".home-discord-promo--card-slot");
+    if (card) {
+      card.querySelectorAll(".home-discord-promo__card-btn--show-offers").forEach(function (btn) {
+        btn.onclick = function (e) {
+          e.preventDefault();
+          goToDiscordCardCarouselSlide(carousel, 1);
+        };
+      });
+    }
+
+    carousel._discordCarouselTimer = setInterval(advance, DISCORD_CARD_CAROUSEL_INTERVAL_MS);
+  });
+}
+
+function buildHomeFlashPerkHtml(mod, icon, titleKey, tagKey) {
+  return (
+    '<div class="home-discord-promo__flash-perk home-discord-promo__flash-perk--' + mod + '">' +
+      '<span class="home-discord-promo__flash-perk-icon" aria-hidden="true">' + icon + "</span>" +
+      '<span class="home-discord-promo__flash-perk-title">' + escapeHtml(i18n(titleKey)) + "</span>" +
+      '<span class="home-discord-promo__flash-perk-tag">' + escapeHtml(i18n(tagKey)) + "</span>" +
+    "</div>"
+  );
+}
+
 function buildDiscordPromoBannerHtml(inCards) {
   if (inCards) return buildDiscordPromoCardSlotHtml("");
-  var cardClass = "";
   return (
-    '<div class="home-discord-promo' + cardClass + '" role="complementary" aria-label="Join BlockSpin Discord">' +
-      '<div class="home-discord-promo__shape home-discord-promo__shape--1" aria-hidden="true"></div>' +
-      '<div class="home-discord-promo__shape home-discord-promo__shape--2" aria-hidden="true"></div>' +
-      '<div class="home-discord-promo__shape home-discord-promo__shape--3" aria-hidden="true"></div>' +
+    '<div class="home-discord-promo home-discord-promo--home home-discord-promo--home-flash" role="complementary" aria-label="Join BlockSpin Discord">' +
+      '<div class="home-discord-promo__home-glow" aria-hidden="true"></div>' +
+      '<div class="home-discord-promo__home-shimmer" aria-hidden="true"></div>' +
+      '<span class="home-discord-promo__shape home-discord-promo__shape--1" aria-hidden="true"></span>' +
+      '<span class="home-discord-promo__shape home-discord-promo__shape--2" aria-hidden="true"></span>' +
+      '<span class="home-discord-promo__shape home-discord-promo__shape--3" aria-hidden="true"></span>' +
       '<div class="home-discord-promo__inner">' +
-        '<div class="home-discord-promo__head">' +
-          '<img src="https://i.ibb.co/Tq7DLCJt/dsfbvbvxcxbvn.png" alt="" width="52" height="52" class="home-discord-promo__logo">' +
-          '<div>' +
-            '<p class="home-discord-promo__title">Join Our Discord Server</p>' +
-            '<p class="home-discord-promo__hook">Trade smarter. Never get scammed.</p>' +
-          '</div>' +
-        '</div>' +
-        '<div class="home-discord-promo__stat">' +
-          '<div class="home-discord-promo__stat-box">' +
-            '<span class="home-discord-promo__stat-num"><span class="discord-member-count">—</span>+</span>' +
-            '<span class="home-discord-promo__stat-label">Traders</span>' +
-          '</div>' +
-        '</div>' +
-        '<div class="home-discord-promo__perks">' +
-          '<span class="home-discord-promo__perk"><span class="home-discord-promo__perk-icon" aria-hidden="true">📊</span> Values</span>' +
-          '<span class="home-discord-promo__perk"><span class="home-discord-promo__perk-icon" aria-hidden="true">🛡️</span> Middleman service</span>' +
-          '<span class="home-discord-promo__perk"><span class="home-discord-promo__perk-icon" aria-hidden="true">🎁</span> Giveaways</span>' +
-        '</div>' +
-        '<div class="home-discord-promo__actions">' +
-          '<a href="https://discord.gg/QbapryYUUx" target="_blank" rel="noopener noreferrer" class="home-discord-promo__btn home-discord-promo__btn--primary">Join now</a>' +
-          '<a href="blockspin-discord.html" class="home-discord-promo__btn home-discord-promo__btn--secondary">What we offer</a>' +
-        '</div>' +
-      '</div>' +
-    '</div>'
+        '<div class="home-discord-promo__flash-badges">' +
+          '<span class="home-discord-promo__flash-badge home-discord-promo__flash-badge--mm">' + escapeHtml(i18n("discord.home.badgeFreeMm")) + "</span>" +
+          '<span class="home-discord-promo__flash-badge home-discord-promo__flash-badge--gw">' + escapeHtml(i18n("discord.home.badgeGiveaways")) + "</span>" +
+          '<span class="home-discord-promo__flash-badge home-discord-promo__flash-badge--trade">' + escapeHtml(i18n("discord.home.badgeTrading")) + "</span>" +
+        "</div>" +
+        '<div class="home-discord-promo__flash-hero">' +
+          '<img src="https://i.ibb.co/Tq7DLCJt/dsfbvbvxcxbvn.png" alt="" width="52" height="52" class="home-discord-promo__logo home-discord-promo__flash-logo">' +
+          '<p class="home-discord-promo__title home-discord-promo__flash-title">' + escapeHtml(i18n("discord.home.title")) + "</p>" +
+          '<p class="home-discord-promo__hook home-discord-promo__flash-hook">' + escapeHtml(i18n("discord.home.hook")) + "</p>" +
+          '<p class="home-discord-promo__flash-stat">' +
+            '<span class="home-discord-promo__flash-stat-num"><span class="discord-member-count">—</span>+</span>' +
+            '<span class="home-discord-promo__flash-stat-label">' + escapeHtml(i18n("discord.home.statLabel")) + "</span>" +
+          "</p>" +
+        "</div>" +
+        '<div class="home-discord-promo__flash-perks">' +
+          buildHomeFlashPerkHtml("trading", "📊", "discord.card.tradingPerk", "discord.home.tradingTag1") +
+          buildHomeFlashPerkHtml("middleman", "🛡️", "discord.card.middlemanTitle", "discord.card.middlemanStep1") +
+          buildHomeFlashPerkHtml("giveaways", "🎁", "discord.card.giveawaysTitle", "discord.card.giveawaysTag2") +
+        "</div>" +
+        '<div class="home-discord-promo__actions home-discord-promo__actions--home home-discord-promo__flash-actions">' +
+          '<a href="' + BSV_DISCORD_INVITE_URL + '" target="_blank" rel="noopener noreferrer" class="home-discord-promo__btn home-discord-promo__btn--primary home-discord-promo__btn--flash-join">' +
+            escapeHtml(i18n("discord.card.joinNow")) + ' <span aria-hidden="true">→</span>' +
+          "</a>" +
+          '<a href="blockspin-discord.html" class="home-discord-promo__btn home-discord-promo__btn--secondary">' + escapeHtml(i18n("discord.card.learnMore")) + "</a>" +
+        "</div>" +
+      "</div>" +
+    "</div>"
   );
 }
 
@@ -251,11 +422,182 @@ function buildCardsHtmlWithDiscordPromo(items, cardBuilder, sectionTitle, minIte
 
 function mountHomeDiscordPromo() {
   var slot = document.getElementById("home-discord-promo-slot");
-  if (slot) slot.outerHTML = buildDiscordPromoBannerHtml(false);
+  if (!slot) return;
+  slot.outerHTML =
+    '<div class="home-hero-row">' +
+      '<div class="home-hero-row__banner">' +
+        '<div class="home-discord-promo-slot">' +
+          buildDiscordPromoBannerHtml(false) +
+        "</div>" +
+      "</div>" +
+      '<div class="home-hero-row__stats" id="home-site-stats-slot"></div>' +
+    "</div>";
+  mountHomeSiteStats();
+}
+
+function mountHomeSiteStats() {
+  var slot = document.getElementById("home-site-stats-slot");
+  if (slot) slot.innerHTML = buildHomeSiteStatsHtml("home-site-stats--beside");
+}
+
+var HOME_SITE_STATS_ICONS = {
+  items:
+    '<svg class="home-site-stats__icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/>' +
+    '</svg>',
+  online:
+    '<svg class="home-site-stats__icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">' +
+      '<rect x="2" y="14" width="3" height="6" rx="0.75"/><rect x="7" y="10" width="3" height="10" rx="0.75"/><rect x="12" y="6" width="3" height="14" rx="0.75"/><rect x="17" y="2" width="3" height="18" rx="0.75"/>' +
+    '</svg>'
+};
+
+function buildHomeSiteStatsHtml(extraClass) {
+  var statsClass = "home-site-stats" + (extraClass ? " " + extraClass : "");
+  return (
+    '<aside class="' + statsClass + '" aria-label="' + escapeHtml(i18n("home.stats.aria")) + '">' +
+      '<div class="home-site-stats__item">' +
+        '<span class="home-site-stats__value" data-home-stat="items">0</span>' +
+        '<span class="home-site-stats__label">' +
+          '<span class="home-site-stats__icon">' + HOME_SITE_STATS_ICONS.items + '</span>' +
+          escapeHtml(i18n("home.stats.itemsTracked")) +
+        '</span>' +
+      '</div>' +
+      '<div class="home-site-stats__item">' +
+        '<span class="home-site-stats__value" data-home-stat="online">0</span>' +
+        '<span class="home-site-stats__label">' +
+          '<span class="home-site-stats__icon">' + HOME_SITE_STATS_ICONS.online + '</span>' +
+          escapeHtml(i18n("home.stats.onlineMembers")) +
+        '</span>' +
+      '</div>' +
+    '</aside>'
+  );
+}
+
+var homeStatAnimFrames = {};
+
+function setHomeStatValue(key, value, animate) {
+  if (typeof value !== "number" || isNaN(value)) return;
+  if (animate) {
+    animateHomeStatValue(key, value);
+    return;
+  }
+  document.querySelectorAll('[data-home-stat="' + key + '"]').forEach(function (el) {
+    el.textContent = value.toLocaleString();
+  });
+}
+
+function animateHomeStatValue(key, targetValue, durationMs) {
+  if (typeof targetValue !== "number" || isNaN(targetValue)) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    setHomeStatValue(key, targetValue, false);
+    return;
+  }
+
+  durationMs = durationMs == null ? 1400 : durationMs;
+  if (homeStatAnimFrames[key]) {
+    cancelAnimationFrame(homeStatAnimFrames[key]);
+    homeStatAnimFrames[key] = null;
+  }
+
+  var els = document.querySelectorAll('[data-home-stat="' + key + '"]');
+  if (!els.length) return;
+
+  var start = performance.now();
+  function frame(now) {
+    var progress = Math.min(1, (now - start) / durationMs);
+    var eased = 1 - Math.pow(1 - progress, 3);
+    var current = Math.round(targetValue * eased);
+    els.forEach(function (el) {
+      el.textContent = current.toLocaleString();
+    });
+    if (progress < 1) {
+      homeStatAnimFrames[key] = requestAnimationFrame(frame);
+    } else {
+      homeStatAnimFrames[key] = null;
+      els.forEach(function (el) {
+        el.textContent = targetValue.toLocaleString();
+      });
+    }
+  }
+  homeStatAnimFrames[key] = requestAnimationFrame(frame);
+}
+
+function filterValueChangeRows(rows) {
+  if (!rows || !rows.length) return [];
+  return rows.filter(function (r) {
+    var name = (r.Title || r.Name || "").toString().trim();
+    if (name === "Anaconda GW" || name === "Firework GW") return false;
+    var t = (r.Title || r.Date || r.Text || "").toString().trim();
+    return t.length > 0;
+  });
+}
+
+function countNamedSheetItems(items) {
+  return (items || []).reduce(function (total, item) {
+    var name = item && (item.Name || item["Name"]);
+    return name && String(name).trim() ? total + 1 : total;
+  }, 0);
+}
+
+function countUntradableItemsFromResults(results) {
+  var match = (results || []).find(function (result) {
+    return result.section === ACCESSORIES_SECTION_NAME;
+  });
+  return countNamedSheetItems(match && match.items);
+}
+
+function countTrackedItemsFromResults(results) {
+  var total = 0;
+  var untradableCounted = false;
+  (results || []).forEach(function (result) {
+    var cfg = typeof getSectionConfig === "function" ? getSectionConfig(result.section) : null;
+    if (cfg) {
+      if (cfg.dataSource !== "sheet") return;
+    } else if (result.section === "Home" || result.section === "\uD83D\uDCB0 Richest Players") {
+      return;
+    }
+    if (result.section === ACCESSORIES_SECTION_NAME) {
+      untradableCounted = true;
+    }
+    total += countNamedSheetItems(result.items);
+  });
+  if (!untradableCounted) {
+    total += countUntradableItemsFromResults(results);
+  }
+  return total;
+}
+
+function countGuideSheetItems(items, nameKeys) {
+  return (items || []).filter(function (item) {
+    return guideField(item, nameKeys).length > 0;
+  }).length;
+}
+
+async function countGuideTrackedItems() {
+  const [fishingItemsResult, fishingTypesResult, farmingResult] = await Promise.all([
+    fetchGuideSheetWithAliases(MONEY_GUIDE_SHEETS.fishingItems, "items"),
+    fetchGuideSheetWithAliases(MONEY_GUIDE_SHEETS.fishingTypes, "types"),
+    fetchGuideSheetWithAliases(MONEY_GUIDE_SHEETS.farming, "farming")
+  ]);
+  return (
+    countGuideSheetItems(fishingItemsResult.items, ["Fishing Name", "Fishing Item", "Name", "Item Name"]) +
+    countGuideSheetItems(fishingTypesResult.items, ["Fishing Item Name", "Item Name", "Name"]) +
+    countGuideSheetItems(farmingResult.items, ["Farming Item", "Name", "Item Name"])
+  );
+}
+
+async function updateHomeSiteStatsFromResults(results) {
+  var total = countTrackedItemsFromResults(results);
+  try {
+    total += await countGuideTrackedItems();
+  } catch (err) {
+    console.warn("Failed to load guide item counts for home stats:", err);
+  }
+  setHomeStatValue("items", total, true);
 }
 
 function buildRobuxGiveawayBannerHtml(bannerId) {
-  return buildRotatingGiveawayCarouselHtml(bannerId);
+  return "";
 }
 
 function initAnalytics() {
@@ -381,63 +723,114 @@ function getRankSize(rank) {
   return 'rank-default';
 }
 
+function getRichestPlayerFields(player, index) {
+  const rank = index + 1;
+  const playerName = player["Roblox Username"] || player["Player Name"] || player.Name || "Unknown";
+  return {
+    rank: rank,
+    rankColor: getRankColor(rank),
+    rankSize: getRankSize(rank),
+    rankClass: String(rank).length >= 3 ? "rank-long" : "",
+    playerName: playerName,
+    level: player["Level"] || "N/A",
+    worth: formatNetWorth(player["Networth"] || player["Net Worth"] || 0),
+    profileUrl: "https://www.roblox.com/search/users?keyword=" + encodeURIComponent(playerName)
+  };
+}
+
+function buildRichestPlayerCard(player, index) {
+  const p = getRichestPlayerFields(player, index);
+  return (
+    '<div class="richest-card richest-card--gold ' +
+    p.rankSize +
+    '" style="border-color: ' +
+    p.rankColor +
+    ';" data-player-name="' +
+    escapeAttr(p.playerName) +
+    '" data-rank="' +
+    p.rank +
+    '">' +
+    '<div class="rank-badge ' +
+    p.rankClass +
+    '" style="background: ' +
+    p.rankColor +
+    ';">#' +
+    p.rank +
+    "</div>" +
+    '<div class="player-info">' +
+    '<div class="player-name">' +
+    escapeHtml(p.playerName) +
+    "</div>" +
+    '<div class="player-level"><span class="player-level-label">' + escapeHtml(i18n("richest.level") + ": ") + '</span><span class="player-level-value">' +
+    escapeHtml(p.level) +
+    "</span></div>" +
+    '<div class="player-worth"><span class="player-worth-label">' + escapeHtml(i18n("richest.netWorth") + ": ") + '</span>' +
+    escapeHtml(p.worth) +
+    "</div>" +
+    '<a href="' +
+    escapeAttr(p.profileUrl) +
+    '" target="_blank" rel="noopener" class="profile-link">' + escapeHtml(i18n("richest.viewProfile")) + '</a>' +
+    "</div></div>"
+  );
+}
+
+function buildRichestCardsContainer(data) {
+  return (
+    '<div class="richest-container richest-container--gold">' +
+    data.map(function (player, index) {
+      return buildRichestPlayerCard(player, index);
+    }).join("") +
+    "</div>"
+  );
+}
+
+function buildRichestNotListedFooterHtml() {
+  return (
+    '<p class="richest-not-listed">' +
+    escapeHtml(i18n("richest.notListedPrompt")) +
+    ' <a href="x-richest-not-listed.html" class="richest-not-listed__link">' +
+    escapeHtml(i18n("richest.notListedLink")) +
+    "</a></p>"
+  );
+}
+
 function createRichestPlayersSection(data) {
+  const notListedLink = buildRichestNotListedFooterHtml();
+
   if (!data || data.length === 0) {
-    return '<p style="text-align: center; color: #888;">No leaderboard data available.</p>';
+    return (
+      '<div class="richest-players-header">' +
+      "<h2>" + escapeHtml(i18n("richest.title")) + "</h2>" +
+      '<p class="richest-intro">' + escapeHtml(i18n("richest.intro")) + "</p>" +
+      notListedLink +
+      "</div>" +
+      '<p style="text-align: center; color: #888;">' +
+      escapeHtml(i18n("richest.noData")) +
+      "</p>"
+    );
   }
 
-  const intro = `
-    <div class="richest-players-header">
-      <h2>Top 1,000 Richest Players in BlockSpin</h2>
-      <p class="richest-intro">The Official BlockSpin leaderboard showing the wealthiest players ranked by the total value of their in-game assets. Rankings go to #1000 and update hourly. To appear, verify yourself in the official BlockSpin Discord server.</p>
-      <input 
-        type="text" 
-        class="richest-search" 
-        id="richest-search-input"
-        placeholder="🔍 Search players by username..."
-      />
-    </div>
-  `;
-
-  const cards = data.map((player, index) => {
-    const rank = index + 1;
-    const rankColor = getRankColor(rank);
-    const formattedWorth = formatNetWorth(player['Networth'] || player['Net Worth'] || 0);
-    const playerName = player['Roblox Username'] || player['Player Name'] || player.Name || 'Unknown';
-    const level = player['Level'] || 'N/A';
-    const rankClass = ("" + rank).length >= 3 ? "rank-long" : "";
-    
-    const robloxSearchUrl = `https://www.roblox.com/search/users?keyword=${encodeURIComponent(playerName)}`;
-
-    return `
-      <div class="richest-card ${getRankSize(rank)}" style="border-color: ${rankColor};" data-player-name="${playerName}">
-        <div class="rank-badge ${rankClass}" style="background: ${rankColor};">
-          #${rank}
-        </div>
-        <div class="player-info">
-          <div class="player-name">${playerName}</div>
-          <div class="player-level"><span style="color: #fff; font-size: 0.9em;">Level: </span><span style="color: #33cce6; font-weight: bold;">${level}</span></div>
-          <div class="player-worth"><span style="color: #fff; font-size: 0.9em;">Net Worth: </span>${formattedWorth}</div>
-          <a href="${robloxSearchUrl}" target="_blank" rel="noopener" class="profile-link">View Profile 🔗</a>
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  return intro + '<div class="richest-container">' + cards + '</div>';
+  return (
+    '<div class="richest-players-header">' +
+    "<h2>" + escapeHtml(i18n("richest.title")) + "</h2>" +
+    '<p class="richest-intro">' + escapeHtml(i18n("richest.intro")) + "</p>" +
+    notListedLink +
+    '<input type="text" class="richest-search" id="richest-search-input" placeholder="' + escapeAttr(i18n("richest.search")) + '" />' +
+    "</div>" +
+    buildRichestCardsContainer(data)
+  );
 }
 
 function filterRichestPlayers(query) {
   const searchTerm = query.toLowerCase().trim();
-  const cards = document.querySelectorAll('.richest-card');
-  
-  cards.forEach(card => {
-    const playerName = (card.dataset.playerName || '').toLowerCase();
-    if (playerName.includes(searchTerm)) {
-      card.style.setProperty('display', 'flex', 'important');
-    } else {
-      card.style.setProperty('display', 'none', 'important');
-    }
+  const showAll = searchTerm.length === 0;
+  const section = document.querySelector(".richest-players-section");
+  if (!section) return;
+
+  section.querySelectorAll(".richest-card").forEach(function (card) {
+    const playerName = (card.dataset.playerName || "").toLowerCase();
+    const match = showAll || playerName.includes(searchTerm);
+    card.style.setProperty("display", match ? "flex" : "none", "important");
   });
 }
 
@@ -518,6 +911,16 @@ async function fetchRichestPlayers() {
   }
 }
 
+function buildCardSaveButtonHtml() {
+  return (
+    '<button type="button" class="card-save-btn" aria-label="' + escapeAttr(i18n("savedCards.saveAria")) + '" title="' + escapeAttr(i18n("savedCards.saveTitle")) + '" aria-pressed="false">' +
+      '<svg class="card-save-btn__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+        '<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>' +
+      "</svg>" +
+    "</button>"
+  );
+}
+
 function createCard(item) {
   const name = safe(item["Name"]);
   const img = safe(item["Image URL"]);
@@ -564,7 +967,7 @@ function createCard(item) {
     
     durabilityHTML = `
       <div class="durability-control" ${invisibleStyle}>
-        <label>Durability:</label>
+        <label>${escapeHtml(i18n("card.durability"))}:</label>
         <div class="durability-input-row">
           <input type="number" class="durability-input" 
                  value="${currentDurability}" 
@@ -609,36 +1012,44 @@ if (showPawn) {
 }
   
   const hasGiveaway = giveawayFlag && giveawayFlag.toString().trim().toLowerCase() === 'yes';
+  const sectionLabel = safe(item.__sheet || "Unknown");
   
   return `
     <div class="card" data-name="${escapeAttr(name)}" 
+         data-section="${escapeAttr(sectionLabel)}"
+         data-image-url="${escapeAttr(img)}"
+         data-demand="${escapeAttr(demand)}"
+         data-durability="${escapeAttr(durability)}"
+         data-card-type="weapon"
+         data-save-card
          data-avg="${escapeAttr(avg)}" 
          data-ranged="${escapeAttr(ranged)}" 
          data-max-durability="${durability ? durability.split('/')[1] : '100'}"
          data-internal-value="${escapeAttr(internalValueForAttr)}">
       <div class="card-left">
-        ${imgTag}
+        ${imgTag ? `<div class="card-item-image-wrap">${imgTag}</div>` : ""}
         ${durabilityHTML}
       </div>
       <div class="card-info">
         <h3>${name}</h3>
-        ${demand ? `<span class="badge">Demand: ${demand}</span>` : ""}
-        <div class="card-avg">Average Value: <span class="avg-value">${avg}</span></div>
-        <div class="card-ranged">Ranged Value: <span class="ranged-value">${ranged}</span></div>
+        ${demand ? `<span class="badge">${escapeHtml(i18n("card.demand"))}: ${escapeHtml(demand)}</span>` : ""}
+        <div class="card-avg">${escapeHtml(i18n("card.avg"))}: <span class="avg-value">${avg}</span></div>
+        <div class="card-ranged">${escapeHtml(i18n("card.ranged"))}: <span class="ranged-value">${ranged}</span></div>
         <div class="card-value-separator"></div>
         <div class="card-secondary-values">
-          ${showNetworth ? `<div class="card-networth">Networth Value: <span class="networth-value">${escapeHtml(String(networthDisplay))}</span></div>` : ""}
-          ${showPawn ? `<div class="card-pawn">Pawn Amount: <span class="pawn-value">${pawnAmount}</span></div>` : ''}
+          ${showNetworth ? `<div class="card-networth">${escapeHtml(i18n("card.networth"))}: <span class="networth-value">${escapeHtml(String(networthDisplay))}</span></div>` : ""}
+          ${showPawn ? `<div class="card-pawn">${escapeHtml(i18n("card.pawn"))}: <span class="pawn-value">${pawnAmount}</span></div>` : ''}
           ${showRepair ? `
             <div class="card-repair">
-              Repair Price: <span class="repair-value">$${repairPrice.toLocaleString()}</span>
+              ${escapeHtml(i18n("card.repair"))}: <span class="repair-value">$${repairPrice.toLocaleString()}</span>
             </div>
           ` : ''}
         </div>
       </div>
       ${hasGiveaway ? `
-        <button class="card-giveaway-trigger" type="button" aria-label="This item has an active giveaway" data-item-name="${escapeAttr(name)}"></button>
+        <button class="card-giveaway-trigger" type="button" aria-label="${escapeAttr(i18n("card.giveawayAria"))}" data-item-name="${escapeAttr(name)}"></button>
       ` : ''}
+      ${buildCardSaveButtonHtml()}
     </div>
   `;
 }
@@ -651,13 +1062,13 @@ function ensureGiveawayModal() {
   modal.innerHTML = `
     <div class="giveaway-modal-backdrop" data-giveaway-close></div>
     <div class="giveaway-modal-content">
-      <button class="giveaway-modal-close" type="button" aria-label="Close giveaway info" data-giveaway-close>&times;</button>
-      <h2 class="giveaway-modal-title">Giveaway Active!</h2>
+      <button class="giveaway-modal-close" type="button" aria-label="${escapeAttr(i18n("giveaway.close"))}" data-giveaway-close>&times;</button>
+      <h2 class="giveaway-modal-title">${escapeHtml(i18n("giveaway.modalTitle"))}</h2>
       <p class="giveaway-modal-text">
-        We are currently doing a giveaway for this item in our Discord server, Join Now!
+        ${escapeHtml(i18n("giveaway.modalBody"))}
       </p>
       <a href="https://discord.gg/QbapryYUUx" target="_blank" rel="noopener" class="giveaway-modal-button">
-        Enter this Giveaway
+        ${escapeHtml(i18n("giveaway.modalBtn"))}
       </a>
     </div>
   `;
@@ -678,8 +1089,8 @@ function createCrewLogoCard(item) {
         <h3>${name}</h3>
         ${imgTag}
         <div class="crew-id-container">
-          <div class="crew-id">ID: ${id}</div>
-          <button class="copy-btn" onclick="copyToClipboard('${escapeAttr(id)}')" title="Copy ID">📋</button>
+          <div class="crew-id">${escapeHtml(i18n("card.id"))}: ${id}</div>
+          <button class="copy-btn" onclick="copyToClipboard('${escapeAttr(id)}')" title="${escapeAttr(i18n("card.copyId"))}">📋</button>
         </div>
       </div>
     </div>
@@ -756,17 +1167,28 @@ function createAccessoryCard(item) {
     : "";
 
   return `
-    <div class="card accessory-item-card" data-name="${escapeAttr(name)}">
+    <div class="card" data-name="${escapeAttr(name)}"
+         data-section="${escapeAttr(safe(item.__sheet || "Accessories"))}"
+         data-image-url="${escapeAttr(img)}"
+         data-rarity="${escapeAttr(rarity)}"
+         data-crate="${escapeAttr(crate)}"
+         data-networth="${escapeAttr(networthDisplay)}"
+         data-card-type="accessory"
+         data-save-card>
       <div class="card-left">
-        ${imgTag}
+        ${imgTag ? `<div class="card-item-image-wrap">${imgTag}</div>` : ""}
       </div>
       <div class="card-info">
         <h3>${escapeHtml(name)}</h3>
         ${rarity ? `<span class="badge accessory-rarity-badge ${rarityClass}">${escapeHtml(rarity)}</span>` : ""}
-        <div class="card-networth"><span class="accessory-label">Networth Value:</span> <span class="networth-value">${escapeHtml(networthDisplay)}</span></div>
-        <div class="card-pawn"><span class="accessory-label">Pawn Value:</span> <span class="pawn-value">${escapeHtml(pawnDisplay)}</span></div>
-        <div class="card-ranged"><span class="accessory-label">Crate:</span> <span>${escapeHtml(crate || "N/A")}</span></div>
+        <div class="card-value-separator"></div>
+        <div class="card-secondary-values">
+          <div class="card-networth">${escapeHtml(i18n("card.networth"))}: <span class="networth-value">${escapeHtml(networthDisplay)}</span></div>
+          <div class="card-pawn">${escapeHtml(i18n("card.pawnValue"))}: <span class="pawn-value">${escapeHtml(pawnDisplay)}</span></div>
+          <div class="card-ranged">${escapeHtml(i18n("card.crate"))}: <span>${escapeHtml(crate || i18n("card.na"))}</span></div>
+        </div>
       </div>
+      ${buildCardSaveButtonHtml()}
     </div>
   `;
 }
@@ -970,16 +1392,16 @@ function createGuideItemCard(item, config) {
   const description = guideField(item, config.descriptionKeys);
   const price = guideField(item, config.priceKeys);
   const imageHtml = imageUrl
-    ? `<img src="${escapeAttr(imageUrl)}" alt="${escapeAttr(name)}" loading="lazy" onerror="this.style.display='none'">`
+    ? `<div class="card-item-image-wrap"><img src="${escapeAttr(imageUrl)}" alt="${escapeAttr(name)}" loading="lazy" onerror="this.style.display='none'"></div>`
     : "";
 
   return `
-    <div class="card guide-vcard guide-item-card">
+    <div class="card guide-vcard guide-item-card" data-name="${escapeAttr(name)}">
       <h3 class="guide-vcard__name">${escapeHtml(name)}</h3>
       <div class="guide-vcard__image">${imageHtml}</div>
       <div class="guide-vcard__price">
-        <span class="guide-vcard__label">Price</span>
-        <span class="guide-vcard__value">${escapeHtml(price || "N/A")}</span>
+        <span class="guide-vcard__label">${escapeHtml(i18n("card.price"))}</span>
+        <span class="guide-vcard__value">${escapeHtml(price || i18n("card.na"))}</span>
       </div>
       ${description ? `<p class="guide-vcard__desc">${escapeHtml(description)}</p>` : ""}
     </div>
@@ -1016,16 +1438,16 @@ function createFishingTypeCard(item) {
   const initialBlockSpinPrice = calculateFishBlockSpinPrice(sellAmount, initialWeight);
   const rarityClass = getGuideRarityClass(rarity);
   const imageHtml = imageUrl
-    ? `<img src="${escapeAttr(imageUrl)}" alt="${escapeAttr(name)}" onerror="this.style.display='none'">`
+    ? `<div class="card-item-image-wrap"><img src="${escapeAttr(imageUrl)}" alt="${escapeAttr(name)}" onerror="this.style.display='none'"></div>`
     : "";
 
   return `
-    <div class="card guide-vcard guide-fish-card fishing-fish-card" data-sell-amount="${escapeAttr(String(sellAmount))}">
+    <div class="card guide-vcard guide-fish-card fishing-fish-card" data-name="${escapeAttr(name)}">
       <h3 class="guide-vcard__name">${escapeHtml(name)}</h3>
       <div class="guide-vcard__image">${imageHtml}</div>
       ${rarity ? `<span class="guide-vcard__rarity ${rarityClass}">${escapeHtml(rarity)}</span>` : ""}
       <div class="guide-vcard__weight fish-weight-control">
-        <label class="guide-vcard__label">Weight</label>
+        <label class="guide-vcard__label">${escapeHtml(i18n("card.weight"))}</label>
         <div class="fish-weight-input-row">
           <input
             type="number"
@@ -1039,18 +1461,18 @@ function createFishingTypeCard(item) {
           />
           <span class="fish-weight-max">/${FISH_WEIGHT_MAX}</span>
           <div class="fish-weight-arrows">
-            <button type="button" aria-label="Increase weight" onmousedown="adjustFishWeight(this, 1, event)" ontouchstart="adjustFishWeight(this, 1, event)">▲</button>
-            <button type="button" aria-label="Decrease weight" onmousedown="adjustFishWeight(this, -1, event)" ontouchstart="adjustFishWeight(this, -1, event)">▼</button>
+            <button type="button" aria-label="${escapeAttr(i18n("card.increaseWeight"))}" onmousedown="adjustFishWeight(this, 1, event)" ontouchstart="adjustFishWeight(this, 1, event)">▲</button>
+            <button type="button" aria-label="${escapeAttr(i18n("card.decreaseWeight"))}" onmousedown="adjustFishWeight(this, -1, event)" ontouchstart="adjustFishWeight(this, -1, event)">▼</button>
           </div>
         </div>
       </div>
       <div class="guide-vcard__divider" aria-hidden="true"></div>
       <div class="guide-vcard__stat">
-        <span class="guide-vcard__label">Sell Amount</span>
+        <span class="guide-vcard__label">${escapeHtml(i18n("card.sellAmount"))}</span>
         <span class="guide-vcard__value guide-vcard__value--sell fish-sell-value">${formatMoney(initialPrice)}</span>
       </div>
       <div class="guide-vcard__stat guide-vcard__stat--blockspin">
-        <span class="guide-vcard__label">Sell Amount (BlockSpin+)</span>
+        <span class="guide-vcard__label">${escapeHtml(i18n("card.sellBlockSpin"))}</span>
         <span class="guide-vcard__value guide-vcard__value--blockspin fish-blockspin-value">${formatMoney(initialBlockSpinPrice)}</span>
       </div>
     </div>
@@ -1063,20 +1485,20 @@ function buildFishingGuideHtml(fishingItems, fishingTypes) {
 
   return `
     <div class="fishing-guide-wrap">
-      <h3 class="fishing-guide-title">Fishing</h3>
-      <h4 class="fishing-mini-header">Items</h4>
-      <div class="guide-vcards-grid fishing-items-cards">${itemCards || '<p class="fishing-empty">No fishing items yet.</p>'}</div>
-      <h4 class="fishing-mini-header">Types of Fishes</h4>
-      <div class="guide-vcards-grid fishing-types-cards">${typeCards || '<p class="fishing-empty">No fish types yet.</p>'}</div>
+      <h3 class="fishing-guide-title">${escapeHtml(i18n("guide.fishing"))}</h3>
+      <h4 class="fishing-mini-header">${escapeHtml(i18n("guide.items"))}</h4>
+      <div class="guide-vcards-grid fishing-items-cards">${itemCards || '<p class="fishing-empty">' + escapeHtml(i18n("guide.noFishingItems")) + '</p>'}</div>
+      <h4 class="fishing-mini-header">${escapeHtml(i18n("guide.fishTypes"))}</h4>
+      <div class="guide-vcards-grid fishing-types-cards">${typeCards || '<p class="fishing-empty">' + escapeHtml(i18n("guide.noFishTypes")) + '</p>'}</div>
     </div>
   `;
 }
 
 async function loadFarmingGuidePanel() {
   const farmingPanel = document.getElementById("money-guide-farming");
-  if (!farmingPanel || farmingPanel.dataset.loaded === "1") return;
+  if (!farmingPanel || farmingPanel.dataset.loaded === "1") return Promise.resolve();
 
-  farmingPanel.innerHTML = '<p class="guide-empty">Loading farming guide...</p>';
+  farmingPanel.innerHTML = '<p class="guide-empty">' + escapeHtml(i18n("guide.loadingFarming")) + '</p>';
   try {
     const result = await fetchGuideSheetWithAliases(MONEY_GUIDE_SHEETS.farming, "farming");
     let warningHtml = "";
@@ -1091,7 +1513,7 @@ async function loadFarmingGuidePanel() {
     farmingPanel.dataset.loaded = "1";
   } catch (error) {
     console.error("Failed to load farming guide data:", error);
-    farmingPanel.innerHTML = '<p class="guide-empty">Failed to load farming guide.</p>';
+    farmingPanel.innerHTML = '<p class="guide-empty">' + escapeHtml(i18n("guide.failedFarming")) + '</p>';
   }
 }
 
@@ -1115,10 +1537,12 @@ function farmingPotThemeClass(pot) {
   return "";
 }
 
-function buildFarmingSelectOptions(options, placeholder) {
+function buildFarmingSelectOptions(options, placeholderKey) {
+  var placeholder = i18n(placeholderKey);
   var opts = '<option value="">' + escapeHtml(placeholder) + "</option>";
   options.forEach(function (opt) {
-    opts += '<option value="' + escapeAttr(opt) + '">' + escapeHtml(opt) + "</option>";
+    var label = window.bsvI18n && window.bsvI18n.tFarmingOption ? window.bsvI18n.tFarmingOption(opt) : opt;
+    opts += '<option value="' + escapeAttr(opt) + '">' + escapeHtml(label) + "</option>";
   });
   return opts;
 }
@@ -1130,49 +1554,59 @@ function buildFarmingPlotPlannerHtml() {
       <article class="farming-plot" data-plot-index="${i}">
         <div class="farming-plot__shell">
           <header class="farming-plot__header">
-            <span class="farming-plot__label">Pot ${i + 1}</span>
+            <span class="farming-plot__label">${escapeHtml(i18n("guide.potN", { n: i + 1 }))}</span>
+            <button type="button" class="farming-plot__reset" aria-label="${escapeAttr(i18n("guide.resetPotAria", { n: i + 1 }))}">${escapeHtml(i18n("guide.resetPot"))}</button>
           </header>
           <div class="farming-plot__pickers">
             <label class="farming-plot__field">
-              <span class="farming-plot__field-name">Pot</span>
-              <select class="farming-plot__select farming-plot__pot" aria-label="Pot ${i + 1} type">
-                ${buildFarmingSelectOptions(FARMING_POT_OPTIONS, "Choose pot")}
+              <span class="farming-plot__field-name">${escapeHtml(i18n("guide.pot"))}</span>
+              <select class="farming-plot__select farming-plot__pot" aria-label="${escapeAttr(i18n("guide.potN", { n: i + 1 }))}">
+                ${buildFarmingSelectOptions(FARMING_POT_OPTIONS, "guide.choosePot")}
               </select>
             </label>
             <label class="farming-plot__field">
-              <span class="farming-plot__field-name">Soil</span>
-              <select class="farming-plot__select farming-plot__soil" aria-label="Pot ${i + 1} soil">
-                ${buildFarmingSelectOptions(FARMING_SOIL_OPTIONS, "Choose soil")}
+              <span class="farming-plot__field-name">${escapeHtml(i18n("guide.soil"))}</span>
+              <select class="farming-plot__select farming-plot__soil" aria-label="${escapeAttr(i18n("guide.potN", { n: i + 1 }))}">
+                ${buildFarmingSelectOptions(FARMING_SOIL_OPTIONS, "guide.chooseSoil")}
               </select>
             </label>
             <label class="farming-plot__field">
-              <span class="farming-plot__field-name">Seed</span>
-              <select class="farming-plot__select farming-plot__seed" aria-label="Pot ${i + 1} seed">
-                ${buildFarmingSelectOptions(FARMING_SEED_OPTIONS, "Choose seed")}
+              <span class="farming-plot__field-name">${escapeHtml(i18n("guide.seed"))}</span>
+              <select class="farming-plot__select farming-plot__seed" aria-label="${escapeAttr(i18n("guide.potN", { n: i + 1 }))}">
+                ${buildFarmingSelectOptions(FARMING_SEED_OPTIONS, "guide.chooseSeed")}
               </select>
             </label>
           </div>
           <div class="farming-plot__result" hidden>
-            <p class="farming-plot__time"><span class="farming-plot__result-label">Grow time:</span> <strong class="farming-plot__time-value"></strong></p>
-            <p class="farming-plot__money"><span class="farming-plot__result-label">Payout:</span> <strong class="farming-plot__money-value"></strong></p>
-            <p class="farming-plot__money-plus"><span class="farming-plot__result-label">BlockSpin Plus Payout:</span> <strong class="farming-plot__money-plus-value"></strong></p>
+            <p class="farming-plot__time"><span class="farming-plot__result-label">${escapeHtml(i18n("guide.growTime"))}</span> <strong class="farming-plot__time-value"></strong></p>
+            <p class="farming-plot__money"><span class="farming-plot__result-label">${escapeHtml(i18n("guide.payout"))}</span> <strong class="farming-plot__money-value"></strong></p>
+            <p class="farming-plot__money-plus"><span class="farming-plot__result-label">${escapeHtml(i18n("guide.payoutPlus"))}</span> <strong class="farming-plot__money-plus-value"></strong></p>
           </div>
-          <p class="farming-plot__hint">Select pot, soil, and seed to see grow time and payout.</p>
+          <p class="farming-plot__hint">${escapeHtml(i18n("guide.plotHint"))}</p>
         </div>
       </article>`);
   }
 
   return `
-    <section class="farming-planner farming-planner--cartoon" aria-label="Farming plot planner">
-      <h4 class="guide-mini-header farming-planner__title">Plant Planner</h4>
-      <p class="farming-planner__intro">Use our Plant Planning Tool to calculate how much cash any planting setup will earn and how long it will take before you invest your money in-game.</p>
+    <section class="farming-planner" aria-label="${escapeAttr(i18n("guide.plannerAria"))}">
+      <h4 class="guide-mini-header farming-planner__title">${escapeHtml(i18n("guide.plantPlanner"))}</h4>
+      <p class="farming-planner__intro">${escapeHtml(i18n("guide.plantIntro"))}</p>
       <div class="farming-plots-grid">${plots.join("")}</div>
       <div class="farming-planner-summary" hidden>
-        <h5 class="farming-planner-summary__title">All plots combined</h5>
-        <p class="farming-planner-summary__row"><span>Total payout:</span> <strong class="farming-planner-summary__money"></strong></p>
-        <p class="farming-planner-summary__row"><span>BlockSpin Plus total:</span> <strong class="farming-planner-summary__money-plus"></strong></p>
+        <h5 class="farming-planner-summary__title">${escapeHtml(i18n("guide.allPlots"))}</h5>
+        <p class="farming-planner-summary__row"><span>${escapeHtml(i18n("guide.totalPayout"))}</span> <strong class="farming-planner-summary__money"></strong></p>
+        <p class="farming-planner-summary__row"><span>${escapeHtml(i18n("guide.totalPlus"))}</span> <strong class="farming-planner-summary__money-plus"></strong></p>
       </div>
     </section>`;
+}
+
+function resetFarmingPlot(plotEl, plannerRoot) {
+  if (!plotEl) return;
+  plotEl.querySelectorAll(".farming-plot__select").forEach(function (select) {
+    select.value = "";
+  });
+  updateFarmingPlot(plotEl);
+  updateFarmingPlannerSummary(plannerRoot);
 }
 
 function updateFarmingPlot(plotEl) {
@@ -1200,7 +1634,7 @@ function updateFarmingPlot(plotEl) {
     return;
   }
 
-  resultEl.querySelector(".farming-plot__time-value").textContent = combo.time;
+  resultEl.querySelector(".farming-plot__time-value").textContent = window.bsvI18n ? window.bsvI18n.tTime(combo.time) : combo.time;
   resultEl.querySelector(".farming-plot__money-value").textContent = formatFarmingMoney(combo.money);
   resultEl.querySelector(".farming-plot__money-plus-value").textContent = formatFarmingMoney(combo.moneyPlus);
   resultEl.hidden = false;
@@ -1250,6 +1684,12 @@ function initFarmingPlotPlanner(root) {
         updateFarmingPlannerSummary(root);
       });
     });
+    var resetBtn = plot.querySelector(".farming-plot__reset");
+    if (resetBtn) {
+      resetBtn.addEventListener("click", function () {
+        resetFarmingPlot(plot, root);
+      });
+    }
   });
 }
 
@@ -1257,9 +1697,9 @@ function buildFarmingGuideHtml(farmingItems) {
   const itemCards = (farmingItems || []).map(createFarmingItemCard).filter(Boolean).join("");
   return `
     <div class="farming-guide-wrap">
-      <h3 class="farming-guide-title">Farming</h3>
-      <h4 class="guide-mini-header">Items</h4>
-      <div class="guide-vcards-grid farming-items-cards">${itemCards || '<p class="guide-empty">No farming items yet.</p>'}</div>
+      <h3 class="farming-guide-title">${escapeHtml(i18n("guide.farming"))}</h3>
+      <h4 class="guide-mini-header">${escapeHtml(i18n("guide.items"))}</h4>
+      <div class="guide-vcards-grid farming-items-cards">${itemCards || '<p class="guide-empty">' + escapeHtml(i18n("guide.noFarmingItems")) + '</p>'}</div>
       ${buildFarmingPlotPlannerHtml()}
     </div>
   `;
@@ -1267,9 +1707,9 @@ function buildFarmingGuideHtml(farmingItems) {
 
 async function loadFishingGuidePanel() {
   const fishingPanel = document.getElementById("money-guide-fishing");
-  if (!fishingPanel || fishingPanel.dataset.loaded === "1") return;
+  if (!fishingPanel || fishingPanel.dataset.loaded === "1") return Promise.resolve();
 
-  fishingPanel.innerHTML = '<p class="fishing-empty">Loading fishing guide...</p>';
+  fishingPanel.innerHTML = '<p class="fishing-empty">' + escapeHtml(i18n("guide.loadingFishing")) + '</p>';
   try {
     const [itemsResult, typesResult] = await Promise.all([
       fetchGuideSheetWithAliases(MONEY_GUIDE_SHEETS.fishingItems, "items"),
@@ -1299,7 +1739,7 @@ async function loadFishingGuidePanel() {
     fishingPanel.querySelectorAll(".fish-weight-input").forEach(updateFishCardPrice);
   } catch (error) {
     console.error("Failed to load fishing guide data:", error);
-    fishingPanel.innerHTML = '<p class="fishing-empty">Failed to load fishing guide.</p>';
+    fishingPanel.innerHTML = '<p class="fishing-empty">' + escapeHtml(i18n("guide.failedFishing")) + '</p>';
   }
 }
 
@@ -1364,119 +1804,66 @@ function updateFishCardPrice(input) {
   }
 }
 
-const QUEST_GUIDE_DATA = {
-  intro: "Quests are an easy way to earn money and valuable items as you progress through the game. You can find and track your available quests in your player sidebar. In total, completing all quests rewards you with $1,000 Cash, 100 XP, 6 Bottles, 15 Bricks, and 5 Molotovs. While these rewards may not be game-changing, they can provide a useful boost for new players by helping with combat and making it easier to purchase early-game items such as vehicles when money is harder to earn.",
-  wikiImage: "https://i.ibb.co/MyRfh0nf/Untitled-design-6.png",
-  wikiAlt: "Quests button location in the game sidebar",
-  categories: [
-    {
-      id: "playtime",
-      title: "Playtime Quests",
-      intro: "There are 3 Playtime Quests that are completed simply by playing the game. These quests start automatically as soon as you join.",
-      quests: [
-        { num: 1, title: "Play for 5 Minutes", reward: "100 Cash" },
-        { num: 2, title: "Play for 10 Minutes", reward: "200 Cash" },
-        { num: 3, title: "Join 5 days in a row", reward: "15 Bricks and 5 Molotovs" }
-      ]
-    },
-    {
-      id: "jobs",
-      title: "Job Quests",
-      intro: "These quests involve working at various jobs located around the map.",
-      quests: [
-        {
-          num: 4,
-          title: "Work 3 Different Jobs",
-          reward: "100 XP",
-          details: [
-            "To complete this quest, you must work at 3 different jobs. The easiest jobs to use are Burger Place, Quick 11, and The Butcher's Cut.",
-            "All job locations can be seen in the image below. To make them easier to find, each workplace has a unique icon displayed above it on the BlockSpin map."
-          ],
-          image: {
-            src: "https://i.ibb.co/cS8HmrhB/Screenshot-2026-05-30-at-19-41-30.png",
-            alt: "Burger Place, Quick 11, and The Butcher's Cut job locations"
-          }
-        },
-        {
-          num: 5,
-          title: "Pro Skimmer",
-          reward: "$175 Cash",
-          details: [
-            "To complete this quest, you must hack 5 ATMs located throughout various hotspots around the map. Before you can start hacking, you will need to purchase Hack Tools. These can be bought from Sam, who can be found behind Sam's Motel, near the Car Dealership."
-          ],
-          image: {
-            src: "https://i.ibb.co/DDdqMXvr/Screenshot-2026-05-30-at-19-58-15.png",
-            alt: "Sam behind Sam's Motel selling Basic Hack Tool"
-          }
-        },
-        {
-          num: 6,
-          title: "Just Keep Mopping",
-          reward: "$100 Cash",
-          details: [
-            "For this quest, get a job at the burger place and mop 10 puddles. The burger place can be found near the gun store."
-          ]
-        }
-      ]
-    },
-    {
-      id: "playthrough",
-      title: "Playthrough Quests",
-      intro: "These quests are naturally completed as you play the game. However, if you wish to earn the rewards sooner, you can focus on completing the required objectives to finish them faster.",
-      quests: [
-        {
-          num: 7,
-          title: "Glass Crackin'",
-          reward: "$50 Cash and 5 Bottles",
-          details: [
-            "To complete this quest, you need to break windows around the map. The windows of all buildings regenerate approximately every minute, allowing you to continue making progress. For the fastest completion, it is recommended to walk through the neighborhood and break the windows of each house you pass until the objective is complete."
-          ]
-        },
-        {
-          num: 8,
-          title: "Learner Driver",
-          reward: "$100 Cash",
-          details: [
-            "To complete this quest, you simply need to drive any vehicle. This can be a vehicle you own or one belonging to another player. For the quickest completion if you do not own a vehicle, try entering vehicles owned by other players around the map. If the vehicles are locked, you can purchase a Lockpick from Sam, who is located behind Sam's Motel, and use it to gain access."
-          ]
-        },
-        {
-          num: 9,
-          title: "Cash for Clutter",
-          reward: "$100 Cash",
-          details: [
-            "To complete this quest, simply sell 3 items to Rick at the Pawn Shop. The Pawn Shop can be found near the Night Club, or you can locate it by following its icon displayed above the building. Once you have sold 3 items to Rick, the quest will be completed."
-          ]
-        },
-        {
-          num: 10,
-          title: "Death by Distance",
-          reward: "$175 Cash and 1 Bottle",
-          details: [
-            "To complete this quest, you must eliminate a player using a throwable item. Keep in mind that when a player is defeated, they enter a temporary paralyzed state where they can either be stomped to finish them off or carried to safety and allowed to recover. For this quest, the final blow must be dealt with a throwable while the player is in this downed state. The easiest method is to use a gun or melee weapon to damage a player until they become paralyzed, then finish them off with a throwable item. We recommend using Milkshakes from the Burger Place or Bottles from Quick 11, as they are inexpensive and easy to obtain."
-          ],
-          image: {
-            src: "https://i.ibb.co/fdvrvmSh/Screenshot-2026-05-30-at-20-51-21.png",
-            alt: "Player throwing a bottle at an opponent in a paralyzed state",
-            compact: true
-          }
-        }
-      ]
-    }
-  ]
-};
+function getQuestGuideDataLocal() {
+  var lang = window.bsvI18n ? window.bsvI18n.getLang() : "en";
+  if (typeof window.getQuestGuideData === "function") {
+    return window.getQuestGuideData(lang) || window.getQuestGuideData("en");
+  }
+  return { intro: "", wikiImage: "", wikiAlt: "", categories: [] };
+}
 
 function buildQuestGuideIntroHtml(introClass) {
   var introCls = introClass || "quest-guide-wiki";
-  return `
-      <div class="${introCls}">
-        <div class="quest-guide-wiki__text">
-          <p>${escapeHtml(QUEST_GUIDE_DATA.intro)}</p>
-        </div>
-        <figure class="quest-guide-wiki__figure">
-          <img src="${escapeAttr(QUEST_GUIDE_DATA.wikiImage)}" alt="${escapeAttr(QUEST_GUIDE_DATA.wikiAlt)}" loading="lazy">
-        </figure>
-      </div>`;
+  var data = getQuestGuideDataLocal();
+  var structure = data.introStructure;
+  var textHtml = "";
+
+  if (structure && Array.isArray(structure.points) && structure.points.length) {
+    var pointsHtml = structure.points.map(function (point) {
+      return (
+        '<div class="quest-guide-intro__point">' +
+          '<h4 class="quest-guide-intro__point-title">' + escapeHtml(point.title || "") + "</h4>" +
+          '<p class="quest-guide-intro__point-text">' + escapeHtml(point.text || "") + "</p>" +
+        "</div>"
+      );
+    }).join("");
+
+    var rewardsHtml = "";
+    if (structure.rewards && Array.isArray(structure.rewards.items) && structure.rewards.items.length) {
+      rewardsHtml =
+        '<div class="quest-guide-intro__rewards">' +
+          '<p class="quest-guide-intro__rewards-title">' + escapeHtml(structure.rewards.title || "") + "</p>" +
+          '<div class="quest-guide-intro__reward-chips">' +
+            structure.rewards.items.map(function (item) {
+              return '<span class="quest-guide-intro__reward-chip">' + escapeHtml(item) + "</span>";
+            }).join("") +
+          "</div>" +
+        "</div>";
+    }
+
+    textHtml =
+      '<div class="quest-guide-intro">' +
+        (structure.kicker
+          ? '<p class="quest-guide-intro__kicker">' + escapeHtml(structure.kicker) + "</p>"
+          : "") +
+        '<div class="quest-guide-intro__points">' + pointsHtml + "</div>" +
+        rewardsHtml +
+        (structure.note
+          ? '<p class="quest-guide-intro__note">' + escapeHtml(structure.note) + "</p>"
+          : "") +
+      "</div>";
+  } else {
+    textHtml = '<p class="quest-guide-intro__fallback">' + escapeHtml(data.intro || "") + "</p>";
+  }
+
+  return (
+    '<div class="' + introCls + '">' +
+      '<div class="quest-guide-wiki__text">' + textHtml + "</div>" +
+      '<figure class="quest-guide-wiki__figure">' +
+        '<img src="' + escapeAttr(data.wikiImage) + '" alt="' + escapeAttr(data.wikiAlt) + '" loading="lazy">' +
+      "</figure>" +
+    "</div>"
+  );
 }
 
 function buildQuestGuideImageHtml(image, imageClass) {
@@ -1489,8 +1876,35 @@ function buildQuestGuideImageHtml(image, imageClass) {
             </figure>`;
 }
 
+function buildQuestGuideVideoHtml(video) {
+  if (!video || !video.videoId) return "";
+  if (video.platform === "tiktok") {
+    var embedSrc =
+      "https://www.tiktok.com/embed/v2/" +
+      encodeURIComponent(video.videoId) +
+      "?lang=en-US";
+    return (
+      '<div class="section-content-embed section-content-embed--tiktok qg-timeline__embed">' +
+      '<h3 class="section-content-embed-title">' +
+      escapeHtml(video.title || "Quest guide video") +
+      "</h3>" +
+      '<div class="section-content-embed-frame-wrap section-content-embed-frame-wrap--portrait">' +
+      '<iframe src="' +
+      escapeAttr(embedSrc) +
+      '" data-base-src="' +
+      escapeAttr(embedSrc) +
+      '" title="' +
+      escapeAttr(video.title || "Quest guide video") +
+      '" loading="lazy" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>' +
+      "</div></div>"
+    );
+  }
+  return "";
+}
+
 function buildQuestGuideHtml() {
-  var sections = QUEST_GUIDE_DATA.categories.map(function (cat) {
+  var data = getQuestGuideDataLocal();
+  var sections = data.categories.map(function (cat) {
     var items = cat.quests.map(function (quest) {
       var details = (quest.details || []).map(function (p) {
         return `<p class="qg-timeline__text">${escapeHtml(p)}</p>`;
@@ -1500,11 +1914,12 @@ function buildQuestGuideHtml() {
               <div class="qg-timeline__node" aria-hidden="true">${quest.num}</div>
               <article class="qg-timeline__card qg-timeline__card--${escapeAttr(cat.id)}">
                 <header class="qg-timeline__head">
-                  <h5 class="qg-timeline__title">Quest ${quest.num}: ${escapeHtml(quest.title)}</h5>
-                  <span class="qg-timeline__reward">Reward: ${escapeHtml(quest.reward)}</span>
+                  <h5 class="qg-timeline__title">${escapeHtml(i18n("guide.questLabel", { num: quest.num }))}: ${escapeHtml(quest.title)}</h5>
+                  <span class="qg-timeline__reward">${escapeHtml(i18n("guide.reward"))}: ${escapeHtml(quest.reward)}</span>
                 </header>
                 ${details ? `<div class="qg-timeline__body">${details}</div>` : ""}
                 ${buildQuestGuideImageHtml(quest.image, "qg-timeline__figure quest-guide-map-image" + (quest.image && quest.image.compact ? " quest-guide-map-image--compact" : ""))}
+                ${buildQuestGuideVideoHtml(quest.video)}
               </article>
             </li>`;
     }).join("");
@@ -1521,7 +1936,7 @@ function buildQuestGuideHtml() {
 
   return `
     <div class="quest-guide-wrap">
-      <h3 class="quest-guide-title">Quest Guide</h3>
+      <h3 class="quest-guide-title">${escapeHtml(i18n("guide.questTitle"))}</h3>
       ${buildQuestGuideIntroHtml()}
       <div class="qg-timeline">${sections}</div>
     </div>`;
@@ -1531,11 +1946,11 @@ function buildQuestGuideHtml() {
 function renderMoneyGameGuideSection() {
   const html = `
     <section class="section money-game-guide-section" id="${slugify("Money & Game Guide")}">
-      <h2>Money &amp; Game Guide</h2>
-      <nav class="money-guide-tabs" aria-label="Money and game guides">
-        <button type="button" class="money-guide-tab money-guide-tab--fishing active" data-panel="money-guide-fishing">Fishing Job</button>
-        <button type="button" class="money-guide-tab money-guide-tab--farming" data-panel="money-guide-farming">Farming Job</button>
-        <button type="button" class="money-guide-tab money-guide-tab--quest" data-panel="money-guide-quest">Quest Guide</button>
+      <h2>${escapeHtml(i18nSection("Money & Game Guide"))}</h2>
+      <nav class="money-guide-tabs" aria-label="${escapeAttr(i18nSection("Money & Game Guide"))}">
+        <button type="button" class="money-guide-tab money-guide-tab--fishing active" data-panel="money-guide-fishing">${escapeHtml(i18n("guide.fishingTab"))}</button>
+        <button type="button" class="money-guide-tab money-guide-tab--farming" data-panel="money-guide-farming">${escapeHtml(i18n("guide.farmingTab"))}</button>
+        <button type="button" class="money-guide-tab money-guide-tab--quest" data-panel="money-guide-quest">${escapeHtml(i18n("guide.questTab"))}</button>
       </nav>
       <div id="money-guide-fishing" class="money-guide-panel money-guide-panel--fishing"></div>
       <div id="money-guide-farming" class="money-guide-panel money-guide-panel--farming" hidden></div>
@@ -1546,8 +1961,24 @@ function renderMoneyGameGuideSection() {
   initMoneyGuideTabs();
 }
 
+function activateMoneyGuideTab(tabKey) {
+  const panelId =
+    tabKey === "farming"
+      ? "money-guide-farming"
+      : tabKey === "quest"
+        ? "money-guide-quest"
+        : "money-guide-fishing";
+  const section = document.getElementById(slugify(MONEY_GAME_GUIDE_SECTION));
+  if (!section) return Promise.resolve();
+  const tab = section.querySelector('.money-guide-tab[data-panel="' + panelId + '"]');
+  if (tab) tab.click();
+  if (panelId === "money-guide-fishing") return loadFishingGuidePanel();
+  if (panelId === "money-guide-farming") return loadFarmingGuidePanel();
+  return Promise.resolve();
+}
+
 function initMoneyGuideTabs() {
-  const section = document.getElementById(slugify("Money & Game Guide"));
+  const section = document.getElementById(slugify(MONEY_GAME_GUIDE_SECTION));
   if (!section || section.dataset.tabsInit === "1") return;
   section.dataset.tabsInit = "1";
   const tabs = section.querySelectorAll(".money-guide-tab");
@@ -1571,6 +2002,8 @@ function initMoneyGuideTabs() {
   activate("money-guide-fishing");
 }
 
+window.bsvActivateMoneyGuideTab = activateMoneyGuideTab;
+
 function renderSection(title, items) {
   if (title === "BlockSpin Map") {
     renderBlockSpinMapSection();
@@ -1580,7 +2013,7 @@ function renderSection(title, items) {
   if (title === "Home") {
     const html = `
       <section class="section" id="${slugify(title)}">
-        <h2>${title}</h2>
+        <h2>${escapeHtml(i18nSection(title))}</h2>
         <div class="home-content">
         </div>
       </section>
@@ -1607,59 +2040,44 @@ function renderSection(title, items) {
   } else if (title === "Omega") {
     const html = `
       <section class="section" id="${slugify("Omega")}">
-        <h2>Omega</h2>
+        <h2>${escapeHtml(i18nSection("Omega"))}</h2>
         <div class="cards">
           ${buildCardsHtmlWithDiscordPromo(items, createCard, "Omega")}
         </div>
-        <div class="legendary-banner giveaway-banner--red" id="omega-anaconda-banner" style="display: none;">
-          <p class="legendary-banner-text">Join our <strong>Anaconda giveaway</strong> in our Discord server!</p>
-          <div class="legendary-banner-right">
-            <a href="https://discord.gg/nKKkXyqCsv" target="_blank" rel="noopener" class="legendary-banner-btn">Join our Discord server</a>
-            <p class="legendary-banner-members"><span class="discord-member-count">—</span> members</p>
-          </div>
-        </div>
-        ${buildRobuxGiveawayBannerHtml("robux-giveaway-banner-" + slugify("Omega"))}
       </section>
     `;
     document.getElementById("sections").insertAdjacentHTML("beforeend", html);
   } else if (title === "Epic") {
     const html = `
       <section class="section" id="${slugify("Epic")}">
-        <h2>Epic</h2>
+        <h2>${escapeHtml(i18nSection("Epic"))}</h2>
         <div class="cards">
           ${buildCardsHtmlWithDiscordPromo(items, createCard, "Epic")}
         </div>
         <div class="legendary-banner giveaway-banner--purple" id="epic-firework-banner" style="display: none;">
-          <p class="legendary-banner-text">Join our <strong>Firework Launcher giveaway</strong> in our Discord server!</p>
+          <p class="legendary-banner-text">${i18n("banner.firework")}</p>
           <div class="legendary-banner-right">
-            <a href="https://discord.gg/8AUjJu9jnr" target="_blank" rel="noopener" class="legendary-banner-btn">Join our Discord server</a>
-            <p class="legendary-banner-members"><span class="discord-member-count">—</span> members</p>
+            <a href="https://discord.gg/8AUjJu9jnr" target="_blank" rel="noopener" class="legendary-banner-btn">${escapeHtml(i18n("banner.joinDiscord"))}</a>
+            <p class="legendary-banner-members"><span class="discord-member-count">—</span> ${escapeHtml(i18n("banner.members"))}</p>
           </div>
-        </div>
-        ${buildRobuxGiveawayBannerHtml("robux-giveaway-banner-" + slugify("Epic"))}
-        <div class="epic-shark-promo">
-          <a href="https://attackshark.com/?ref=RIVER" target="_blank" rel="noopener noreferrer sponsored" class="epic-shark-promo-link">
-            <p class="epic-shark-promo-text">CLICK HERE TO GET THE BEST GAMING MICE!</p>
-            <img src="https://i.ibb.co/0pM24HZ9/ph-11134207-7rasi-m9tr2cfmioxw1c.jpg" alt="Attack Shark gaming mice" class="epic-shark-promo-img" loading="lazy" />
-          </a>
         </div>
       </section>
     `;
     document.getElementById("sections").insertAdjacentHTML("beforeend", html);
   } else {
-    var robuxTail = ROBUX_GIVEAWAY_SECTION_TITLES.has(title)
-      ? buildRobuxGiveawayBannerHtml("robux-giveaway-banner-" + slugify(title))
-      : "";
     const html = `
       <section class="section" id="${slugify(title)}">
-        <h2>${title}</h2>
+        <h2>${escapeHtml(i18nSection(title))}</h2>
         <div class="cards">
           ${buildCardsHtmlWithDiscordPromo(items, createCard, title)}
         </div>
-        ${robuxTail}
       </section>
     `;
     document.getElementById("sections").insertAdjacentHTML("beforeend", html);
+  }
+
+  if (typeof window.bsvRefreshSavedCardButtons === "function") {
+    window.bsvRefreshSavedCardButtons();
   }
 }
 
@@ -1667,15 +2085,15 @@ function renderSection(title, items) {
 function renderLegendarySectionWithBanner(items) {
   const html = `
     <section class="section" id="${slugify("Legendary")}">
-      <h2>Legendary</h2>
+      <h2>${escapeHtml(i18nSection("Legendary"))}</h2>
       <div class="cards">
         ${buildCardsHtmlWithDiscordPromo(items, createCard, "Legendary")}
       </div>
       <div class="legendary-banner">
-        <p class="legendary-banner-text">We <strong>giveaway</strong> a <strong>Legendary gun</strong> in our Discord server every day!</p>
+        <p class="legendary-banner-text">${i18n("banner.legendary")}</p>
         <div class="legendary-banner-right">
-          <a href="https://discord.gg/scgqMpPAC6" target="_blank" rel="noopener" class="legendary-banner-btn">Join our Discord server</a>
-          <p class="legendary-banner-members"><span class="discord-member-count">—</span> members</p>
+          <a href="https://discord.gg/scgqMpPAC6" target="_blank" rel="noopener" class="legendary-banner-btn">${escapeHtml(i18n("banner.joinDiscord"))}</a>
+          <p class="legendary-banner-members"><span class="discord-member-count">—</span> ${escapeHtml(i18n("banner.members"))}</p>
         </div>
       </div>
     </section>
@@ -1686,11 +2104,10 @@ function renderLegendarySectionWithBanner(items) {
 function renderVehiclesSectionWithBanner(items) {
   const html = `
     <section class="section" id="${slugify("Vehicles")}">
-      <h2>Vehicles</h2>
+      <h2>${escapeHtml(i18nSection("Vehicles"))}</h2>
       <div class="cards">
         ${buildCardsHtmlWithDiscordPromo(items, createCard, "Vehicles")}
       </div>
-      ${buildHumveeGiveawayBannerHtml("vehicles-humvee-giveaway-banner")}
     </section>
   `;
   document.getElementById("sections").insertAdjacentHTML("beforeend", html);
@@ -1701,12 +2118,54 @@ function fetchDiscordMemberCount() {
     .then(function (res) { return res.json(); })
     .then(function (data) {
       var n = data.approximate_member_count;
+      var online = data.approximate_presence_count;
       if (typeof n === "number" && !isNaN(n)) {
         var els = document.querySelectorAll(".discord-member-count");
         els.forEach(function (el) { el.textContent = n.toLocaleString(); });
       }
+      if (typeof online === "number" && !isNaN(online)) {
+        setHomeStatValue("online", online, true);
+        document.querySelectorAll(".discord-online-count").forEach(function (el) {
+          el.textContent = online.toLocaleString();
+        });
+      }
     })
     .catch(function () {});
+}
+
+function createFooterBoosterCard(booster) {
+  const name = escapeHtml(String(booster?.name || "Unknown"));
+  const avatarUrl = escapeAttr(String(booster?.avatarUrl || ""));
+  return `
+    <article class="footer-booster-card" aria-label="${name}">
+      <img src="${avatarUrl}" alt="${name}" loading="lazy" decoding="async" />
+      <span>${name}</span>
+    </article>
+  `;
+}
+
+async function loadFooterBoosters() {
+  const footer = document.getElementById("footer-boosters");
+  const track = document.getElementById("footer-boosters-track");
+  if (!footer || !track) return;
+
+  if (!BOOSTERS_API_URL || BOOSTERS_API_URL.includes("YOUR-RAILWAY-URL")) {
+    return;
+  }
+
+  try {
+    const res = await fetch(BOOSTERS_API_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Boosters endpoint failed: ${res.status}`);
+    const data = await res.json();
+    const boosters = Array.isArray(data?.boosters) ? data.boosters : [];
+    if (boosters.length === 0) return;
+
+    const cardsHtml = boosters.map(createFooterBoosterCard).join("");
+    track.innerHTML = cardsHtml + cardsHtml;
+    footer.hidden = false;
+  } catch (err) {
+    console.error("Failed to load footer boosters:", err);
+  }
 }
 
 function renderCrewLogosSection(items) {
@@ -1722,7 +2181,7 @@ function renderCrewLogosSection(items) {
     }
   });
 
-  let html = `<section class="section" id="${slugify("Crew Logos")}"><h2>Crew Logos</h2>`;
+  let html = `<section class="section" id="${slugify("Crew Logos")}"><h2>${escapeHtml(i18nSection("Crew Logos"))}</h2>`;
   
   Object.keys(grouped).forEach(header => {
     if (grouped[header].length > 0) {
@@ -1778,7 +2237,7 @@ function renderAccessoriesSection(items) {
     structure[big][mini].push(item);
   });
 
-  let html = `<section class="section accessories-section" id="${slugify(ACCESSORIES_SECTION_NAME)}"><h2>${ACCESSORIES_SECTION_NAME}</h2>`;
+  let html = `<section class="section accessories-section" id="${slugify(ACCESSORIES_SECTION_NAME)}"><h2>${escapeHtml(i18nSection(ACCESSORIES_SECTION_NAME))}</h2>`;
   const navData = [];
   let bigCounter = 0;
   let miniCounter = 0;
@@ -1883,9 +2342,9 @@ function renderScammerSection(items) {
   const sectionId = slugify("💰 Richest Players");
   const html = `
     <section class="section richest-players-section" id="${sectionId}">
-      <a href="#" class="richest-back-to-top" id="richest-back-to-top" aria-label="Back to top">
+      <a href="#" class="richest-back-to-top" id="richest-back-to-top" aria-label="${escapeAttr(i18n("richest.backToTop"))}">
         <img src="https://i.ibb.co/N2kY994q/undo.png" alt="" class="richest-back-to-top-icon" />
-        <span class="richest-back-to-top-text">Back to top</span>
+        <span class="richest-back-to-top-text">${escapeHtml(i18n("richest.backToTop"))}</span>
       </a>
       ${createRichestPlayersSection(items)}
     </section>
@@ -1893,18 +2352,19 @@ function renderScammerSection(items) {
   document.getElementById("sections").insertAdjacentHTML("beforeend", html);
   
   setTimeout(() => {
-    const searchInput = document.getElementById('richest-search-input');
+    const searchInput = document.getElementById("richest-search-input");
     if (searchInput) {
-      searchInput.addEventListener('input', function(e) {
+      searchInput.addEventListener("input", function (e) {
         filterRichestPlayers(e.target.value);
       });
     }
-    const backToTop = document.getElementById('richest-back-to-top');
-    const section = document.querySelector('.richest-players-section');
+
+    const backToTop = document.getElementById("richest-back-to-top");
+    const section = document.querySelector(".richest-players-section");
     if (backToTop && section) {
-      backToTop.addEventListener('click', function(e) {
+      backToTop.addEventListener("click", function (e) {
         e.preventDefault();
-        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        section.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
   }, 100);
@@ -1914,6 +2374,7 @@ function initSectionsNav() {
   const nav = document.getElementById("sections-nav");
   if (!nav) return;
 
+  nav.innerHTML = "";
   let extrasHeaderShown = false;
   SECTION_NAMES.forEach((name) => {
     const cfg = typeof getSectionConfig === "function" ? getSectionConfig(name) : null;
@@ -1924,13 +2385,15 @@ function initSectionsNav() {
 
       const extrasHeader = document.createElement("div");
       extrasHeader.className = "nav-extras-header";
-      extrasHeader.textContent = "Extras";
+      extrasHeader.setAttribute("data-i18n", "nav.extras");
+      extrasHeader.textContent = i18n("nav.extras");
       nav.appendChild(extrasHeader);
       extrasHeaderShown = true;
     }
 
     const btn = document.createElement("button");
-    btn.textContent = name;
+    btn.dataset.section = name;
+    btn.textContent = i18nSection(name);
     btn.addEventListener("click", () => showSection(name));
     nav.appendChild(btn);
   });
@@ -1941,57 +2404,15 @@ function getSectionElementId(title) {
   return cfg ? cfg.id : slugify(title);
 }
 
-function syncItemSectionSearchPlacement(name) {
-  const sectionsEl = document.getElementById("sections");
-  const searchContainer = document.querySelector(".search-container");
-  if (!sectionsEl || !searchContainer) return;
-
-  const cfg = typeof getSectionConfig === "function" ? getSectionConfig(name) : null;
-  const searchHidden = !cfg || cfg.search === "hide";
-  const mobileSearchInSection = Boolean(cfg && cfg.mobileSearchInSection);
-
-  function restoreSearchBeforeHome() {
-    const homeSec = document.getElementById("home");
-    if (
-      searchContainer.parentNode === sectionsEl &&
-      homeSec &&
-      searchContainer.nextElementSibling === homeSec
-    ) {
-      return;
-    }
-    if (homeSec) {
-      sectionsEl.insertBefore(searchContainer, homeSec);
-    } else {
-      sectionsEl.prepend(searchContainer);
-    }
-  }
-
-  if (!window.matchMedia("(max-width: 1024px)").matches || searchHidden || !mobileSearchInSection) {
-    restoreSearchBeforeHome();
-    return;
-  }
-
-  const activeSec = document.getElementById(getSectionElementId(name));
-  if (!activeSec || !activeSec.classList.contains("section")) {
-    restoreSearchBeforeHome();
-    return;
-  }
-
-  const cards = activeSec.querySelector(".cards");
-  if (cards) {
-    activeSec.insertBefore(searchContainer, cards);
-  } else {
-    const h2 = activeSec.querySelector("h2");
-    if (h2) {
-      h2.insertAdjacentElement("afterend", searchContainer);
-    } else {
-      activeSec.prepend(searchContainer);
-    }
-  }
+function setHeaderSearchVisible(visible) {
+  const searchContainer = document.getElementById("header-search") || document.querySelector(".top-navbar .search-container");
+  if (!searchContainer) return;
+  searchContainer.classList.toggle("is-hidden", !visible);
 }
 
 function showSection(name) {
   console.log(`Showing section: ${name}`);
+  _activeSectionName = name;
 
   const cfg = typeof getSectionConfig === "function" ? getSectionConfig(name) : null;
   if (!cfg) return;
@@ -2008,18 +2429,21 @@ function showSection(name) {
   const taxCalc = taxSidebarColumn ? taxSidebarColumn.querySelector('.tax-calculator') : null;
   const middlemanPromo = taxSidebarColumn ? taxSidebarColumn.querySelector('.discord-mm-promo--sidebar') : null;
   const accessoriesFastNav = document.getElementById('accessories-fast-nav');
+  const isHome = cfg.id === 'home';
 
-  document.body.classList.toggle('is-home', cfg.id === 'home');
+  document.body.classList.toggle('is-home', isHome);
 
   if (taxSidebarColumn) {
-    if (cfg.sidebarColumn === 'hide') {
+    if (isHome || cfg.sidebarColumn === 'hide') {
+      taxSidebarColumn.style.display = 'flex';
       taxSidebarColumn.style.visibility = 'hidden';
       taxSidebarColumn.style.opacity = '0';
-      taxSidebarColumn.style.display = 'none';
+      taxSidebarColumn.style.pointerEvents = 'none';
     } else {
       taxSidebarColumn.style.visibility = 'visible';
       taxSidebarColumn.style.opacity = '1';
       taxSidebarColumn.style.display = 'flex';
+      taxSidebarColumn.style.pointerEvents = 'auto';
     }
   }
 
@@ -2042,14 +2466,7 @@ function showSection(name) {
     homeValueChanges.style.display = cfg.homeValueChanges ? 'block' : 'none';
   }
 
-  const searchContainer = document.querySelector('.search-container');
-  if (searchContainer) {
-    if (cfg.search === 'hide') {
-      searchContainer.style.cssText = 'visibility: hidden; height: 0; margin: 0; overflow: hidden;';
-    } else {
-      searchContainer.style.cssText = 'visibility: visible; height: auto; overflow: visible; width: 100%; display: flex; justify-content: center; align-items: center;';
-    }
-  }
+  setHeaderSearchVisible(cfg.search !== "hide");
 
   getSectionRegistry().forEach(function (sectionCfg) {
     const el = document.getElementById(sectionCfg.id);
@@ -2057,12 +2474,13 @@ function showSection(name) {
   });
 
   document.querySelectorAll("#sections-nav button").forEach(b => {
-    b.classList.toggle("active", b.textContent === name);
+    b.classList.toggle("active", b.dataset.section === name);
   });
 
-  syncItemSectionSearchPlacement(name);
   trackEvent("view_section", { section_name: name });
 }
+
+window.showSection = showSection;
 
 function initSearch() {
   const input = document.getElementById("search");
@@ -2084,7 +2502,7 @@ function getTaxBreakdown(amountWant) {
   if (totalWithdraw <= TAX_MAX_DROP) {
     return {
       totalWithdraw,
-      lines: ['Drop $' + totalWithdraw.toLocaleString()],
+      lines: [i18n("tax.dropAmount", { amount: "$" + totalWithdraw.toLocaleString() })],
       singleDrop: true
     };
   }
@@ -2095,13 +2513,13 @@ function getTaxBreakdown(amountWant) {
   const lines = [];
 
   if (full40kCount === 1 && lastWithdraw > 0) {
-    lines.push('Drop $40,000 once');
-    lines.push('then Drop $' + lastWithdraw.toLocaleString() + '.');
+    lines.push(i18n("tax.drop40kTimesOnce"));
+    lines.push(i18n("tax.thenDrop", { amount: "$" + lastWithdraw.toLocaleString() }));
   } else if (lastWithdraw > 0) {
-    lines.push('Drop $40,000 ' + full40kCount.toLocaleString() + ' times');
-    lines.push('then Drop $' + lastWithdraw.toLocaleString() + '.');
+    lines.push(i18n("tax.drop40kTimes", { count: full40kCount.toLocaleString() }));
+    lines.push(i18n("tax.thenDrop", { amount: "$" + lastWithdraw.toLocaleString() }));
   } else {
-    lines.push('Drop $40,000 ' + full40kCount.toLocaleString() + ' times.');
+    lines.push(i18n("tax.drop40kTimes", { count: full40kCount.toLocaleString() }) + ".");
   }
   return { totalWithdraw, lines, singleDrop: false };
 }
@@ -2111,12 +2529,54 @@ function formatDollar(amount) {
 }
 
 function buildTaxBreakdownHtml(want, breakdown) {
-  return '<span class="tax-how-label">To drop ' +
-    formatDollar(want) +
-    ' in game you drop ' +
-    formatDollar(breakdown.totalWithdraw) +
-    '. Steps:</span><br>' +
-    breakdown.lines.map(function(line) { return line + '<br>'; }).join('');
+  return '<span class="tax-how-label">' +
+    escapeHtml(i18n("tax.howLabel", { want: formatDollar(want), withdraw: formatDollar(breakdown.totalWithdraw) })) +
+    '</span><br>' +
+    breakdown.lines.map(function(line) { return escapeHtml(line) + '<br>'; }).join('');
+}
+
+function bindTaxCalcWidget(root) {
+  if (!root || root.dataset.taxBound === "1") return;
+  var input = root.querySelector("[data-tax-input]");
+  var amountEl = root.querySelector("[data-tax-amount]");
+  var breakdownEl = root.querySelector("[data-tax-breakdown]");
+  if (!input || !amountEl) return;
+  root.dataset.taxBound = "1";
+
+  function update() {
+    var raw = input.value.replace(/[^\d]/g, "");
+    var want = parseInt(raw, 10) || 0;
+    var b = getTaxBreakdown(want);
+    amountEl.textContent = b.totalWithdraw.toLocaleString();
+    var afterLabel = root.querySelector("[data-tax-after-label]");
+    if (afterLabel) afterLabel.hidden = b.totalWithdraw <= 0;
+    if (!breakdownEl) return;
+    if (b.totalWithdraw <= 0) {
+      breakdownEl.innerHTML = "";
+      return;
+    }
+    breakdownEl.innerHTML = buildTaxBreakdownHtml(want, b);
+  }
+
+  input.addEventListener("input", function (e) {
+    var cursorPos = e.target.selectionStart;
+    var oldValue = e.target.value;
+    var newValue = oldValue.replace(/[^\d]/g, "");
+    if (oldValue !== newValue) {
+      e.target.value = newValue;
+      e.target.setSelectionRange(Math.max(0, cursorPos - 1), Math.max(0, cursorPos - 1));
+    }
+    update();
+  });
+
+  input.addEventListener("paste", function (e) {
+    e.preventDefault();
+    var paste = (e.clipboardData || window.clipboardData).getData("text");
+    var cleaned = (paste || "").replace(/[^\d]/g, "");
+    document.execCommand("insertText", false, cleaned);
+  });
+
+  update();
 }
 
 function initTaxCalculator() {
@@ -2499,7 +2959,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   var homeHumveeWrap = document.querySelector(".home-humvee-banner-wrap");
   if (homeHumveeWrap) {
-    homeHumveeWrap.innerHTML = buildHumveeGiveawayBannerHtml("home-humvee-giveaway-banner");
+    homeHumveeWrap.innerHTML = "";
   }
   mountHomeDiscordPromo();
 
@@ -2539,11 +2999,27 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const results = await Promise.all(fetchPromises);
 
-  results.forEach(({ section, items }) => {
-    renderSection(section, items);
+  sectionsContainer.classList.add("loaded");
+
+  results.forEach(function (result) {
+    _renderedSectionCache.push(result);
+    renderSection(result.section, result.items);
   });
+  if (typeof window.bsvRefreshSavedCardButtons === "function") {
+    window.bsvRefreshSavedCardButtons();
+  }
+  if (typeof window.bsvFetchSavedCards === "function") {
+    window.bsvFetchSavedCards();
+  }
+  updateHomeSiteStatsFromResults(results);
   applyStripGiveawayBannerVisibility();
   initGiveawayBannerCarousels();
+  initDiscordPromoCardCarousels();
+
+  setTimeout(function () {
+    var loadingScreen = document.getElementById("loading-screen");
+    if (loadingScreen) loadingScreen.style.display = "none";
+  }, 150);
 
   let initialSection = "Home";
   if (window.location.hash && window.location.hash.startsWith('#sec=')) {
@@ -2555,27 +3031,45 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   showSection(initialSection);
-  loadTopDonators();
   loadValueChanges();
   fetchDiscordMemberCount();
-
-  sectionsContainer.classList.add("loaded");
-  
-  setTimeout(() => {
-    document.getElementById('loading-screen').style.display = 'none';
-  }, 300);
-
+  loadFooterBoosters();
 });
 
-var _searchPlacementResizeTimer;
-window.addEventListener("resize", function () {
-  clearTimeout(_searchPlacementResizeTimer);
-  _searchPlacementResizeTimer = setTimeout(function () {
-    var active = document.querySelector("#sections-nav button.active");
-    if (active && typeof syncItemSectionSearchPlacement === "function") {
-      syncItemSectionSearchPlacement(active.textContent.trim());
-    }
-  }, 120);
+function refreshDynamicContentForLanguage() {
+  document.querySelectorAll("#sections > .section:not(#home)").forEach(function (el) {
+    el.remove();
+  });
+
+  _renderedSectionCache.forEach(function (result) {
+    renderSection(result.section, result.items);
+  });
+
+  applyStripGiveawayBannerVisibility();
+  initGiveawayBannerCarousels();
+  initDiscordPromoCardCarousels();
+  initSectionsNav();
+  showSection(_activeSectionName);
+
+  var mobileMenu = document.getElementById("mobile-menu");
+  if (mobileMenu) {
+    mobileMenu.innerHTML = "";
+    delete mobileMenu.dataset.bsvMobileInit;
+    setupMobileHamburgerMenu();
+  }
+
+  var taxInput = document.getElementById("taxInput");
+  if (taxInput) taxInput.dispatchEvent(new Event("input"));
+  var mobileTaxInput = document.getElementById("mobile-tax-input");
+  if (mobileTaxInput) mobileTaxInput.dispatchEvent(new Event("input"));
+}
+
+document.addEventListener("bsv:languagechange", function () {
+  if (_renderedSectionCache.length) {
+    refreshDynamicContentForLanguage();
+  } else {
+    initSectionsNav();
+  }
 });
 
 document.addEventListener('click', function(e) {
@@ -2625,124 +3119,104 @@ function openRiverLinks(e) {
   document.body.appendChild(modal);
 }
 
-// Fetch and display top donators
-async function loadTopDonators() {
-  try {
-    const donators = await fetchSheet("Top Donate");
-    const donatorList = document.getElementById('donator-list');
-    
-    if (!donators || donators.length === 0) {
-      const noDonatorsHTML = '<div class="donator-loading">No donators yet</div>';
-      if (donatorList) donatorList.innerHTML = noDonatorsHTML;
-      return;
-    }
-    
-    const top10 = donators.slice(0, 10);
-    
-    const donatorsHTML = top10.map((donator, index) => {
-      const rank = index + 1;
-      const name = donator.Name || 'Anonymous';
-      const donation = donator.Donation || '0';
-      const profile = donator['User Profile'] || '#';
-      
-      const formattedDonation = donation;
-      
-      return `
-        <div class="donator-item">
-          <div class="donator-rank">${rank}</div>
-          <div class="donator-info">
-            <div class="donator-name">${name}</div>
-            <div class="donator-amount">${formattedDonation}</div>
-            ${profile !== '#' ? `<a href="${profile}" target="_blank" class="donator-profile">View Profile 🔗</a>` : ''}
-          </div>
-        </div>
-      `;
-    }).join('');
-    
-    if (donatorList) donatorList.innerHTML = donatorsHTML;
-    
-  } catch (error) {
-    console.error('Error loading donators:', error);
-    const errorHTML = '<div class="donator-loading">Failed to load donators</div>';
-    const donatorList = document.getElementById('donator-list');
-    if (donatorList) donatorList.innerHTML = errorHTML;
-  }
-}
-
 // Show/hide Epic/Omega giveaway banners from Website Configs.
 // Your sheet: row 1 = column headers "Anaconda GW" and "Firework GW", row 2 = "Yes" under each to show that banner.
 // Using "GW" avoids clashing with item names like Anaconda/Firework in other sheets.
 function applyBannerConfig(rows) {
   if (!rows || !rows.length) return;
-  var showAnaconda = false;
   var showFirework = false;
   var first = rows[0];
   if (first && ("Anaconda GW" in first || "Firework GW" in first)) {
-    var anacondaVal = (first["Anaconda GW"] || "").toString().trim().toLowerCase();
     var fireworkVal = (first["Firework GW"] || "").toString().trim().toLowerCase();
-    showAnaconda = /^(yes|1|true|on)$/.test(anacondaVal);
     showFirework = /^(yes|1|true|on)$/.test(fireworkVal);
   } else {
     rows.forEach(function (r) {
       var name = (r.Title || r.Name || '').toString().trim();
       var show = (r.Show || r.Enabled || '').toString().trim().toLowerCase();
-      if (name === "Anaconda GW") showAnaconda = /^(yes|1|true|on)$/.test(show);
       if (name === "Firework GW") showFirework = /^(yes|1|true|on)$/.test(show);
     });
   }
-  var anacondaEl = document.getElementById('omega-anaconda-banner');
   var fireworkEl = document.getElementById('epic-firework-banner');
-  if (anacondaEl) anacondaEl.style.display = showAnaconda ? 'flex' : 'none';
   if (fireworkEl) fireworkEl.style.display = showFirework ? 'flex' : 'none';
 }
 
 // Fetch and display recent value changes from spreadsheet (sheet: "Website Configs", columns: Title, Date, Text, Color)
+function buildValueChangeItemHtml(r, useTimeline) {
+  var colorMap = { green: "green", orange: "orange", red: "red", blue: "blue" };
+  var title = (r.Title || "").toString().trim();
+  var date = (r.Date || "").toString().trim();
+  var text = (r.Text || "").toString().trim();
+  var color = (r.Color || "").toString().trim().toLowerCase();
+  var colorKey = colorMap[color] ? color : "";
+  var colorClass = colorKey ? " value-change-item--" + colorKey : "";
+  var timelineClass = useTimeline ? " value-change-item--timeline" : "";
+  var titleEsc = title.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  var dateEsc = date.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  var textEsc = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/\n/g, "<br>");
+
+  if (useTimeline) {
+    return (
+      '<div class="value-change-item value-change-item--timeline' + colorClass + '">' +
+        '<div class="value-change-item__body">' +
+        (titleEsc ? '<p class="value-change-title">' + titleEsc + "</p>" : "") +
+        (dateEsc ? '<p class="value-change-date">' + dateEsc + "</p>" : "") +
+        (textEsc ? '<p class="value-change-text">' + textEsc + "</p>" : "") +
+        "</div>" +
+        '<div class="value-change-icon' + colorClass + '" aria-hidden="true"></div>' +
+      "</div>"
+    );
+  }
+
+  return (
+    '<div class="value-change-item' + colorClass + '">' +
+      '<div class="value-change-icon' + colorClass + '"></div>' +
+      (titleEsc ? '<p class="value-change-title">' + titleEsc + "</p>" : "") +
+      (dateEsc ? '<p class="value-change-date">' + dateEsc + "</p>" : "") +
+      (textEsc ? '<p class="value-change-text">' + textEsc + "</p>" : "") +
+    "</div>"
+  );
+}
+
 async function loadValueChanges() {
   var listEl = document.getElementById('value-changes-list');
   var mobileListEl = document.getElementById('mobile-value-changes-list');
-  if (!listEl && !mobileListEl) return;
-  function setValueChangesHtml(html) {
+  var homeMainListEl = document.getElementById('home-main-value-changes-list');
+  if (!listEl && !mobileListEl && !homeMainListEl) return;
+  function setSidebarValueChangesHtml(html) {
     if (listEl) listEl.innerHTML = html;
     if (mobileListEl) mobileListEl.innerHTML = html;
   }
   try {
     var rows = await fetchSheet("Website Configs");
     if (!rows || rows.length === 0) {
-      setValueChangesHtml('<div class="value-changes-loading">No value changes yet.</div>');
+      var emptyHtml = '<div class="value-changes-loading">' + escapeHtml(i18n("changes.none")) + '</div>';
+      setSidebarValueChangesHtml(emptyHtml);
+      if (homeMainListEl) homeMainListEl.innerHTML = emptyHtml;
       return;
     }
     applyBannerConfig(rows);
-    var filtered = rows.filter(function (r) {
-      var name = (r.Title || r.Name || '').toString().trim();
-      if (name === "Anaconda GW" || name === "Firework GW") return false;
-      var t = (r.Title || r.Date || r.Text || '').toString().trim();
-      return t.length > 0;
-    });
+    var filtered = filterValueChangeRows(rows);
     if (filtered.length === 0) {
-      setValueChangesHtml('<div class="value-changes-loading">No value changes yet.</div>');
+      var noneHtml = '<div class="value-changes-loading">' + escapeHtml(i18n("changes.none")) + '</div>';
+      setSidebarValueChangesHtml(noneHtml);
+      if (homeMainListEl) homeMainListEl.innerHTML = noneHtml;
       return;
     }
-    var colorMap = { green: 'green', orange: 'orange', red: 'red', blue: 'blue' };
-    var html = filtered.map(function (r) {
-      var title = (r.Title || '').toString().trim();
-      var date = (r.Date || '').toString().trim();
-      var text = (r.Text || '').toString().trim();
-      var color = (r.Color || '').toString().trim().toLowerCase();
-      var colorClass = colorMap[color] ? ' value-change-item--' + colorMap[color] : '';
-      var titleEsc = title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-      var dateEsc = date.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-      var textEsc = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\n/g, '<br>');
-      return '<div class="value-change-item' + colorClass + '">' +
-        '<div class="value-change-icon' + colorClass + '"></div>' +
-        (titleEsc ? '<p class="value-change-title">' + titleEsc + '</p>' : '') +
-        (dateEsc ? '<p class="value-change-date">' + dateEsc + '</p>' : '') +
-        (textEsc ? '<p class="value-change-text">' + textEsc + '</p>' : '') +
-        '</div>';
-    }).join('');
-    setValueChangesHtml(html);
+    var classicHtml = filtered.map(function (r) { return buildValueChangeItemHtml(r, false); }).join("");
+    var timelineHtml = filtered.map(function (r) { return buildValueChangeItemHtml(r, true); }).join("");
+    setSidebarValueChangesHtml(classicHtml);
+    if (homeMainListEl) {
+      homeMainListEl.innerHTML =
+        '<div class="value-changes-list__track">' +
+          '<div class="value-changes-list__rail" aria-hidden="true"></div>' +
+          '<div class="value-changes-list__items">' + timelineHtml + "</div>" +
+        "</div>";
+    }
   } catch (err) {
     console.error('Error loading value changes:', err);
-    setValueChangesHtml('<div class="value-changes-loading">Failed to load value changes.</div>');
+    var failHtml = '<div class="value-changes-loading">' + escapeHtml(i18n("changes.failed")) + '</div>';
+    setSidebarValueChangesHtml(failHtml);
+    if (homeMainListEl) homeMainListEl.innerHTML = failHtml;
   }
 }
 
@@ -2754,24 +3228,13 @@ function setupMobileHamburgerMenu() {
   var mobileMenu = document.getElementById('mobile-menu');
   if (!hamburgerBtn || !mobileMenu || mobileMenu.dataset.bsvMobileInit === '1') return;
   mobileMenu.dataset.bsvMobileInit = '1';
-
   var sectionsNav = document.getElementById('sections-nav');
   if (sectionsNav) {
     var navClone = sectionsNav.cloneNode(true);
     mobileMenu.appendChild(navClone);
-    var drawerPromo = document.createElement('div');
-    drawerPromo.className = 'mobile-menu-drawer-promo';
-    drawerPromo.innerHTML =
-      '<p class="mobile-menu-sponsored-label">Sponsored</p>' +
-      '<div class="mobile-menu-shark-promo">' +
-      '<a href="https://attackshark.com/?ref=RIVER" target="_blank" rel="noopener noreferrer sponsored" class="mobile-menu-shark-promo-link">' +
-      '<p class="mobile-menu-shark-promo-text">CLICK HERE TO GET THE BEST GAMING MICE!</p>' +
-      '<img src="https://i.ibb.co/0pM24HZ9/ph-11134207-7rasi-m9tr2cfmioxw1c.jpg" alt="Attack Shark gaming mice" class="mobile-menu-shark-promo-img" loading="lazy" />' +
-      '</a></div>';
-    mobileMenu.appendChild(drawerPromo);
     navClone.querySelectorAll('button').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        var sectionName = (btn.textContent || '').trim();
+        var sectionName = btn.dataset.section || (btn.textContent || '').trim();
         showSection(sectionName);
         hamburgerBtn.classList.remove('active');
         mobileMenu.classList.remove('active');
@@ -2783,10 +3246,6 @@ function setupMobileHamburgerMenu() {
     });
     mobileMenu.addEventListener('click', function(e) {
       if (e.target.tagName === 'BUTTON') {
-        hamburgerBtn.classList.remove('active');
-        mobileMenu.classList.remove('active');
-      }
-      if (e.target.closest && e.target.closest('.mobile-menu-drawer-promo a')) {
         hamburgerBtn.classList.remove('active');
         mobileMenu.classList.remove('active');
       }
