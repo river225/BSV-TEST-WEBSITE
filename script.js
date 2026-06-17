@@ -1442,7 +1442,7 @@ function createFishingTypeCard(item) {
     : "";
 
   return `
-    <div class="card guide-vcard guide-fish-card fishing-fish-card" data-name="${escapeAttr(name)}">
+    <div class="card guide-vcard guide-fish-card fishing-fish-card" data-name="${escapeAttr(name)}" data-sell-amount="${escapeAttr(String(sellAmount))}">
       <h3 class="guide-vcard__name">${escapeHtml(name)}</h3>
       <div class="guide-vcard__image">${imageHtml}</div>
       ${rarity ? `<span class="guide-vcard__rarity ${rarityClass}">${escapeHtml(rarity)}</span>` : ""}
@@ -3518,4 +3518,5 @@ if (document.readyState === 'loading') {
 } else {
   initThemeSwitcher();
   applyPinkThemeDividers();
+}
 }

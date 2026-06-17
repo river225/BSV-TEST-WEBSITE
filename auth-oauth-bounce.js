@@ -1,9 +1,35 @@
 (function () {
   var OAUTH_RETURN_KEY = "bsv-oauth-return-to";
+  var MAIN_SITE_ORIGINS = {
+    "https://blockspinvalues.com": true,
+    "https://www.blockspinvalues.com": true
+  };
+
+  function isTestSite() {
+    var host = window.location.hostname;
+    if (host === "localhost" || host === "127.0.0.1") return true;
+    if (/\.github\.io$/i.test(host)) return true;
+    if (document.documentElement && document.documentElement.dataset.bsvEnv === "test") return true;
+    return !!document.querySelector('meta[name="bsv-env"][content="test"]');
+  }
+
+  function purgeStaleMainReturnUrl() {
+    if (!isTestSite()) return;
+    try {
+      var stored = localStorage.getItem(OAUTH_RETURN_KEY);
+      if (!stored) return;
+      if (MAIN_SITE_ORIGINS[new URL(stored).origin]) {
+        localStorage.removeItem(OAUTH_RETURN_KEY);
+      }
+    } catch (_) {}
+  }
 
   function readSavedReturnTo() {
     try {
-      return sessionStorage.getItem(OAUTH_RETURN_KEY) || localStorage.getItem(OAUTH_RETURN_KEY);
+      var fromSession = sessionStorage.getItem(OAUTH_RETURN_KEY);
+      if (fromSession) return fromSession;
+      if (isTestSite()) return null;
+      return localStorage.getItem(OAUTH_RETURN_KEY);
     } catch (_) {
       return null;
     }
@@ -36,13 +62,21 @@
     if (!saved) return false;
     try {
       var target = saved.split("#")[0];
-      if (new URL(target).origin !== window.location.origin) {
+      var savedOrigin = new URL(target).origin;
+      var currentOrigin = window.location.origin;
+      if (savedOrigin !== currentOrigin) {
+        window.location.replace(target + hash);
+        return true;
+      }
+      if (isTestSite() && MAIN_SITE_ORIGINS[currentOrigin]) {
         window.location.replace(target + hash);
         return true;
       }
     } catch (_) {}
     return false;
   }
+
+  purgeStaleMainReturnUrl();
 
   var hash = window.location.hash || "";
   var hashParams = parseHashParams(hash);

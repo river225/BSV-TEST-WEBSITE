@@ -1,0 +1,8 @@
+{
+  "name": "blockspin-values-dev",
+  "private": true,
+  "scripts": {
+    "start": "python3 -m http.server 5500",
+    "dev": "python3 -m http.server 5500"
+  }
+}

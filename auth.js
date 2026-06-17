@@ -46,7 +46,9 @@
     var url = window.location.href.split("#")[0];
     try {
       sessionStorage.setItem(OAUTH_RETURN_KEY, url);
-      localStorage.setItem(OAUTH_RETURN_KEY, url);
+      if (!isTestSite()) {
+        localStorage.setItem(OAUTH_RETURN_KEY, url);
+      }
     } catch (_) {}
   }
 
@@ -62,8 +64,20 @@
     return !!document.querySelector('meta[name="bsv-env"][content="test"]');
   }
 
+  function isTestSite() {
+    if (isDevSite()) return true;
+    var host = window.location.hostname;
+    if (host === "localhost" || host === "127.0.0.1") return true;
+    return /\.github\.io$/i.test(host);
+  }
+
+  function isMainLiveSite() {
+    var host = window.location.hostname;
+    return host === "blockspinvalues.com" || host === "www.blockspinvalues.com";
+  }
+
   function warnIfLoggedInOnWrongSite() {
-    if (isDevSite()) return;
+    if (isTestSite()) return;
     var token = getAuthToken();
     if (!token) return;
     var banner = document.getElementById("auth-wrong-site-banner");
@@ -91,7 +105,26 @@
     if (hash.indexOf("bsv_auth=") !== -1) {
       var match = hash.match(/bsv_auth=([^&]+)/);
       if (match && match[1]) {
-        setAuthToken(decodeURIComponent(match[1]));
+        var token = decodeURIComponent(match[1]);
+        var savedReturn = null;
+        try {
+          savedReturn = sessionStorage.getItem(OAUTH_RETURN_KEY);
+        } catch (_) {}
+        if (isMainLiveSite() && savedReturn) {
+          try {
+            var savedUrl = new URL(savedReturn.split("#")[0]);
+            var savedHost = savedUrl.hostname;
+            var isSavedTest =
+              savedHost === "localhost" ||
+              savedHost === "127.0.0.1" ||
+              /\.github\.io$/i.test(savedHost);
+            if (isSavedTest && savedUrl.origin !== window.location.origin) {
+              window.location.replace(savedReturn.split("#")[0] + "#bsv_auth=" + encodeURIComponent(token));
+              return false;
+            }
+          } catch (_) {}
+        }
+        setAuthToken(token);
         justLoggedIn = true;
       }
       history.replaceState(null, "", window.location.pathname + window.location.search);
