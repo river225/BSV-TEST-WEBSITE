@@ -71,10 +71,28 @@
     return /\.github\.io$/i.test(host);
   }
 
+  var MAIN_SITE_ORIGINS = {
+    "https://blockspinvalues.com": true,
+    "https://www.blockspinvalues.com": true
+  };
+
   function isMainLiveSite() {
     var host = window.location.hostname;
     return host === "blockspinvalues.com" || host === "www.blockspinvalues.com";
   }
+
+  function purgeStaleMainReturnUrl() {
+    if (!isTestSite()) return;
+    try {
+      var stored = localStorage.getItem(OAUTH_RETURN_KEY);
+      if (!stored) return;
+      if (MAIN_SITE_ORIGINS[new URL(stored).origin]) {
+        localStorage.removeItem(OAUTH_RETURN_KEY);
+      }
+    } catch (_) {}
+  }
+
+  purgeStaleMainReturnUrl();
 
   function warnIfLoggedInOnWrongSite() {
     if (isTestSite()) return;

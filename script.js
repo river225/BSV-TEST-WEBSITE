@@ -3519,4 +3519,3 @@ if (document.readyState === 'loading') {
   initThemeSwitcher();
   applyPinkThemeDividers();
 }
-}
