@@ -12,11 +12,11 @@
 <script src="auth-oauth-bounce.js?v=20260619-test-oauth"></script>
 <title>BlockSpin Values — Dev</title>
 <meta name="description" content="Development copy of BlockSpin Values — not the public site." />
-<link rel="icon" type="image/gif" href="https://i.ibb.co/WW3G6H2j/Nombre-del-proyecto.gif">
-<meta property="og:image" content="https://i.ibb.co/WW3G6H2j/Nombre-del-proyecto.gif">
+<link rel="icon" type="image/png" href="https://i.ibb.co/Xk7sgWyt/Blockspinvaluesnew-1-5.png">
+<meta property="og:image" content="https://i.ibb.co/Xk7sgWyt/Blockspinvaluesnew-1-5.png">
 <meta property="og:title" content="BlockSpin Values (Dev / staging)">
 <meta property="og:description" content="Development / staging build — not the public BlockSpin Values site.">
-<link rel="stylesheet" href="style.css?v=20260618-discord-banner-sm" />
+<link rel="stylesheet" href="style.css?v=20260704-cinematic-about" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Inter:wght@400;600;700&amp;family=Nunito+Sans:ital,wght@0,600;0,700;1,600&amp;family=Oswald:wght@500;600;700&amp;family=Poppins:wght@400;600;700&amp;family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet" />
@@ -101,19 +101,11 @@
 
   
 
-<button class="hamburger-menu" id="hamburger-btn" data-i18n-aria="nav.menu" aria-label="Menu">
-  <span></span>
-  <span></span>
-  <span></span>
-</button>
-
-<div class="mobile-menu-overlay" id="mobile-menu"></div>
-
 <nav class="top-navbar">
   <div class="nav-container-full">
     <div class="nav-left">
       <a href="#" class="nav-brand" onclick="showSection('Home'); return false;">
-        <img src="https://i.ibb.co/gZQzvDp1/qu-Ohyw-V8.webp" alt="BlockSpin Values Logo" class="nav-logo-img">
+        <img src="https://i.ibb.co/Xk7sgWyt/Blockspinvaluesnew-1-5.png" alt="BlockSpin Values Logo" class="nav-logo-img">
         <span class="nav-title">Block<span style="color: #ff1a1a;">Spin</span> <span style="color: #33cce6;">Values</span></span>
       </a>
       <a href="x-about.html" data-i18n="nav.about">About Us</a>
@@ -121,7 +113,15 @@
     </div>
 
     <div class="search-container is-hidden" id="header-search">
-      <input id="search" type="text" data-i18n-placeholder="search.placeholder" data-i18n-aria="search.label" placeholder="Search items…" aria-label="Search items" />
+      <div class="search-bar">
+        <input id="search" type="text" data-i18n-placeholder="search.placeholder" data-i18n-aria="search.label" placeholder="Search items…" aria-label="Search items" />
+        <button type="button" class="search-reset-btn" id="search-reset" data-i18n-aria="search.resetAria" data-i18n-title="search.resetAria" hidden aria-label="Clear search and show all items" title="Clear search and show all items">
+          <svg class="search-reset-btn__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+        </button>
+      </div>
     </div>
     
     <div class="nav-right">
@@ -188,11 +188,6 @@
       </section>
     </div>
   </div>
-</div>
-
-<div class="mobile-subnav" data-i18n-aria="misc.secondaryNav" aria-label="Secondary navigation">
-  <a href="x-about.html" data-i18n="nav.about">About Us</a>
-  <a href="x-faq.html" data-i18n="nav.faq">FAQ</a>
 </div>
 
 <div id="loading-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(160deg, #1a2740 0%, #0f1724 100%); display: flex; align-items: center; justify-content: center; z-index: 9999;">
@@ -288,8 +283,6 @@ We’ve launched a complete site redesign, and items will now display both their
 </section>
     </main> 
 
-
-
     <div class="tax-sidebar-column" id="tax-sidebar-column">
     <aside class="tax-calculator">
         <div class="tax-badge-wrapper">
@@ -323,13 +316,17 @@ We’ve launched a complete site redesign, and items will now display both their
 
 </div>
 
+<aside class="richest-hero-panel" id="richest-hero-panel" hidden aria-hidden="true">
+  <img class="richest-hero-image" src="https://i.ibb.co/Zpd59zpc/ea8270e2-9913-41fa-b961-3ab29f74b3ea-removebg-preview.png" alt="BlockSpin richest player character" loading="lazy" decoding="async">
+</aside>
+
 <script src="auth.js?v=20260619-test-oauth"></script>
-<script src="saved-cards.js?v=20260618-saved-empty-copy"></script>
-<script src="site-i18n.js?v=20260618-discord-flash"></script>
+<script src="saved-cards.js?v=20260619-saved-sync-fix"></script>
+<script src="site-i18n.js?v=20260619-farming-paste"></script>
 <script src="site-settings.js?v=20260614-i18n-full"></script>
-<script src="section-config.js?v=20260618-no-test"></script>
+<script src="section-config.js?v=20260619-guide-fastnav"></script>
 <script src="quest-guide-i18n.js?v=20260618-quest-intro"></script>
-<script src="script.js?v=20260618-no-test"></script> 
+<script src="script.js?v=20260619-guide-fastnav"></script> 
 
 
 <footer class="site-footer">
@@ -339,56 +336,45 @@ We’ve launched a complete site redesign, and items will now display both their
       <div class="footer-boosters-track" id="footer-boosters-track"></div>
     </div>
   </section>
-  <div class="footer-content">
-    <p data-i18n="footer.copyright">© 2026 BlockSpin Values · Dev site</p>
-    <div class="footer-links">
-      <a href="z-contact.html" data-i18n="footer.contact">Contact Us</a>
-<span>•</span>
-<a href="z-terms.html" data-i18n="footer.terms">Terms of Service</a>
-<span>•</span>
-<a href="z-privacy.html" data-i18n="footer.privacy">Privacy Policy</a>
+  <div class="footer-side-nav">
+    <div class="footer-side-nav__group" aria-label="Contact">
+      <p class="footer-side-nav__title">Contact</p>
+      <ul class="footer-side-nav__list">
+        <li>
+          <a class="footer-side-nav__link" href="mailto:riverytacc11@gmail.com">
+            <svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            <span>Email</span>
+          </a>
+        </li>
+        <li>
+          <a class="footer-side-nav__link" href="https://discord.gg/blockspinvalues" target="_blank" rel="noopener noreferrer">
+            <svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.445.865-.608 1.25-1.845-.276-3.68-.276-5.487 0-.164-.393-.406-.874-.618-1.25a.077.077 0 0 0-.078-.037 19.736 19.736 0 0 0-4.885 1.515.07.07 0 0 0-.032.028C.533 9.046-.319 13.58.099 18.058a.082.082 0 0 0 .031.056c2.053 1.508 4.041 2.423 5.993 3.029a.078.078 0 0 0 .084-.028c.462-.63.873-1.295 1.226-1.994a.076.076 0 0 0-.042-.106c-.653-.248-1.274-.55-1.872-.892a.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.099.246.198.373.292a.077.077 0 0 1-.007.128 12.299 12.299 0 0 1-1.873.891.077.077 0 0 0-.041.107c.36.698.772 1.363 1.225 1.993a.076.076 0 0 0 .084.028c1.961-.607 3.95-1.522 6.002-3.029a.077.077 0 0 0 .031-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.029zM8.02 15.331c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.211 0 2.176 1.095 2.157 2.419 0 1.333-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.211 0 2.176 1.095 2.157 2.419 0 1.333-.946 2.419-2.157 2.419z"/></svg>
+            <span>Discord</span>
+          </a>
+        </li>
+      </ul>
     </div>
+    <div class="footer-side-nav__group" aria-label="Legal">
+      <p class="footer-side-nav__title" data-i18n="footer.legal">Legal</p>
+      <ul class="footer-side-nav__list">
+        <li>
+          <a class="footer-side-nav__link" href="z-terms.html">
+            <svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            <span data-i18n="footer.terms">Terms of Service</span>
+          </a>
+        </li>
+        <li>
+          <a class="footer-side-nav__link" href="z-privacy.html">
+            <svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 6h2v2h-2V7zm0 4h2v6h-2v-6z"/></svg>
+            <span data-i18n="footer.privacy">Privacy Policy</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-content">
+    <p data-i18n="footer.copyright">© 2026 BlockSpin Values</p>
   </div>
 </footer>
-
-<div class="mobile-calc-backdrop" id="mobile-calc-backdrop" aria-hidden="true"></div>
-<button class="mobile-calc-arrow" id="mobile-calc-arrow" type="button" data-i18n-aria="tax.openMobile" aria-label="Open tax calculator">
-  <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
-  </svg>
-</button>
-
-<aside class="mobile-tax-calc" id="mobile-tax-calc">
-  <button class="mobile-calc-close" id="mobile-calc-close">×</button>
-  <div class="mobile-tax-scroll" id="mobile-tax-scroll">
-  <div class="mobile-tax-content" id="mobile-tax-content">
-    <div class="tax-badge-wrapper">
-      <div class="tax-badge"></div>
-      <div class="tax-badge-tooltip" data-i18n="tax.tooltip">
-        Our Tax Calculator has been carefully tested to ensure accuracy. If you find an issue, please let us know.
-      </div>
-    </div>
-    <h2 data-i18n="tax.title">Tax Calculator</h2>
-    <div class="tax-result">
-      <div class="amount">$<span id="mobile-tax-amount">0</span></div>
-      <div id="mobile-tax-breakdown" class="tax-breakdown"></div>
-    </div>
-    <input type="number" id="mobile-tax-input" data-i18n-placeholder="tax.placeholder" placeholder="Enter cash amount to drop" />
-    <div class="tax-reminders">
-      <h3 class="tax-reminders-heading" data-i18n="tax.howTitle">How does it work?</h3>
-      <p class="tax-reminders-intro" data-i18n="tax.howIntro">Tax Calculator shows exactly how much cash to drop and in what order to avoid losing money to the game's cash tax system.</p>
-      <p class="tax-reminders-bullets" data-i18n-html="tax.bullets">- <strong>You NEED BlockSpin Plus</strong> for this Calculator<br>
-      - <span class="tax-warning-line">Never reset with more than 60,000 cash on you</span><br>
-      - <strong>NEVER</strong> leave the game in combat after resetting<br>
-      - Wait 1 min in between cash drops</p>
-    </div>
-  </div>
-  <div class="mobile-recent-changes" id="mobile-recent-changes">
-    <h2 class="value-changes-heading" data-i18n="home.valueChanges">Value Changes</h2>
-    <div class="value-changes-list" id="mobile-value-changes-list">
-      <div class="value-changes-loading" data-i18n="loading.changes">Loading value changes...</div>
-    </div>
-  </div>
-</aside>
 </body> 
 </html>

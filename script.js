@@ -59,6 +59,9 @@ const ANACONDA_GIVEAWAY_IMAGE_URL = "https://i.ibb.co/QqD6BSd/j-Sn2mv-Y-1-remove
 const ANACONDA_GIVEAWAY_DISCORD_URL = "https://discord.gg/nKKkXyqCsv";
 const ROBUX_GIVEAWAY_IMAGE_URL = "https://i.ibb.co/7fC16qY/Screenshot-2026-05-06-at-02-28-05-removebg-preview.png";
 const ROBUX_GIVEAWAY_DISCORD_URL = "https://discord.gg/GufVWmACAh";
+const FISHING_GUIDE_FOOTER_IMAGE_URL = "https://i.ibb.co/pvBhZgf5/no-Filter-7-removebg-preview.png";
+const FARMING_GUIDE_FOOTER_IMAGE_URL = "https://i.ibb.co/WWjndtxz/8b388c3c-7695-431b-8b2f-9350b0406615-removebg-preview.png";
+const GUIDE_COMING_SOON_IMAGE_URL = "https://i.ibb.co/WpMkM9xS/Screenshot-2026-07-05-at-11-09-38-removebg-preview.png";
 const BSV_DISCORD_GUILD_ID = "1402820361539817554";
 const BSV_DISCORD_INVITE_URL = "https://discord.gg/QbapryYUUx";
 const BSV_BOT_PUBLIC_BASE_DEFAULT = "https://bsv-bot-production.up.railway.app";
@@ -226,10 +229,22 @@ function getDiscordPromoSectionCopy(sectionTitle) {
   return map[sectionTitle] || { tags: "Trading · Middleman · Giveaways" };
 }
 
+function buildMiddlemanShieldIconHtml(size) {
+  var px = size || 26;
+  return (
+    '<svg class="middleman-shield-icon" viewBox="0 0 24 24" width="' + px + '" height="' + px + '" aria-hidden="true">' +
+      '<path fill="#ffffff" stroke="#000000" stroke-width="1.65" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>' +
+      '<path fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 12.5l2 2.5 4.5-5"></path>' +
+    '</svg>'
+  );
+}
+
 function buildDiscordCardExplainerSlideHtml(kind) {
   var isGiveaways = kind === "giveaways";
   var modClass = isGiveaways ? "home-discord-promo__offer--giveaways" : "home-discord-promo__offer--middleman";
-  var icon = isGiveaways ? "🎁" : "🛡️";
+  var iconMarkup = isGiveaways
+    ? '<span class="home-discord-promo__offer-emoji" aria-hidden="true">🎁</span>'
+    : '<span class="home-discord-promo__offer-icon-wrap" aria-hidden="true">' + buildMiddlemanShieldIconHtml() + '</span>';
   var title = isGiveaways ? i18n("discord.card.giveawaysTitle") : i18n("discord.card.middlemanTitle");
   var text = isGiveaways ? i18n("discord.card.giveawaysDesc") : i18n("discord.card.middlemanDesc");
   var tags = isGiveaways
@@ -243,7 +258,7 @@ function buildDiscordCardExplainerSlideHtml(kind) {
 
   return (
     '<div class="home-discord-promo__offer ' + modClass + '">' +
-      '<span class="home-discord-promo__offer-emoji" aria-hidden="true">' + icon + '</span>' +
+      iconMarkup +
       '<p class="home-discord-promo__card-title home-discord-promo__offer-title">' + escapeHtml(title) + '</p>' +
       '<p class="home-discord-promo__offer-text">' + escapeHtml(text) + '</p>' +
       '<p class="home-discord-promo__card-tags home-discord-promo__offer-tags">' + escapeHtml(tags) + '</p>' +
@@ -258,7 +273,7 @@ function buildDiscordPromoCardSlotHtml(sectionTitle) {
     '<div class="home-discord-promo__carousel-slide is-active" data-slide="join" aria-hidden="false">' +
       '<img src="https://i.ibb.co/Tq7DLCJt/dsfbvbvxcxbvn.png" alt="" width="48" height="48" class="home-discord-promo__card-logo">' +
       '<p class="home-discord-promo__card-title">Join Our Discord Server</p>' +
-      '<p class="home-discord-promo__card-stat"><span class="discord-member-count">—</span>+ traders</p>' +
+      '<p class="home-discord-promo__card-stat"><span class="discord-member-count" data-home-stat="traders">0</span>+ traders</p>' +
       '<p class="home-discord-promo__card-tags">' + escapeHtml(copy.tags) + '</p>' +
       '<div class="home-discord-promo__card-actions">' +
         '<a href="' + BSV_DISCORD_INVITE_URL + '" target="_blank" rel="noopener noreferrer" class="home-discord-promo__card-btn home-discord-promo__card-btn--join">' + escapeHtml(i18n("discord.card.joinNow")) + '</a>' +
@@ -380,13 +395,13 @@ function buildDiscordPromoBannerHtml(inCards) {
           '<p class="home-discord-promo__title home-discord-promo__flash-title">' + escapeHtml(i18n("discord.home.title")) + "</p>" +
           '<p class="home-discord-promo__hook home-discord-promo__flash-hook">' + escapeHtml(i18n("discord.home.hook")) + "</p>" +
           '<p class="home-discord-promo__flash-stat">' +
-            '<span class="home-discord-promo__flash-stat-num"><span class="discord-member-count">—</span>+</span>' +
+            '<span class="home-discord-promo__flash-stat-num"><span class="discord-member-count" data-home-stat="traders">0</span>+</span>' +
             '<span class="home-discord-promo__flash-stat-label">' + escapeHtml(i18n("discord.home.statLabel")) + "</span>" +
           "</p>" +
         "</div>" +
         '<div class="home-discord-promo__flash-perks">' +
           buildHomeFlashPerkHtml("trading", "📊", "discord.card.tradingPerk", "discord.home.tradingTag1") +
-          buildHomeFlashPerkHtml("middleman", "🛡️", "discord.card.middlemanTitle", "discord.card.middlemanStep1") +
+          buildHomeFlashPerkHtml("middleman", buildMiddlemanShieldIconHtml(22), "discord.card.middlemanTitle", "discord.card.middlemanStep1") +
           buildHomeFlashPerkHtml("giveaways", "🎁", "discord.card.giveawaysTitle", "discord.card.giveawaysTag2") +
         "</div>" +
         '<div class="home-discord-promo__actions home-discord-promo__actions--home home-discord-promo__flash-actions">' +
@@ -634,13 +649,11 @@ function setupDiscordClickTracking() {
 }
 
 function initDiscordJoinNudge() {
-  if (!window.matchMedia("(max-width: 1024px)").matches) return;
   if (sessionStorage.getItem(DISCORD_JOIN_NUDGE_STORAGE_KEY) === "1") return;
   var path = (window.location.pathname || "").toLowerCase();
   if (path.indexOf("blockspin-discord") !== -1) return;
 
   setTimeout(function () {
-    if (!window.matchMedia("(max-width: 1024px)").matches) return;
     if (sessionStorage.getItem(DISCORD_JOIN_NUDGE_STORAGE_KEY) === "1") return;
     if (document.getElementById("discord-join-nudge")) return;
 
@@ -653,7 +666,7 @@ function initDiscordJoinNudge() {
       '<button type="button" class="discord-join-nudge__close" aria-label="Dismiss">&times;</button>' +
       '<img src="https://i.ibb.co/Tq7DLCJt/dsfbvbvxcxbvn.png" alt="" width="36" height="36" class="discord-join-nudge__icon">' +
       '<div class="discord-join-nudge__body">' +
-        '<p class="discord-join-nudge__title">Join <span class="discord-member-count">—</span>+ BlockSpin traders</p>' +
+        '<p class="discord-join-nudge__title">Join <span class="discord-member-count" data-home-stat="traders">0</span>+ BlockSpin traders</p>' +
         '<p class="discord-join-nudge__text">Free middleman · live values · giveaways</p>' +
       '</div>' +
       '<div class="discord-join-nudge__actions">' +
@@ -706,9 +719,9 @@ function formatNetWorth(value) {
 }
 
 function getRankColor(rank) {
-  if (rank === 1) return '#FFD700';
-  if (rank === 2) return '#C0C0C0';
-  if (rank === 3) return '#CD7F32';
+  if (rank === 1) return '#FFE566';
+  if (rank === 2) return '#E8F0FF';
+  if (rank === 3) return '#FFB060';
   if (rank >= 4 && rank <= 25) return '#8B5CF6';
   if (rank >= 26 && rank <= 100) return '#EC4899';
   if (rank >= 101 && rank <= 500) return '#48BB78';
@@ -723,6 +736,16 @@ function getRankSize(rank) {
   return 'rank-default';
 }
 
+function getRankTierClass(rank) {
+  if (rank === 1) return 'rank-tier-1';
+  if (rank === 2) return 'rank-tier-2';
+  if (rank === 3) return 'rank-tier-3';
+  if (rank >= 4 && rank <= 25) return 'rank-tier-top25';
+  if (rank >= 26 && rank <= 100) return 'rank-tier-top100';
+  if (rank >= 101 && rank <= 500) return 'rank-tier-top500';
+  return 'rank-tier-default';
+}
+
 function getRichestPlayerFields(player, index) {
   const rank = index + 1;
   const playerName = player["Roblox Username"] || player["Player Name"] || player.Name || "Unknown";
@@ -730,6 +753,7 @@ function getRichestPlayerFields(player, index) {
     rank: rank,
     rankColor: getRankColor(rank),
     rankSize: getRankSize(rank),
+    rankTier: getRankTierClass(rank),
     rankClass: String(rank).length >= 3 ? "rank-long" : "",
     playerName: playerName,
     level: player["Level"] || "N/A",
@@ -743,6 +767,8 @@ function buildRichestPlayerCard(player, index) {
   return (
     '<div class="richest-card richest-card--gold ' +
     p.rankSize +
+    ' ' +
+    p.rankTier +
     '" style="border-color: ' +
     p.rankColor +
     ';" data-player-name="' +
@@ -757,6 +783,7 @@ function buildRichestPlayerCard(player, index) {
     ';">#' +
     p.rank +
     "</div>" +
+    '<img class="player-avatar" alt="" width="56" height="56" decoding="async" />' +
     '<div class="player-info">' +
     '<div class="player-name">' +
     escapeHtml(p.playerName) +
@@ -815,7 +842,13 @@ function createRichestPlayersSection(data) {
     "<h2>" + escapeHtml(i18n("richest.title")) + "</h2>" +
     '<p class="richest-intro">' + escapeHtml(i18n("richest.intro")) + "</p>" +
     notListedLink +
-    '<input type="text" class="richest-search" id="richest-search-input" placeholder="' + escapeAttr(i18n("richest.search")) + '" />' +
+    '<div class="richest-search-bar">' +
+    '<input type="text" class="richest-search" id="richest-search-input" placeholder="' + escapeAttr(i18n("richest.search")) + '" aria-label="' + escapeAttr(i18n("richest.search")) + '" />' +
+    '<button type="button" class="search-reset-btn" id="richest-search-reset" hidden aria-label="' + escapeAttr(i18n("richest.searchResetAria")) + '" title="' + escapeAttr(i18n("richest.searchResetAria")) + '">' +
+    '<svg class="search-reset-btn__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>' +
+    '<path d="M3 3v5h5"/>' +
+    '</svg></button></div>' +
     "</div>" +
     buildRichestCardsContainer(data)
   );
@@ -832,6 +865,63 @@ function filterRichestPlayers(query) {
     const match = showAll || playerName.includes(searchTerm);
     card.style.setProperty("display", match ? "flex" : "none", "important");
   });
+}
+
+const RICHEST_AVATAR_BATCH_SIZE = 100;
+
+async function loadRichestPlayerAvatars() {
+  const section = document.querySelector(".richest-players-section");
+  if (!section) return;
+
+  const cards = Array.from(section.querySelectorAll(".richest-card[data-player-name]"));
+  if (!cards.length) return;
+
+  const names = [];
+  const seen = new Set();
+  cards.forEach(function (card) {
+    const name = String(card.dataset.playerName || "").trim();
+    const key = name.toLowerCase();
+    if (!name || seen.has(key)) return;
+    seen.add(key);
+    names.push(name);
+  });
+
+  const apiUrl =
+    typeof window.bsvBotApiUrl === "function"
+      ? window.bsvBotApiUrl("api/roblox-avatars")
+      : `${BSV_BOT_PUBLIC_BASE}/api/roblox-avatars`;
+
+  for (let i = 0; i < names.length; i += RICHEST_AVATAR_BATCH_SIZE) {
+    const batch = names.slice(i, i + RICHEST_AVATAR_BATCH_SIZE);
+    try {
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ usernames: batch })
+      });
+      if (!res.ok) continue;
+      const data = await res.json();
+      const avatars = (data && data.avatars) || {};
+
+      cards.forEach(function (card) {
+        const name = String(card.dataset.playerName || "").trim();
+        const entry = avatars[name.toLowerCase()];
+        if (!entry || !entry.imageUrl) return;
+
+        const img = card.querySelector(".player-avatar");
+        if (img) {
+          img.src = entry.imageUrl;
+          img.alt = name;
+        }
+        if (entry.profileUrl) {
+          const link = card.querySelector(".profile-link");
+          if (link) link.href = entry.profileUrl;
+        }
+      });
+    } catch (err) {
+      console.warn("Failed to load richest player avatars:", err);
+    }
+  }
 }
 
 async function fetchSheet(sheetName) {
@@ -1479,17 +1569,45 @@ function createFishingTypeCard(item) {
   `;
 }
 
+function buildComingSoonGuidePanelHtml() {
+  return (
+    '<div class="coming-soon-guide-wrap">' +
+    '<h3 class="coming-soon-guide-title" id="mg-guide-coming-soon">' +
+    escapeHtml(i18n("guide.comingSoonSection")) +
+    "</h3>" +
+    '<div class="guide-coming-soon-showcase">' +
+    '<img src="' +
+    escapeAttr(GUIDE_COMING_SOON_IMAGE_URL) +
+    '" alt="" loading="lazy" decoding="async" />' +
+    "</div></div>"
+  );
+}
+
+function buildGuideFooterImageHtml(imageUrl) {
+  if (!imageUrl) return "";
+  return (
+    '<div class="guide-footer-image">' +
+    '<img src="' +
+    escapeAttr(imageUrl) +
+    '" alt="" loading="lazy" decoding="async" />' +
+    '<p class="guide-footer-image__caption">' +
+    escapeHtml(i18n("guide.moreComingSoon")) +
+    "</p></div>"
+  );
+}
+
 function buildFishingGuideHtml(fishingItems, fishingTypes) {
   const itemCards = (fishingItems || []).map(createFishingItemCard).filter(Boolean).join("");
   const typeCards = (fishingTypes || []).map(createFishingTypeCard).filter(Boolean).join("");
 
   return `
     <div class="fishing-guide-wrap">
-      <h3 class="fishing-guide-title">${escapeHtml(i18n("guide.fishing"))}</h3>
-      <h4 class="fishing-mini-header">${escapeHtml(i18n("guide.items"))}</h4>
+      <h3 class="fishing-guide-title" id="mg-guide-fishing">${escapeHtml(i18n("guide.fishing"))}</h3>
+      <h4 class="fishing-mini-header" id="mg-fishing-items">${escapeHtml(i18n("guide.items"))}</h4>
       <div class="guide-vcards-grid fishing-items-cards">${itemCards || '<p class="fishing-empty">' + escapeHtml(i18n("guide.noFishingItems")) + '</p>'}</div>
-      <h4 class="fishing-mini-header">${escapeHtml(i18n("guide.fishTypes"))}</h4>
+      <h4 class="fishing-mini-header" id="mg-fishing-types">${escapeHtml(i18n("guide.fishTypes"))}</h4>
       <div class="guide-vcards-grid fishing-types-cards">${typeCards || '<p class="fishing-empty">' + escapeHtml(i18n("guide.noFishTypes")) + '</p>'}</div>
+      ${buildGuideFooterImageHtml(FISHING_GUIDE_FOOTER_IMAGE_URL)}
     </div>
   `;
 }
@@ -1530,6 +1648,159 @@ function formatFarmingMoney(amount) {
   return "$" + Number(amount).toLocaleString("en-US");
 }
 
+function parseFarmingTimeToMinutes(timeStr) {
+  var s = String(timeStr || "").trim().toLowerCase();
+  var m = /^(\d+)\s*minutes?$/.exec(s);
+  if (m) return Number(m[1]);
+  m = /^(\d+)\s*hours?$/.exec(s);
+  if (m) return Number(m[1]) * 60;
+  m = /^(\d+)\s*days?$/.exec(s);
+  if (m) return Number(m[1]) * 1440;
+  return 0;
+}
+
+function formatFarmingTimeBreakdown(timeStr) {
+  if (window.bsvI18n && window.bsvI18n.tTime) {
+    return window.bsvI18n.tTime(timeStr);
+  }
+  return timeStr;
+}
+
+function formatFarmingPotList(potNumbers) {
+  var labels = potNumbers.map(function (n) {
+    return i18n("guide.potN", { n: n });
+  });
+  var andWord = i18n("guide.and");
+  if (labels.length === 1) return labels[0];
+  if (labels.length === 2) return labels[0] + " " + andWord + " " + labels[1];
+  return labels.slice(0, -1).join(", ") + ", " + andWord + " " + labels[labels.length - 1];
+}
+
+function buildFarmingTimeBreakdownLines(plots) {
+  var potsByTime = new Map();
+
+  plots.forEach(function (plot) {
+    var time = plot.dataset.time;
+    if (!time) return;
+    var potNum = Number(plot.dataset.plotIndex) + 1;
+    if (!potsByTime.has(time)) potsByTime.set(time, []);
+    potsByTime.get(time).push(potNum);
+  });
+
+  if (!potsByTime.size) return [];
+
+  return [...potsByTime.entries()]
+    .sort(function (a, b) {
+      var minA = Math.min.apply(null, a[1]);
+      var minB = Math.min.apply(null, b[1]);
+      return minA - minB;
+    })
+    .map(function (entry) {
+      var time = entry[0];
+      var potNumbers = entry[1].sort(function (a, b) {
+        return a - b;
+      });
+      return i18n("guide.potsGrowIn", {
+        potList: formatFarmingPotList(potNumbers),
+        time: formatFarmingTimeBreakdown(time)
+      });
+    });
+}
+
+let FARMING_ITEM_IMAGES = {};
+
+function buildFarmingItemImageLookup(farmingItems) {
+  const lookup = {};
+  (farmingItems || []).forEach(function (item) {
+    const name = guideField(item, ["Farming Item", "Name", "Item Name"]);
+    if (!name) return;
+    const imageUrl = guideField(item, ["Farming Image", "Item image", "Image", "Image URL"]);
+    if (imageUrl) lookup[name] = imageUrl;
+  });
+  return lookup;
+}
+
+function farmingOptionLabel(optionValue) {
+  return window.bsvI18n && window.bsvI18n.tFarmingOption
+    ? window.bsvI18n.tFarmingOption(optionValue)
+    : optionValue;
+}
+
+function farmingOptionImageHtml(optionValue, className) {
+  const imageUrl = FARMING_ITEM_IMAGES[optionValue];
+  if (!imageUrl) {
+    return '<span class="' + className + ' farming-plot__option-image--empty" aria-hidden="true"></span>';
+  }
+  return (
+    '<img class="' +
+    className +
+    '" src="' +
+    escapeAttr(imageUrl) +
+    '" alt="" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">'
+  );
+}
+
+function farmingPickerTriggerHtml(placeholder, value) {
+  if (!value) {
+    return (
+      '<span class="farming-plot__picker-value farming-plot__picker-value--placeholder">' +
+      escapeHtml(placeholder) +
+      "</span>"
+    );
+  }
+  return (
+    farmingOptionImageHtml(value, "farming-plot__picker-thumb") +
+    '<span class="farming-plot__picker-value">' +
+    escapeHtml(farmingOptionLabel(value)) +
+    "</span>"
+  );
+}
+
+function buildFarmingSelectOptions(options, placeholderKey) {
+  var placeholder = i18n(placeholderKey);
+  var opts = '<option value="">' + escapeHtml(placeholder) + "</option>";
+  options.forEach(function (opt) {
+    var label = farmingOptionLabel(opt);
+    opts += '<option value="' + escapeAttr(opt) + '">' + escapeHtml(label) + "</option>";
+  });
+  return opts;
+}
+
+function buildFarmingImagePickerHtml(options, placeholderKey, selectClass) {
+  var placeholder = i18n(placeholderKey);
+  var optionItems = options
+    .map(function (opt) {
+      return (
+        '<li><button type="button" class="farming-plot__picker-option" role="option" data-value="' +
+        escapeAttr(opt) +
+        '">' +
+        farmingOptionImageHtml(opt, "farming-plot__option-image") +
+        '<span class="farming-plot__option-label">' +
+        escapeHtml(farmingOptionLabel(opt)) +
+        "</span></button></li>"
+      );
+    })
+    .join("");
+
+  return (
+    '<div class="farming-plot__picker" data-placeholder="' +
+    escapeAttr(placeholder) +
+    '">' +
+    '<select class="farming-plot__select ' +
+    selectClass +
+    ' farming-plot__select--native" aria-hidden="true" tabindex="-1">' +
+    buildFarmingSelectOptions(options, placeholderKey) +
+    "</select>" +
+    '<button type="button" class="farming-plot__picker-trigger" aria-haspopup="listbox" aria-expanded="false">' +
+    farmingPickerTriggerHtml(placeholder, "") +
+    '<span class="farming-plot__picker-chevron" aria-hidden="true"></span>' +
+    "</button>" +
+    '<ul class="farming-plot__picker-menu" role="listbox" hidden>' +
+    optionItems +
+    "</ul></div>"
+  );
+}
+
 function farmingPotThemeClass(pot) {
   if (pot === "Diamond Pot") return "farming-plot--pot-diamond";
   if (pot === "Golden Pot") return "farming-plot--pot-golden";
@@ -1537,14 +1808,82 @@ function farmingPotThemeClass(pot) {
   return "";
 }
 
-function buildFarmingSelectOptions(options, placeholderKey) {
-  var placeholder = i18n(placeholderKey);
-  var opts = '<option value="">' + escapeHtml(placeholder) + "</option>";
-  options.forEach(function (opt) {
-    var label = window.bsvI18n && window.bsvI18n.tFarmingOption ? window.bsvI18n.tFarmingOption(opt) : opt;
-    opts += '<option value="' + escapeAttr(opt) + '">' + escapeHtml(label) + "</option>";
+function syncFarmingPickerDisplay(pickerEl) {
+  if (!pickerEl) return;
+  var select = pickerEl.querySelector(".farming-plot__select--native");
+  var trigger = pickerEl.querySelector(".farming-plot__picker-trigger");
+  if (!select || !trigger) return;
+
+  var placeholder = pickerEl.dataset.placeholder || "";
+  var value = select.value;
+  trigger.innerHTML =
+    farmingPickerTriggerHtml(placeholder, value) +
+    '<span class="farming-plot__picker-chevron" aria-hidden="true"></span>';
+
+  pickerEl.querySelectorAll(".farming-plot__picker-option").forEach(function (optionBtn) {
+    optionBtn.setAttribute("aria-selected", optionBtn.dataset.value === value ? "true" : "false");
   });
-  return opts;
+}
+
+function setFarmingPickerValue(pickerEl, value) {
+  if (!pickerEl) return;
+  var select = pickerEl.querySelector(".farming-plot__select--native");
+  if (!select) return;
+  select.value = value || "";
+  syncFarmingPickerDisplay(pickerEl);
+}
+
+function closeFarmingPickerMenu(pickerEl) {
+  if (!pickerEl) return;
+  var menu = pickerEl.querySelector(".farming-plot__picker-menu");
+  var trigger = pickerEl.querySelector(".farming-plot__picker-trigger");
+  if (menu) menu.hidden = true;
+  if (trigger) trigger.setAttribute("aria-expanded", "false");
+  pickerEl.classList.remove("farming-plot__picker--open");
+}
+
+function closeAllFarmingPickerMenus(exceptPicker) {
+  document.querySelectorAll(".farming-plot__picker--open").forEach(function (picker) {
+    if (picker !== exceptPicker) closeFarmingPickerMenu(picker);
+  });
+}
+
+function toggleFarmingPickerMenu(pickerEl) {
+  if (!pickerEl) return;
+  var menu = pickerEl.querySelector(".farming-plot__picker-menu");
+  var trigger = pickerEl.querySelector(".farming-plot__picker-trigger");
+  if (!menu || !trigger) return;
+
+  var willOpen = menu.hidden;
+  closeAllFarmingPickerMenus(pickerEl);
+  menu.hidden = !willOpen;
+  trigger.setAttribute("aria-expanded", willOpen ? "true" : "false");
+  pickerEl.classList.toggle("farming-plot__picker--open", willOpen);
+}
+
+function initFarmingImagePicker(pickerEl, onChange) {
+  if (!pickerEl || pickerEl.dataset.pickerInit === "1") return;
+  pickerEl.dataset.pickerInit = "1";
+
+  var select = pickerEl.querySelector(".farming-plot__select--native");
+  var trigger = pickerEl.querySelector(".farming-plot__picker-trigger");
+  var menu = pickerEl.querySelector(".farming-plot__picker-menu");
+  if (!select || !trigger || !menu) return;
+
+  syncFarmingPickerDisplay(pickerEl);
+
+  trigger.addEventListener("click", function () {
+    toggleFarmingPickerMenu(pickerEl);
+  });
+
+  menu.querySelectorAll(".farming-plot__picker-option").forEach(function (optionBtn) {
+    optionBtn.addEventListener("click", function () {
+      select.value = optionBtn.dataset.value || "";
+      syncFarmingPickerDisplay(pickerEl);
+      closeFarmingPickerMenu(pickerEl);
+      if (typeof onChange === "function") onChange();
+    });
+  });
 }
 
 function buildFarmingPlotPlannerHtml() {
@@ -1555,26 +1894,23 @@ function buildFarmingPlotPlannerHtml() {
         <div class="farming-plot__shell">
           <header class="farming-plot__header">
             <span class="farming-plot__label">${escapeHtml(i18n("guide.potN", { n: i + 1 }))}</span>
-            <button type="button" class="farming-plot__reset" aria-label="${escapeAttr(i18n("guide.resetPotAria", { n: i + 1 }))}">${escapeHtml(i18n("guide.resetPot"))}</button>
+            <div class="farming-plot__actions">
+              <button type="button" class="farming-plot__paste" aria-label="${escapeAttr(i18n("guide.pastePotAria", { n: i + 1, next: ((i + 1) % FARMING_PLOT_COUNT) + 1 }))}">${escapeHtml(i18n("guide.pastePot"))}</button>
+              <button type="button" class="farming-plot__reset" aria-label="${escapeAttr(i18n("guide.resetPotAria", { n: i + 1 }))}">${escapeHtml(i18n("guide.resetPot"))}</button>
+            </div>
           </header>
           <div class="farming-plot__pickers">
             <label class="farming-plot__field">
               <span class="farming-plot__field-name">${escapeHtml(i18n("guide.pot"))}</span>
-              <select class="farming-plot__select farming-plot__pot" aria-label="${escapeAttr(i18n("guide.potN", { n: i + 1 }))}">
-                ${buildFarmingSelectOptions(FARMING_POT_OPTIONS, "guide.choosePot")}
-              </select>
+              ${buildFarmingImagePickerHtml(FARMING_POT_OPTIONS, "guide.choosePot", "farming-plot__pot")}
             </label>
             <label class="farming-plot__field">
               <span class="farming-plot__field-name">${escapeHtml(i18n("guide.soil"))}</span>
-              <select class="farming-plot__select farming-plot__soil" aria-label="${escapeAttr(i18n("guide.potN", { n: i + 1 }))}">
-                ${buildFarmingSelectOptions(FARMING_SOIL_OPTIONS, "guide.chooseSoil")}
-              </select>
+              ${buildFarmingImagePickerHtml(FARMING_SOIL_OPTIONS, "guide.chooseSoil", "farming-plot__soil")}
             </label>
             <label class="farming-plot__field">
               <span class="farming-plot__field-name">${escapeHtml(i18n("guide.seed"))}</span>
-              <select class="farming-plot__select farming-plot__seed" aria-label="${escapeAttr(i18n("guide.potN", { n: i + 1 }))}">
-                ${buildFarmingSelectOptions(FARMING_SEED_OPTIONS, "guide.chooseSeed")}
-              </select>
+              ${buildFarmingImagePickerHtml(FARMING_SEED_OPTIONS, "guide.chooseSeed", "farming-plot__seed")}
             </label>
           </div>
           <div class="farming-plot__result" hidden>
@@ -1588,24 +1924,55 @@ function buildFarmingPlotPlannerHtml() {
   }
 
   return `
-    <section class="farming-planner" aria-label="${escapeAttr(i18n("guide.plannerAria"))}">
+    <section class="farming-planner" id="mg-farming-planner" aria-label="${escapeAttr(i18n("guide.plannerAria"))}">
       <h4 class="guide-mini-header farming-planner__title">${escapeHtml(i18n("guide.plantPlanner"))}</h4>
       <p class="farming-planner__intro">${escapeHtml(i18n("guide.plantIntro"))}</p>
       <div class="farming-plots-grid">${plots.join("")}</div>
       <div class="farming-planner-summary" hidden>
         <h5 class="farming-planner-summary__title">${escapeHtml(i18n("guide.allPlots"))}</h5>
-        <p class="farming-planner-summary__row"><span>${escapeHtml(i18n("guide.totalPayout"))}</span> <strong class="farming-planner-summary__money"></strong></p>
-        <p class="farming-planner-summary__row"><span>${escapeHtml(i18n("guide.totalPlus"))}</span> <strong class="farming-planner-summary__money-plus"></strong></p>
+        <div class="farming-planner-summary__totals">
+          <p class="farming-planner-summary__row"><span>${escapeHtml(i18n("guide.totalPayout"))}</span> <strong class="farming-planner-summary__money"></strong></p>
+          <p class="farming-planner-summary__row"><span>${escapeHtml(i18n("guide.totalPlus"))}</span> <strong class="farming-planner-summary__money-plus"></strong></p>
+        </div>
+        <div class="farming-planner-summary__times">
+          <h6 class="farming-planner-summary__times-title">${escapeHtml(i18n("guide.timeBreakdown"))}</h6>
+          <ul class="farming-planner-summary__times-list"></ul>
+        </div>
       </div>
     </section>`;
 }
 
+function syncFarmingPlotPickers(plotEl) {
+  if (!plotEl) return;
+  plotEl.querySelectorAll(".farming-plot__picker").forEach(syncFarmingPickerDisplay);
+}
+
 function resetFarmingPlot(plotEl, plannerRoot) {
   if (!plotEl) return;
-  plotEl.querySelectorAll(".farming-plot__select").forEach(function (select) {
-    select.value = "";
+  plotEl.querySelectorAll(".farming-plot__picker").forEach(function (picker) {
+    setFarmingPickerValue(picker, "");
   });
   updateFarmingPlot(plotEl);
+  updateFarmingPlannerSummary(plannerRoot);
+}
+
+function pasteFarmingPlotToNext(sourcePlotEl, plannerRoot) {
+  if (!sourcePlotEl || !plannerRoot) return;
+  var sourceIndex = Number(sourcePlotEl.dataset.plotIndex);
+  if (isNaN(sourceIndex)) return;
+
+  var plots = plannerRoot.querySelectorAll(".farming-plot");
+  if (!plots.length) return;
+
+  var targetPlot = plots[(sourceIndex + 1) % plots.length];
+  if (!targetPlot) return;
+
+  targetPlot.querySelector(".farming-plot__pot").value = sourcePlotEl.querySelector(".farming-plot__pot").value;
+  targetPlot.querySelector(".farming-plot__soil").value = sourcePlotEl.querySelector(".farming-plot__soil").value;
+  targetPlot.querySelector(".farming-plot__seed").value = sourcePlotEl.querySelector(".farming-plot__seed").value;
+  syncFarmingPlotPickers(targetPlot);
+
+  updateFarmingPlot(targetPlot);
   updateFarmingPlannerSummary(plannerRoot);
 }
 
@@ -1631,6 +1998,7 @@ function updateFarmingPlot(plotEl) {
     hintEl.hidden = false;
     plotEl.dataset.money = "";
     plotEl.dataset.moneyPlus = "";
+    plotEl.dataset.time = "";
     return;
   }
 
@@ -1641,6 +2009,7 @@ function updateFarmingPlot(plotEl) {
   hintEl.hidden = true;
   plotEl.dataset.money = String(combo.money);
   plotEl.dataset.moneyPlus = String(combo.moneyPlus);
+  plotEl.dataset.time = combo.time;
 }
 
 function updateFarmingPlannerSummary(plannerRoot) {
@@ -1669,6 +2038,20 @@ function updateFarmingPlannerSummary(plannerRoot) {
 
   summaryEl.querySelector(".farming-planner-summary__money").textContent = formatFarmingMoney(totalMoney);
   summaryEl.querySelector(".farming-planner-summary__money-plus").textContent = formatFarmingMoney(totalPlus);
+
+  var timesList = summaryEl.querySelector(".farming-planner-summary__times-list");
+  var timeLines = buildFarmingTimeBreakdownLines(plots);
+  if (timesList) {
+    timesList.innerHTML = timeLines
+      .map(function (line) {
+        return "<li>" + escapeHtml(line) + "</li>";
+      })
+      .join("");
+  }
+
+  var timesBlock = summaryEl.querySelector(".farming-planner-summary__times");
+  if (timesBlock) timesBlock.hidden = timeLines.length === 0;
+
   summaryEl.hidden = false;
 }
 
@@ -1676,14 +2059,31 @@ function initFarmingPlotPlanner(root) {
   if (!root || root.dataset.plannerInit === "1") return;
   root.dataset.plannerInit = "1";
 
+  if (!root.dataset.pickerDismissInit) {
+    root.dataset.pickerDismissInit = "1";
+    document.addEventListener("click", function (event) {
+      if (event.target.closest(".farming-plot__picker")) return;
+      closeAllFarmingPickerMenus();
+    });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") closeAllFarmingPickerMenus();
+    });
+  }
+
   var plots = root.querySelectorAll(".farming-plot");
   plots.forEach(function (plot) {
-    plot.querySelectorAll(".farming-plot__select").forEach(function (select) {
-      select.addEventListener("change", function () {
+    plot.querySelectorAll(".farming-plot__picker").forEach(function (picker) {
+      initFarmingImagePicker(picker, function () {
         updateFarmingPlot(plot);
         updateFarmingPlannerSummary(root);
       });
     });
+    var pasteBtn = plot.querySelector(".farming-plot__paste");
+    if (pasteBtn) {
+      pasteBtn.addEventListener("click", function () {
+        pasteFarmingPlotToNext(plot, root);
+      });
+    }
     var resetBtn = plot.querySelector(".farming-plot__reset");
     if (resetBtn) {
       resetBtn.addEventListener("click", function () {
@@ -1694,13 +2094,15 @@ function initFarmingPlotPlanner(root) {
 }
 
 function buildFarmingGuideHtml(farmingItems) {
+  FARMING_ITEM_IMAGES = buildFarmingItemImageLookup(farmingItems);
   const itemCards = (farmingItems || []).map(createFarmingItemCard).filter(Boolean).join("");
   return `
     <div class="farming-guide-wrap">
-      <h3 class="farming-guide-title">${escapeHtml(i18n("guide.farming"))}</h3>
-      <h4 class="guide-mini-header">${escapeHtml(i18n("guide.items"))}</h4>
+      <h3 class="farming-guide-title" id="mg-guide-farming">${escapeHtml(i18n("guide.farming"))}</h3>
+      <h4 class="guide-mini-header" id="mg-farming-items">${escapeHtml(i18n("guide.items"))}</h4>
       <div class="guide-vcards-grid farming-items-cards">${itemCards || '<p class="guide-empty">' + escapeHtml(i18n("guide.noFarmingItems")) + '</p>'}</div>
       ${buildFarmingPlotPlannerHtml()}
+      ${buildGuideFooterImageHtml(FARMING_GUIDE_FOOTER_IMAGE_URL)}
     </div>
   `;
 }
@@ -1813,57 +2215,64 @@ function getQuestGuideDataLocal() {
 }
 
 function buildQuestGuideIntroHtml(introClass) {
-  var introCls = introClass || "quest-guide-wiki";
+  var introCls = introClass || "quest-guide-intro-wiki";
   var data = getQuestGuideDataLocal();
   var structure = data.introStructure;
-  var textHtml = "";
+  var bodyHtml = "";
 
   if (structure && Array.isArray(structure.points) && structure.points.length) {
-    var pointsHtml = structure.points.map(function (point) {
+    var sectionsHtml = structure.points.map(function (point) {
       return (
-        '<div class="quest-guide-intro__point">' +
-          '<h4 class="quest-guide-intro__point-title">' + escapeHtml(point.title || "") + "</h4>" +
-          '<p class="quest-guide-intro__point-text">' + escapeHtml(point.text || "") + "</p>" +
-        "</div>"
+        '<section class="quest-guide-intro-wiki__section">' +
+          '<h4 class="quest-guide-intro-wiki__heading">' + escapeHtml(point.title || "") + "</h4>" +
+          '<p class="quest-guide-intro-wiki__text">' + escapeHtml(point.text || "") + "</p>" +
+        "</section>"
       );
     }).join("");
 
     var rewardsHtml = "";
     if (structure.rewards && Array.isArray(structure.rewards.items) && structure.rewards.items.length) {
       rewardsHtml =
-        '<div class="quest-guide-intro__rewards">' +
-          '<p class="quest-guide-intro__rewards-title">' + escapeHtml(structure.rewards.title || "") + "</p>" +
-          '<div class="quest-guide-intro__reward-chips">' +
+        '<section class="quest-guide-intro-wiki__section quest-guide-intro-wiki__section--rewards">' +
+          '<h4 class="quest-guide-intro-wiki__heading">' + escapeHtml(structure.rewards.title || "") + "</h4>" +
+          '<ul class="quest-guide-intro-wiki__list">' +
             structure.rewards.items.map(function (item) {
-              return '<span class="quest-guide-intro__reward-chip">' + escapeHtml(item) + "</span>";
+              return "<li>" + escapeHtml(item) + "</li>";
             }).join("") +
-          "</div>" +
-        "</div>";
+          "</ul>" +
+        "</section>";
     }
 
-    textHtml =
-      '<div class="quest-guide-intro">' +
+    bodyHtml =
+      '<div class="quest-guide-intro-wiki__body">' +
         (structure.kicker
-          ? '<p class="quest-guide-intro__kicker">' + escapeHtml(structure.kicker) + "</p>"
+          ? '<p class="quest-guide-intro-wiki__lead">' + escapeHtml(structure.kicker) + "</p>"
           : "") +
-        '<div class="quest-guide-intro__points">' + pointsHtml + "</div>" +
+        sectionsHtml +
         rewardsHtml +
         (structure.note
-          ? '<p class="quest-guide-intro__note">' + escapeHtml(structure.note) + "</p>"
+          ? '<p class="quest-guide-intro-wiki__note">' + escapeHtml(structure.note) + "</p>"
           : "") +
       "</div>";
   } else {
-    textHtml = '<p class="quest-guide-intro__fallback">' + escapeHtml(data.intro || "") + "</p>";
+    bodyHtml =
+      '<div class="quest-guide-intro-wiki__body">' +
+        '<p class="quest-guide-intro-wiki__text">' + escapeHtml(data.intro || "") + "</p>" +
+      "</div>";
   }
 
-  return (
-    '<div class="' + introCls + '">' +
-      '<div class="quest-guide-wiki__text">' + textHtml + "</div>" +
-      '<figure class="quest-guide-wiki__figure">' +
+  var figureHtml = "";
+  if (data.wikiImage) {
+    figureHtml =
+      '<figure class="quest-guide-intro-wiki__figure">' +
         '<img src="' + escapeAttr(data.wikiImage) + '" alt="' + escapeAttr(data.wikiAlt) + '" loading="lazy">' +
-      "</figure>" +
-    "</div>"
-  );
+        (data.wikiAlt
+          ? '<figcaption class="quest-guide-intro-wiki__caption">' + escapeHtml(data.wikiAlt) + "</figcaption>"
+          : "") +
+      "</figure>";
+  }
+
+  return '<article class="' + introCls + '" id="mg-quest-intro">' + bodyHtml + figureHtml + "</article>";
 }
 
 function buildQuestGuideImageHtml(image, imageClass) {
@@ -1926,7 +2335,7 @@ function buildQuestGuideHtml() {
 
     return `
         <section class="qg-timeline__section qg-timeline__section--${escapeAttr(cat.id)}">
-          <div class="qg-timeline__hero qg-timeline__hero--${escapeAttr(cat.id)}">
+          <div class="qg-timeline__hero qg-timeline__hero--${escapeAttr(cat.id)}" id="mg-quest-${escapeAttr(cat.id)}">
             <h4 class="qg-timeline__section-title">${escapeHtml(cat.title)}</h4>
             <p class="qg-timeline__section-desc">${escapeHtml(cat.intro)}</p>
           </div>
@@ -1936,7 +2345,7 @@ function buildQuestGuideHtml() {
 
   return `
     <div class="quest-guide-wrap">
-      <h3 class="quest-guide-title">${escapeHtml(i18n("guide.questTitle"))}</h3>
+      <h3 class="quest-guide-title" id="mg-guide-quest">${escapeHtml(i18n("guide.questTitle"))}</h3>
       ${buildQuestGuideIntroHtml()}
       <div class="qg-timeline">${sections}</div>
     </div>`;
@@ -1947,14 +2356,20 @@ function renderMoneyGameGuideSection() {
   const html = `
     <section class="section money-game-guide-section" id="${slugify("Money & Game Guide")}">
       <h2>${escapeHtml(i18nSection("Money & Game Guide"))}</h2>
-      <nav class="money-guide-tabs" aria-label="${escapeAttr(i18nSection("Money & Game Guide"))}">
-        <button type="button" class="money-guide-tab money-guide-tab--fishing active" data-panel="money-guide-fishing">${escapeHtml(i18n("guide.fishingTab"))}</button>
-        <button type="button" class="money-guide-tab money-guide-tab--farming" data-panel="money-guide-farming">${escapeHtml(i18n("guide.farmingTab"))}</button>
-        <button type="button" class="money-guide-tab money-guide-tab--quest" data-panel="money-guide-quest">${escapeHtml(i18n("guide.questTab"))}</button>
-      </nav>
-      <div id="money-guide-fishing" class="money-guide-panel money-guide-panel--fishing"></div>
-      <div id="money-guide-farming" class="money-guide-panel money-guide-panel--farming" hidden></div>
-      <div id="money-guide-quest" class="money-guide-panel money-guide-panel--quest" hidden>${buildQuestGuideHtml()}</div>
+      <div class="money-guide-layout">
+        <div class="money-guide-content">
+          <nav class="money-guide-tabs" aria-label="${escapeAttr(i18nSection("Money & Game Guide"))}">
+            <button type="button" class="money-guide-tab money-guide-tab--fishing active" data-panel="money-guide-fishing">${escapeHtml(i18n("guide.fishingTab"))}</button>
+            <button type="button" class="money-guide-tab money-guide-tab--farming" data-panel="money-guide-farming">${escapeHtml(i18n("guide.farmingTab"))}</button>
+            <button type="button" class="money-guide-tab money-guide-tab--quest" data-panel="money-guide-quest">${escapeHtml(i18n("guide.questTab"))}</button>
+            <button type="button" class="money-guide-tab money-guide-tab--coming-soon" data-panel="money-guide-coming-soon">${escapeHtml(i18n("guide.comingSoonTab"))}</button>
+          </nav>
+          <div id="money-guide-fishing" class="money-guide-panel money-guide-panel--fishing"></div>
+          <div id="money-guide-farming" class="money-guide-panel money-guide-panel--farming" hidden></div>
+          <div id="money-guide-quest" class="money-guide-panel money-guide-panel--quest" hidden>${buildQuestGuideHtml()}</div>
+          <div id="money-guide-coming-soon" class="money-guide-panel money-guide-panel--coming-soon" hidden>${buildComingSoonGuidePanelHtml()}</div>
+        </div>
+      </div>
     </section>
   `;
   document.getElementById("sections").insertAdjacentHTML("beforeend", html);
@@ -1967,7 +2382,9 @@ function activateMoneyGuideTab(tabKey) {
       ? "money-guide-farming"
       : tabKey === "quest"
         ? "money-guide-quest"
-        : "money-guide-fishing";
+        : tabKey === "coming-soon"
+          ? "money-guide-coming-soon"
+          : "money-guide-fishing";
   const section = document.getElementById(slugify(MONEY_GAME_GUIDE_SECTION));
   if (!section) return Promise.resolve();
   const tab = section.querySelector('.money-guide-tab[data-panel="' + panelId + '"]');
@@ -1994,6 +2411,7 @@ function initMoneyGuideTabs() {
     } else if (panelId === "money-guide-farming") {
       loadFarmingGuidePanel();
     }
+    refreshMoneyGuideFastNav(panelId);
   }
 
   tabs.forEach(tab => {
@@ -2058,7 +2476,7 @@ function renderSection(title, items) {
           <p class="legendary-banner-text">${i18n("banner.firework")}</p>
           <div class="legendary-banner-right">
             <a href="https://discord.gg/8AUjJu9jnr" target="_blank" rel="noopener" class="legendary-banner-btn">${escapeHtml(i18n("banner.joinDiscord"))}</a>
-            <p class="legendary-banner-members"><span class="discord-member-count">—</span> ${escapeHtml(i18n("banner.members"))}</p>
+            <p class="legendary-banner-members"><span class="discord-member-count" data-home-stat="traders">0</span> ${escapeHtml(i18n("banner.members"))}</p>
           </div>
         </div>
       </section>
@@ -2093,7 +2511,7 @@ function renderLegendarySectionWithBanner(items) {
         <p class="legendary-banner-text">${i18n("banner.legendary")}</p>
         <div class="legendary-banner-right">
           <a href="https://discord.gg/scgqMpPAC6" target="_blank" rel="noopener" class="legendary-banner-btn">${escapeHtml(i18n("banner.joinDiscord"))}</a>
-          <p class="legendary-banner-members"><span class="discord-member-count">—</span> ${escapeHtml(i18n("banner.members"))}</p>
+          <p class="legendary-banner-members"><span class="discord-member-count" data-home-stat="traders">0</span> ${escapeHtml(i18n("banner.members"))}</p>
         </div>
       </div>
     </section>
@@ -2120,8 +2538,7 @@ function fetchDiscordMemberCount() {
       var n = data.approximate_member_count;
       var online = data.approximate_presence_count;
       if (typeof n === "number" && !isNaN(n)) {
-        var els = document.querySelectorAll(".discord-member-count");
-        els.forEach(function (el) { el.textContent = n.toLocaleString(); });
+        setHomeStatValue("traders", n, true);
       }
       if (typeof online === "number" && !isNaN(online)) {
         setHomeStatValue("online", online, true);
@@ -2182,20 +2599,25 @@ function renderCrewLogosSection(items) {
   });
 
   let html = `<section class="section" id="${slugify("Crew Logos")}"><h2>${escapeHtml(i18nSection("Crew Logos"))}</h2>`;
-  
+  const navData = [];
+  let crewCounter = 0;
+
   Object.keys(grouped).forEach(header => {
     if (grouped[header].length > 0) {
+      const anchor = `crew-nav-${crewCounter++}`;
       html += `
-        <div class="crew-header">${header}</div>
+        <div class="crew-header" id="${anchor}">${escapeHtml(header)}</div>
         <div class="crew-logos-scroll">
           ${grouped[header].map(createCrewLogoCard).join("")}
         </div>
       `;
+      navData.push({ title: header, anchor: anchor });
     }
   });
   
   html += `</section>`;
   document.getElementById("sections").insertAdjacentHTML("beforeend", html);
+  renderCrewFastNav(navData);
 }
 
 function renderAccessoriesSection(items) {
@@ -2265,62 +2687,226 @@ function renderAccessoriesSection(items) {
   renderAccessoriesFastNav(navData);
 }
 
-function renderAccessoriesFastNav(navData) {
-  const sidebar = document.getElementById("tax-sidebar-column");
-  if (!sidebar) return;
+let accessoriesFastNavData = null;
+let crewFastNavData = null;
+const GUIDE_FAST_NAV_BOX_ID = "guide-section-fast-nav";
 
-  let box = document.getElementById("accessories-fast-nav");
+function ensureGuideFastNavBox() {
+  const sidebar = document.getElementById("tax-sidebar-column");
+  if (!sidebar) return null;
+
+  let box = document.getElementById(GUIDE_FAST_NAV_BOX_ID);
   if (!box) {
     box = document.createElement("aside");
-    box.id = "accessories-fast-nav";
-    box.style.display = "none";
-    box.style.background = "#141d28";
-    box.style.border = "1px solid #2f3f52";
-    box.style.borderRadius = "12px";
-    box.style.boxShadow = "0 6px 18px rgba(0, 0, 0, 0.28)";
-    box.style.padding = "8px 9px";
-    box.style.marginTop = "0";
-    box.style.marginBottom = "10px";
-    box.style.maxHeight = "none";
-    box.style.overflowY = "visible";
-    box.style.position = "sticky";
-    box.style.top = "12px";
+    box.id = GUIDE_FAST_NAV_BOX_ID;
+    box.className = "guide-fast-nav";
     sidebar.insertBefore(box, sidebar.firstChild);
   }
+  return box;
+}
 
+function getActiveMoneyGuidePanelId() {
+  const section = document.getElementById(slugify(MONEY_GAME_GUIDE_SECTION));
+  if (!section) return "money-guide-fishing";
+  const activeTab = section.querySelector(".money-guide-tab.active");
+  return activeTab && activeTab.dataset.panel
+    ? activeTab.dataset.panel
+    : "money-guide-fishing";
+}
+
+function buildMoneyGuideFastNavData(panelId) {
+  panelId = panelId || getActiveMoneyGuidePanelId();
+
+  if (panelId === "money-guide-farming") {
+    return [{
+      title: i18n("guide.farmingTab"),
+      panel: "money-guide-farming",
+      anchor: "mg-guide-farming",
+      minis: [
+        { title: i18n("guide.items"), anchor: "mg-farming-items" },
+        { title: i18n("guide.plantPlanner"), anchor: "mg-farming-planner" }
+      ]
+    }];
+  }
+
+  if (panelId === "money-guide-quest") {
+    const data = getQuestGuideDataLocal();
+    const questMinis = [{ title: "Overview", anchor: "mg-quest-intro" }];
+    (data.categories || []).forEach(function (cat) {
+      if (!cat || !cat.id) return;
+      questMinis.push({
+        title: cat.title || cat.id,
+        anchor: "mg-quest-" + cat.id
+      });
+    });
+    return [{
+      title: i18n("guide.questTab"),
+      panel: "money-guide-quest",
+      anchor: "mg-guide-quest",
+      minis: questMinis
+    }];
+  }
+
+  if (panelId === "money-guide-coming-soon") {
+    return [{
+      title: i18n("guide.comingSoonTab"),
+      panel: "money-guide-coming-soon",
+      anchor: "mg-guide-coming-soon",
+      minis: []
+    }];
+  }
+
+  return [{
+    title: i18n("guide.fishingTab"),
+    panel: "money-guide-fishing",
+    anchor: "mg-guide-fishing",
+    minis: [
+      { title: i18n("guide.items"), anchor: "mg-fishing-items" },
+      { title: i18n("guide.fishTypes"), anchor: "mg-fishing-types" }
+    ]
+  }];
+}
+
+function removeEmbeddedMoneyGuideFastNav() {
+  document.querySelectorAll(".money-guide-fast-nav").forEach(function (el) {
+    el.remove();
+  });
+}
+
+function refreshMoneyGuideFastNav(panelId) {
+  if (_activeSectionName !== MONEY_GAME_GUIDE_SECTION) return;
+  removeEmbeddedMoneyGuideFastNav();
+  const box = ensureGuideFastNavBox();
+  if (!box) return;
+  renderGuideFastNav(buildMoneyGuideFastNavData(panelId), {
+    sectionId: slugify(MONEY_GAME_GUIDE_SECTION)
+  });
+  setGuideFastNavVisible(true);
+}
+
+function handleGuideFastNavClick(btn) {
+  const panelId = btn.getAttribute("data-panel");
+  const targetId = btn.getAttribute("data-target");
+
+  function scrollToTarget() {
+    if (!targetId) {
+      if (panelId) {
+        const panel = document.getElementById(panelId);
+        if (panel) panel.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      return;
+    }
+    const el = document.getElementById(targetId);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  if (!panelId) {
+    scrollToTarget();
+    return;
+  }
+
+  const panel = document.getElementById(panelId);
+  const needsTabSwitch = panel && panel.hidden;
+  if (!needsTabSwitch) {
+    scrollToTarget();
+    return;
+  }
+
+  const tab = document.querySelector('.money-guide-tab[data-panel="' + panelId + '"]');
+  if (tab) tab.click();
+
+  const loadPromise =
+    panelId === "money-guide-fishing"
+      ? loadFishingGuidePanel()
+      : panelId === "money-guide-farming"
+        ? loadFarmingGuidePanel()
+        : Promise.resolve();
+
+  Promise.resolve(loadPromise).then(function () {
+    requestAnimationFrame(scrollToTarget);
+  });
+}
+
+function renderGuideFastNav(navGroups, options) {
+  options = options || {};
+  const box = options.targetBox || ensureGuideFastNavBox();
+  if (!box) return;
+
+  const topBtnId = options.topBtnId || "guide-fast-nav-top";
   const rows = [];
-  rows.push('<h2 style="margin:0 0 7px 0; color:#dbeafe; font-size:0.9rem; text-align:center; font-weight:700;">Fast Navigation</h2>');
+  rows.push(
+    '<h2 class="guide-fast-nav__title">' + escapeHtml(options.title || "Fast Navigation") + "</h2>"
+  );
 
-  navData.forEach(group => {
-    rows.push(
-      `<button type="button" data-target="${escapeAttr(group.anchor)}" style="display:block;width:100%;text-align:left;background:transparent;border:none;color:#e5efff;font-weight:700;padding:5px 4px;cursor:pointer;border-radius:0;margin-bottom:2px;font-size:0.79rem;">${escapeHtml(group.title)}</button>`
-    );
-    (group.minis || []).forEach(mini => {
-      rows.push(
-        `<button type="button" data-target="${escapeAttr(mini.anchor)}" style="display:block;width:100%;text-align:left;background:transparent;border:none;color:#9ec3dd;padding:4px 4px 4px 14px;cursor:pointer;border-radius:0;margin:0 0 1px 0;font-size:0.74rem;">${escapeHtml(mini.title)}</button>`
-      );
+  navGroups.forEach(function (group) {
+    const groupAttrs = ['type="button"', 'class="guide-fast-nav__btn guide-fast-nav__btn--group"'];
+    if (group.anchor) groupAttrs.push('data-target="' + escapeAttr(group.anchor) + '"');
+    if (group.panel) groupAttrs.push('data-panel="' + escapeAttr(group.panel) + '"');
+    rows.push("<button " + groupAttrs.join(" ") + ">" + escapeHtml(group.title) + "</button>");
+
+    (group.minis || []).forEach(function (mini) {
+      const miniAttrs = ['type="button"', 'class="guide-fast-nav__btn guide-fast-nav__btn--mini"'];
+      miniAttrs.push('data-target="' + escapeAttr(mini.anchor) + '"');
+      const panel = mini.panel || group.panel;
+      if (panel) miniAttrs.push('data-panel="' + escapeAttr(panel) + '"');
+      rows.push("<button " + miniAttrs.join(" ") + ">" + escapeHtml(mini.title) + "</button>");
     });
   });
 
-  rows.push('<div style="height:6px"></div>');
-  rows.push('<button type="button" id="acc-fast-nav-top" style="width:100%;padding:6px 8px;background:#203047;color:#cfe6ff;border:1px solid #355274;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.75rem;">Back to Top</button>');
+  rows.push('<div class="guide-fast-nav__spacer"></div>');
+  rows.push(
+    '<button type="button" class="guide-fast-nav__top" id="' + escapeAttr(topBtnId) + '">' +
+      escapeHtml(options.topLabel || "Back to Top") +
+    "</button>"
+  );
   box.innerHTML = rows.join("");
+  box.classList.add("is-visible");
+  box.style.display = "block";
+  box.style.visibility = "visible";
+  box.style.opacity = "1";
+  box.style.pointerEvents = "auto";
 
-  box.querySelectorAll("button[data-target]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const targetId = btn.getAttribute("data-target");
-      const el = targetId ? document.getElementById(targetId) : null;
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  box.querySelectorAll("button[data-target], button[data-panel]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      handleGuideFastNavClick(btn);
     });
   });
 
-  const topBtn = document.getElementById("acc-fast-nav-top");
-  if (topBtn) {
-    topBtn.addEventListener("click", () => {
-      const sec = document.getElementById(slugify(ACCESSORIES_SECTION_NAME));
+  const topBtn = document.getElementById(topBtnId);
+  if (topBtn && options.sectionId) {
+    topBtn.addEventListener("click", function () {
+      const sec = document.getElementById(options.sectionId);
       if (sec) sec.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }
+}
+
+function setGuideFastNavVisible(visible) {
+  const box = document.getElementById(GUIDE_FAST_NAV_BOX_ID);
+  if (!box) return;
+  box.classList.toggle("is-visible", Boolean(visible));
+  box.style.display = visible ? "block" : "none";
+  box.style.visibility = visible ? "visible" : "hidden";
+  box.style.opacity = visible ? "1" : "0";
+  box.style.pointerEvents = visible ? "auto" : "none";
+}
+
+function renderMoneyGuideFastNav() {
+  refreshMoneyGuideFastNav(getActiveMoneyGuidePanelId());
+}
+
+function renderAccessoriesFastNav(navData) {
+  accessoriesFastNavData = navData;
+  renderGuideFastNav(navData, {
+    sectionId: slugify(ACCESSORIES_SECTION_NAME)
+  });
+}
+
+function renderCrewFastNav(navData) {
+  crewFastNavData = navData;
+  renderGuideFastNav(navData, {
+    sectionId: slugify("Crew Logos")
+  });
 }
 
 
@@ -2353,11 +2939,29 @@ function renderScammerSection(items) {
   
   setTimeout(() => {
     const searchInput = document.getElementById("richest-search-input");
+    const resetBtn = document.getElementById("richest-search-reset");
+
+    function updateRichestResetVisibility() {
+      if (resetBtn) resetBtn.hidden = !searchInput || !searchInput.value;
+    }
+
     if (searchInput) {
       searchInput.addEventListener("input", function (e) {
         filterRichestPlayers(e.target.value);
+        updateRichestResetVisibility();
       });
     }
+
+    if (resetBtn && searchInput) {
+      resetBtn.addEventListener("click", function () {
+        searchInput.value = "";
+        filterRichestPlayers("");
+        updateRichestResetVisibility();
+        searchInput.focus();
+      });
+    }
+
+    updateRichestResetVisibility();
 
     const backToTop = document.getElementById("richest-back-to-top");
     const section = document.querySelector(".richest-players-section");
@@ -2367,6 +2971,8 @@ function renderScammerSection(items) {
         section.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
+
+    loadRichestPlayerAvatars();
   }, 100);
 }
 
@@ -2410,6 +3016,17 @@ function setHeaderSearchVisible(visible) {
   searchContainer.classList.toggle("is-hidden", !visible);
 }
 
+function setRichestHeroPanelVisible(visible) {
+  var panel = document.getElementById("richest-hero-panel");
+  if (!panel) return;
+  var section = document.querySelector(".richest-players-section");
+  if (visible && section && panel.parentElement !== section) {
+    section.appendChild(panel);
+  }
+  panel.hidden = !visible;
+  panel.setAttribute("aria-hidden", visible ? "false" : "true");
+}
+
 function showSection(name) {
   console.log(`Showing section: ${name}`);
   _activeSectionName = name;
@@ -2428,7 +3045,7 @@ function showSection(name) {
   const homeValueChanges = document.getElementById('home-value-changes');
   const taxCalc = taxSidebarColumn ? taxSidebarColumn.querySelector('.tax-calculator') : null;
   const middlemanPromo = taxSidebarColumn ? taxSidebarColumn.querySelector('.discord-mm-promo--sidebar') : null;
-  const accessoriesFastNav = document.getElementById('accessories-fast-nav');
+  const accessoriesFastNav = document.getElementById(GUIDE_FAST_NAV_BOX_ID);
   const isHome = cfg.id === 'home';
 
   document.body.classList.toggle('is-home', isHome);
@@ -2452,12 +3069,29 @@ function showSection(name) {
     applyVisibilityMode(middlemanPromo, cfg.middlemanPromo, 'block');
   }
 
-  if (accessoriesFastNav) {
-    const showFastNav = Boolean(cfg.accessoriesFastNav);
-    accessoriesFastNav.style.display = showFastNav ? 'block' : 'none';
-    accessoriesFastNav.style.visibility = showFastNav ? 'visible' : 'hidden';
-    accessoriesFastNav.style.opacity = showFastNav ? '1' : '0';
-    accessoriesFastNav.style.pointerEvents = showFastNav ? 'auto' : 'none';
+  setRichestHeroPanelVisible(cfg.id === 'richest-players');
+
+  if (cfg.accessoriesFastNav) {
+    removeEmbeddedMoneyGuideFastNav();
+    if (accessoriesFastNavData) {
+      renderGuideFastNav(accessoriesFastNavData, {
+        sectionId: slugify(ACCESSORIES_SECTION_NAME)
+      });
+    }
+    setGuideFastNavVisible(true);
+  } else if (cfg.moneyGuideFastNav) {
+    renderMoneyGuideFastNav();
+  } else if (cfg.crewFastNav) {
+    removeEmbeddedMoneyGuideFastNav();
+    if (crewFastNavData) {
+      renderGuideFastNav(crewFastNavData, {
+        sectionId: slugify("Crew Logos")
+      });
+    }
+    setGuideFastNavVisible(true);
+  } else {
+    removeEmbeddedMoneyGuideFastNav();
+    setGuideFastNavVisible(false);
   }
 
   if (homeValueChanges) {
@@ -2484,15 +3118,37 @@ window.showSection = showSection;
 
 function initSearch() {
   const input = document.getElementById("search");
+  const resetBtn = document.getElementById("search-reset");
   if (!input) return;
 
-  input.addEventListener("input", () => {
+  function applySearchFilter() {
     const val = input.value.toLowerCase();
     document.querySelectorAll(".card").forEach(card => {
       const name = card.dataset.name.toLowerCase();
       card.classList.toggle("hidden", !name.includes(val));
     });
+  }
+
+  function updateResetVisibility() {
+    if (!resetBtn) return;
+    resetBtn.hidden = !input.value;
+  }
+
+  input.addEventListener("input", () => {
+    applySearchFilter();
+    updateResetVisibility();
   });
+
+  if (resetBtn) {
+    resetBtn.addEventListener("click", () => {
+      input.value = "";
+      applySearchFilter();
+      updateResetVisibility();
+      input.focus();
+    });
+  }
+
+  updateResetVisibility();
 }
 
 function getTaxBreakdown(amountWant) {
@@ -2954,6 +3610,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const progressText = document.getElementById("progress-text");
 
   if (!sectionsContainer || !progressBar || !progressText) {
+    loadFooterBoosters();
     return;
   }
 
@@ -3025,6 +3682,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (window.location.hash && window.location.hash.startsWith('#sec=')) {
     let requested = decodeURIComponent(window.location.hash.substring(5));
     if (requested === "Uncommon") requested = "Common / Uncommon";
+    if (requested === "richest-players" || requested === "Richest Players") {
+      requested = "💰 Richest Players";
+    }
     if (SECTION_NAMES.includes(requested)) {
       initialSection = requested;
     }
@@ -3051,17 +3711,8 @@ function refreshDynamicContentForLanguage() {
   initSectionsNav();
   showSection(_activeSectionName);
 
-  var mobileMenu = document.getElementById("mobile-menu");
-  if (mobileMenu) {
-    mobileMenu.innerHTML = "";
-    delete mobileMenu.dataset.bsvMobileInit;
-    setupMobileHamburgerMenu();
-  }
-
   var taxInput = document.getElementById("taxInput");
   if (taxInput) taxInput.dispatchEvent(new Event("input"));
-  var mobileTaxInput = document.getElementById("mobile-tax-input");
-  if (mobileTaxInput) mobileTaxInput.dispatchEvent(new Event("input"));
 }
 
 document.addEventListener("bsv:languagechange", function () {
@@ -3179,12 +3830,10 @@ function buildValueChangeItemHtml(r, useTimeline) {
 
 async function loadValueChanges() {
   var listEl = document.getElementById('value-changes-list');
-  var mobileListEl = document.getElementById('mobile-value-changes-list');
   var homeMainListEl = document.getElementById('home-main-value-changes-list');
-  if (!listEl && !mobileListEl && !homeMainListEl) return;
+  if (!listEl && !homeMainListEl) return;
   function setSidebarValueChangesHtml(html) {
     if (listEl) listEl.innerHTML = html;
-    if (mobileListEl) mobileListEl.innerHTML = html;
   }
   try {
     var rows = await fetchSheet("Website Configs");
@@ -3208,7 +3857,6 @@ async function loadValueChanges() {
     if (homeMainListEl) {
       homeMainListEl.innerHTML =
         '<div class="value-changes-list__track">' +
-          '<div class="value-changes-list__rail" aria-hidden="true"></div>' +
           '<div class="value-changes-list__items">' + timelineHtml + "</div>" +
         "</div>";
     }
@@ -3220,238 +3868,6 @@ async function loadValueChanges() {
   }
 }
 
-
-/* MOBILE MENU FUNCTIONALITY — index clones #sections-nav; other pages get link list */
-function setupMobileHamburgerMenu() {
-  if (!window.matchMedia("(max-width: 1024px)").matches) return;
-  var hamburgerBtn = document.getElementById('hamburger-btn');
-  var mobileMenu = document.getElementById('mobile-menu');
-  if (!hamburgerBtn || !mobileMenu || mobileMenu.dataset.bsvMobileInit === '1') return;
-  mobileMenu.dataset.bsvMobileInit = '1';
-  var sectionsNav = document.getElementById('sections-nav');
-  if (sectionsNav) {
-    var navClone = sectionsNav.cloneNode(true);
-    mobileMenu.appendChild(navClone);
-    navClone.querySelectorAll('button').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var sectionName = btn.dataset.section || (btn.textContent || '').trim();
-        showSection(sectionName);
-        hamburgerBtn.classList.remove('active');
-        mobileMenu.classList.remove('active');
-      });
-    });
-    hamburgerBtn.addEventListener('click', function() {
-      hamburgerBtn.classList.toggle('active');
-      mobileMenu.classList.toggle('active');
-    });
-    mobileMenu.addEventListener('click', function(e) {
-      if (e.target.tagName === 'BUTTON') {
-        hamburgerBtn.classList.remove('active');
-        mobileMenu.classList.remove('active');
-      }
-    });
-    return;
-  }
-
-  var inner = document.createElement('div');
-  inner.className = 'mobile-menu-satellite-inner';
-  inner.innerHTML =
-    '<a href="index.html">Home</a>' +
-    '<a href="x-about.html">About Us</a>' +
-    '<a href="x-faq.html">FAQ</a>' +
-    '<a href="z-contact.html">Contact Us</a>';
-  mobileMenu.appendChild(inner);
-  hamburgerBtn.addEventListener('click', function() {
-    hamburgerBtn.classList.toggle('active');
-    mobileMenu.classList.toggle('active');
-  });
-  mobileMenu.addEventListener('click', function(e) {
-    if (e.target.tagName === 'A') {
-      hamburgerBtn.classList.remove('active');
-      mobileMenu.classList.remove('active');
-    }
-  });
-}
-document.addEventListener('DOMContentLoaded', setupMobileHamburgerMenu);
-
-// MOBILE TAX CALCULATOR
-
-document.addEventListener('DOMContentLoaded', function() {
-    if (!window.matchMedia("(max-width: 1024px)").matches) return;
-
-    const arrow = document.getElementById('mobile-calc-arrow');
-    const calc = document.getElementById('mobile-tax-calc');
-    const backdrop = document.getElementById('mobile-calc-backdrop');
-    const closeBtn = document.getElementById('mobile-calc-close');
-    const input = document.getElementById('mobile-tax-input');
-    const amount = document.getElementById('mobile-tax-amount');
-    const mobileTaxContent = document.getElementById('mobile-tax-content');
-    const mobileRecentChanges = document.getElementById('mobile-recent-changes');
-    const mobilePromo = calc.querySelector('.discord-mm-promo--mobile-panel');
-    const accessoriesCfg = typeof getSectionConfig === "function" ? getSectionConfig(ACCESSORIES_SECTION_NAME) : null;
-    const accessoriesSectionId = accessoriesCfg ? accessoriesCfg.id : slugify(ACCESSORIES_SECTION_NAME);
-    const originalMobileTaxContentHtml = mobileTaxContent ? mobileTaxContent.innerHTML : '';
-    
-    if (!arrow || !calc || !closeBtn || !input || !amount) {
-      return;
-    }
-
-    function openCalc() {
-      calc.classList.add('active');
-      document.body.classList.add('mobile-panel-open');
-      if (backdrop) {
-        backdrop.classList.add('active');
-        backdrop.setAttribute('aria-hidden', 'false');
-      }
-    }
-
-    function closeCalc() {
-      calc.classList.remove('active');
-      document.body.classList.remove('mobile-panel-open');
-      if (backdrop) {
-        backdrop.classList.remove('active');
-        backdrop.setAttribute('aria-hidden', 'true');
-      }
-    }
-    
-    const calcSections = typeof getMobileTaxArrowSectionIds === "function"
-      ? getMobileTaxArrowSectionIds()
-      : ['home', 'uncommon', 'rare', 'epic', 'legendary', 'omega', 'vehicles', 'misc', slugify(ACCESSORIES_SECTION_NAME)];
-    
-    arrow.addEventListener('click', openCalc);
-    closeBtn.addEventListener('click', closeCalc);
-    if (backdrop) {
-      backdrop.addEventListener('click', closeCalc);
-    }
-    
-    const breakdownEl = document.getElementById('mobile-tax-breakdown');
-
-    function updateMobileTax() {
-      const want = parseInt((input.value || '').replace(/[^\d]/g, ''), 10) || 0;
-      const b = getTaxBreakdown(want);
-      amount.innerHTML = b.totalWithdraw.toLocaleString() + ' <span class="tax-after-label">After Tax</span>';
-      if (breakdownEl) {
-        if (b.totalWithdraw <= 0) {
-          breakdownEl.innerHTML = '';
-          return;
-        }
-        breakdownEl.innerHTML = buildTaxBreakdownHtml(want, b);
-      }
-    }
-    input.addEventListener('input', updateMobileTax);
-    updateMobileTax();
-
-    function renderMobileAccessoriesFastNav() {
-      if (!mobileTaxContent) return;
-      const section = document.getElementById(accessoriesSectionId);
-      if (!section) return;
-
-      const bigHeaders = Array.from(section.querySelectorAll('.accessories-big-header'));
-      const miniHeaders = Array.from(section.querySelectorAll('.accessories-mini-header'));
-
-      if (bigHeaders.length === 0 && miniHeaders.length === 0) return;
-
-      const rows = [];
-      rows.push('<h2 style="margin:0 0 8px 0; color:#dbeafe; font-size:0.95rem; text-align:center; font-weight:700;">Fast Navigation</h2>');
-
-      bigHeaders.forEach(function(el) {
-        const id = el.id || '';
-        const title = escapeHtml((el.textContent || '').trim());
-        if (!id || !title) return;
-        rows.push(`<button type="button" data-target="${escapeAttr(id)}" style="display:block;width:100%;text-align:left;background:transparent;border:none;color:#e5efff;font-weight:700;padding:6px 4px;cursor:pointer;border-radius:0;margin-bottom:2px;font-size:0.82rem;">${title}</button>`);
-      });
-
-      miniHeaders.forEach(function(el) {
-        const id = el.id || '';
-        const title = escapeHtml((el.textContent || '').trim());
-        if (!id || !title) return;
-        rows.push(`<button type="button" data-target="${escapeAttr(id)}" style="display:block;width:100%;text-align:left;background:transparent;border:none;color:#9ec3dd;padding:5px 4px 5px 14px;cursor:pointer;border-radius:0;margin:0 0 1px 0;font-size:0.76rem;">${title}</button>`);
-      });
-
-      rows.push('<div style="height:8px"></div>');
-      rows.push('<button type="button" id="mobile-acc-fast-nav-top" style="width:100%;padding:7px 9px;background:#203047;color:#cfe6ff;border:1px solid #355274;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.78rem;">Back to Top</button>');
-
-      mobileTaxContent.innerHTML = rows.join('');
-
-      mobileTaxContent.querySelectorAll('button[data-target]').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          const targetId = btn.getAttribute('data-target');
-          const target = targetId ? document.getElementById(targetId) : null;
-          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          closeCalc();
-        });
-      });
-
-      const topBtn = document.getElementById('mobile-acc-fast-nav-top');
-      if (topBtn) {
-        topBtn.addEventListener('click', function() {
-          const sec = document.getElementById(accessoriesSectionId);
-          if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          closeCalc();
-        });
-      }
-    }
-
-    function restoreMobileTaxContent() {
-      if (!mobileTaxContent) return;
-      if (mobileTaxContent.dataset.navMode === 'accessories') {
-        mobileTaxContent.innerHTML = originalMobileTaxContentHtml;
-        mobileTaxContent.dataset.navMode = '';
-      }
-    }
-
-    // Show/hide arrow based on active section
-    function updateArrowVisibility() {
-      const sections = document.querySelectorAll('.sections > section');
-      let activeSection = null;
-      
-      sections.forEach(section => {
-        const computedStyle = window.getComputedStyle(section);
-        if (computedStyle.display === 'block') {
-          activeSection = section.id;
-        }
-      });
-      
-      const isHome = activeSection === 'home';
-      const isAccessories = activeSection === accessoriesSectionId;
-
-      if (isAccessories) {
-        renderMobileAccessoriesFastNav();
-        if (mobileTaxContent) {
-          mobileTaxContent.dataset.navMode = 'accessories';
-          mobileTaxContent.style.display = 'block';
-        }
-        if (mobileRecentChanges) mobileRecentChanges.style.display = 'none';
-        if (mobilePromo) mobilePromo.style.display = 'none';
-      } else {
-        restoreMobileTaxContent();
-        if (mobileTaxContent) mobileTaxContent.style.display = isHome ? 'none' : 'block';
-        if (mobileRecentChanges) mobileRecentChanges.style.display = isHome ? 'block' : 'none';
-        if (mobilePromo) mobilePromo.style.display = isHome ? 'none' : 'block';
-      }
-
-      if (calcSections.includes(activeSection)) {
-        arrow.style.display = 'flex';
-      } else {
-        arrow.style.display = 'none';
-        closeCalc();
-      }
-    }
-    
-    updateArrowVisibility();
-    
-    // Check when sections change
-    const observer = new MutationObserver(updateArrowVisibility);
-    const sectionsContainer = document.querySelector('.sections');
-    if (sectionsContainer) {
-      observer.observe(sectionsContainer, { 
-        childList: true, 
-        subtree: true, 
-        attributes: true, 
-        attributeFilter: ['style'] 
-      });
-    }
-  });
 
 /* ========== PINK WEBSITE THEME - theme switcher (remove with theme section in style.css) ========== */
 var THEMES_DISABLED = true; /* Set to false to re-enable theme switcher */

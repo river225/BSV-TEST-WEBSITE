@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bsv-env="test">
 <head>
     <meta charset="UTF-8">
     <script src="auth-oauth-bounce.js?v=20260612-fix"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="canonical" href="https://blockspinvalues.com/x-faq.html" />
-    <link rel="icon" type="image/gif" href="https://i.ibb.co/WW3G6H2j/Nombre-del-proyecto.gif">
-    <link rel="apple-touch-icon" href="https://i.ibb.co/gZQzvDp1/qu-Ohyw-V8.webp">
+    <link rel="icon" type="image/png" href="https://i.ibb.co/Xk7sgWyt/Blockspinvaluesnew-1-5.png">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/Xk7sgWyt/Blockspinvaluesnew-1-5.png">
     <title>FAQ</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20260704-cinematic-about">
     <style>
         .faq-container {
             max-width: 900px;
@@ -53,120 +53,13 @@
             margin-bottom: 50px;
             line-height: 1.6;
         }
-        
-        .faq-item {
-            background: #1f2a38;
-            border: 2px solid #33cce6;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .faq-item:hover {
-            border-color: #5bc5de;
-        }
-        
-        .faq-question {
-            padding: 20px 25px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            user-select: none;
-        }
-        
-        .faq-question h3 {
-            margin: 0;
-            font-size: 1.2rem;
-            color: #33cce6;
-            font-weight: 600;
-        }
-        
-        .faq-icon {
-            font-size: 1.5rem;
-            color: #33cce6;
-            font-weight: bold;
-            transition: transform 0.3s ease;
-        }
-        
-        .faq-item.active .faq-icon {
-            transform: rotate(45deg);
-        }
-        
-        .faq-answer {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
-                        padding 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                        opacity 0.3s ease;
-            padding: 0 25px;
-            opacity: 0;
-        }
-        
-        .faq-item.active .faq-answer {
-            max-height: 800px;
-            padding: 0 25px 20px 25px;
-            opacity: 1;
-        }
-        
-        .faq-answer p {
-            margin: 0;
-            color: #fff;
-            line-height: 1.8;
-            font-size: 1rem;
-        }
-        
-        .back-btn {
-            display: inline-block;
-            margin: 30px auto;
-            padding: 12px 30px;
-            background: #33cce6;
-            color: #000;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: bold;
-            text-align: center;
-        }
-        
-        .back-btn:hover {
-            background: #5bc5de;
-        }
     </style>
 </head>
-<body>
+<body data-bsv-page="faq">
 
-<nav class="top-navbar">
-  <div class="nav-container-full">
-    <div class="nav-left">
-      <a href="index.html" class="nav-brand">
-        <img src="https://i.ibb.co/gZQzvDp1/qu-Ohyw-V8.webp" alt="BlockSpin Values Logo" class="nav-logo-img">
-        <span class="nav-title">Block<span style="color: #ff1a1a;">Spin</span> <span style="color: #33cce6;">Values</span></span>
-      </a>
-      <a href="x-about.html">About Us</a>
-      <a href="x-faq.html">FAQ</a>
-      <a href="blockspin-discord.html">Join Discord</a>
-    </div>
-    
-    <div class="nav-right">
-      <div class="theme-switcher" id="theme-switcher" aria-label="Theme">
-        <button type="button" class="theme-switcher-btn active" data-theme="default" title="Original theme" aria-label="Original theme"></button>
-        <button type="button" class="theme-switcher-btn" data-theme="red" title="Red theme" aria-label="Red theme"></button>
-        <button type="button" class="theme-switcher-btn" data-theme="pink" title="Pink theme" aria-label="Pink theme"></button>
-        <button type="button" class="theme-switcher-btn" data-theme="purple" title="Purple theme" aria-label="Purple theme"></button>
-      </div>
-      <div class="nav-login" id="nav-login"></div>
-    </div>
-  </div>
-</nav>
+<div id="bsv-site-header"></div>
 
-<div class="mobile-subnav" aria-label="Secondary navigation">
-  <a href="x-about.html">About Us</a>
-  <a href="x-faq.html">FAQ</a>
-  <a href="blockspin-discord.html">Join Discord</a>
-</div>
-
-    <div class="faq-container">
+    <div class="faq-container faq-page--pills">
         <a href="index.html" class="back-btn-top">← Back</a>
         
         <h1 class="faq-header">FAQ</h1>
@@ -304,21 +197,9 @@
         });
     </script>
 
-<footer class="site-footer">
-  <div class="footer-content">
-    <p>© 2026 BlockSpin Values</p>
-    <div class="footer-links">
-      <a href="blockspin-discord.html">Join Discord</a>
-      <span>•</span>
-      <a href="z-contact.html">Contact Us</a>
-      <span>•</span>
-      <a href="z-terms.html">Terms of Service</a>
-      <span>•</span>
-      <a href="z-privacy.html">Privacy Policy</a>
-    </div>
-  </div>
-</footer>
-<script src="auth.js?v=20260612-fix"></script>
+<div id="bsv-site-footer"></div>
+<script src="site-chrome.js?v=20260704-cinematic-about"></script>
+<script src="auth.js?v=20260619-test-oauth"></script>
 <script src="script.js"></script>
 </body>
 </html>

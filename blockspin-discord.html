@@ -9,7 +9,7 @@
     <link rel="canonical" href="https://blockspinvalues.com/blockspin-discord.html" />
     <meta property="og:title" content="BlockSpin Trading Community Discord — BlockSpin Values">
     <meta property="og:description" content="Join the BlockSpin trading community on Discord. Middleman service, live values, giveaways, and thousands of active BlockSpin traders.">
-    <meta property="og:image" content="https://i.ibb.co/WW3G6H2j/Nombre-del-proyecto.gif">
+    <meta property="og:image" content="https://i.ibb.co/Xk7sgWyt/Blockspinvaluesnew-1-5.png">
     <meta property="og:url" content="https://blockspinvalues.com/blockspin-discord.html">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
@@ -29,9 +29,9 @@
       }
     }
     </script>
-    <link rel="icon" type="image/gif" href="https://i.ibb.co/WW3G6H2j/Nombre-del-proyecto.gif">
-    <link rel="apple-touch-icon" href="https://i.ibb.co/gZQzvDp1/qu-Ohyw-V8.webp">
-    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="https://i.ibb.co/Xk7sgWyt/Blockspinvaluesnew-1-5.png">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/Xk7sgWyt/Blockspinvaluesnew-1-5.png">
+    <link rel="stylesheet" href="style.css?v=20260704-cinematic-about">
     <style>
         .join-wrap { max-width: 1100px; margin: 0 auto 60px; padding: 0 16px; }
         .join-hero {
@@ -226,7 +226,7 @@
             border-color: var(--benefit-accent, #5865f2);
         }
         .join-benefit--values { --benefit-accent: #33cce6; }
-        .join-benefit--middleman { --benefit-accent: #5865f2; }
+        .join-benefit--middleman { --benefit-accent: #34d399; }
         .join-benefit--giveaways { --benefit-accent: #fbbf24; }
         .join-benefit--suggestions { --benefit-accent: #a78bfa; }
         .join-benefit--community { --benefit-accent: #34d399; }
@@ -299,7 +299,6 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
             padding: 14px 28px;
             background: linear-gradient(135deg, #5865f2 0%, #4752c4 100%);
             color: #fff;
@@ -310,11 +309,6 @@
             border: 3px solid #000;
             box-shadow: 0 4px 0 #000;
             transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
-        }
-        .join-cta-bottom img {
-            width: 22px;
-            height: 22px;
-            flex-shrink: 0;
         }
         .join-cta-bottom:hover {
             transform: translateY(-2px);
@@ -329,42 +323,11 @@
             text-decoration: none;
         }
         .join-back:hover { color: #5bc5de; }
-        @media (max-width: 768px) {
-            .join-hero { grid-template-columns: 1fr; padding: 24px 20px; }
-            .join-benefit { max-width: 100%; }
-        }
     </style>
 </head>
-<body>
+<body data-bsv-page="discord">
 
-<nav class="top-navbar">
-  <div class="nav-container-full">
-    <div class="nav-left">
-      <a href="index.html" class="nav-brand">
-        <img src="https://i.ibb.co/gZQzvDp1/qu-Ohyw-V8.webp" alt="BlockSpin Values Logo" class="nav-logo-img">
-        <span class="nav-title">Block<span style="color: #ff1a1a;">Spin</span> <span style="color: #33cce6;">Values</span></span>
-      </a>
-      <a href="x-about.html">About Us</a>
-      <a href="x-faq.html">FAQ</a>
-      <a href="blockspin-discord.html">Join Discord</a>
-    </div>
-    <div class="nav-right">
-      <div class="theme-switcher" id="theme-switcher" aria-label="Theme">
-        <button type="button" class="theme-switcher-btn active" data-theme="default" title="Original theme" aria-label="Original theme"></button>
-        <button type="button" class="theme-switcher-btn" data-theme="red" title="Red theme" aria-label="Red theme"></button>
-        <button type="button" class="theme-switcher-btn" data-theme="pink" title="Pink theme" aria-label="Pink theme"></button>
-        <button type="button" class="theme-switcher-btn" data-theme="purple" title="Purple theme" aria-label="Purple theme"></button>
-      </div>
-      <div class="nav-login" id="nav-login"></div>
-    </div>
-  </div>
-</nav>
-
-<div class="mobile-subnav" aria-label="Secondary navigation">
-  <a href="x-about.html">About Us</a>
-  <a href="x-faq.html">FAQ</a>
-  <a href="blockspin-discord.html">Join Discord</a>
-</div>
+<div id="bsv-site-header"></div>
 
 <div class="join-wrap">
     <a href="index.html" class="join-back">← Back to Home</a>
@@ -413,7 +376,12 @@
                 </div>
             </article>
             <article class="join-benefit join-benefit--middleman">
-                <div class="join-benefit__icon" aria-hidden="true">🛡️</div>
+                <div class="join-benefit__icon join-benefit__icon--shield" aria-hidden="true">
+                    <svg class="middleman-shield-icon" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+                        <path fill="#ffffff" stroke="#000000" stroke-width="1.65" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        <path fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 12.5l2 2.5 4.5-5"></path>
+                    </svg>
+                </div>
                 <div class="join-benefit__body">
                     <h3>Middleman service</h3>
                     <p>Trade with confidence using our free Middleman service. Staff hold items during trades so buyers and sellers don't get scammed.</p>
@@ -439,10 +407,6 @@
     <section class="join-faq">
         <h2>Frequently asked questions</h2>
         <details>
-            <summary>Is this the BlockSpin Discord server?</summary>
-            <p>Yes — BlockSpin Values runs the BlockSpin trading community Discord for BlockSpin on Roblox. Join for live values, middleman service, giveaways, and trader chat.</p>
-        </details>
-        <details>
             <summary>What is BlockSpin Values?</summary>
             <p>A community-driven value list for BlockSpin on Roblox — accurate trading values, a tax calculator, and the BlockSpin trading community Discord run by traders.</p>
         </details>
@@ -463,26 +427,12 @@
     <div class="join-bottom-cta">
         <p class="join-bottom-cta__text">Ready to join the BlockSpin trading community on Discord?</p>
         <a href="https://discord.gg/QbapryYUUx" target="_blank" rel="noopener noreferrer" class="join-cta-bottom">
-            <img src="https://i.ibb.co/Tq7DLCJt/dsfbvbvxcxbvn.png" alt="">
             Join Discord Server
         </a>
     </div>
 </div>
 
-<footer class="site-footer">
-  <div class="footer-content">
-    <p>© 2026 BlockSpin Values · Dev site</p>
-    <div class="footer-links">
-      <a href="blockspin-discord.html">Join Discord</a>
-      <span>•</span>
-      <a href="z-contact.html">Contact Us</a>
-      <span>•</span>
-      <a href="z-terms.html">Terms of Service</a>
-      <span>•</span>
-      <a href="z-privacy.html">Privacy Policy</a>
-    </div>
-  </div>
-</footer>
+<div id="bsv-site-footer"></div>
 
 <script>
 fetch("https://discord.com/api/v10/invites/QbapryYUUx?with_counts=true")
@@ -500,7 +450,8 @@ fetch("https://discord.com/api/v10/invites/QbapryYUUx?with_counts=true")
     }
   }).catch(function () {});
 </script>
-<script src="auth.js?v=20260612-fix"></script>
+<script src="site-chrome.js?v=20260704-cinematic-about"></script>
+<script src="auth.js?v=20260619-test-oauth"></script>
 <script src="script.js"></script>
 </body>
 </html>

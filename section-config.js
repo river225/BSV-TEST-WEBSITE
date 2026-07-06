@@ -24,7 +24,7 @@
       middlemanPromo: "hide",
       homeValueChanges: false,
       accessoriesFastNav: false,
-      mobileTaxArrow: false
+      crewFastNav: false,
     },
     {
       title: "Common / Uncommon",
@@ -39,7 +39,6 @@
       middlemanPromo: "show",
       homeValueChanges: false,
       accessoriesFastNav: false,
-      mobileTaxArrow: true
     },
     {
       title: "Rare",
@@ -54,7 +53,6 @@
       middlemanPromo: "show",
       homeValueChanges: false,
       accessoriesFastNav: false,
-      mobileTaxArrow: true
     },
     {
       title: "Epic",
@@ -69,7 +67,6 @@
       middlemanPromo: "show",
       homeValueChanges: false,
       accessoriesFastNav: false,
-      mobileTaxArrow: true
     },
     {
       title: "Legendary",
@@ -84,7 +81,6 @@
       middlemanPromo: "show",
       homeValueChanges: false,
       accessoriesFastNav: false,
-      mobileTaxArrow: true
     },
     {
       title: "Omega",
@@ -99,7 +95,6 @@
       middlemanPromo: "show",
       homeValueChanges: false,
       accessoriesFastNav: false,
-      mobileTaxArrow: true
     },
     {
       title: "Misc",
@@ -114,7 +109,6 @@
       middlemanPromo: "show",
       homeValueChanges: false,
       accessoriesFastNav: false,
-      mobileTaxArrow: true
     },
     {
       title: "Vehicles",
@@ -129,7 +123,7 @@
       middlemanPromo: "show",
       homeValueChanges: false,
       accessoriesFastNav: false,
-      mobileTaxArrow: true
+      moneyGuideFastNav: false,
     },
     {
       title: ACCESSORIES_SECTION_TITLE,
@@ -144,7 +138,8 @@
       middlemanPromo: "ghost",
       homeValueChanges: false,
       accessoriesFastNav: true,
-      mobileTaxArrow: true
+      crewFastNav: false,
+      moneyGuideFastNav: false,
     },
     {
       title: "Money & Game Guide",
@@ -158,11 +153,11 @@
       middlemanPromo: "ghost",
       homeValueChanges: false,
       accessoriesFastNav: false,
-      mobileTaxArrow: false
+      moneyGuideFastNav: true,
     },
     {
       title: "💰 Richest Players",
-      id: "💰-richest-players",
+      id: "richest-players",
       navGroup: "extras",
       dataSource: "richest",
       search: "hide",
@@ -172,7 +167,7 @@
       middlemanPromo: "ghost",
       homeValueChanges: false,
       accessoriesFastNav: false,
-      mobileTaxArrow: false
+      moneyGuideFastNav: false,
     },
     {
       title: "Crew Logos",
@@ -187,7 +182,8 @@
       middlemanPromo: "ghost",
       homeValueChanges: false,
       accessoriesFastNav: false,
-      mobileTaxArrow: false
+      crewFastNav: true,
+      moneyGuideFastNav: false,
     }
   ];
 
@@ -212,12 +208,6 @@
 
   function getSectionConfigById(id) {
     return registryById[id] || null;
-  }
-
-  function getMobileTaxArrowSectionIds() {
-    return BSV_SECTION_REGISTRY
-      .filter(function (entry) { return entry.mobileTaxArrow; })
-      .map(function (entry) { return entry.id; });
   }
 
   function applyVisibilityMode(el, mode, displayWhenShown) {
@@ -248,6 +238,5 @@
   global.getSectionTitles = getSectionTitles;
   global.getSectionConfig = getSectionConfig;
   global.getSectionConfigById = getSectionConfigById;
-  global.getMobileTaxArrowSectionIds = getMobileTaxArrowSectionIds;
   global.applyVisibilityMode = applyVisibilityMode;
 })(typeof window !== "undefined" ? window : globalThis);

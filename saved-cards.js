@@ -5,9 +5,110 @@
   var LOCAL_SAVED_PREFIX = "bsv-saved-cards-local-";
   var MAX_SAVED_CARDS = 60;
   var savedCards = [];
+  var savedCardsRevision = 0;
   var panelOpen = false;
   var currentUserId = null;
   var useLocalStorage = false;
+  var pendingRemovalIds = Object.create(null);
+  var pendingRemovalKeys = Object.create(null);
+  var fetchInFlight = false;
+
+  function bumpSavedCardsRevision() {
+    savedCardsRevision += 1;
+  }
+
+  function trackPendingRemoval(id, key) {
+    if (id) pendingRemovalIds[id] = true;
+    if (key) pendingRemovalKeys[key] = true;
+  }
+
+  function clearPendingRemoval(id, key) {
+    if (id) delete pendingRemovalIds[id];
+    if (key) delete pendingRemovalKeys[key];
+  }
+
+  function hasPendingRemovals() {
+    return Object.keys(pendingRemovalIds).length > 0 || Object.keys(pendingRemovalKeys).length > 0;
+  }
+
+  function isPendingRemoval(card) {
+    if (!card) return false;
+    if (card.id && pendingRemovalIds[card.id]) return true;
+    return !!pendingRemovalKeys[cardStorageKey(card)];
+  }
+
+  function hasUnsyncedLocalCards(cards) {
+    return (cards || savedCards).some(function (c) {
+      return String(c.id || "").indexOf("local-") === 0;
+    });
+  }
+
+  function mergeServerSavedCards(serverCards) {
+    var incoming = Array.isArray(serverCards) ? serverCards : [];
+    var serverByKey = Object.create(null);
+    incoming.forEach(function (c) {
+      serverByKey[cardStorageKey(c)] = c;
+    });
+
+    var merged = incoming.filter(function (c) {
+      return !isPendingRemoval(c);
+    });
+
+    savedCards.forEach(function (local) {
+      if (isPendingRemoval(local)) return;
+      var key = cardStorageKey(local);
+      if (!serverByKey[key]) {
+        merged.unshift(local);
+      }
+    });
+
+    return merged;
+  }
+
+  function applyFetchedSavedCards(cards, revisionAtStart) {
+    if (revisionAtStart !== savedCardsRevision) return savedCards;
+    if (hasPendingRemovals() || hasUnsyncedLocalCards()) {
+      savedCards = mergeServerSavedCards(cards);
+    } else {
+      savedCards = Array.isArray(cards) ? cards.slice() : [];
+    }
+    bumpSavedCardsRevision();
+    updateUi();
+    syncCardSaveButtons();
+    return savedCards;
+  }
+
+  function completeSavedCardRemoval(removeId, removeKey) {
+    return deleteSavedCard(removeId).then(function () {
+      clearPendingRemoval(removeId, removeKey);
+      if (useLocalStorage) writeLocalSavedCards(savedCards);
+    }).catch(function () {
+      useLocalStorage = true;
+      writeLocalSavedCards(savedCards);
+      clearPendingRemoval(removeId, removeKey);
+    });
+  }
+
+  function removeSavedCardsFromState(id, key) {
+    var before = savedCards.length;
+    savedCards = savedCards.filter(function (c) {
+      if (id && c.id === id) return false;
+      if (key && cardStorageKey(c) === key) return false;
+      return true;
+    });
+    if (savedCards.length === before) return false;
+    bumpSavedCardsRevision();
+    if (useLocalStorage) writeLocalSavedCards(savedCards);
+    updateUi();
+    syncCardSaveButtons();
+    return true;
+  }
+
+  function cardSaveButtonShowsSaved(cardEl) {
+    var btn = cardEl && cardEl.querySelector(".card-save-btn");
+    if (!btn) return false;
+    return btn.getAttribute("aria-pressed") === "true" || btn.classList.contains("card-save-btn--saved");
+  }
 
   function t(key, vars) {
     if (window.bsvI18n && typeof window.bsvI18n.t === "function") {
@@ -131,8 +232,15 @@
       });
   }
 
-  function loadSavedCardsFromLocal() {
-    savedCards = readLocalSavedCards();
+  function loadSavedCardsFromLocal(revisionAtStart) {
+    if (revisionAtStart != null && revisionAtStart !== savedCardsRevision) return savedCards;
+    var localCards = readLocalSavedCards();
+    if (hasPendingRemovals() || hasUnsyncedLocalCards()) {
+      savedCards = mergeServerSavedCards(localCards);
+    } else {
+      savedCards = localCards;
+    }
+    bumpSavedCardsRevision();
     updateUi();
     syncCardSaveButtons();
     return savedCards;
@@ -207,49 +315,62 @@
   }
 
   function fetchSavedCards() {
+    if (fetchInFlight) return Promise.resolve(savedCards);
+    fetchInFlight = true;
+    var revisionAtStart = savedCardsRevision;
     var token = getAuthToken();
     if (!token) {
       savedCards = [];
       useLocalStorage = false;
+      pendingRemovalIds = Object.create(null);
+      pendingRemovalKeys = Object.create(null);
+      bumpSavedCardsRevision();
       updateUi();
+      fetchInFlight = false;
       return Promise.resolve([]);
     }
     return resolveCurrentUser().then(function () {
       if (!currentUserId) {
-        savedCards = [];
-        updateUi();
+        if (revisionAtStart === savedCardsRevision) {
+          savedCards = [];
+          bumpSavedCardsRevision();
+          updateUi();
+        }
         return [];
       }
       return fetch(apiUrl("api/saved-cards"), { headers: authHeaders() })
         .then(function (res) {
           if (res.status === 401) {
-            savedCards = [];
-            useLocalStorage = false;
-            updateUi();
-            return [];
+            if (revisionAtStart === savedCardsRevision) {
+              savedCards = [];
+              useLocalStorage = false;
+              bumpSavedCardsRevision();
+              updateUi();
+            }
+            return null;
           }
           if (apiUnavailableStatus(res.status)) {
             useLocalStorage = true;
-            return loadSavedCardsFromLocal();
+            return loadSavedCardsFromLocal(revisionAtStart);
           }
           if (!res.ok) throw new Error("fetch_failed");
           useLocalStorage = false;
           return res.json();
         })
         .then(function (data) {
+          if (data == null) return savedCards;
           if (Array.isArray(data)) {
-            savedCards = data;
-          } else {
-            savedCards = Array.isArray(data && data.cards) ? data.cards : [];
+            return applyFetchedSavedCards(data, revisionAtStart);
           }
-          updateUi();
-          syncCardSaveButtons();
-          return savedCards;
+          var cards = Array.isArray(data && data.cards) ? data.cards : [];
+          return applyFetchedSavedCards(cards, revisionAtStart);
         })
         .catch(function () {
           useLocalStorage = true;
-          return loadSavedCardsFromLocal();
+          return loadSavedCardsFromLocal(revisionAtStart);
         });
+    }).finally(function () {
+      fetchInFlight = false;
     });
   }
 
@@ -568,19 +689,11 @@
       e.stopPropagation();
       var removeId = removeBtn.getAttribute("data-remove-saved");
       if (!removeId) return;
-      deleteSavedCard(removeId)
-        .then(function () {
-          savedCards = savedCards.filter(function (c) { return c.id !== removeId; });
-          updateUi();
-          syncCardSaveButtons();
-        })
-        .catch(function () {
-          savedCards = savedCards.filter(function (c) { return c.id !== removeId; });
-          writeLocalSavedCards(savedCards);
-          useLocalStorage = true;
-          updateUi();
-          syncCardSaveButtons();
-        });
+      var removedCard = savedCards.find(function (c) { return c.id === removeId; });
+      var removeKey = removedCard ? cardStorageKey(removedCard) : null;
+      trackPendingRemoval(removeId, removeKey);
+      removeSavedCardsFromState(removeId, removeKey);
+      completeSavedCardRemoval(removeId, removeKey);
       return;
     }
 
@@ -624,7 +737,6 @@
     panel.classList.add("saved-cards-panel--open");
     backdrop.classList.add("saved-cards-backdrop--open");
     renderPanelContent();
-    fetchSavedCards();
   }
 
   function closePanel() {
@@ -717,6 +829,35 @@
     tools.insertBefore(btn, settingsBtn);
   }
 
+  function unsaveCardFromToggle(cardEl, payload, key) {
+    var existing = findSavedCardForPayload(payload);
+    if (!existing) {
+      existing = savedCards.find(function (c) { return cardStorageKey(c) === key; });
+    }
+    if (!existing) {
+      var name = String(payload.name || "").trim().toLowerCase();
+      var type = String(payload.cardType || "weapon").trim().toLowerCase();
+      existing = savedCards.find(function (c) {
+        return String(c.name || "").trim().toLowerCase() === name &&
+          cardTypesMatch(c.cardType, type);
+      }) || null;
+    }
+    if (!existing) {
+      if (!removeSavedCardsFromState(null, key)) {
+        syncCardSaveButtons();
+      }
+      return;
+    }
+
+    var removeId = existing.id;
+    trackPendingRemoval(removeId, key);
+    removeSavedCardsFromState(removeId, key);
+
+    if (!removeId) return;
+
+    completeSavedCardRemoval(removeId, key);
+  }
+
   function toggleSaveOnCard(cardEl) {
     if (!getAuthToken()) {
       if (typeof window.startDiscordLogin === "function") {
@@ -728,29 +869,10 @@
     var payload = cardPayloadFromElement(cardEl);
     if (!payload) return;
     var key = cardStorageKey(payload);
+    var wantsUnsave = cardSaveButtonShowsSaved(cardEl);
 
-    var existing = findSavedCardForPayload(payload);
-    if (existing || isSavedKey(key)) {
-      if (!existing) {
-        existing = savedCards.find(function (c) { return cardStorageKey(c) === key; });
-      }
-      if (!existing) {
-        syncCardSaveButtons();
-        return;
-      }
-      deleteSavedCard(existing.id)
-        .then(function () {
-          savedCards = savedCards.filter(function (c) { return c.id !== existing.id; });
-          updateUi();
-          syncCardSaveButtons();
-        })
-        .catch(function () {
-          savedCards = savedCards.filter(function (c) { return c.id !== existing.id; });
-          writeLocalSavedCards(savedCards);
-          useLocalStorage = true;
-          updateUi();
-          syncCardSaveButtons();
-        });
+    if (wantsUnsave || isPayloadSaved(payload) || isSavedKey(key)) {
+      unsaveCardFromToggle(cardEl, payload, key);
       return;
     }
 
@@ -761,8 +883,8 @@
         if (!data.alreadySaved) {
           savedCards = savedCards.filter(function (c) { return cardStorageKey(c) !== key; });
           savedCards.unshift(data.card);
-        } else {
-          fetchSavedCards();
+          bumpSavedCardsRevision();
+          if (useLocalStorage) writeLocalSavedCards(savedCards);
         }
         updateUi();
         syncCardSaveButtons();
@@ -799,6 +921,10 @@
 
     document.addEventListener("bsv:authchange", function (e) {
       setCurrentUser(e.detail && e.detail.user);
+      if (!getAuthToken()) {
+        pendingRemovalIds = Object.create(null);
+        pendingRemovalKeys = Object.create(null);
+      }
       fetchSavedCards();
       if (panelOpen) renderPanelContent();
     });
