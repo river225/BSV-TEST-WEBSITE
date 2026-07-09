@@ -46,8 +46,8 @@
         '<div class="nav-container-full">' +
           '<div class="nav-left">' +
             '<a href="index.html" class="nav-brand">' +
-              '<img src="https://i.ibb.co/Xk7sgWyt/Blockspinvaluesnew-1-5.png" alt="BlockSpin Values Logo" class="nav-logo-img">' +
-              '<span class="nav-title">Block<span style="color: #ff1a1a;">Spin</span> <span style="color: #33cce6;">Values</span></span>' +
+              '<img src="https://i.ibb.co/gZQzvDp1/qu-Ohyw-V8.webp" alt="BlockSpin Values Logo" class="nav-logo-img">' +
+              '<span class="nav-title"><span style="color: #ff1a1a;">BlockSpin</span> <span style="color: #33cce6;">Values</span></span>' +
             "</a>" +
             navLink("x-about.html", "About Us", activePage, "about") +
             navLink("x-faq.html", "FAQ", activePage, "faq") +

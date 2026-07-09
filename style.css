@@ -231,7 +231,7 @@ background-attachment: fixed;
   transform: none;
   width: 130px;
   height: 45px;
-  background-image: url('https://i.ibb.co/Xk7sgWyt/Blockspinvaluesnew-1-5.png');
+  background-image: url('https://i.ibb.co/gZQzvDp1/qu-Ohyw-V8.webp');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -487,29 +487,6 @@ background-attachment: fixed;
   visibility: hidden;
   opacity: 0;
   overflow: visible;
-}.richest-hero-panel {
-  position: absolute;
-  top: 0;
-  left: calc(100% + 48px);
-  right: auto;
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: none;
-  overflow: visible;
-  pointer-events: none;
-  z-index: 2;
-  flex-shrink: 0;
-}.richest-hero-panel[hidden] {
-  display: none !important;
-}.richest-hero-panel .richest-hero-image {
-  display: block;
-  width: min(720px, 52vw);
-  max-width: none;
-  height: auto;
-  margin: 0;
-  object-fit: contain;
-  filter: drop-shadow(0 18px 48px rgba(0, 0, 0, 0.58));
 }.guide-fast-nav {
   display: none;
   background: #141d28;

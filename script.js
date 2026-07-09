@@ -3016,17 +3016,6 @@ function setHeaderSearchVisible(visible) {
   searchContainer.classList.toggle("is-hidden", !visible);
 }
 
-function setRichestHeroPanelVisible(visible) {
-  var panel = document.getElementById("richest-hero-panel");
-  if (!panel) return;
-  var section = document.querySelector(".richest-players-section");
-  if (visible && section && panel.parentElement !== section) {
-    section.appendChild(panel);
-  }
-  panel.hidden = !visible;
-  panel.setAttribute("aria-hidden", visible ? "false" : "true");
-}
-
 function showSection(name) {
   console.log(`Showing section: ${name}`);
   _activeSectionName = name;
@@ -3068,8 +3057,6 @@ function showSection(name) {
     applyVisibilityMode(taxCalc, cfg.taxCalc, cfg.id === 'home' ? 'none' : 'block');
     applyVisibilityMode(middlemanPromo, cfg.middlemanPromo, 'block');
   }
-
-  setRichestHeroPanelVisible(cfg.id === 'richest-players');
 
   if (cfg.accessoriesFastNav) {
     removeEmbeddedMoneyGuideFastNav();
