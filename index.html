@@ -12,11 +12,11 @@
 <script src="auth-oauth-bounce.js?v=20260619-test-oauth"></script>
 <title>BlockSpin Values — Dev</title>
 <meta name="description" content="Development copy of BlockSpin Values — not the public site." />
-<link rel="icon" type="image/png" href="https://i.ibb.co/gZQzvDp1/qu-Ohyw-V8.webp">
-<meta property="og:image" content="https://i.ibb.co/gZQzvDp1/qu-Ohyw-V8.webp">
+<link rel="icon" type="image/png" href="https://i.ibb.co/VYjk9L14/Block-Spin-Values-Logo.png">
+<meta property="og:image" content="https://i.ibb.co/VYjk9L14/Block-Spin-Values-Logo.png">
 <meta property="og:title" content="BlockSpin Values (Dev / staging)">
 <meta property="og:description" content="Development / staging build — not the public BlockSpin Values site.">
-<link rel="stylesheet" href="style.css?v=20260704-cinematic-about" />
+<link rel="stylesheet" href="style.css?v=20260712-richest-mobile2" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Inter:wght@400;600;700&amp;family=Nunito+Sans:ital,wght@0,600;0,700;1,600&amp;family=Oswald:wght@500;600;700&amp;family=Poppins:wght@400;600;700&amp;family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet" />
@@ -101,12 +101,13 @@
 
   
 
+<header class="site-header-shell">
 <nav class="top-navbar">
   <div class="nav-container-full">
     <div class="nav-left">
       <a href="#" class="nav-brand" onclick="showSection('Home'); return false;">
-        <img src="https://i.ibb.co/gZQzvDp1/qu-Ohyw-V8.webp" alt="BlockSpin Values Logo" class="nav-logo-img">
-        <span class="nav-title"><span style="color: #ff1a1a;">BlockSpin</span> <span style="color: #33cce6;">Values</span></span>
+        <img src="https://i.ibb.co/VYjk9L14/Block-Spin-Values-Logo.png" alt="BlockSpin Values Logo" class="nav-logo-img">
+        <span class="nav-title">Block<span class="brand-spin">Spin</span> Values</span>
       </a>
       <a href="x-about.html" data-i18n="nav.about">About Us</a>
       <a href="x-faq.html" data-i18n="nav.faq">FAQ</a>
@@ -147,17 +148,34 @@
         </svg>
       </a>
       <span class="nav-right-divider" aria-hidden="true"></span>
-      <div class="nav-tools" id="nav-tools">
-        <button type="button" class="nav-settings-btn" id="nav-settings-btn" data-i18n-aria="nav.settings" data-i18n-title="nav.settings" aria-label="Settings" aria-expanded="false" title="Settings">
-          <svg class="nav-settings-btn__icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path fill="currentColor" d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97 0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1 0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
-          </svg>
-        </button>
-      </div>
       <div class="nav-login" id="nav-login"></div>
     </div>
   </div>
 </nav>
+</header>
+<div class="site-mobile-below-header">
+<nav class="header-subnav" aria-label="Site pages">
+  <a href="x-about.html" data-i18n="nav.about">About Us</a>
+  <span class="header-subnav__sep" aria-hidden="true">·</span>
+  <a href="x-faq.html" data-i18n="nav.faq">FAQ</a>
+</nav>
+<div class="nav-mobile-toolbar is-active" aria-label="Mobile shortcuts">
+  <div class="nav-tools" id="nav-tools">
+    <button type="button" class="nav-settings-btn" id="nav-settings-btn" data-i18n-aria="nav.settings" data-i18n-title="nav.settings" aria-label="Settings" aria-expanded="false" title="Settings">
+      <svg class="nav-settings-btn__icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+        <circle cx="12" cy="12" r="3"/>
+      </svg>
+    </button>
+  </div>
+</div>
+</div>
+
+<button type="button" class="sections-menu-toggle" id="sections-menu-toggle" aria-label="Open sections menu" aria-expanded="false" aria-controls="sections-sidebar">
+  <span class="sections-menu-toggle__bar" aria-hidden="true"></span>
+  <span class="sections-menu-toggle__bar" aria-hidden="true"></span>
+  <span class="sections-menu-toggle__bar" aria-hidden="true"></span>
+</button>
 
 <div class="site-settings-modal" id="site-settings-modal" hidden>
   <div class="site-settings-modal__backdrop" id="site-settings-backdrop"></div>
@@ -190,6 +208,8 @@
   </div>
 </div>
 
+<div class="menu-overlay" id="sections-menu-overlay" hidden></div>
+
 <div id="loading-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(160deg, #1a2740 0%, #0f1724 100%); display: flex; align-items: center; justify-content: center; z-index: 9999;">
   <div style="text-align: center; width: 400px; max-width: 90%;">
     <h2 style="color: #33cce6; font-size: 2rem; margin-bottom: 30px;" data-i18n="loading.title">Loading BlockSpin Values...</h2>
@@ -202,7 +222,7 @@
 
 <div class="main-container"> 
 
-    <div class="sections-sidebar">
+    <div class="sections-sidebar" id="sections-sidebar">
       <nav class="sections-nav" id="sections-nav"></nav>
     </div>
 
@@ -215,8 +235,8 @@
     
     <div class="welcome-header">
       <h1>
-        <span class="welcome-title-line"><span style="color: #ff1a1a;">BlockSpin</span></span>
-        <span class="welcome-title-line" style="color: #33cce6;">Values</span>
+        <span class="welcome-title-line">Block<span class="brand-spin">Spin</span></span>
+        <span class="welcome-title-line">Values</span>
       </h1>
       <p class="subtitle welcome-subtitle-with-icon" data-i18n="home.tagline">The Most Trusted BlockSpin Value List</p>
       <p class="founder-credit"><span data-i18n="home.founderPrefix">Founded and maintained by</span> <a href="#" onclick="openRiverLinks(event)" style="color: #33cce6; text-decoration: underline;">river</a></p>
@@ -230,11 +250,17 @@
 
     <div class="home-two-columns">
       
-      <div class="home-column home-column--announcements">
-        <div class="home-announcements-box__title-row">
-          <img class="home-announcements-box__icon" src="https://i.ibb.co/20SshwSg/dfsawefsvdbsadfsv.png" alt="" width="32" height="32" loading="lazy">
-          <h2 data-i18n="home.announcements">Announcements</h2>
+      <div class="home-column home-column--announcements home-panel is-open" data-home-panel>
+        <div class="home-panel__header">
+          <div class="home-announcements-box__title-row">
+            <img class="home-announcements-box__icon" src="https://i.ibb.co/20SshwSg/dfsawefsvdbsadfsv.png" alt="" width="32" height="32" loading="lazy">
+            <h2 data-i18n="home.announcements">Announcements</h2>
+          </div>
+          <button type="button" class="home-panel__toggle" aria-expanded="true" data-i18n-aria="home.panelToggle" aria-label="Show or hide section">
+            <svg class="home-panel__toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg>
+          </button>
         </div>
+        <div class="home-panel__body">
         <div class="announcement-list">
 
              <div class="announcement-item-clean">
@@ -257,12 +283,20 @@
 We’ve launched a complete site redesign, and items will now display both their repair prices and pawn values across all durability levels. This update is designed to give you clearer, more detailed information and an overall better user experience.</p>
           </div>
         </div>
+        </div>
       </div>
 
-      <div class="home-column home-column--value-changes">
-        <h2 class="value-changes-heading" data-i18n="home.recentChanges">Recent Value Changes</h2>
+      <div class="home-column home-column--value-changes home-panel is-open" data-home-panel>
+        <div class="home-panel__header">
+          <h2 class="value-changes-heading" data-i18n="home.recentChanges">Recent Value Changes</h2>
+          <button type="button" class="home-panel__toggle" aria-expanded="true" data-i18n-aria="home.panelToggle" aria-label="Show or hide section">
+            <svg class="home-panel__toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg>
+          </button>
+        </div>
+        <div class="home-panel__body">
         <div class="value-changes-list" id="home-main-value-changes-list">
           <div class="value-changes-loading" data-i18n="loading.changes">Loading value changes...</div>
+        </div>
         </div>
       </div>
 
@@ -317,12 +351,12 @@ We’ve launched a complete site redesign, and items will now display both their
 </div>
 
 <script src="auth.js?v=20260619-test-oauth"></script>
-<script src="saved-cards.js?v=20260619-saved-sync-fix"></script>
+<script src="saved-cards.js?v=20260710-saved-order-fix"></script>
 <script src="site-i18n.js?v=20260619-farming-paste"></script>
 <script src="site-settings.js?v=20260614-i18n-full"></script>
-<script src="section-config.js?v=20260619-guide-fastnav"></script>
+<script src="section-config.js?v=20260712-untradable-mobile"></script>
 <script src="quest-guide-i18n.js?v=20260618-quest-intro"></script>
-<script src="script.js?v=20260619-guide-fastnav"></script> 
+<script src="script.js?v=20260712-richest-mobile2"></script> 
 
 
 <footer class="site-footer">
@@ -332,6 +366,9 @@ We’ve launched a complete site redesign, and items will now display both their
       <div class="footer-boosters-track" id="footer-boosters-track"></div>
     </div>
   </section>
+  <div class="footer-content">
+    <p data-i18n="footer.copyright">© 2026 BlockSpin Values</p>
+  </div>
   <div class="footer-side-nav">
     <div class="footer-side-nav__group" aria-label="Contact">
       <p class="footer-side-nav__title">Contact</p>
@@ -367,9 +404,6 @@ We’ve launched a complete site redesign, and items will now display both their
         </li>
       </ul>
     </div>
-  </div>
-  <div class="footer-content">
-    <p data-i18n="footer.copyright">© 2026 BlockSpin Values</p>
   </div>
 </footer>
 </body> 

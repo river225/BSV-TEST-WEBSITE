@@ -826,7 +826,8 @@
       else openPanel();
     });
 
-    tools.insertBefore(btn, settingsBtn);
+    settingsBtn.insertAdjacentElement("beforebegin", btn);
+    if (typeof initMobileHeaderToolbar === "function") initMobileHeaderToolbar();
   }
 
   function unsaveCardFromToggle(cardEl, payload, key) {

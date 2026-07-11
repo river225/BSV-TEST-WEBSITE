@@ -132,7 +132,7 @@
       dataSource: "sheet",
       sheetName: "Accessories",
       search: "hide",
-      mobileSearchInSection: false,
+      mobileSearchInSection: true,
       sidebarColumn: "show",
       taxCalc: "ghost",
       middlemanPromo: "ghost",

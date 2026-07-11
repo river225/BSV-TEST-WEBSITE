@@ -110,6 +110,7 @@
       "home.founderPrefix": "Founded and maintained by",
       "home.announcements": "Announcements",
       "home.recentChanges": "Recent Value Changes",
+      "home.panelToggle": "Show or hide section",
       "home.valueChanges": "Value Changes",
       "home.whatIsTitle": "What is BlockSpin Values?",
       "home.whatIsBody":
@@ -403,6 +404,7 @@
       "home.founderPrefix": "Fondé et maintenu par",
       "home.announcements": "Annonces",
       "home.recentChanges": "Changements de valeurs récents",
+      "home.panelToggle": "Afficher ou masquer la section",
       "home.valueChanges": "Changements de valeurs",
       "home.whatIsTitle": "Qu'est-ce que BlockSpin Values ?",
       "home.whatIsBody":
@@ -696,6 +698,7 @@
       "home.founderPrefix": "Fundado y mantenido por",
       "home.announcements": "Anuncios",
       "home.recentChanges": "Cambios de valor recientes",
+      "home.panelToggle": "Mostrar u ocultar sección",
       "home.valueChanges": "Cambios de valor",
       "home.whatIsTitle": "¿Qué es BlockSpin Values?",
       "home.whatIsBody":

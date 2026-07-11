@@ -257,6 +257,7 @@
         "</button>";
       var loginBtn = document.getElementById("nav-login-btn");
       if (loginBtn) loginBtn.addEventListener("click", startDiscordLogin);
+      if (typeof initMobileHeaderToolbar === "function") initMobileHeaderToolbar();
       return;
     }
 
@@ -297,6 +298,7 @@
         logoutDiscord();
       });
     }
+    if (typeof initMobileHeaderToolbar === "function") initMobileHeaderToolbar();
   }
 
   function initDiscordAuth() {

@@ -3,6 +3,7 @@ const SECTION_NAMES = typeof getSectionTitles === "function" ? getSectionTitles(
 
 const GA_MEASUREMENT_ID = "G-XXXXXXXXXX";
 const ACCESSORIES_SECTION_NAME = "Untradable Items";
+const RICHEST_SECTION_NAME = "💰 Richest Players";
 const MONEY_GAME_GUIDE_SECTION = "Money & Game Guide";
 const MONEY_GUIDE_SHEETS = {
   fishingItems: "Fishing Item",
@@ -863,7 +864,11 @@ function filterRichestPlayers(query) {
   section.querySelectorAll(".richest-card").forEach(function (card) {
     const playerName = (card.dataset.playerName || "").toLowerCase();
     const match = showAll || playerName.includes(searchTerm);
-    card.style.setProperty("display", match ? "flex" : "none", "important");
+    if (match) {
+      card.style.removeProperty("display");
+    } else {
+      card.style.setProperty("display", "none", "important");
+    }
   });
 }
 
@@ -2834,9 +2839,11 @@ function renderGuideFastNav(navGroups, options) {
 
   const topBtnId = options.topBtnId || "guide-fast-nav-top";
   const rows = [];
-  rows.push(
-    '<h2 class="guide-fast-nav__title">' + escapeHtml(options.title || "Fast Navigation") + "</h2>"
-  );
+  if (options.includeTitle !== false) {
+    rows.push(
+      '<h2 class="guide-fast-nav__title">' + escapeHtml(options.title || i18n("guide.fastNavAria")) + "</h2>"
+    );
+  }
 
   navGroups.forEach(function (group) {
     const groupAttrs = ['type="button"', 'class="guide-fast-nav__btn guide-fast-nav__btn--group"'];
@@ -2853,12 +2860,14 @@ function renderGuideFastNav(navGroups, options) {
     });
   });
 
-  rows.push('<div class="guide-fast-nav__spacer"></div>');
-  rows.push(
-    '<button type="button" class="guide-fast-nav__top" id="' + escapeAttr(topBtnId) + '">' +
-      escapeHtml(options.topLabel || "Back to Top") +
-    "</button>"
-  );
+  if (options.includeTopButton !== false) {
+    rows.push('<div class="guide-fast-nav__spacer"></div>');
+    rows.push(
+      '<button type="button" class="guide-fast-nav__top" id="' + escapeAttr(topBtnId) + '">' +
+        escapeHtml(options.topLabel || i18n("richest.backToTop")) +
+      "</button>"
+    );
+  }
   box.innerHTML = rows.join("");
   box.classList.add("is-visible");
   box.style.display = "block";
@@ -2872,13 +2881,29 @@ function renderGuideFastNav(navGroups, options) {
     });
   });
 
-  const topBtn = document.getElementById(topBtnId);
-  if (topBtn && options.sectionId) {
-    topBtn.addEventListener("click", function () {
-      const sec = document.getElementById(options.sectionId);
-      if (sec) sec.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+  if (options.includeTopButton !== false) {
+    const topBtn = document.getElementById(topBtnId);
+    if (topBtn && options.sectionId) {
+      topBtn.addEventListener("click", function () {
+        const sec = document.getElementById(options.sectionId);
+        if (sec) sec.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
   }
+}
+
+function renderAccessoriesMobileFastNav(navData) {
+  const sectionEl = document.getElementById("untradable-items");
+  if (!sectionEl) return;
+  ensureAccessoriesMobileChrome(sectionEl);
+  const mobileBox = document.getElementById("section-mobile-fastnav");
+  if (!mobileBox) return;
+  renderGuideFastNav(navData, {
+    sectionId: slugify(ACCESSORIES_SECTION_NAME),
+    targetBox: mobileBox,
+    includeTitle: false,
+    includeTopButton: false
+  });
 }
 
 function setGuideFastNavVisible(visible) {
@@ -2900,6 +2925,7 @@ function renderAccessoriesFastNav(navData) {
   renderGuideFastNav(navData, {
     sectionId: slugify(ACCESSORIES_SECTION_NAME)
   });
+  renderAccessoriesMobileFastNav(navData);
 }
 
 function renderCrewFastNav(navData) {
@@ -2928,8 +2954,11 @@ function renderScammerSection(items) {
   const sectionId = slugify("💰 Richest Players");
   const html = `
     <section class="section richest-players-section" id="${sectionId}">
-      <a href="#" class="richest-back-to-top" id="richest-back-to-top" aria-label="${escapeAttr(i18n("richest.backToTop"))}">
-        <img src="https://i.ibb.co/N2kY994q/undo.png" alt="" class="richest-back-to-top-icon" />
+      <a href="#" class="richest-back-to-top" id="richest-back-to-top" hidden aria-label="${escapeAttr(i18n("richest.backToTop"))}">
+        <svg class="richest-back-to-top-icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 4v12M6 10l6-6 6 6" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 4v12M6 10l6-6 6 6" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
         <span class="richest-back-to-top-text">${escapeHtml(i18n("richest.backToTop"))}</span>
       </a>
       ${createRichestPlayersSection(items)}
@@ -2972,6 +3001,7 @@ function renderScammerSection(items) {
       });
     }
 
+    syncBackToTopVisibility();
     loadRichestPlayerAvatars();
   }, 100);
 }
@@ -3005,6 +3035,137 @@ function initSectionsNav() {
   });
 }
 
+function closeSectionsMenu() {
+  document.body.classList.remove("sections-menu-open");
+  const toggle = document.getElementById("sections-menu-toggle");
+  const overlay = document.getElementById("sections-menu-overlay");
+  if (toggle) {
+    toggle.classList.remove("is-open");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-label", "Open sections menu");
+  }
+  if (overlay) {
+    overlay.classList.remove("active");
+    overlay.hidden = true;
+  }
+  document.body.style.overflow = "";
+}
+
+function openSectionsMenu() {
+  document.body.classList.add("sections-menu-open");
+  const toggle = document.getElementById("sections-menu-toggle");
+  const overlay = document.getElementById("sections-menu-overlay");
+  if (toggle) {
+    toggle.classList.add("is-open");
+    toggle.setAttribute("aria-expanded", "true");
+    toggle.setAttribute("aria-label", "Close sections menu");
+  }
+  if (overlay) {
+    overlay.hidden = false;
+    overlay.classList.add("active");
+  }
+  document.body.style.overflow = "hidden";
+}
+
+function initMobileSectionsMenu() {
+  const toggle = document.getElementById("sections-menu-toggle");
+  const overlay = document.getElementById("sections-menu-overlay");
+  if (!toggle) return;
+
+  toggle.addEventListener("click", () => {
+    if (document.body.classList.contains("sections-menu-open")) {
+      closeSectionsMenu();
+    } else {
+      openSectionsMenu();
+    }
+  });
+
+  if (overlay) {
+    overlay.addEventListener("click", closeSectionsMenu);
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeSectionsMenu();
+  });
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 900) closeSectionsMenu();
+  });
+}
+
+function initCollapsiblePanels() {
+  const homePanels = document.querySelectorAll("[data-home-panel]");
+  const sectionPanels = document.querySelectorAll("[data-section-panel]");
+
+  function wirePanel(panel, btnSelector) {
+    const btn = panel.querySelector(btnSelector);
+    if (!btn) return;
+    btn.addEventListener("click", function () {
+      if (window.matchMedia("(min-width: 901px)").matches) return;
+      const isOpen = panel.classList.toggle("is-open");
+      btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  homePanels.forEach(function (panel) {
+    wirePanel(panel, ".home-panel__toggle");
+  });
+  sectionPanels.forEach(function (panel) {
+    wirePanel(panel, ".section-mobile-panel__toggle");
+  });
+
+  window.addEventListener("resize", function () {
+    if (!window.matchMedia("(min-width: 901px)").matches) return;
+    homePanels.forEach(function (panel) {
+      panel.classList.add("is-open");
+      const btn = panel.querySelector(".home-panel__toggle");
+      if (btn) btn.setAttribute("aria-expanded", "true");
+    });
+    sectionPanels.forEach(function (panel) {
+      panel.classList.add("is-open");
+      const btn = panel.querySelector(".section-mobile-panel__toggle");
+      if (btn) btn.setAttribute("aria-expanded", "true");
+    });
+  });
+}
+
+function initHomePanelToggles() {
+  initCollapsiblePanels();
+}
+
+function initMobileHeaderToolbar() {
+  const toolbar = document.querySelector(".nav-mobile-toolbar");
+  const tools = document.getElementById("nav-tools");
+  const navRight = document.querySelector(".nav-right");
+  const login = document.getElementById("nav-login");
+  if (!toolbar || !tools || !navRight) return;
+
+  const mq = window.matchMedia("(max-width: 900px)");
+
+  function apply() {
+    if (mq.matches) {
+      if (tools.parentElement !== toolbar) {
+        toolbar.appendChild(tools);
+      }
+      if (login && login.parentElement !== navRight) {
+        navRight.appendChild(login);
+      }
+      toolbar.classList.add("is-active");
+    } else {
+      if (tools.parentElement !== navRight) {
+        navRight.insertBefore(tools, login || null);
+      }
+      if (login && login.parentElement !== navRight) {
+        navRight.appendChild(login);
+      }
+      toolbar.classList.remove("is-active");
+    }
+  }
+
+  apply();
+  mq.addEventListener("change", apply);
+}
+
 function getSectionElementId(title) {
   const cfg = typeof getSectionConfig === "function" ? getSectionConfig(title) : null;
   return cfg ? cfg.id : slugify(title);
@@ -3014,6 +3175,170 @@ function setHeaderSearchVisible(visible) {
   const searchContainer = document.getElementById("header-search") || document.querySelector(".top-navbar .search-container");
   if (!searchContainer) return;
   searchContainer.classList.toggle("is-hidden", !visible);
+}
+
+function shouldUseMobileSectionSearch(sectionName) {
+  if (sectionName === "💰 Richest Players") return false;
+  const cfg = typeof getSectionConfig === "function" ? getSectionConfig(sectionName) : null;
+  if (cfg) return cfg.mobileSearchInSection === true;
+  const hiddenSearchSections = ["Home", "Crew Logos", "Crate Game", "💰 Richest Players", ACCESSORIES_SECTION_NAME];
+  return !hiddenSearchSections.includes(sectionName);
+}
+
+function isHeaderSearchVisibleForSection(sectionName) {
+  const cfg = typeof getSectionConfig === "function" ? getSectionConfig(sectionName) : null;
+  if (cfg) {
+    if (cfg.mobileSearchInSection === true && window.matchMedia("(max-width: 900px)").matches) {
+      return true;
+    }
+    return cfg.search !== "hide";
+  }
+  const hiddenSearchSections = ["Home", "Crew Logos", "Crate Game", "💰 Richest Players", ACCESSORIES_SECTION_NAME];
+  return !hiddenSearchSections.includes(sectionName);
+}
+
+function wireSectionMobilePanel(panel) {
+  if (!panel || panel.dataset.panelWired === "1") return;
+  const btn = panel.querySelector(".section-mobile-panel__toggle");
+  if (!btn) return;
+  panel.dataset.panelWired = "1";
+  btn.addEventListener("click", function () {
+    if (window.matchMedia("(min-width: 901px)").matches) return;
+    const isOpen = panel.classList.toggle("is-open");
+    btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  });
+}
+
+function ensureAccessoriesMobileChrome(sectionEl) {
+  let chrome = sectionEl.querySelector(".section-mobile-chrome");
+  if (!chrome) {
+    chrome = document.createElement("div");
+    chrome.className = "section-mobile-chrome";
+    const toggleIcon =
+      '<svg class="section-mobile-panel__toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg>';
+    chrome.innerHTML =
+      '<div class="section-mobile-panel is-open" data-section-panel>' +
+        '<div class="section-mobile-panel__header">' +
+          '<h3 class="section-mobile-panel__title">' + escapeHtml(i18n("guide.fastNavAria")) + "</h3>" +
+          '<button type="button" class="section-mobile-panel__toggle" aria-expanded="true" aria-label="' +
+            escapeAttr(i18n("home.panelToggle")) + '">' + toggleIcon + "</button>" +
+        "</div>" +
+        '<div class="section-mobile-panel__body">' +
+          '<aside class="guide-fast-nav guide-fast-nav--in-section" id="section-mobile-fastnav"></aside>' +
+        "</div>" +
+      "</div>" +
+      '<div class="section-search-mount"></div>';
+    const heading = sectionEl.querySelector("h2:first-of-type");
+    if (heading) {
+      heading.insertAdjacentElement("afterend", chrome);
+    } else {
+      sectionEl.insertBefore(chrome, sectionEl.firstChild);
+    }
+    const panel = chrome.querySelector("[data-section-panel]");
+    wireSectionMobilePanel(panel);
+  }
+  return chrome;
+}
+
+function ensureAccessoriesBackToTop() {
+  let btn = document.getElementById("accessories-back-to-top");
+  if (!btn) {
+    btn = document.createElement("button");
+    btn.type = "button";
+    btn.id = "accessories-back-to-top";
+    btn.className = "section-back-to-top";
+    btn.hidden = true;
+    btn.setAttribute("aria-label", i18n("richest.backToTop"));
+    btn.innerHTML =
+      '<svg class="section-back-to-top__icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+        '<path d="M12 4v12M6 10l6-6 6 6" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<path d="M12 4v12M6 10l6-6 6 6" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+      "</svg>" +
+      '<span class="section-back-to-top__text">' + escapeHtml(i18n("richest.backToTop")) + "</span>";
+    btn.addEventListener("click", function () {
+      const sec = document.getElementById("untradable-items");
+      if (sec) sec.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    document.body.appendChild(btn);
+  }
+  return btn;
+}
+
+function syncBackToTopVisibility() {
+  const mobile = window.matchMedia("(max-width: 900px)").matches;
+  const active = _activeSectionName;
+
+  const untradableBtn = ensureAccessoriesBackToTop();
+  untradableBtn.hidden = !(mobile && active === ACCESSORIES_SECTION_NAME);
+
+  const richestBtn = document.getElementById("richest-back-to-top");
+  if (richestBtn) {
+    richestBtn.hidden = active !== RICHEST_SECTION_NAME;
+  }
+}
+
+function ensureSectionSearchMount(sectionEl) {
+  if (sectionEl && sectionEl.id === "untradable-items") {
+    ensureAccessoriesMobileChrome(sectionEl);
+  }
+
+  let mount = sectionEl.querySelector(".section-mobile-chrome .section-search-mount") ||
+    sectionEl.querySelector(".section-search-mount");
+  if (!mount) {
+    mount = document.createElement("div");
+    mount.className = "section-search-mount";
+    const heading = sectionEl.querySelector("h2:first-of-type");
+    if (heading) {
+      heading.insertAdjacentElement("afterend", mount);
+    } else {
+      sectionEl.insertBefore(mount, sectionEl.firstChild);
+    }
+  }
+  return mount;
+}
+
+function syncHeaderSearchPlacement(sectionName) {
+  const searchContainer = document.getElementById("header-search");
+  const navContainer = document.querySelector(".nav-container-full");
+  if (!searchContainer || !navContainer) return;
+
+  const searchVisible = isHeaderSearchVisibleForSection(sectionName);
+  const useInSection = window.matchMedia("(max-width: 900px)").matches &&
+    searchVisible &&
+    shouldUseMobileSectionSearch(sectionName);
+
+  if (useInSection) {
+    const sectionId = typeof getSectionElementId === "function"
+      ? getSectionElementId(sectionName)
+      : slugify(sectionName);
+    const sectionEl = document.getElementById(sectionId);
+    if (sectionEl) {
+      const mount = ensureSectionSearchMount(sectionEl);
+      if (searchContainer.parentElement !== mount) {
+        mount.appendChild(searchContainer);
+      }
+      searchContainer.classList.add("search-container--in-section");
+      return;
+    }
+  }
+
+  const navRight = navContainer.querySelector(".nav-right");
+  if (searchContainer.parentElement !== navContainer) {
+    navContainer.insertBefore(searchContainer, navRight || null);
+  }
+  searchContainer.classList.remove("search-container--in-section");
+}
+
+function initMobileSectionSearch() {
+  const mq = window.matchMedia("(max-width: 900px)");
+  mq.addEventListener("change", function () {
+    const sectionName = _activeSectionName || "Home";
+    const cfg = typeof getSectionConfig === "function" ? getSectionConfig(sectionName) : null;
+    const useMobileSectionSearch = mq.matches && shouldUseMobileSectionSearch(sectionName);
+    setHeaderSearchVisible(cfg ? (useMobileSectionSearch || cfg.search !== "hide") : isHeaderSearchVisibleForSection(sectionName));
+    syncHeaderSearchPlacement(sectionName);
+    syncBackToTopVisibility();
+  });
 }
 
 function showSection(name) {
@@ -3064,6 +3389,7 @@ function showSection(name) {
       renderGuideFastNav(accessoriesFastNavData, {
         sectionId: slugify(ACCESSORIES_SECTION_NAME)
       });
+      renderAccessoriesMobileFastNav(accessoriesFastNavData);
     }
     setGuideFastNavVisible(true);
   } else if (cfg.moneyGuideFastNav) {
@@ -3087,17 +3413,33 @@ function showSection(name) {
     homeValueChanges.style.display = cfg.homeValueChanges ? 'block' : 'none';
   }
 
-  setHeaderSearchVisible(cfg.search !== "hide");
+  const useMobileSectionSearch = window.matchMedia("(max-width: 900px)").matches &&
+    shouldUseMobileSectionSearch(name);
+  setHeaderSearchVisible(useMobileSectionSearch || cfg.search !== "hide");
+  syncHeaderSearchPlacement(name);
+  syncBackToTopVisibility();
 
   getSectionRegistry().forEach(function (sectionCfg) {
     const el = document.getElementById(sectionCfg.id);
-    if (el) el.style.display = sectionCfg.title === name ? "block" : "none";
+    if (!el) return;
+    if (sectionCfg.title === name) {
+      if (sectionCfg.id === "richest-players") {
+        el.style.display = "flex";
+        el.style.flexDirection = "column";
+      } else {
+        el.style.display = "block";
+        el.style.flexDirection = "";
+      }
+    } else {
+      el.style.display = "none";
+    }
   });
 
   document.querySelectorAll("#sections-nav button").forEach(b => {
     b.classList.toggle("active", b.dataset.section === name);
   });
 
+  closeSectionsMenu();
   trackEvent("view_section", { section_name: name });
 }
 
@@ -3608,6 +3950,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   mountHomeDiscordPromo();
 
   initSectionsNav();
+  initMobileSectionsMenu();
+  initHomePanelToggles();
+  initMobileHeaderToolbar();
+  initMobileSectionSearch();
   initSearch();
   initTaxCalculator();
 

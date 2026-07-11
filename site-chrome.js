@@ -42,23 +42,33 @@
     var dev = isDevSite();
     var login = dev ? '<div class="nav-login" id="nav-login"></div>' : "";
     return (
-      '<nav class="top-navbar">' +
-        '<div class="nav-container-full">' +
-          '<div class="nav-left">' +
-            '<a href="index.html" class="nav-brand">' +
-              '<img src="https://i.ibb.co/gZQzvDp1/qu-Ohyw-V8.webp" alt="BlockSpin Values Logo" class="nav-logo-img">' +
-              '<span class="nav-title"><span style="color: #ff1a1a;">BlockSpin</span> <span style="color: #33cce6;">Values</span></span>' +
-            "</a>" +
-            navLink("x-about.html", "About Us", activePage, "about") +
-            navLink("x-faq.html", "FAQ", activePage, "faq") +
+      '<header class="site-header-shell">' +
+        '<nav class="top-navbar">' +
+          '<div class="nav-container-full">' +
+            '<div class="nav-left">' +
+              '<a href="index.html" class="nav-brand">' +
+                '<img src="https://i.ibb.co/VYjk9L14/Block-Spin-Values-Logo.png" alt="BlockSpin Values Logo" class="nav-logo-img">' +
+                '<span class="nav-title">Block<span class="brand-spin">Spin</span> Values</span>' +
+              "</a>" +
+              navLink("x-about.html", "About Us", activePage, "about") +
+              navLink("x-faq.html", "FAQ", activePage, "faq") +
+            "</div>" +
+            '<div class="nav-right">' +
+              themeSwitcher() +
+              SOCIAL +
+              login +
+            "</div>" +
           "</div>" +
-          '<div class="nav-right">' +
-            themeSwitcher() +
-            SOCIAL +
-            login +
-          "</div>" +
-        "</div>" +
-      "</nav>"
+        "</nav>" +
+      "</header>" +
+      '<div class="site-mobile-below-header">' +
+        '<nav class="header-subnav" aria-label="Site pages">' +
+          navLink("x-about.html", "About Us", activePage, "about") +
+          '<span class="header-subnav__sep" aria-hidden="true">·</span>' +
+          navLink("x-faq.html", "FAQ", activePage, "faq") +
+        "</nav>" +
+        '<div class="nav-mobile-toolbar" aria-label="Mobile shortcuts"></div>' +
+      "</div>"
     );
   }
 
@@ -101,12 +111,45 @@
             '<div class="footer-boosters-track" id="footer-boosters-track"></div>' +
           "</div>" +
         "</section>" +
-        footerSideNavBlock() +
         '<div class="footer-content">' +
           "<p>" + copy + "</p>" +
         "</div>" +
+        footerSideNavBlock() +
       "</footer>"
     );
+  }
+
+  function initMobileHeaderToolbar() {
+    var toolbar = document.querySelector(".nav-mobile-toolbar");
+    var tools = document.getElementById("nav-tools");
+    var navRight = document.querySelector(".nav-right");
+    var login = document.getElementById("nav-login");
+    if (!toolbar || !tools || !navRight) return;
+
+    var mq = window.matchMedia("(max-width: 900px)");
+
+    function apply() {
+      if (mq.matches) {
+        if (tools.parentElement !== toolbar) {
+          toolbar.appendChild(tools);
+        }
+        if (login && login.parentElement !== navRight) {
+          navRight.appendChild(login);
+        }
+        toolbar.classList.add("is-active");
+      } else {
+        if (tools.parentElement !== navRight) {
+          navRight.insertBefore(tools, login || null);
+        }
+        if (login && login.parentElement !== navRight) {
+          navRight.appendChild(login);
+        }
+        toolbar.classList.remove("is-active");
+      }
+    }
+
+    apply();
+    mq.addEventListener("change", apply);
   }
 
   function mount(activePage) {
@@ -114,6 +157,7 @@
     var footerMount = document.getElementById("bsv-site-footer");
     if (headerMount) headerMount.outerHTML = renderHeader(activePage || "");
     if (footerMount) footerMount.innerHTML = renderFooter();
+    initMobileHeaderToolbar();
   }
 
   function autoMount() {
@@ -130,4 +174,6 @@
   }
 
   global.bsvMountSiteChrome = mount;
+  global.bsvInitMobileHeaderToolbar = initMobileHeaderToolbar;
+  global.initMobileHeaderToolbar = initMobileHeaderToolbar;
 })(typeof window !== "undefined" ? window : globalThis);
