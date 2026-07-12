@@ -178,6 +178,9 @@
     var footerMount = document.getElementById("bsv-site-footer");
     if (headerMount) headerMount.outerHTML = renderHeader(activePage || "");
     if (footerMount) footerMount.innerHTML = renderFooter();
+    var boostersSlot = document.getElementById("bsv-discord-boosters-slot");
+    var boosters = document.getElementById("footer-boosters");
+    if (boostersSlot && boosters) boostersSlot.appendChild(boosters);
     initMobileHeaderToolbar();
   }
 

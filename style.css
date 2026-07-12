@@ -13921,37 +13921,37 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   }
 }
 
-/* Discord join page — keep footer boosters in flow above copyright */
+/* Discord join page — boosters sit above footer, not inside it */
+body[data-bsv-page="discord"] .join-boosters-slot {
+  max-width: 1100px;
+  margin: 36px auto 0;
+  padding: 0 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+body[data-bsv-page="discord"] .join-boosters-slot .footer-boosters {
+  position: static;
+  left: auto;
+  bottom: auto;
+  transform: none;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  z-index: auto;
+}
 body[data-bsv-page="discord"] .site-footer {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   min-height: auto;
-  margin-top: 32px;
-}
-body[data-bsv-page="discord"] .site-footer:has(#footer-boosters:not([hidden])) {
-  margin-top: 32px;
-}
-body[data-bsv-page="discord"] .footer-boosters {
-  position: static;
-  left: auto;
-  bottom: auto;
-  transform: none;
-  width: min(1100px, calc(100% - 32px));
-  margin: 0 auto 24px;
-  z-index: auto;
+  margin-top: 0;
 }
 @media (max-width: 900px) {
-  body[data-bsv-page="discord"] .site-footer:has(#footer-boosters:not([hidden])) {
+  body[data-bsv-page="discord"] .join-boosters-slot {
     margin-top: 28px;
+    padding: 0 12px;
   }
-  body[data-bsv-page="discord"] .footer-boosters {
-    position: static;
-    left: auto;
-    bottom: auto;
-    transform: none;
-    width: calc(100% - 24px);
-    max-width: 100%;
-    margin: 0 auto 20px;
+  body[data-bsv-page="discord"] .site-footer {
+    margin-top: 0;
   }
 }
