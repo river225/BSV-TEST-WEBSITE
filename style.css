@@ -1,4 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=Paytone+One&display=swap');::-webkit-scrollbar {
+@import url('https://fonts.googleapis.com/css2?family=Paytone+One&display=swap');
+
+/* Lock appearance — ignore OS/browser forced dark mode */
+html {
+  color-scheme: light only;
+  -webkit-color-scheme: light;
+  background-color: #0f1724;
+}
+
+:root {
+  color-scheme: light only;
+}
+
+input,
+textarea,
+select,
+button {
+  color-scheme: light only;
+}
+
+@media (prefers-color-scheme: dark) {
+  html,
+  body {
+    color-scheme: light only;
+    -webkit-color-scheme: light;
+    background: linear-gradient(160deg, #1a2740 0%, #0f1724 100%) !important;
+    background-attachment: fixed !important;
+    color: #fff !important;
+  }
+}
+
+::-webkit-scrollbar {
   display: none;
   width: 0;
   height: 0;
@@ -450,7 +481,7 @@ background-attachment: fixed;
 }.accessories-section .cards {
   margin-bottom: 12px;
   width: 100%;
-}#untradable-items .cards .card {
+}#untradeable-items .cards .card {
   min-width: min(100%, 280px);
 }.card-info .badge.accessory-rarity-badge {
   text-transform: none;
@@ -610,7 +641,158 @@ background-attachment: fixed;
 .tax-badge-tooltip:hover {
   opacity: 1;
   transform: translateY(-4px);
-}.tax-badge-contact a {
+}
+
+/* Item exclusive prestige badges (spreadsheet: exclusive / veryexclusive = yes) */
+.card-bottom-actions {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 14;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.card-bottom-actions .card-save-btn {
+  position: static;
+  bottom: auto;
+  left: auto;
+  flex-shrink: 0;
+}
+
+.card-exclusive-badge-wrapper {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.card-exclusive-badge {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  pointer-events: auto;
+  cursor: help;
+  opacity: 1;
+  transition: transform 0.15s ease;
+}
+
+.card-exclusive-badge__icon {
+  display: block;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.5)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+}
+
+.card-exclusive-badge-wrapper--very .card-exclusive-badge__icon {
+  filter: drop-shadow(0 0 6px rgba(244, 63, 94, 0.55)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+}
+
+.card-exclusive-badge-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  top: auto;
+  left: 0;
+  right: auto;
+  transform: translateY(0);
+  width: max-content;
+  max-width: min(220px, calc(100vw - 32px));
+  padding: 8px 10px;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  font-weight: 600;
+  color: #ffffff;
+  background: rgba(31, 41, 55, 0.96);
+  border-radius: 6px;
+  border: 1px solid rgba(251, 191, 36, 0.55);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  pointer-events: none;
+  white-space: normal;
+  text-align: left;
+  z-index: 20;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.card-exclusive-badge-wrapper--very .card-exclusive-badge-tooltip {
+  border-color: rgba(248, 113, 113, 0.65);
+}
+
+.card-exclusive-badge:hover,
+.card-exclusive-badge:focus-visible {
+  transform: scale(1.1);
+  outline: none;
+}
+
+.card-exclusive-badge-wrapper--standard .card-exclusive-badge:hover .card-exclusive-badge__icon,
+.card-exclusive-badge-wrapper--standard .card-exclusive-badge:focus-visible .card-exclusive-badge__icon {
+  filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.75)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+.card-exclusive-badge-wrapper--very .card-exclusive-badge:hover .card-exclusive-badge__icon,
+.card-exclusive-badge-wrapper--very .card-exclusive-badge:focus-visible .card-exclusive-badge__icon {
+  filter: drop-shadow(0 0 10px rgba(244, 63, 94, 0.75)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+.card-exclusive-badge:hover + .card-exclusive-badge-tooltip,
+.card-exclusive-badge:focus-visible + .card-exclusive-badge-tooltip,
+.card-exclusive-badge-tooltip:hover {
+  opacity: 1;
+  transform: translateY(4px);
+  pointer-events: auto;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .card-giveaway-trigger:hover {
+    transform: none;
+  }
+
+  .card-exclusive-badge {
+    cursor: default;
+  }
+
+  .card-exclusive-badge:hover,
+  .card-exclusive-badge:focus,
+  .card-exclusive-badge:focus-visible {
+    transform: none;
+    outline: none;
+  }
+
+  .card-exclusive-badge-wrapper--standard .card-exclusive-badge:hover .card-exclusive-badge__icon,
+  .card-exclusive-badge-wrapper--standard .card-exclusive-badge:focus .card-exclusive-badge__icon,
+  .card-exclusive-badge-wrapper--standard .card-exclusive-badge:focus-visible .card-exclusive-badge__icon,
+  .card-exclusive-badge-wrapper--very .card-exclusive-badge:hover .card-exclusive-badge__icon,
+  .card-exclusive-badge-wrapper--very .card-exclusive-badge:focus .card-exclusive-badge__icon,
+  .card-exclusive-badge-wrapper--very .card-exclusive-badge:focus-visible .card-exclusive-badge__icon {
+    filter: none;
+  }
+
+  .card-exclusive-badge:hover + .card-exclusive-badge-tooltip,
+  .card-exclusive-badge:focus + .card-exclusive-badge-tooltip,
+  .card-exclusive-badge:focus-visible + .card-exclusive-badge-tooltip,
+  .card-exclusive-badge-tooltip:hover {
+    opacity: 0;
+    transform: none;
+    pointer-events: none;
+  }
+}
+
+.tax-badge-contact a {
   color: #38bdf8;
   font-weight: 600;
   text-decoration: underline;
@@ -5464,6 +5646,18 @@ background-attachment: fixed;
   min-height: var(--home-panel-height);
   height: var(--home-panel-height);
   box-sizing: border-box;
+  overflow: hidden;
+}.home-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1 1 auto;
+}.home-panel__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }.home-column--announcements {
   background: linear-gradient(160deg, #1a1f2e 0%, #0d1117 100%);
   border: 4px solid #000;
@@ -5548,8 +5742,11 @@ background-attachment: fixed;
 .home-column--value-changes .value-changes-list {
   flex: 1 1 auto;
   min-height: 0;
-  height: auto;
-  max-height: none !important;
+  max-height: 100%;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }.home-column--value-changes .value-changes-list {
   position: relative;
   padding-left: 0;
@@ -5597,8 +5794,11 @@ background-attachment: fixed;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+  overflow: hidden;
 }.tax-sidebar-column .value-changes-list {
   min-height: 200px;
+  max-height: min(60vh, 420px);
+  overscroll-behavior: contain;
 }.home-value-changes .value-changes-heading {
   font-size: 1.55rem; /* larger header to better fill box */
   font-weight: 700;
@@ -9113,8 +9313,8 @@ html[data-sidenav-palette="ocean"] .sections-nav button[data-section="Epic"].act
 html[data-sidenav-palette="ocean"] .sections-nav button[data-section="Legendary"].active { background: linear-gradient(135deg, #0e7490 0%, #5eead4 100%); color: #fff; }html[data-sidenav-palette="ocean"] #sections-nav button[data-section="Omega"].active,
 html[data-sidenav-palette="ocean"] .sections-nav button[data-section="Omega"].active { background: linear-gradient(135deg, #1d4ed8 0%, #93c5fd 100%); color: #fff; }html[data-sidenav-palette="ocean"] #sections-nav button[data-section="Misc"].active,
 html[data-sidenav-palette="ocean"] .sections-nav button[data-section="Misc"].active { background: linear-gradient(135deg, #0891b2 0%, #67e8f9 100%); color: #fff; }html[data-sidenav-palette="ocean"] #sections-nav button[data-section="Vehicles"].active,
-html[data-sidenav-palette="ocean"] .sections-nav button[data-section="Vehicles"].active { background: linear-gradient(135deg, #334155 0%, #94a3b8 100%); color: #fff; }html[data-sidenav-palette="ocean"] #sections-nav button[data-section="Untradable Items"].active,
-html[data-sidenav-palette="ocean"] .sections-nav button[data-section="Untradable Items"].active { background: linear-gradient(135deg, #164e63 0%, #06b6d4 100%); color: #fff; }html[data-sidenav-palette="ocean"] #sections-nav button[data-section="Money & Game Guide"].active,
+html[data-sidenav-palette="ocean"] .sections-nav button[data-section="Vehicles"].active { background: linear-gradient(135deg, #334155 0%, #94a3b8 100%); color: #fff; }html[data-sidenav-palette="ocean"] #sections-nav button[data-section="Untradeable Items"].active,
+html[data-sidenav-palette="ocean"] .sections-nav button[data-section="Untradeable Items"].active { background: linear-gradient(135deg, #164e63 0%, #06b6d4 100%); color: #fff; }html[data-sidenav-palette="ocean"] #sections-nav button[data-section="Money & Game Guide"].active,
 html[data-sidenav-palette="ocean"] .sections-nav button[data-section="Money & Game Guide"].active { background: linear-gradient(135deg, #075985 0%, #7dd3fc 100%); color: #fff; }html[data-sidenav-palette="ocean"] #sections-nav button[data-section="💰 Richest Players"].active,
 html[data-sidenav-palette="ocean"] .sections-nav button[data-section="💰 Richest Players"].active { background: linear-gradient(135deg, #0284c7 0%, #bae6fd 100%); color: #fff; }html[data-sidenav-palette="ocean"] #sections-nav button[data-section="Crew Logos"].active,
 html[data-sidenav-palette="ocean"] .sections-nav button[data-section="Crew Logos"].active { background: linear-gradient(135deg, #0f766e 0%, #2dd4bf 100%); color: #fff; }html[data-sidenav-palette="ocean"] #sections-nav button[data-section="BlockSpin Map"].active,
@@ -9127,8 +9327,8 @@ html[data-sidenav-palette="ember"] .sections-nav button[data-section="Epic"].act
 html[data-sidenav-palette="ember"] .sections-nav button[data-section="Legendary"].active { background: linear-gradient(135deg, #d97706 0%, #fde047 100%); color: #fff; }html[data-sidenav-palette="ember"] #sections-nav button[data-section="Omega"].active,
 html[data-sidenav-palette="ember"] .sections-nav button[data-section="Omega"].active { background: linear-gradient(135deg, #b91c1c 0%, #f87171 100%); color: #fff; }html[data-sidenav-palette="ember"] #sections-nav button[data-section="Misc"].active,
 html[data-sidenav-palette="ember"] .sections-nav button[data-section="Misc"].active { background: linear-gradient(135deg, #be123c 0%, #fb7185 100%); color: #fff; }html[data-sidenav-palette="ember"] #sections-nav button[data-section="Vehicles"].active,
-html[data-sidenav-palette="ember"] .sections-nav button[data-section="Vehicles"].active { background: linear-gradient(135deg, #78350f 0%, #d6a910 100%); color: #fff; }html[data-sidenav-palette="ember"] #sections-nav button[data-section="Untradable Items"].active,
-html[data-sidenav-palette="ember"] .sections-nav button[data-section="Untradable Items"].active { background: linear-gradient(135deg, #991b1b 0%, #fca5a5 100%); color: #fff; }html[data-sidenav-palette="ember"] #sections-nav button[data-section="Money & Game Guide"].active,
+html[data-sidenav-palette="ember"] .sections-nav button[data-section="Vehicles"].active { background: linear-gradient(135deg, #78350f 0%, #d6a910 100%); color: #fff; }html[data-sidenav-palette="ember"] #sections-nav button[data-section="Untradeable Items"].active,
+html[data-sidenav-palette="ember"] .sections-nav button[data-section="Untradeable Items"].active { background: linear-gradient(135deg, #991b1b 0%, #fca5a5 100%); color: #fff; }html[data-sidenav-palette="ember"] #sections-nav button[data-section="Money & Game Guide"].active,
 html[data-sidenav-palette="ember"] .sections-nav button[data-section="Money & Game Guide"].active { background: linear-gradient(135deg, #a16207 0%, #facc15 100%); color: #fff; }html[data-sidenav-palette="ember"] #sections-nav button[data-section="💰 Richest Players"].active,
 html[data-sidenav-palette="ember"] .sections-nav button[data-section="💰 Richest Players"].active { background: linear-gradient(135deg, #92400e 0%, #f59e0b 100%); color: #fff; }html[data-sidenav-palette="ember"] #sections-nav button[data-section="Crew Logos"].active,
 html[data-sidenav-palette="ember"] .sections-nav button[data-section="Crew Logos"].active { background: linear-gradient(135deg, #7c2d12 0%, #fdba74 100%); color: #fff; }html[data-sidenav-palette="ember"] #sections-nav button[data-section="BlockSpin Map"].active,
@@ -9141,8 +9341,8 @@ html[data-sidenav-palette="violet"] .sections-nav button[data-section="Epic"].ac
 html[data-sidenav-palette="violet"] .sections-nav button[data-section="Legendary"].active { background: linear-gradient(135deg, #86198f 0%, #f0abfc 100%); color: #fff; }html[data-sidenav-palette="violet"] #sections-nav button[data-section="Omega"].active,
 html[data-sidenav-palette="violet"] .sections-nav button[data-section="Omega"].active { background: linear-gradient(135deg, #be185d 0%, #f9a8d4 100%); color: #fff; }html[data-sidenav-palette="violet"] #sections-nav button[data-section="Misc"].active,
 html[data-sidenav-palette="violet"] .sections-nav button[data-section="Misc"].active { background: linear-gradient(135deg, #a21caf 0%, #e879f9 100%); color: #fff; }html[data-sidenav-palette="violet"] #sections-nav button[data-section="Vehicles"].active,
-html[data-sidenav-palette="violet"] .sections-nav button[data-section="Vehicles"].active { background: linear-gradient(135deg, #4c1d95 0%, #8b5cf6 100%); color: #fff; }html[data-sidenav-palette="violet"] #sections-nav button[data-section="Untradable Items"].active,
-html[data-sidenav-palette="violet"] .sections-nav button[data-section="Untradable Items"].active { background: linear-gradient(135deg, #701a75 0%, #d946ef 100%); color: #fff; }html[data-sidenav-palette="violet"] #sections-nav button[data-section="Money & Game Guide"].active,
+html[data-sidenav-palette="violet"] .sections-nav button[data-section="Vehicles"].active { background: linear-gradient(135deg, #4c1d95 0%, #8b5cf6 100%); color: #fff; }html[data-sidenav-palette="violet"] #sections-nav button[data-section="Untradeable Items"].active,
+html[data-sidenav-palette="violet"] .sections-nav button[data-section="Untradeable Items"].active { background: linear-gradient(135deg, #701a75 0%, #d946ef 100%); color: #fff; }html[data-sidenav-palette="violet"] #sections-nav button[data-section="Money & Game Guide"].active,
 html[data-sidenav-palette="violet"] .sections-nav button[data-section="Money & Game Guide"].active { background: linear-gradient(135deg, #581c87 0%, #c084fc 100%); color: #fff; }html[data-sidenav-palette="violet"] #sections-nav button[data-section="💰 Richest Players"].active,
 html[data-sidenav-palette="violet"] .sections-nav button[data-section="💰 Richest Players"].active { background: linear-gradient(135deg, #6b21a8 0%, #e879f9 100%); color: #fff; }html[data-sidenav-palette="violet"] #sections-nav button[data-section="Crew Logos"].active,
 html[data-sidenav-palette="violet"] .sections-nav button[data-section="Crew Logos"].active { background: linear-gradient(135deg, #7e22ce 0%, #d8b4fe 100%); color: #fff; }html[data-sidenav-palette="violet"] #sections-nav button[data-section="BlockSpin Map"].active,
@@ -9161,8 +9361,8 @@ html[data-sidenav-palette="neon"] .sections-nav button[data-section="Epic"].acti
 html[data-sidenav-palette="neon"] .sections-nav button[data-section="Legendary"].active { background: linear-gradient(135deg, #ffea00 0%, #ea580c 100%); color: #1a1000; }html[data-sidenav-palette="neon"] #sections-nav button[data-section="Omega"].active,
 html[data-sidenav-palette="neon"] .sections-nav button[data-section="Omega"].active { background: linear-gradient(135deg, #ff0054 0%, #be123c 100%); color: #fff; }html[data-sidenav-palette="neon"] #sections-nav button[data-section="Misc"].active,
 html[data-sidenav-palette="neon"] .sections-nav button[data-section="Misc"].active { background: linear-gradient(135deg, #ff00aa 0%, #be185d 100%); color: #fff; }html[data-sidenav-palette="neon"] #sections-nav button[data-section="Vehicles"].active,
-html[data-sidenav-palette="neon"] .sections-nav button[data-section="Vehicles"].active { background: linear-gradient(135deg, #7df9ff 0%, #475569 100%); color: #041018; }html[data-sidenav-palette="neon"] #sections-nav button[data-section="Untradable Items"].active,
-html[data-sidenav-palette="neon"] .sections-nav button[data-section="Untradable Items"].active { background: linear-gradient(135deg, #ccff00 0%, #65a30d 100%); color: #101804; }html[data-sidenav-palette="neon"] #sections-nav button[data-section="Money & Game Guide"].active,
+html[data-sidenav-palette="neon"] .sections-nav button[data-section="Vehicles"].active { background: linear-gradient(135deg, #7df9ff 0%, #475569 100%); color: #041018; }html[data-sidenav-palette="neon"] #sections-nav button[data-section="Untradeable Items"].active,
+html[data-sidenav-palette="neon"] .sections-nav button[data-section="Untradeable Items"].active { background: linear-gradient(135deg, #ccff00 0%, #65a30d 100%); color: #101804; }html[data-sidenav-palette="neon"] #sections-nav button[data-section="Money & Game Guide"].active,
 html[data-sidenav-palette="neon"] .sections-nav button[data-section="Money & Game Guide"].active { background: linear-gradient(135deg, #00ffd5 0%, #0d9488 100%); color: #001814; }html[data-sidenav-palette="neon"] #sections-nav button[data-section="💰 Richest Players"].active,
 html[data-sidenav-palette="neon"] .sections-nav button[data-section="💰 Richest Players"].active { background: linear-gradient(135deg, #ffe600 0%, #ca8a04 100%); color: #1a1400; }html[data-sidenav-palette="neon"] #sections-nav button[data-section="Crew Logos"].active,
 html[data-sidenav-palette="neon"] .sections-nav button[data-section="Crew Logos"].active { background: linear-gradient(135deg, #ff6ec7 0%, #9333ea 100%); color: #fff; }html[data-sidenav-palette="neon"] #sections-nav button[data-section="BlockSpin Map"].active,
@@ -11907,7 +12107,7 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   text-decoration: underline;
 }
 
-/* Untradable mobile chrome — fast nav panel + in-section search */
+/* Untradeable mobile chrome — fast nav panel + in-section search */
 .section-mobile-chrome {
   display: none;
 }
@@ -12070,11 +12270,15 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
 
 @media (min-width: 901px) {
   .home-panel .home-panel__body {
-    max-height: none !important;
-    opacity: 1 !important;
-    margin-top: 0 !important;
-    overflow: visible !important;
-    pointer-events: auto !important;
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    opacity: 1;
+    margin-top: 0;
+    overflow: hidden;
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
   }
 
   .home-column--value-changes .home-panel__header .value-changes-heading {
@@ -12488,7 +12692,7 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     box-sizing: border-box;
   }
 
-  #untradable-items .section-mobile-chrome {
+  #untradeable-items .section-mobile-chrome {
     display: block;
     width: 100%;
     padding: 0 12px;
@@ -12541,7 +12745,7 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     -webkit-overflow-scrolling: touch;
   }
 
-  #untradable-items .search-container--in-section {
+  #untradeable-items .search-container--in-section {
     margin: 0 0 14px;
     padding: 0;
   }
@@ -13347,9 +13551,11 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   .home-column .announcement-list,
   .home-column--value-changes .value-changes-list {
     max-height: 200px;
+    flex: none;
     gap: 8px;
-    overflow-y: auto;
+    overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 
   .home-column--announcements .announcement-item-clean {
@@ -13614,5 +13820,138 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   .home-discord-promo__flash-badge {
     font-size: 0.46rem;
     padding: 2px 5px;
+  }
+}
+
+/* Exclusive badge icon picker (dev test section) */
+.exclusive-badge-test-section code {
+  font-size: 0.88em;
+  color: #fde68a;
+  background: rgba(15, 23, 36, 0.6);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.exclusive-badge-test__pick {
+  margin: 0 0 16px;
+  font-size: 0.9rem;
+  color: #33cce6;
+  font-weight: 600;
+}
+
+.exclusive-badge-gallery__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.exclusive-badge-gallery__tile {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  padding: 10px 10px 12px;
+  border-radius: 12px;
+  border: 2px solid #355274;
+  background: #1a2532;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.exclusive-badge-gallery__tile:hover {
+  border-color: #33cce6;
+  background: #243447;
+  transform: translateY(-1px);
+}
+
+.exclusive-badge-gallery__tile--active {
+  border-color: #33cce6;
+  background: linear-gradient(160deg, rgba(51, 204, 230, 0.18), #1a2532 55%);
+  box-shadow: 0 0 0 1px rgba(51, 204, 230, 0.35);
+}
+
+.exclusive-badge-gallery__tile-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #dbeafe;
+  line-height: 1.3;
+}
+
+.exclusive-badge-gallery__tile-id {
+  font-size: 0.65rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: rgba(253, 230, 138, 0.85);
+}
+
+.exclusive-badge-gallery__tile-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 10px 8px;
+  border-radius: 8px;
+  background: rgba(15, 23, 36, 0.55);
+  border: 1px solid rgba(53, 82, 116, 0.6);
+}
+
+.exclusive-badge-gallery__tile-preview .card-bottom-actions {
+  position: static;
+  transform: none;
+  pointer-events: none;
+}
+
+.exclusive-badge-test__actions {
+  gap: 14px;
+}
+
+@media (max-width: 420px) {
+  .exclusive-badge-gallery__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .exclusive-badge-gallery__tile {
+    padding: 8px;
+  }
+
+  .exclusive-badge-gallery__tile-label {
+    font-size: 0.66rem;
+  }
+}
+
+/* Discord join page — keep footer boosters in flow above copyright */
+body[data-bsv-page="discord"] .site-footer {
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: auto;
+  margin-top: 32px;
+}
+body[data-bsv-page="discord"] .site-footer:has(#footer-boosters:not([hidden])) {
+  margin-top: 32px;
+}
+body[data-bsv-page="discord"] .footer-boosters {
+  position: static;
+  left: auto;
+  bottom: auto;
+  transform: none;
+  width: min(1100px, calc(100% - 32px));
+  margin: 0 auto 24px;
+  z-index: auto;
+}
+@media (max-width: 900px) {
+  body[data-bsv-page="discord"] .site-footer:has(#footer-boosters:not([hidden])) {
+    margin-top: 28px;
+  }
+  body[data-bsv-page="discord"] .footer-boosters {
+    position: static;
+    left: auto;
+    bottom: auto;
+    transform: none;
+    width: calc(100% - 24px);
+    max-width: 100%;
+    margin: 0 auto 20px;
   }
 }

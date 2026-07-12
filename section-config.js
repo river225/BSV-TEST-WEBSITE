@@ -8,7 +8,7 @@
   /** @typedef {'show'|'hide'|'ghost'} VisibilityMode */
   /** @typedef {'none'|'sheet'|'richest'} DataSource */
 
-  const ACCESSORIES_SECTION_TITLE = "Untradable Items";
+  const ACCESSORIES_SECTION_TITLE = "Untradeable Items";
 
   /** @type {Array<object>} */
   const BSV_SECTION_REGISTRY = [
@@ -127,7 +127,7 @@
     },
     {
       title: ACCESSORIES_SECTION_TITLE,
-      id: "untradable-items",
+      id: "untradeable-items",
       navGroup: "main",
       dataSource: "sheet",
       sheetName: "Accessories",

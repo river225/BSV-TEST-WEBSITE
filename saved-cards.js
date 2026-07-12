@@ -522,10 +522,10 @@
       if (match) return match;
     }
 
-    if (lower === "accessories" || lower === "untradable") {
+    if (lower === "accessories" || lower === "untradable" || lower === "untradeable") {
       return typeof window.BSV_ACCESSORIES_SECTION_TITLE === "string"
         ? window.BSV_ACCESSORIES_SECTION_TITLE
-        : "Untradable Items";
+        : "Untradeable Items";
     }
 
     return label;

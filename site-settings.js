@@ -1,6 +1,5 @@
 (function () {
   var FONT_KEY = "bsv-font";
-  var CARD_EFFECTS_KEY = "bsv-card-effects";
 
   var FONTS = [
     {
@@ -61,14 +60,6 @@
     }
   }
 
-  function getSavedCardEffects() {
-    try {
-      return localStorage.getItem(CARD_EFFECTS_KEY) || "on";
-    } catch (_) {
-      return "on";
-    }
-  }
-
   function applyFont(fontId) {
     var def = getFontDef(fontId);
     document.documentElement.style.setProperty("--bsv-site-font", def.family);
@@ -82,17 +73,6 @@
     } catch (_) {}
     document.querySelectorAll(".site-settings-font-chip").forEach(function (btn) {
       btn.classList.toggle("is-active", btn.dataset.font === fontId);
-    });
-  }
-
-  function applyCardEffects(mode) {
-    var on = mode !== "off";
-    document.documentElement.classList.toggle("bsv-card-effects-off", !on);
-    try {
-      localStorage.setItem(CARD_EFFECTS_KEY, on ? "on" : "off");
-    } catch (_) {}
-    document.querySelectorAll("[data-card-effects]").forEach(function (btn) {
-      btn.classList.toggle("is-active", btn.dataset.cardEffects === (on ? "on" : "off"));
     });
   }
 
@@ -145,8 +125,8 @@
   }
 
   function initSiteSettings() {
+    document.documentElement.classList.remove("bsv-card-effects-off");
     applyFont(getSavedFont());
-    applyCardEffects(getSavedCardEffects());
     buildFontGrid();
 
     var settingsBtn = document.getElementById("nav-settings-btn");
@@ -164,12 +144,6 @@
     if (backdrop) backdrop.addEventListener("click", closeSettingsModal);
     if (closeBtn) closeBtn.addEventListener("click", closeSettingsModal);
 
-    document.querySelectorAll("[data-card-effects]").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        applyCardEffects(btn.dataset.cardEffects);
-      });
-    });
-
     document.querySelectorAll("[data-lang]").forEach(function (btn) {
       btn.addEventListener("click", function () {
         if (window.bsvI18n) window.bsvI18n.applyLanguage(btn.getAttribute("data-lang"));
@@ -184,7 +158,6 @@
   }
 
   window.bsvApplySiteFont = applyFont;
-  window.bsvApplyCardEffects = applyCardEffects;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initSiteSettings);

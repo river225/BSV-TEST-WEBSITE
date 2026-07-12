@@ -7,6 +7,9 @@
 
 <meta charset="UTF-8" /> 
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light only" />
+<meta name="theme-color" content="#0f1724" />
+<style>html{color-scheme:light only;-webkit-color-scheme:light;background-color:#0f1724}</style>
 <meta name="robots" content="noindex, nofollow" />
 <meta name="bsv-env" content="test" /> 
 <script src="auth-oauth-bounce.js?v=20260619-test-oauth"></script>
@@ -16,7 +19,7 @@
 <meta property="og:image" content="https://i.ibb.co/VYjk9L14/Block-Spin-Values-Logo.png">
 <meta property="og:title" content="BlockSpin Values (Dev / staging)">
 <meta property="og:description" content="Development / staging build — not the public BlockSpin Values site.">
-<link rel="stylesheet" href="style.css?v=20260712-responsive-mobile" />
+<link rel="stylesheet" href="style.css?v=20260712-mg-guide-banner" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Inter:wght@400;600;700&amp;family=Nunito+Sans:ital,wght@0,600;0,700;1,600&amp;family=Oswald:wght@500;600;700&amp;family=Poppins:wght@400;600;700&amp;family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet" />
@@ -37,7 +40,6 @@
     var root = document.documentElement;
     root.style.setProperty("--bsv-site-font", fonts[f] || fonts.default);
     if (f && f !== "default") root.setAttribute("data-bsv-font", f);
-    if (localStorage.getItem("bsv-card-effects") === "off") root.classList.add("bsv-card-effects-off");
   } catch (e) {}
 })();
 </script>
@@ -197,13 +199,6 @@
         <h3 class="site-settings-section__title" data-i18n="settings.font">Font</h3>
         <div class="site-settings-font-grid" id="font-picker-grid" role="listbox" data-i18n-aria="settings.ariaFont" aria-label="Font"></div>
       </section>
-      <section class="site-settings-section">
-        <h3 class="site-settings-section__title" data-i18n="settings.cardEffects">Card hover effect</h3>
-        <div class="site-settings-segmented" role="group" data-i18n-aria="settings.ariaCardEffects" aria-label="Item card effect">
-          <button type="button" class="site-settings-segment" data-card-effects="on" data-i18n="settings.enable">On</button>
-          <button type="button" class="site-settings-segment" data-card-effects="off" data-i18n="settings.disable">Off</button>
-        </div>
-      </section>
     </div>
   </div>
 </div>
@@ -351,12 +346,12 @@ We’ve launched a complete site redesign, and items will now display both their
 </div>
 
 <script src="auth.js?v=20260619-test-oauth"></script>
-<script src="saved-cards.js?v=20260710-saved-order-fix"></script>
-<script src="site-i18n.js?v=20260619-farming-paste"></script>
-<script src="site-settings.js?v=20260614-i18n-full"></script>
-<script src="section-config.js?v=20260712-untradable-mobile"></script>
+<script src="saved-cards.js?v=20260712-untradeable-spelling"></script>
+<script src="site-i18n.js?v=20260712-untradeable-spelling"></script>
+<script src="site-settings.js?v=20260712-no-card-hover-setting"></script>
+<script src="section-config.js?v=20260712-exclusive-icons-final"></script>
 <script src="quest-guide-i18n.js?v=20260618-quest-intro"></script>
-<script src="script.js?v=20260712-richest-mobile2"></script> 
+<script src="script.js?v=20260712-mg-guide-banner"></script> 
 
 
 <footer class="site-footer">

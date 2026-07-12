@@ -9,15 +9,15 @@
   }
 
   var SOCIAL =
-    '<a href="https://discord.gg/QbapryYUUx" target="_blank" rel="noopener noreferrer" class="nav-discord" title="Join our Discord server!" aria-label="Join our Discord server!">' +
+    '<a href="https://discord.gg/QbapryYUUx" target="_blank" rel="noopener noreferrer" class="nav-discord" data-nav-tip="Join our Discord server!" title="Join our Discord server!" aria-label="Join our Discord server!">' +
       '<svg class="nav-social-link__icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
         '<path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.445.865-.608 1.25-1.845-.276-3.68-.276-5.487 0-.164-.393-.406-.874-.618-1.25a.077.077 0 0 0-.078-.037 19.736 19.736 0 0 0-4.885 1.515.07.07 0 0 0-.032.028C.533 9.046-.319 13.58.099 18.058a.082.082 0 0 0 .031.056c2.053 1.508 4.041 2.423 5.993 3.029a.078.078 0 0 0 .084-.028c.462-.63.873-1.295 1.226-1.994a.076.076 0 0 0-.042-.106c-.653-.248-1.274-.55-1.872-.892a.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.099.246.198.373.292a.077.077 0 0 1-.007.128 12.299 12.299 0 0 1-1.873.891.077.077 0 0 0-.041.107c.36.698.772 1.363 1.225 1.993a.076.076 0 0 0 .084.028c1.961-.607 3.95-1.522 6.002-3.029a.077.077 0 0 0 .031-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.029zM8.02 15.331c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.211 0 2.176 1.095 2.157 2.419 0 1.333-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.211 0 2.176 1.095 2.157 2.419 0 1.333-.946 2.419-2.157 2.419z"/>' +
       "</svg></a>" +
-    '<a href="https://www.roblox.com/communities/754565168/BlockSpin-Values#!/about" target="_blank" rel="noopener noreferrer" class="nav-roblox" title="Join our Roblox community!" aria-label="Join our Roblox community!">' +
+    '<a href="https://www.roblox.com/communities/754565168/BlockSpin-Values#!/about" target="_blank" rel="noopener noreferrer" class="nav-roblox" data-nav-tip="Join our Roblox community!" title="Join our Roblox community!" aria-label="Join our Roblox community!">' +
       '<svg class="nav-social-link__icon nav-social-link__icon--roblox" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
         '<path d="M18.926 23.998 0 18.892 5.075.002 24 5.108ZM15.348 10.09l-5.282-1.453-1.414 5.273 5.282 1.453z"/>' +
       "</svg></a>" +
-    '<a href="https://www.tiktok.com/@river1_0_?is_from_webapp=1&amp;sender_device=pc" target="_blank" rel="noopener noreferrer" class="nav-tiktok" title="Check out River\'s TikTok!" aria-label="Check out River\'s TikTok!">' +
+    '<a href="https://www.tiktok.com/@river1_0_?is_from_webapp=1&amp;sender_device=pc" target="_blank" rel="noopener noreferrer" class="nav-tiktok" data-nav-tip="Check out River\'s TikTok!" title="Check out River\'s TikTok!" aria-label="Check out River\'s TikTok!">' +
       '<svg class="nav-social-link__icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
         '<path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74a2.89 2.89 0 0 1 2.31-4.64a2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>' +
       "</svg></a>";
@@ -38,21 +38,42 @@
     return '<a href="' + href + '"' + cls + ">" + label + "</a>";
   }
 
+  function headerSearch() {
+    return (
+      '<div class="search-container is-hidden" id="header-search">' +
+        '<div class="search-bar">' +
+          '<input id="search" type="text" placeholder="Search items…" aria-label="Search items" />' +
+          '<button type="button" class="search-reset-btn" id="search-reset" hidden aria-label="Clear search and show all items" title="Clear search and show all items">' +
+            '<svg class="search-reset-btn__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+              '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>' +
+              '<path d="M3 3v5h5"/>' +
+            "</svg>" +
+          "</button>" +
+        "</div>" +
+      "</div>"
+    );
+  }
+
   function renderHeader(activePage) {
     var dev = isDevSite();
     var login = dev ? '<div class="nav-login" id="nav-login"></div>' : "";
+    var isHome = activePage === "home";
+    var brandHref = isHome ? "#" : "index.html";
+    var brandOnclick = isHome ? ' onclick="showSection(\'Home\'); return false;"' : "";
+    var search = isHome ? headerSearch() : "";
     return (
       '<header class="site-header-shell">' +
         '<nav class="top-navbar">' +
           '<div class="nav-container-full">' +
             '<div class="nav-left">' +
-              '<a href="index.html" class="nav-brand">' +
+              '<a href="' + brandHref + '" class="nav-brand"' + brandOnclick + ">" +
                 '<img src="https://i.ibb.co/VYjk9L14/Block-Spin-Values-Logo.png" alt="BlockSpin Values Logo" class="nav-logo-img">' +
                 '<span class="nav-title">Block<span class="brand-spin">Spin</span> Values</span>' +
               "</a>" +
               navLink("x-about.html", "About Us", activePage, "about") +
               navLink("x-faq.html", "FAQ", activePage, "faq") +
             "</div>" +
+            search +
             '<div class="nav-right">' +
               themeSwitcher() +
               SOCIAL +

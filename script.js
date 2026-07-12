@@ -2,7 +2,7 @@ const SPREADSHEET_ID = "1rhptMcfWB2I-x3i9TNMwePcDD9SWWwGsaLwELqxCKzo";
 const SECTION_NAMES = typeof getSectionTitles === "function" ? getSectionTitles() : [];
 
 const GA_MEASUREMENT_ID = "G-XXXXXXXXXX";
-const ACCESSORIES_SECTION_NAME = "Untradable Items";
+const ACCESSORIES_SECTION_NAME = "Untradeable Items";
 const RICHEST_SECTION_NAME = "💰 Richest Players";
 const MONEY_GAME_GUIDE_SECTION = "Money & Game Guide";
 const MONEY_GUIDE_SHEETS = {
@@ -56,8 +56,6 @@ const FISH_WEIGHT_STEP = 0.1;
 
 const GIVEAWAY_CAROUSEL_INTERVAL_MS = 10000;
 const DISCORD_CARD_CAROUSEL_INTERVAL_MS = 9000;
-const ANACONDA_GIVEAWAY_IMAGE_URL = "https://i.ibb.co/QqD6BSd/j-Sn2mv-Y-1-removebg-preview.png";
-const ANACONDA_GIVEAWAY_DISCORD_URL = "https://discord.gg/nKKkXyqCsv";
 const ROBUX_GIVEAWAY_IMAGE_URL = "https://i.ibb.co/7fC16qY/Screenshot-2026-05-06-at-02-28-05-removebg-preview.png";
 const ROBUX_GIVEAWAY_DISCORD_URL = "https://discord.gg/GufVWmACAh";
 const FISHING_GUIDE_FOOTER_IMAGE_URL = "https://i.ibb.co/pvBhZgf5/no-Filter-7-removebg-preview.png";
@@ -100,7 +98,7 @@ if (typeof window !== "undefined") {
 const DISCORD_JOIN_NUDGE_DELAY_MS = 45000;
 const DISCORD_JOIN_NUDGE_STORAGE_KEY = "bsv-discord-nudge-dismissed";
 const ROBUX_GIVEAWAY_SECTION_TITLES = new Set(["Common / Uncommon", "Rare", "Epic", "Omega", "Misc"]);
-const bannerVisibility = { anaconda: false, firework: false, humvee: false, robux: false };
+const bannerVisibility = { humvee: false, robux: false };
 
 function isBsvTestEnvironment() {
   if (document.documentElement && document.documentElement.dataset.bsvEnv === "test") return true;
@@ -159,25 +157,6 @@ function buildGiveawayEndsSoonBadgeHtml() {
   return `<span class="giveaway-ends-soon-badge">Ends Soon!</span>`;
 }
 
-function buildAnacondaStripSlideHtml() {
-  var img = escapeAttr(ANACONDA_GIVEAWAY_IMAGE_URL);
-  var href = escapeAttr(ANACONDA_GIVEAWAY_DISCORD_URL);
-  return `
-        ${buildGiveawayEndsSoonBadgeHtml()}
-        <div class="anaconda-banner-figure">
-          <img src="${img}" alt="Anaconda giveaway prize" class="anaconda-banner-prize-image" loading="lazy" decoding="async" />
-        </div>
-        <div class="anaconda-banner-body">
-          <p class="legendary-banner-text humvee-banner-copy humvee-banner-copy--stack">
-            <span class="humvee-banner-title">Anaconda Giveaway</span>
-          </p>
-          <div class="legendary-banner-right humvee-banner-actions">
-            <a href="${href}" target="_blank" rel="noopener" class="legendary-banner-btn humvee-banner-btn-holo anaconda-banner-btn">Enter Giveaway</a>
-          </div>
-        </div>
-        <div class="giveaway-strip-side-spacer" aria-hidden="true"></div>`;
-}
-
 function buildRobuxStripSlideHtml() {
   var img = escapeAttr(ROBUX_GIVEAWAY_IMAGE_URL);
   var href = escapeAttr(ROBUX_GIVEAWAY_DISCORD_URL);
@@ -202,10 +181,7 @@ function buildRotatingGiveawayCarouselHtml(bannerId) {
   return `
       <div class="giveaway-strip-carousel" id="${id}" data-rotate="1" style="display: none;" aria-live="polite">
         <div class="giveaway-strip-carousel__viewport">
-          <article class="giveaway-strip-carousel__slide legendary-banner giveaway-banner--humvee giveaway-banner--anaconda-strip is-active" data-slide="anaconda" aria-hidden="false">
-            ${buildAnacondaStripSlideHtml()}
-          </article>
-          <article class="giveaway-strip-carousel__slide legendary-banner giveaway-banner--robux giveaway-banner--robux-strip" data-slide="robux" aria-hidden="true">
+          <article class="giveaway-strip-carousel__slide legendary-banner giveaway-banner--robux giveaway-banner--robux-strip is-active" data-slide="robux" aria-hidden="false">
             ${buildRobuxStripSlideHtml()}
           </article>
         </div>
@@ -225,7 +201,7 @@ function getDiscordPromoSectionCopy(sectionTitle) {
     "Omega": { tags: "Trading · Giveaways · Middleman" },
     "Misc": { tags: "Middleman · Trading · Giveaways" },
     "Vehicles": { tags: "Giveaways · Trading · Middleman" },
-    "Untradable Items": { tags: "Trading · Community · Giveaways" }
+    "Untradeable Items": { tags: "Trading · Community · Giveaways" }
   };
   return map[sectionTitle] || { tags: "Trading · Middleman · Giveaways" };
 }
@@ -254,7 +230,7 @@ function buildDiscordCardExplainerSlideHtml(kind) {
   var actions =
     '<div class="home-discord-promo__card-actions">' +
       '<a href="' + BSV_DISCORD_INVITE_URL + '" target="_blank" rel="noopener noreferrer" class="home-discord-promo__card-btn home-discord-promo__card-btn--join">' + escapeHtml(i18n("discord.card.joinNow")) + '</a>' +
-      '<a href="blockspin-discord.html" class="home-discord-promo__card-btn home-discord-promo__card-btn--more">' + escapeHtml(i18n("discord.card.learnMore")) + '</a>' +
+      '<a href="blockspin-discord-server.html" class="home-discord-promo__card-btn home-discord-promo__card-btn--more">' + escapeHtml(i18n("discord.card.learnMore")) + '</a>' +
     '</div>';
 
   return (
@@ -409,7 +385,7 @@ function buildDiscordPromoBannerHtml(inCards) {
           '<a href="' + BSV_DISCORD_INVITE_URL + '" target="_blank" rel="noopener noreferrer" class="home-discord-promo__btn home-discord-promo__btn--primary home-discord-promo__btn--flash-join">' +
             escapeHtml(i18n("discord.card.joinNow")) + ' <span aria-hidden="true">→</span>' +
           "</a>" +
-          '<a href="blockspin-discord.html" class="home-discord-promo__btn home-discord-promo__btn--secondary">' + escapeHtml(i18n("discord.card.learnMore")) + "</a>" +
+          '<a href="blockspin-discord-server.html" class="home-discord-promo__btn home-discord-promo__btn--secondary">' + escapeHtml(i18n("discord.card.learnMore")) + "</a>" +
         "</div>" +
       "</div>" +
     "</div>"
@@ -672,7 +648,7 @@ function initDiscordJoinNudge() {
       '</div>' +
       '<div class="discord-join-nudge__actions">' +
         '<a href="' + BSV_DISCORD_INVITE_URL + '" target="_blank" rel="noopener noreferrer" class="discord-join-nudge__btn discord-join-nudge__btn--join">Join now</a>' +
-        '<a href="blockspin-discord.html" class="discord-join-nudge__btn discord-join-nudge__btn--more">Learn more</a>' +
+        '<a href="blockspin-discord-server.html" class="discord-join-nudge__btn discord-join-nudge__btn--more">Learn more</a>' +
       '</div>';
 
     document.body.appendChild(nudge);
@@ -1016,6 +992,90 @@ function buildCardSaveButtonHtml() {
   );
 }
 
+function isSheetYesValue(value) {
+  return /^(yes|true|1|ticked|checked|on|y)$/i.test(String(value || "").trim());
+}
+
+function itemHasSheetFlag(item, flagName) {
+  if (!item || !flagName) return false;
+  var target = String(flagName).toLowerCase().replace(/\s+/g, "");
+  return Object.keys(item).some(function (key) {
+    if (key === "__sheet") return false;
+    return key.toLowerCase().replace(/\s+/g, "") === target && isSheetYesValue(item[key]);
+  });
+}
+
+function getItemExclusiveTier(item) {
+  if (itemHasSheetFlag(item, "veryexclusive")) return "veryexclusive";
+  if (itemHasSheetFlag(item, "exclusive")) return "exclusive";
+  return null;
+}
+
+var _exclusiveBadgeIconSeq = 0;
+
+function nextExclusiveBadgeIconId(suffix) {
+  _exclusiveBadgeIconSeq += 1;
+  return "bsvEx" + _exclusiveBadgeIconSeq + suffix;
+}
+
+function buildExclusiveBadgeIconSvg(tier) {
+  if (tier === "veryexclusive") {
+    var g = nextExclusiveBadgeIconId("Bd");
+    return (
+      '<svg class="card-exclusive-badge__icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">' +
+        "<defs>" +
+          '<linearGradient id="' + g + '" x1="20%" y1="0%" x2="80%" y2="100%">' +
+            '<stop offset="0%" stop-color="#fda4af"/>' +
+            '<stop offset="40%" stop-color="#be123c"/>' +
+            '<stop offset="100%" stop-color="#1a0510"/>' +
+          "</linearGradient>" +
+        "</defs>" +
+        '<path fill="url(#' + g + ')" stroke="#4c0519" stroke-width="1" stroke-linejoin="round" d="M12 3 19.5 9 12 21 4.5 9z"/>' +
+        '<path fill="none" stroke="#fecdd3" stroke-opacity="0.35" stroke-width="0.7" d="M4.5 9h15M12 3v18"/>' +
+      "</svg>"
+    );
+  }
+
+  var g = nextExclusiveBadgeIconId("Ss");
+  return (
+    '<svg class="card-exclusive-badge__icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">' +
+      "<defs>" +
+        '<linearGradient id="' + g + '" x1="0%" y1="0%" x2="0%" y2="100%">' +
+          '<stop offset="0%" stop-color="#fde68a"/>' +
+          '<stop offset="100%" stop-color="#d97706"/>' +
+        "</linearGradient>" +
+      "</defs>" +
+      '<path fill="url(#' + g + ')" stroke="#78350f" stroke-width="1" d="M12 2.5 20 7v7c0 5-3.5 8.5-8 9.5-4.5-1-8-4.5-8-9.5V7z"/>' +
+      '<path fill="#fef3c7" stroke="#92400e" stroke-width="0.5" d="M12 8.5l1.3 2.6 2.9.4-2.1 2 .5 2.9L12 15l-2.6 1.4.5-2.9-2.1-2 2.9-.4z"/>' +
+    "</svg>"
+  );
+}
+
+function buildCardExclusiveBadgeHtml(tier) {
+  if (!tier) return "";
+  var isVery = tier === "veryexclusive";
+  var modClass = isVery ? "card-exclusive-badge-wrapper--very" : "card-exclusive-badge-wrapper--standard";
+  var tooltipKey = isVery ? "card.exclusiveVeryTooltip" : "card.exclusiveTooltip";
+  var ariaKey = isVery ? "card.exclusiveVeryAria" : "card.exclusiveAria";
+  return (
+    '<div class="card-exclusive-badge-wrapper ' + modClass + '">' +
+      '<div class="card-exclusive-badge" role="img" aria-label="' + escapeAttr(i18n(ariaKey)) + '">' +
+        buildExclusiveBadgeIconSvg(tier) +
+      '</div>' +
+      '<div class="card-exclusive-badge-tooltip" role="tooltip">' + escapeHtml(i18n(tooltipKey)) + "</div>" +
+    "</div>"
+  );
+}
+
+function buildCardBottomActionsHtml(exclusiveTier) {
+  return (
+    '<div class="card-bottom-actions">' +
+      buildCardSaveButtonHtml() +
+      buildCardExclusiveBadgeHtml(exclusiveTier) +
+    "</div>"
+  );
+}
+
 function createCard(item) {
   const name = safe(item["Name"]);
   const img = safe(item["Image URL"]);
@@ -1107,6 +1167,7 @@ if (showPawn) {
 }
   
   const hasGiveaway = giveawayFlag && giveawayFlag.toString().trim().toLowerCase() === 'yes';
+  const exclusiveTier = getItemExclusiveTier(item);
   const sectionLabel = safe(item.__sheet || "Unknown");
   
   return `
@@ -1144,7 +1205,7 @@ if (showPawn) {
       ${hasGiveaway ? `
         <button class="card-giveaway-trigger" type="button" aria-label="${escapeAttr(i18n("card.giveawayAria"))}" data-item-name="${escapeAttr(name)}"></button>
       ` : ''}
-      ${buildCardSaveButtonHtml()}
+      ${buildCardBottomActionsHtml(exclusiveTier)}
     </div>
   `;
 }
@@ -1260,6 +1321,7 @@ function createAccessoryCard(item) {
   const imgTag = img
     ? `<img src="${img}" alt="${name}" onerror="this.style.display='none'">`
     : "";
+  const exclusiveTier = getItemExclusiveTier(item);
 
   return `
     <div class="card" data-name="${escapeAttr(name)}"
@@ -1283,7 +1345,7 @@ function createAccessoryCard(item) {
           <div class="card-ranged">${escapeHtml(i18n("card.crate"))}: <span>${escapeHtml(crate || i18n("card.na"))}</span></div>
         </div>
       </div>
-      ${buildCardSaveButtonHtml()}
+      ${buildCardBottomActionsHtml(exclusiveTier)}
     </div>
   `;
 }
@@ -2456,8 +2518,6 @@ function renderSection(title, items) {
     renderCrewLogosSection(items);
   } else if (title === ACCESSORIES_SECTION_NAME) {
     renderAccessoriesSection(items);
-  } else if (title === "Legendary") {
-    renderLegendarySectionWithBanner(items);
   } else if (title === "Vehicles") {
     renderVehiclesSectionWithBanner(items);
   } else if (title === "Omega") {
@@ -2476,13 +2536,6 @@ function renderSection(title, items) {
         <h2>${escapeHtml(i18nSection("Epic"))}</h2>
         <div class="cards">
           ${buildCardsHtmlWithDiscordPromo(items, createCard, "Epic")}
-        </div>
-        <div class="legendary-banner giveaway-banner--purple" id="epic-firework-banner" style="display: none;">
-          <p class="legendary-banner-text">${i18n("banner.firework")}</p>
-          <div class="legendary-banner-right">
-            <a href="https://discord.gg/8AUjJu9jnr" target="_blank" rel="noopener" class="legendary-banner-btn">${escapeHtml(i18n("banner.joinDiscord"))}</a>
-            <p class="legendary-banner-members"><span class="discord-member-count" data-home-stat="traders">0</span> ${escapeHtml(i18n("banner.members"))}</p>
-          </div>
         </div>
       </section>
     `;
@@ -2504,25 +2557,6 @@ function renderSection(title, items) {
   }
 }
 
-
-function renderLegendarySectionWithBanner(items) {
-  const html = `
-    <section class="section" id="${slugify("Legendary")}">
-      <h2>${escapeHtml(i18nSection("Legendary"))}</h2>
-      <div class="cards">
-        ${buildCardsHtmlWithDiscordPromo(items, createCard, "Legendary")}
-      </div>
-      <div class="legendary-banner">
-        <p class="legendary-banner-text">${i18n("banner.legendary")}</p>
-        <div class="legendary-banner-right">
-          <a href="https://discord.gg/scgqMpPAC6" target="_blank" rel="noopener" class="legendary-banner-btn">${escapeHtml(i18n("banner.joinDiscord"))}</a>
-          <p class="legendary-banner-members"><span class="discord-member-count" data-home-stat="traders">0</span> ${escapeHtml(i18n("banner.members"))}</p>
-        </div>
-      </div>
-    </section>
-  `;
-  document.getElementById("sections").insertAdjacentHTML("beforeend", html);
-}
 
 function renderVehiclesSectionWithBanner(items) {
   const html = `
@@ -2893,7 +2927,7 @@ function renderGuideFastNav(navGroups, options) {
 }
 
 function renderAccessoriesMobileFastNav(navData) {
-  const sectionEl = document.getElementById("untradable-items");
+  const sectionEl = document.getElementById("untradeable-items");
   if (!sectionEl) return;
   ensureAccessoriesMobileChrome(sectionEl);
   const mobileBox = document.getElementById("section-mobile-fastnav");
@@ -3256,7 +3290,7 @@ function ensureAccessoriesBackToTop() {
       "</svg>" +
       '<span class="section-back-to-top__text">' + escapeHtml(i18n("richest.backToTop")) + "</span>";
     btn.addEventListener("click", function () {
-      const sec = document.getElementById("untradable-items");
+      const sec = document.getElementById("untradeable-items");
       if (sec) sec.scrollIntoView({ behavior: "smooth", block: "start" });
     });
     document.body.appendChild(btn);
@@ -3278,7 +3312,7 @@ function syncBackToTopVisibility() {
 }
 
 function ensureSectionSearchMount(sectionEl) {
-  if (sectionEl && sectionEl.id === "untradable-items") {
+  if (sectionEl && sectionEl.id === "untradeable-items") {
     ensureAccessoriesMobileChrome(sectionEl);
   }
 
@@ -4018,6 +4052,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (requested === "richest-players" || requested === "Richest Players") {
       requested = "💰 Richest Players";
     }
+    if (requested === "Untradable Items") requested = ACCESSORIES_SECTION_NAME;
     if (SECTION_NAMES.includes(requested)) {
       initialSection = requested;
     }
@@ -4103,27 +4138,6 @@ function openRiverLinks(e) {
   document.body.appendChild(modal);
 }
 
-// Show/hide Epic/Omega giveaway banners from Website Configs.
-// Your sheet: row 1 = column headers "Anaconda GW" and "Firework GW", row 2 = "Yes" under each to show that banner.
-// Using "GW" avoids clashing with item names like Anaconda/Firework in other sheets.
-function applyBannerConfig(rows) {
-  if (!rows || !rows.length) return;
-  var showFirework = false;
-  var first = rows[0];
-  if (first && ("Anaconda GW" in first || "Firework GW" in first)) {
-    var fireworkVal = (first["Firework GW"] || "").toString().trim().toLowerCase();
-    showFirework = /^(yes|1|true|on)$/.test(fireworkVal);
-  } else {
-    rows.forEach(function (r) {
-      var name = (r.Title || r.Name || '').toString().trim();
-      var show = (r.Show || r.Enabled || '').toString().trim().toLowerCase();
-      if (name === "Firework GW") showFirework = /^(yes|1|true|on)$/.test(show);
-    });
-  }
-  var fireworkEl = document.getElementById('epic-firework-banner');
-  if (fireworkEl) fireworkEl.style.display = showFirework ? 'flex' : 'none';
-}
-
 // Fetch and display recent value changes from spreadsheet (sheet: "Website Configs", columns: Title, Date, Text, Color)
 function buildValueChangeItemHtml(r, useTimeline) {
   var colorMap = { green: "green", orange: "orange", red: "red", blue: "blue" };
@@ -4176,7 +4190,6 @@ async function loadValueChanges() {
       if (homeMainListEl) homeMainListEl.innerHTML = emptyHtml;
       return;
     }
-    applyBannerConfig(rows);
     var filtered = filterValueChangeRows(rows);
     if (filtered.length === 0) {
       var noneHtml = '<div class="value-changes-loading">' + escapeHtml(i18n("changes.none")) + '</div>';

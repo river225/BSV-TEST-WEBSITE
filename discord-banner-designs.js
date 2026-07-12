@@ -3,7 +3,7 @@
   var DISCORD_INVITE = typeof BSV_DISCORD_INVITE_URL !== "undefined"
     ? BSV_DISCORD_INVITE_URL
     : "https://discord.gg/QbapryYUUx";
-  var MORE_URL = "blockspin-discord.html";
+  var MORE_URL = "blockspin-discord-server.html";
 
   function esc(s) {
     return String(s == null ? "" : s)
