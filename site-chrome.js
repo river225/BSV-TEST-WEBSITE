@@ -694,7 +694,7 @@
     });
   }
 
-  var CHROME_ASSET_V = "20260926-live-trading";
+  var CHROME_ASSET_V = "20260926-profile-menu";
 
   function ensureHomeHeaderDeps() {
     ensureSettingsModal();

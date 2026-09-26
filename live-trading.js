@@ -108,113 +108,28 @@
     });
   }
 
-  var RESUME_LOGIN_KEY = "bsv-live-trading-resume-login";
-
-  function setModalOpen(open) {
-    var modal = document.getElementById("live-trading-login-modal");
-    if (!modal) return;
-    modal.hidden = !open;
-    document.body.classList.toggle("live-trading-login-open", open);
-  }
-
-  function markResumeLoginModal() {
-    try {
-      sessionStorage.setItem(RESUME_LOGIN_KEY, "1");
-    } catch (_) {}
-    try {
-      var url = new URL(window.location.href);
-      url.searchParams.set("lt_login", "1");
-      var qs = url.searchParams.toString();
-      history.replaceState(null, "", url.pathname + (qs ? "?" + qs : "") + url.hash);
-    } catch (_) {}
-  }
-
-  function shouldResumeLoginModal() {
-    try {
-      if (sessionStorage.getItem(RESUME_LOGIN_KEY) === "1") return true;
-    } catch (_) {}
-    try {
-      return new URLSearchParams(window.location.search || "").get("lt_login") === "1";
-    } catch (_) {
-      return false;
+  function openSharedLogin() {
+    if (typeof window.bsvOpenLoginModal === "function") {
+      window.bsvOpenLoginModal();
+      return;
     }
-  }
-
-  function clearResumeLoginModal() {
-    try {
-      sessionStorage.removeItem(RESUME_LOGIN_KEY);
-    } catch (_) {}
-    try {
-      var url = new URL(window.location.href);
-      if (!url.searchParams.has("lt_login")) return;
-      url.searchParams.delete("lt_login");
-      var qs = url.searchParams.toString();
-      history.replaceState(null, "", url.pathname + (qs ? "?" + qs : "") + url.hash);
-    } catch (_) {}
-  }
-
-  function startDiscordLoginAndResume() {
-    markResumeLoginModal();
-    if (typeof window.startDiscordLogin === "function") window.startDiscordLogin();
-  }
-
-  function startRobloxLoginAndResume() {
-    markResumeLoginModal();
-    var err = document.getElementById("live-trading-roblox-error");
-    if (err) err.hidden = true;
-    if (typeof window.startRobloxLogin === "function") window.startRobloxLogin();
+    setTimeout(function () {
+      if (typeof window.bsvOpenLoginModal === "function") window.bsvOpenLoginModal();
+    }, 50);
   }
 
   function applySession(session) {
     session = session || {};
     var ready = !!session.ready;
-    var discord = session.discord || session.user || null;
-    var roblox = session.roblox || null;
-
     var gate = document.getElementById("live-trading-gate");
     var workspace = document.getElementById("live-trading-workspace");
     if (gate) gate.hidden = ready;
     if (workspace) workspace.hidden = !ready;
-
-    var stepDiscord = document.getElementById("live-trading-step-discord");
-    var stepRoblox = document.getElementById("live-trading-step-roblox");
-    var discordStatus = document.getElementById("live-trading-discord-status");
-    var robloxStatus = document.getElementById("live-trading-roblox-status");
-    var discordBtn = document.getElementById("live-trading-discord-btn");
-    var robloxBtn = document.getElementById("live-trading-roblox-btn");
-
-    if (stepDiscord) stepDiscord.classList.toggle("is-complete", !!discord);
-    if (stepRoblox) {
-      stepRoblox.classList.toggle("is-complete", !!roblox);
-      stepRoblox.classList.toggle("is-locked", !discord);
-    }
-    if (discordStatus) {
-      discordStatus.textContent = discord
-        ? t("liveTrading.discordDone", "Discord connected") +
-          (discord.displayName || discord.username ? " · " + (discord.displayName || discord.username) : "")
-        : "";
-    }
-    if (robloxStatus) {
-      robloxStatus.textContent = roblox
-        ? t("liveTrading.robloxDone", "Roblox connected") +
-          (roblox.username ? " · " + roblox.username : "")
-        : "";
-    }
-    if (discordBtn) {
-      discordBtn.disabled = !!discord;
-      discordBtn.hidden = !!discord;
-    }
-    if (robloxBtn) {
-      robloxBtn.disabled = !discord || !!roblox;
-      robloxBtn.hidden = !!roblox;
-    }
-
-    if (ready) setModalOpen(false);
     return {
       ready: ready,
-      discord: discord,
-      user: discord,
-      roblox: roblox
+      discord: session.discord || session.user || null,
+      user: session.discord || session.user || null,
+      roblox: session.roblox || null
     };
   }
 
@@ -227,71 +142,17 @@
     return Promise.resolve(applySession({ ready: false, discord: null, roblox: null }));
   }
 
-  function resumeLoginModalIfNeeded(session) {
-    if (!shouldResumeLoginModal()) return;
-    clearResumeLoginModal();
-    if (session && session.ready) return;
-    setModalOpen(true);
-  }
-
   function bindLoginUi() {
     var openBtn = document.getElementById("live-trading-open-login");
-    var closeBtn = document.getElementById("live-trading-login-close");
-    var backdrop = document.getElementById("live-trading-login-backdrop");
-    var discordBtn = document.getElementById("live-trading-discord-btn");
-    var robloxBtn = document.getElementById("live-trading-roblox-btn");
-    var robloxError = document.getElementById("live-trading-roblox-error");
-
     if (openBtn) {
       openBtn.addEventListener("click", function () {
-        setModalOpen(true);
+        openSharedLogin();
         refreshSession();
       });
     }
-    if (closeBtn) closeBtn.addEventListener("click", function () { setModalOpen(false); });
-    if (backdrop) backdrop.addEventListener("click", function () { setModalOpen(false); });
-
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") setModalOpen(false);
-    });
-
-    if (discordBtn) {
-      discordBtn.addEventListener("click", startDiscordLoginAndResume);
-    }
-
-    // Header Log In on this page should also return into the login steps modal.
-    document.addEventListener(
-      "click",
-      function (e) {
-        var btn = e.target && e.target.closest ? e.target.closest("#nav-login-btn.nav-login-btn--signin") : null;
-        if (!btn) return;
-        markResumeLoginModal();
-      },
-      true
-    );
-
-    if (robloxBtn) {
-      robloxBtn.addEventListener("click", startRobloxLoginAndResume);
-    }
-
-    try {
-      if (new URLSearchParams(window.location.search || "").get("bsv_roblox_error") ||
-          (window.location.hash || "").indexOf("bsv_roblox_error=") !== -1) {
-        if (robloxError) robloxError.hidden = false;
-        setModalOpen(true);
-      }
-    } catch (_) {}
 
     document.addEventListener("bsv:authchange", function (e) {
       applySession(e.detail || {});
-    });
-    document.addEventListener("bsv:roblox-oauth-unavailable", function () {
-      if (robloxError) {
-        robloxError.hidden = false;
-        robloxError.textContent =
-          "Roblox login is not set up on the server yet. Add ROBLOX_CLIENT_ID and ROBLOX_CLIENT_SECRET on Railway, then try again.";
-      }
-      setModalOpen(true);
     });
     document.addEventListener("bsv:languagechange", function () {
       buildSectionsNav();
@@ -303,9 +164,7 @@
     buildSectionsNav();
     initMobileSectionsMenu();
     bindLoginUi();
-    // Same first paint for every visitor; auth only toggles visibility after load.
-    // After Discord OAuth, reopen the login steps modal so Step 2 is ready.
-    refreshSession().then(resumeLoginModalIfNeeded);
+    refreshSession();
   }
 
   if (document.readyState === "loading") {

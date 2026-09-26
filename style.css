@@ -6351,19 +6351,67 @@ background-attachment: fixed;
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  min-width: 180px;
-  padding: 12px;
-  background: var(--bsv-surface-raised);
-  border: 1px solid hsl(var(--bsv-accent-hue) 76% 55% / 0.35);
-  border-radius: 12px;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+  width: min(292px, calc(100vw - 24px));
+  padding: 14px 14px 12px;
+  background: linear-gradient(180deg, #1a2330 0%, #121a24 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
   z-index: 1200;
-}.nav-login-menu__name {
-  margin: 0 0 10px;
+}.nav-login-menu__title {
+  margin: 0 0 12px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-align: center;
+}.nav-login-menu__section {
+  padding: 10px 10px 11px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.22);
+}.nav-login-menu__section-label {
+  margin: 0 0 6px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}.nav-login-menu__status {
+  margin: 0;
   font-size: 0.9rem;
   font-weight: 600;
   color: #fff;
   word-break: break-word;
+}.nav-login-menu__status--ok {
+  color: #86efac;
+}.nav-login-menu__link-btn {
+  width: 100%;
+  margin-top: 2px;
+  padding: 9px 12px;
+  border: 2px solid #000;
+  border-radius: 9px;
+  color: #fff;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+}.nav-login-menu__link-btn--roblox {
+  background: linear-gradient(180deg, #f0436a 0%, #be123c 100%);
+}.nav-login-menu__link-btn--discord {
+  background: linear-gradient(180deg, #6875f5 0%, #4752c4 100%);
+}.nav-login-menu__trading-note {
+  margin: 0 0 10px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  background: rgba(251, 191, 36, 0.1);
+  color: #fde68a;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.35;
+}.nav-login-menu__logout-wrap {
+  margin-top: 2px;
 }#nav-logout-test,
 .nav-logout-test {
   display: none !important;
@@ -6371,16 +6419,189 @@ background-attachment: fixed;
   pointer-events: none !important;
 }.nav-login-menu__logout {
   width: 100%;
-  padding: 8px 12px;
-  border: 1px solid rgba(255, 80, 80, 0.45);
-  border-radius: 8px;
-  background: rgba(255, 80, 80, 0.1);
-  color: #ff8a8a;
-  font-size: 0.85rem;
-  font-weight: 600;
+  padding: 10px 12px;
+  border: 1px solid rgba(239, 68, 68, 0.55);
+  border-radius: 10px;
+  background: rgba(220, 38, 38, 0.92);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 800;
   cursor: pointer;
 }.nav-login-menu__logout:hover {
-  background: rgba(255, 80, 80, 0.2);
+  background: #ef4444;
+}.nav-login-menu__logout-choices {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}.nav-login-menu__logout-choices[hidden] {
+  display: none !important;
+}.nav-login-menu__logout-hint {
+  margin: 0 0 2px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: center;
+}.nav-login-menu__logout-opt {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fecaca;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}.nav-login-menu__logout-opt:hover {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+.bsv-login-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.bsv-login-modal[hidden] {
+  display: none !important;
+}
+.bsv-login-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+}
+.bsv-login-modal__box {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 440px);
+  max-height: min(90vh, 720px);
+  overflow: auto;
+  padding: 28px 22px 24px;
+  border-radius: 16px;
+  border: 3px solid #000;
+  background: var(--bsv-surface-card, #141d28);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+}
+.bsv-login-modal__close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.bsv-login-modal__title {
+  margin: 0 0 20px;
+  color: #fff;
+  font-size: 1.45rem;
+  text-align: center;
+}
+.bsv-login-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.bsv-login-step {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 14px;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.22);
+}
+.bsv-login-step.is-complete {
+  border-color: rgba(76, 175, 30, 0.55);
+  background: rgba(76, 175, 30, 0.1);
+}
+.bsv-login-step.is-locked {
+  opacity: 0.55;
+}
+.bsv-login-step__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  padding: 6px 8px;
+  border-radius: 999px;
+  font: 700 0.72rem/1 system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  background: #334155;
+}
+.bsv-login-step[data-step="discord"] .bsv-login-step__badge {
+  background: #5865f2;
+}
+.bsv-login-step[data-step="roblox"] .bsv-login-step__badge {
+  background: #e11d48;
+}
+.bsv-login-step__title {
+  margin: 0 0 6px;
+  color: #fff;
+  font-size: 1.05rem;
+}
+.bsv-login-step__status {
+  margin: 0 0 10px;
+  min-height: 1.2em;
+  color: #86efac;
+  font-size: 0.92rem;
+}
+.bsv-login-step__btn {
+  appearance: none;
+  border: 2px solid #000;
+  border-radius: 10px;
+  padding: 11px 16px;
+  font: 700 0.95rem/1 system-ui, sans-serif;
+  color: #fff;
+  cursor: pointer;
+  width: 100%;
+}
+.bsv-login-step__btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.bsv-login-step__btn--discord {
+  background: linear-gradient(180deg, #6875f5 0%, #4752c4 100%);
+}
+.bsv-login-step__btn--roblox {
+  background: linear-gradient(180deg, #f0436a 0%, #be123c 100%);
+}
+.bsv-login-step__error {
+  margin: 10px 0 0;
+  color: #fca5a5;
+  font-size: 0.88rem;
+}
+.bsv-login-step__error[hidden] {
+  display: none !important;
+}
+.bsv-login-modal__note {
+  margin: 16px 0 0;
+  color: #fde68a;
+  font-size: 0.86rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.35;
+}
+.bsv-login-modal__note[hidden] {
+  display: none !important;
+}
+body.bsv-login-open {
+  overflow: hidden;
 }body {
   padding-top: 70px;
 }.home-page-clean {

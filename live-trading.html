@@ -84,7 +84,7 @@
 <script defer src="auth-oauth-bounce.js?v=20260926-live-trading"></script>
 <title>Live Trading — BlockSpin Values (Dev)</title>
 <meta name="description" content="Live Trading — development build of BlockSpin Values." />
-<link rel="stylesheet" href="style.css?v=20260926-lt-center" />
+<link rel="stylesheet" href="style.css?v=20260926-profile-menu" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Paytone+One&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
@@ -160,42 +160,14 @@
   <div class="tax-sidebar-column live-trading-layout-spacer" id="tax-sidebar-column" aria-hidden="true"></div>
 </div>
 
-<div class="live-trading-login-modal" id="live-trading-login-modal" hidden>
-  <div class="live-trading-login-modal__backdrop" id="live-trading-login-backdrop"></div>
-  <div class="live-trading-login-modal__box" role="dialog" aria-modal="true" aria-labelledby="live-trading-login-title">
-    <button type="button" class="live-trading-login-modal__close" id="live-trading-login-close" data-i18n-aria="liveTrading.close" aria-label="Close">&times;</button>
-    <h2 class="live-trading-login-modal__title" id="live-trading-login-title" data-i18n="liveTrading.loginBtn">Log in</h2>
-
-    <ol class="live-trading-steps">
-      <li class="live-trading-step" id="live-trading-step-discord" data-step="discord">
-        <div class="live-trading-step__badge" data-i18n="liveTrading.step1">Step 1</div>
-        <div class="live-trading-step__body">
-          <h3 class="live-trading-step__title" data-i18n="liveTrading.step1Title">Log in with Discord</h3>
-          <p class="live-trading-step__status" id="live-trading-discord-status"></p>
-          <button type="button" class="live-trading-step__btn live-trading-step__btn--discord" id="live-trading-discord-btn" data-i18n="liveTrading.discordBtn">Log in with Discord</button>
-        </div>
-      </li>
-      <li class="live-trading-step" id="live-trading-step-roblox" data-step="roblox">
-        <div class="live-trading-step__badge" data-i18n="liveTrading.step2">Step 2</div>
-        <div class="live-trading-step__body">
-          <h3 class="live-trading-step__title" data-i18n="liveTrading.step2Title">Log in with Roblox</h3>
-          <p class="live-trading-step__status" id="live-trading-roblox-status"></p>
-          <button type="button" class="live-trading-step__btn live-trading-step__btn--roblox" id="live-trading-roblox-btn" data-i18n="liveTrading.robloxBtn">Log in with Roblox</button>
-          <p class="live-trading-step__error" id="live-trading-roblox-error" hidden>Roblox login is not configured yet. Try again shortly.</p>
-        </div>
-      </li>
-    </ol>
-  </div>
-</div>
-
 <div id="bsv-sponsor-banner-slot" class="bsv-sponsor-banner-slot"></div>
 <div id="bsv-site-footer"></div>
 
-<script defer src="site-chrome.js?v=20260926-live-trading"></script>
-<script defer src="auth.js?v=20260926-lt-layout"></script>
-<script defer src="site-i18n.js?v=20260926-live-trading"></script>
-<script defer src="site-settings.js?v=20260926-live-trading"></script>
+<script defer src="site-chrome.js?v=20260926-profile-menu"></script>
+<script defer src="auth.js?v=20260926-profile-menu"></script>
+<script defer src="site-i18n.js?v=20260926-profile-menu"></script>
+<script defer src="site-settings.js?v=20260926-profile-menu"></script>
 <script defer src="section-config.js?v=20260926-live-trading"></script>
-<script defer src="live-trading.js?v=20260926-lt-layout"></script>
+<script defer src="live-trading.js?v=20260926-profile-menu"></script>
 </body>
 </html>
