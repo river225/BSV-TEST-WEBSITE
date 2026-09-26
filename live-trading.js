@@ -526,6 +526,14 @@
     document.body.classList.remove("lt-picker-open");
   }
 
+  function rarityColor(rarity) {
+    if (rarity === "all") return "#94a3b8";
+    for (var i = 0; i < TRADE_SHEETS.length; i++) {
+      if (TRADE_SHEETS[i].rarity === rarity) return TRADE_SHEETS[i].color;
+    }
+    return "#94a3b8";
+  }
+
   function renderPickerRarities() {
     var el = document.getElementById("lt-picker-rarities");
     if (!el) return;
@@ -537,11 +545,15 @@
     el.innerHTML = labels
       .map(function (r) {
         var label = r === "all" ? "All" : r;
+        var color = rarityColor(r);
+        var active = pickerRarity === r;
         return (
           '<button type="button" class="lt-picker__rarity' +
-          (pickerRarity === r ? " is-active" : "") +
+          (active ? " is-active" : "") +
           '" data-rarity="' +
           escapeAttr(r) +
+          '" style="--lt-rarity:' +
+          escapeAttr(color) +
           '">' +
           escapeHtml(label) +
           "</button>"

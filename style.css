@@ -16854,7 +16854,8 @@ body.live-trading-page .live-trading-layout-spacer {
   position: relative;
   z-index: 1;
   width: min(100%, 560px);
-  max-height: min(86vh, 720px);
+  height: min(86vh, 640px);
+  max-height: min(86vh, 640px);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -16864,11 +16865,13 @@ body.live-trading-page .live-trading-layout-spacer {
   background: #141d28;
   box-shadow: 0 24px 50px rgba(0, 0, 0, 0.5);
   box-sizing: border-box;
+  overflow: hidden;
 }
 .lt-picker__head {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-shrink: 0;
 }
 .lt-picker__title {
   margin: 0;
@@ -16895,33 +16898,39 @@ body.live-trading-page .live-trading-layout-spacer {
   background: rgba(0, 0, 0, 0.35);
   color: #fff;
   font: 600 0.95rem/1 system-ui, sans-serif;
+  flex-shrink: 0;
 }
 .lt-picker__rarities {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  flex-shrink: 0;
 }
 .lt-picker__rarity {
   appearance: none;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--lt-rarity, #94a3b8);
   border-radius: 999px;
   padding: 7px 10px;
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.8);
+  background: rgba(0, 0, 0, 0.28);
+  color: var(--lt-rarity, #94a3b8);
   font: 700 0.72rem/1 system-ui, sans-serif;
   cursor: pointer;
 }
 .lt-picker__rarity.is-active {
-  border-color: rgba(255, 255, 255, 0.35);
-  background: rgba(255, 255, 255, 0.14);
+  border-color: var(--lt-rarity, #94a3b8);
+  background: var(--lt-rarity, #94a3b8);
   color: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
 }
 .lt-picker__grid {
   flex: 1 1 auto;
-  min-height: 180px;
+  min-height: 0;
+  height: 100%;
   overflow: auto;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: 118px;
+  align-content: start;
   gap: 8px;
   padding: 4px 2px 8px;
   scrollbar-width: auto;
@@ -16931,7 +16940,9 @@ body.live-trading-page .live-trading-layout-spacer {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 6px;
+  height: 118px;
   padding: 10px 8px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -16939,6 +16950,7 @@ body.live-trading-page .live-trading-layout-spacer {
   color: #fff;
   cursor: pointer;
   text-align: center;
+  box-sizing: border-box;
 }
 .lt-picker__item:hover {
   border-color: rgba(51, 204, 230, 0.55);
@@ -16972,6 +16984,8 @@ body.live-trading-page .live-trading-layout-spacer {
   font-size: 0.8rem;
   font-weight: 650;
   text-align: center;
+  flex-shrink: 0;
+  min-height: 1.2em;
 }
 body.lt-picker-open {
   overflow: hidden;
