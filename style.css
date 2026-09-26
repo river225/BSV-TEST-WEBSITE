@@ -16540,7 +16540,17 @@ body.live-trading-page .live-trading-workspace {
   width: 100%;
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
+}
+.lt-side__tags-label {
+  flex: 0 0 auto;
+  margin-right: 2px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.75rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 .lt-tag {
   appearance: none;
