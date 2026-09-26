@@ -302,18 +302,22 @@
       headers: { Authorization: "Bearer " + token }
     })
       .then(function (res) {
-        if (!res.ok) throw new Error("auth_me_failed");
-        return res.json();
-      })
-      .then(function (data) {
-        if (!data || !data.loggedIn || !data.user) {
+        // Only drop the session on explicit auth rejection — never on network/CORS blips.
+        if (res.status === 401 || res.status === 403) {
           setAuthToken(null);
           return null;
         }
-        return data.user;
+        if (!res.ok) return null;
+        return res.json().then(function (data) {
+          if (!data || !data.loggedIn || !data.user) {
+            setAuthToken(null);
+            return null;
+          }
+          return data.user;
+        });
       })
       .catch(function () {
-        setAuthToken(null);
+        // Keep token so a temporary API failure does not log the user out.
         return null;
       });
   }
