@@ -715,6 +715,11 @@
     });
   }
 
+  var TIP_LFO =
+    "This user is open to offers that may be different from their trade post";
+  var TIP_NLFO =
+    "This user only wants what is listed and is not open to other offers";
+
   function itemPhrase(item) {
     var qty = Math.max(1, Number(item.qty) || 1);
     var name = String(item.name || "Item");
@@ -730,68 +735,141 @@
     return list.slice(0, -1).join(", ") + " and " + list[list.length - 1];
   }
 
-  function sidePhrase(side, emptyLabel) {
+  function sideTradePhrase(side, emptyLabel) {
     var parts = [];
     ((side && side.items) || []).forEach(function (item) {
       parts.push(itemPhrase(item));
     });
     if (side && side.cash) parts.push(formatCash(side.cash));
-    if (side && side.lookingForOffers) parts.push("Looking for offers");
-    if (side && side.notLookingForOffers) parts.push("Not looking for offers");
     return joinPhrases(parts) || emptyLabel || "nothing";
   }
 
-  function infoSummary(post) {
-    return (
-      sidePhrase(post.giving, "nothing") +
+  function postSummaryHtml(post) {
+    var user =
+      (post.author && post.author.robloxUsername) || "This trader";
+    var trade =
+      sideTradePhrase(post.giving, "nothing") +
       " for " +
-      sidePhrase(post.wanting, "nothing")
+      sideTradePhrase(post.wanting, "nothing");
+    var lines =
+      '<p class="lt-post__summary-text">' + escapeHtml(trade) + "</p>";
+    if (post.wanting && post.wanting.lookingForOffers) {
+      lines +=
+        '<p class="lt-post__summary-offer">' +
+        escapeHtml(user + " is looking for offers.") +
+        "</p>";
+    } else if (post.wanting && post.wanting.notLookingForOffers) {
+      lines +=
+        '<p class="lt-post__summary-offer">' +
+        escapeHtml(user + " is not looking for offers.") +
+        "</p>";
+    }
+    return lines;
+  }
+
+  function resolveItemDisplay(item) {
+    var cat = findCatalogItem(item.id);
+    return {
+      id: item.id,
+      name: item.name || (cat && cat.name) || "Item",
+      image: item.image || (cat && cat.image) || "",
+      color: item.color || (cat && cat.color) || "#334155",
+      rarity: item.rarity || (cat && cat.rarity) || "",
+      value: (cat && cat.value) || item.value || "",
+      qty: Math.max(1, Number(item.qty) || 1)
+    };
+  }
+
+  function itemCardHtml(item) {
+    var d = resolveItemDisplay(item);
+    return (
+      '<div class="lt-icard" style="--lt-card:' +
+      escapeAttr(d.color) +
+      ";background:radial-gradient(120% 90% at 50% 18%," +
+      escapeAttr(d.color) +
+      "99,transparent 70%),linear-gradient(180deg," +
+      escapeAttr(d.color) +
+      "88,#070b12 78%)\" title=\"" +
+      escapeAttr(d.name) +
+      '">' +
+      (d.qty > 1
+        ? '<span class="lt-icard__qty">' + escapeHtml(String(d.qty) + "×") + "</span>"
+        : "") +
+      '<div class="lt-icard__art">' +
+      (d.image
+        ? '<img src="' +
+          escapeAttr(d.image) +
+          '" alt="' +
+          escapeAttr(d.name) +
+          '" loading="lazy" decoding="async">'
+        : '<span class="lt-icard__ph" aria-hidden="true"></span>') +
+      "</div>" +
+      '<div class="lt-icard__bar">' +
+      '<span class="lt-icard__name">' +
+      escapeHtml(d.name) +
+      "</span>" +
+      '<span class="lt-icard__num">' +
+      escapeHtml(String(d.qty)) +
+      "</span>" +
+      "</div>" +
+      "</div>"
     );
   }
 
-  function stackHtml(side) {
+  function cashCardHtml(cash) {
+    return (
+      '<div class="lt-icard lt-icard--cash" title="' +
+      escapeAttr(formatCash(cash)) +
+      '">' +
+      '<div class="lt-icard__art lt-icard__art--cash">' +
+      '<span class="lt-icard__cash-sign">$</span>' +
+      "</div>" +
+      '<div class="lt-icard__bar">' +
+      '<span class="lt-icard__name">Cash</span>' +
+      '<span class="lt-icard__num">' +
+      escapeHtml(formatCash(cash).replace(/^\$/, "")) +
+      "</span>" +
+      "</div>" +
+      "</div>"
+    );
+  }
+
+  function offersBadgeCardHtml(kind) {
+    var isLfo = kind === "lfo";
+    var tip = isLfo ? TIP_LFO : TIP_NLFO;
+    return (
+      '<div class="lt-icard lt-icard--offers lt-icard--' +
+      (isLfo ? "lfo" : "nlfo") +
+      '" tabindex="0" data-tip="' +
+      escapeAttr(tip) +
+      '" title="' +
+      escapeAttr(tip) +
+      '">' +
+      '<div class="lt-offers-badge' +
+      (isLfo ? "" : " lt-offers-badge--no") +
+      '" aria-hidden="true">' +
+      '<span class="lt-offers-badge__top">' +
+      (isLfo ? "???" : "NO") +
+      "</span>" +
+      '<span class="lt-offers-badge__word">OFFERS</span>' +
+      '<span class="lt-offers-badge__lines"></span>' +
+      "</div>" +
+      "</div>"
+    );
+  }
+
+  function railHtml(side) {
     var items = (side && side.items) || [];
     var cash = side && side.cash ? Number(side.cash) : 0;
     var parts = [];
     items.forEach(function (item) {
-      var qty = Math.max(1, Number(item.qty) || 1);
-      parts.push(
-        '<span class="lt-stack__item" title="' +
-          escapeAttr(item.name) +
-          '">' +
-          (qty > 1
-            ? '<span class="lt-stack__qty">' +
-              escapeHtml(String(qty) + "×") +
-              "</span>"
-            : "") +
-          (item.image
-            ? '<img src="' +
-              escapeAttr(item.image) +
-              '" alt="' +
-              escapeAttr(item.name) +
-              '" width="44" height="44" loading="lazy" decoding="async">'
-            : '<span class="lt-stack__ph"></span>') +
-          '<span class="lt-stack__name">' +
-          escapeHtml(item.name) +
-          "</span>" +
-          "</span>"
-      );
+      parts.push(itemCardHtml(item));
     });
-    if (cash > 0) {
-      parts.push(
-        '<span class="lt-stack__cash">' + escapeHtml(formatCash(cash)) + "</span>"
-      );
-    }
-    if (side && side.lookingForOffers) {
-      parts.push('<span class="lt-stack__tag lt-stack__tag--lfo">Looking for offers</span>');
-    }
-    if (side && side.notLookingForOffers) {
-      parts.push(
-        '<span class="lt-stack__tag lt-stack__tag--nlfo">Not looking for offers</span>'
-      );
-    }
+    if (cash > 0) parts.push(cashCardHtml(cash));
+    if (side && side.lookingForOffers) parts.push(offersBadgeCardHtml("lfo"));
+    if (side && side.notLookingForOffers) parts.push(offersBadgeCardHtml("nlfo"));
     if (!parts.length) {
-      parts.push('<span class="lt-stack__empty">—</span>');
+      parts.push('<div class="lt-rail__empty">—</div>');
     }
     return parts.join("");
   }
@@ -806,6 +884,23 @@
           "&width=150&height=150&format=png"
         : "");
     var own = isOwnPost(post);
+    var wanting = post.wanting || {};
+    var offerCorner = "";
+    if (wanting.lookingForOffers) {
+      offerCorner =
+        '<span class="lt-post__offer-corner lt-post__offer-corner--lfo" data-tip="' +
+        escapeAttr(TIP_LFO) +
+        '" title="' +
+        escapeAttr(TIP_LFO) +
+        '">Accepting offers</span>';
+    } else if (wanting.notLookingForOffers) {
+      offerCorner =
+        '<span class="lt-post__offer-corner lt-post__offer-corner--nlfo" data-tip="' +
+        escapeAttr(TIP_NLFO) +
+        '" title="' +
+        escapeAttr(TIP_NLFO) +
+        '">Not accepting offers</span>';
+    }
     return (
       '<article class="lt-post" data-id="' +
       escapeAttr(post.id) +
@@ -833,22 +928,21 @@
       "</header>" +
       '<div class="lt-post__trade">' +
       '<div class="lt-post__side">' +
-      '<span class="lt-post__side-pill">I Have</span>' +
-      '<div class="lt-stack lt-stack--scroll">' +
-      stackHtml(post.giving) +
+      '<span class="lt-post__side-pill">Offering</span>' +
+      '<div class="lt-rail">' +
+      railHtml(post.giving) +
       "</div></div>" +
       '<div class="lt-post__side">' +
-      '<span class="lt-post__side-pill">I Want</span>' +
-      '<div class="lt-stack lt-stack--scroll">' +
-      stackHtml(post.wanting) +
+      '<span class="lt-post__side-pill">Requesting</span>' +
+      '<div class="lt-rail">' +
+      railHtml(post.wanting) +
       "</div></div>" +
       "</div>" +
-      '<details class="lt-post__info">' +
-      "<summary>Info</summary>" +
-      '<p class="lt-post__info-text">' +
-      escapeHtml(infoSummary(post)) +
-      "</p>" +
-      "</details>" +
+      '<div class="lt-post__summary">' +
+      '<p class="lt-post__summary-label">Post Summary</p>' +
+      postSummaryHtml(post) +
+      "</div>" +
+      offerCorner +
       "</article>"
     );
   }
