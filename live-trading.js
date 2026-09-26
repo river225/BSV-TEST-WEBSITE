@@ -328,6 +328,17 @@
     }, 50);
   }
 
+  function isLoggedIn() {
+    return !!(currentSession && currentSession.ready);
+  }
+
+  /** Browse is public; create / interact need Discord login. */
+  function requireLoginForAction() {
+    if (isLoggedIn()) return true;
+    openSharedLogin();
+    return false;
+  }
+
   function applySession(session) {
     session = session || {};
     var discord = session.discord || session.user || null;
@@ -339,12 +350,12 @@
     };
     var gate = document.getElementById("live-trading-gate");
     var workspace = document.getElementById("live-trading-workspace");
-    if (gate) gate.hidden = currentSession.ready;
-    if (workspace) workspace.hidden = !currentSession.ready;
-    if (currentSession.ready) {
-      loadCatalog();
-      renderFeed();
-    }
+    // Board is always visible; gate stays unused (login modal handles prompts).
+    if (gate) gate.hidden = true;
+    if (workspace) workspace.hidden = false;
+    loadCatalog();
+    renderFeed();
+    syncLiveTradingBoardHeight();
     return currentSession;
   }
 
@@ -383,6 +394,7 @@
       renderDraftGrids();
       clearComposerError();
     }
+    requestAnimationFrame(syncLiveTradingBoardHeight);
   }
 
   function clearComposerError() {
@@ -651,6 +663,7 @@
   }
 
   function submitPost() {
+    if (!requireLoginForAction()) return;
     clearComposerError();
     draft.givingCash = parseCash(
       (document.getElementById("lt-giving-cash") || {}).value
@@ -716,6 +729,7 @@
   }
 
   function deletePost(id) {
+    if (!requireLoginForAction()) return;
     writePosts(
       readPosts().filter(function (p) {
         return p.id !== id;
@@ -1026,6 +1040,7 @@
 
     if (openCreate) {
       openCreate.addEventListener("click", function () {
+        if (!requireLoginForAction()) return;
         setComposerOpen(true);
         loadCatalog();
       });
@@ -1101,6 +1116,23 @@
     });
   }
 
+  function syncLiveTradingBoardHeight() {
+    var nav = document.getElementById("sections-nav");
+    var feedWrap = document.querySelector(".lt-feed-wrap");
+    if (!nav || !feedWrap) return;
+    if (window.matchMedia && window.matchMedia("(max-width: 900px)").matches) {
+      feedWrap.style.removeProperty("height");
+      feedWrap.style.removeProperty("min-height");
+      return;
+    }
+    var navBottom = nav.getBoundingClientRect().bottom;
+    var wrapTop = feedWrap.getBoundingClientRect().top;
+    var h = Math.round(navBottom - wrapTop);
+    if (h < 220) h = 220;
+    feedWrap.style.setProperty("height", h + "px", "important");
+    feedWrap.style.setProperty("min-height", h + "px", "important");
+  }
+
   function clearLiveTradingSidebarLocks(sidebar, sections) {
     [sidebar, sections].forEach(function (el) {
       if (!el) return;
@@ -1158,6 +1190,7 @@
       if (prevWsMax) workspace.style.setProperty("max-width", prevWsMax, "important");
       else workspace.style.removeProperty("max-width");
     }
+    syncLiveTradingBoardHeight();
   }
 
   function init() {
@@ -1166,12 +1199,22 @@
     bindLoginUi();
     bindBoardUi();
     lockLiveTradingSidebarWidths();
-    window.addEventListener("resize", lockLiveTradingSidebarWidths);
+    window.addEventListener("resize", function () {
+      lockLiveTradingSidebarWidths();
+      syncLiveTradingBoardHeight();
+    });
     if (window.visualViewport) {
-      window.visualViewport.addEventListener("resize", lockLiveTradingSidebarWidths);
+      window.visualViewport.addEventListener("resize", function () {
+        lockLiveTradingSidebarWidths();
+        syncLiveTradingBoardHeight();
+      });
     }
     refreshSession();
+    requestAnimationFrame(syncLiveTradingBoardHeight);
   }
+
+  // Expose for upcoming post interactions (chat, etc.).
+  window.bsvLiveTradingRequireLogin = requireLoginForAction;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);

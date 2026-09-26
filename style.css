@@ -16673,10 +16673,12 @@ body.live-trading-page .live-trading-workspace {
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(0, 0, 0, 0.16);
+  /* Height is synced in JS to the bottom of the sections sidebar nav. */
+  box-sizing: border-box;
 }
 .lt-feed {
   height: 100%;
-  max-height: min(62vh, 720px);
+  max-height: none;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 12px;
@@ -16686,6 +16688,7 @@ body.live-trading-page .live-trading-workspace {
   -webkit-overflow-scrolling: touch;
   scrollbar-width: auto;
   scrollbar-color: #33cce6 rgba(255, 255, 255, 0.08);
+  box-sizing: border-box;
 }
 .lt-feed::-webkit-scrollbar {
   width: 10px;

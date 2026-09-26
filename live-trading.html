@@ -92,7 +92,7 @@ window.BSV_BUILD = "20260926-sessionfix";
 <script defer src="auth-oauth-bounce.js?v=20260926-sessionfix"></script>
 <title>Live Trading — BlockSpin Values (Dev)</title>
 <meta name="description" content="Live Trading — development build of BlockSpin Values." />
-<link rel="stylesheet" href="style.css?v=20260926-lt-cards2" />
+<link rel="stylesheet" href="style.css?v=20260926-lt-public" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Paytone+One&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
@@ -150,15 +150,15 @@ window.BSV_BUILD = "20260926-sessionfix";
 
   <main id="sections" class="sections live-trading-main">
     <section class="section live-trading-section" id="live-trading" style="display:block;">
-      <div class="live-trading-gate" id="live-trading-gate">
+      <div class="live-trading-gate" id="live-trading-gate" hidden>
         <div class="live-trading-gate__card">
           <h1 class="live-trading-gate__title" data-i18n="liveTrading.needLogin">You need to Log in</h1>
-          <p class="live-trading-gate__body" data-i18n="liveTrading.needLoginBody">To use the Live Trading feature you must login</p>
+          <p class="live-trading-gate__body" data-i18n="liveTrading.needLoginBody">Log in to create posts or interact with trades.</p>
           <button type="button" class="live-trading-gate__login-btn" id="live-trading-open-login" data-i18n="liveTrading.loginBtn">Log in</button>
         </div>
       </div>
 
-      <div class="live-trading-workspace" id="live-trading-workspace" hidden>
+      <div class="live-trading-workspace" id="live-trading-workspace">
         <div class="lt-board" id="lt-board">
           <h2 class="lt-board__title">Live Trading</h2>
 
@@ -255,6 +255,6 @@ window.BSV_BUILD = "20260926-sessionfix";
 <script defer src="site-i18n.js?v=20260926-sessionfix"></script>
 <script defer src="site-settings.js?v=20260926-sessionfix"></script>
 <script defer src="section-config.js?v=20260926-sessionfix"></script>
-<script defer src="live-trading.js?v=20260926-lt-cards2"></script>
+<script defer src="live-trading.js?v=20260926-lt-public"></script>
 </body>
 </html>
