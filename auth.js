@@ -8,8 +8,12 @@
   window.addEventListener("pageshow", removeWrongSiteBanner);
 
   var AUTH_TOKEN_KEY = "bsv-discord-auth";
+  var ROBLOX_LINK_KEY = "bsv-roblox-link";
+  var ROBLOX_TOKEN_KEY = "bsv-roblox-auth";
   var OAUTH_RETURN_KEY = "bsv-oauth-return-to";
   var logoutTestObserver = null;
+  var cachedDiscordUser = null;
+  var cachedRobloxLink = null;
 
   function apiBase() {
     if (typeof window.bsvBotApiUrl === "function") return window.bsvBotApiUrl("");
@@ -102,14 +106,75 @@
 
   purgeStaleMainReturnUrl();
 
+  function getRobloxToken() {
+    try {
+      return localStorage.getItem(ROBLOX_TOKEN_KEY);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function setRobloxToken(token) {
+    try {
+      if (token) localStorage.setItem(ROBLOX_TOKEN_KEY, token);
+      else localStorage.removeItem(ROBLOX_TOKEN_KEY);
+    } catch (_) {}
+  }
+
+  function readRobloxLink() {
+    try {
+      var raw = localStorage.getItem(ROBLOX_LINK_KEY);
+      if (!raw) return null;
+      var parsed = JSON.parse(raw);
+      if (!parsed || !parsed.username) return null;
+      return parsed;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function writeRobloxLink(link) {
+    try {
+      if (link) localStorage.setItem(ROBLOX_LINK_KEY, JSON.stringify(link));
+      else localStorage.removeItem(ROBLOX_LINK_KEY);
+    } catch (_) {}
+    cachedRobloxLink = link || null;
+  }
+
+  function clearRobloxLink() {
+    setRobloxToken(null);
+    writeRobloxLink(null);
+  }
+
+  function emitAuthChange(user) {
+    cachedDiscordUser = user || null;
+    document.dispatchEvent(
+      new CustomEvent("bsv:authchange", {
+        detail: {
+          user: cachedDiscordUser,
+          roblox: cachedRobloxLink,
+          ready: !!(cachedDiscordUser && cachedRobloxLink)
+        }
+      })
+    );
+  }
+
   function parseAuthHash() {
     var hash = window.location.hash || "";
     var justLoggedIn = false;
 
-    if (hash.indexOf("bsv_auth_error=") !== -1) {
+    if (hash.indexOf("bsv_auth_error=") !== -1 || hash.indexOf("bsv_roblox_error=") !== -1) {
       clearOAuthReturnTo();
       history.replaceState(null, "", window.location.pathname + window.location.search);
       return false;
+    }
+
+    if (hash.indexOf("bsv_roblox_auth=") !== -1) {
+      var robloxMatch = hash.match(/bsv_roblox_auth=([^&]+)/);
+      if (robloxMatch && robloxMatch[1]) {
+        setRobloxToken(decodeURIComponent(robloxMatch[1]));
+        justLoggedIn = true;
+      }
     }
 
     if (hash.indexOf("bsv_auth=") !== -1) {
@@ -137,6 +202,9 @@
         setAuthToken(token);
         justLoggedIn = true;
       }
+    }
+
+    if (hash.indexOf("bsv_auth=") !== -1 || hash.indexOf("bsv_roblox_auth=") !== -1) {
       history.replaceState(null, "", window.location.pathname + window.location.search);
     }
 
@@ -150,8 +218,67 @@
     window.location.href = authUrl("api/auth/discord?return_to=" + encodeURIComponent(returnTo));
   }
 
+  function startRobloxLogin(options) {
+    options = options || {};
+    saveOAuthReturnTo();
+    var returnTo = window.location.href.split("#")[0];
+    var url = authUrl("api/auth/roblox?return_to=" + encodeURIComponent(returnTo));
+
+    return fetch(url, { method: "GET", redirect: "manual", credentials: "omit" })
+      .then(function (res) {
+        if (res.status === 404 || res.status === 405) {
+          document.dispatchEvent(new CustomEvent("bsv:roblox-oauth-unavailable"));
+          if (typeof options.onUnavailable === "function") options.onUnavailable();
+          return { ok: false, reason: "unavailable" };
+        }
+        window.location.href = url;
+        return { ok: true };
+      })
+      .catch(function () {
+        // Network probe failed — still attempt the OAuth URL (same as Discord).
+        window.location.href = url;
+        return { ok: true };
+      });
+  }
+
+  function linkRobloxUsername(username) {
+    var name = String(username || "").trim();
+    if (!name || name.length < 3 || name.length > 20) {
+      return Promise.reject(new Error("invalid_username"));
+    }
+    if (!cachedDiscordUser && !getAuthToken()) {
+      return Promise.reject(new Error("discord_required"));
+    }
+    return fetch(authUrl("api/roblox-avatars"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ usernames: [name] })
+    })
+      .then(function (res) {
+        if (!res.ok) throw new Error("roblox_lookup_failed");
+        return res.json();
+      })
+      .then(function (data) {
+        var avatars = (data && data.avatars) || {};
+        var key = name.toLowerCase();
+        var info = avatars[key] || avatars[name] || null;
+        if (!info || !info.userId) throw new Error("roblox_not_found");
+        var link = {
+          username: name,
+          userId: info.userId,
+          imageUrl: info.imageUrl || "",
+          profileUrl: info.profileUrl || ("https://www.roblox.com/users/" + info.userId + "/profile"),
+          linkedAt: Date.now()
+        };
+        writeRobloxLink(link);
+        emitAuthChange(cachedDiscordUser);
+        return link;
+      });
+  }
+
   function logoutDiscord() {
     setAuthToken(null);
+    clearRobloxLink();
     clearOAuthReturnTo();
     dismissWelcomeBanner();
     fetch(authUrl("api/auth/logout"), { method: "POST" }).catch(function () {});
@@ -237,7 +364,7 @@
     var slot = document.getElementById("nav-login");
     if (!slot) return;
 
-    document.dispatchEvent(new CustomEvent("bsv:authchange", { detail: { user: user || null } }));
+    emitAuthChange(user || null);
 
     if (!user) {
       var loginLabel = window.bsvI18n ? window.bsvI18n.t("auth.login") : "Log In";
@@ -293,15 +420,62 @@
     if (typeof initMobileHeaderToolbar === "function") initMobileHeaderToolbar();
   }
 
+  function fetchRobloxSession() {
+    cachedRobloxLink = readRobloxLink();
+    var token = getRobloxToken();
+    if (!token) return Promise.resolve(cachedRobloxLink);
+    // Future OAuth token path — keep local link if /me/roblox is not available yet.
+    return fetch(authUrl("api/auth/roblox/me"), {
+      headers: { Authorization: "Bearer " + token }
+    })
+      .then(function (res) {
+        if (!res.ok) throw new Error("roblox_me_failed");
+        return res.json();
+      })
+      .then(function (data) {
+        if (data && data.user) {
+          var link = {
+            username: data.user.username || data.user.name || "Roblox",
+            userId: data.user.id || data.user.userId,
+            imageUrl: data.user.avatarUrl || data.user.imageUrl || "",
+            profileUrl: data.user.profileUrl || "",
+            linkedAt: Date.now()
+          };
+          writeRobloxLink(link);
+          return link;
+        }
+        return cachedRobloxLink;
+      })
+      .catch(function () {
+        return cachedRobloxLink;
+      });
+  }
+
+  function getAuthSession() {
+    return Promise.all([fetchAuthUser(), fetchRobloxSession()]).then(function (pair) {
+      var user = pair[0];
+      var roblox = pair[1];
+      cachedDiscordUser = user || null;
+      cachedRobloxLink = roblox || null;
+      return {
+        user: cachedDiscordUser,
+        discord: cachedDiscordUser,
+        roblox: cachedRobloxLink,
+        ready: !!(cachedDiscordUser && cachedRobloxLink)
+      };
+    });
+  }
+
   function initDiscordAuth() {
     removeLogoutTestButton();
     watchForLogoutTestButton();
     var justLoggedIn = parseAuthHash();
-    fetchAuthUser().then(function (user) {
-      renderNavLogin(user);
+    cachedRobloxLink = readRobloxLink();
+    getAuthSession().then(function (session) {
+      renderNavLogin(session.user);
       removeLogoutTestButton();
-      if (justLoggedIn && user) {
-        showWelcomeBanner(user.displayName || user.username || "back");
+      if (justLoggedIn && session.user) {
+        showWelcomeBanner(session.user.displayName || session.user.username || "back");
         setTimeout(removeLogoutTestButton, 0);
       }
     });
@@ -309,8 +483,8 @@
       if (!e.target.closest(".nav-login-user")) closeLoginMenu();
     });
     document.addEventListener("bsv:languagechange", function () {
-      fetchAuthUser().then(function (user) {
-        renderNavLogin(user);
+      getAuthSession().then(function (session) {
+        renderNavLogin(session.user);
       });
     });
     window.addEventListener("pageshow", function () {
@@ -319,13 +493,20 @@
     });
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initDiscordAuth);
-  } else {
-    initDiscordAuth();
+  if (!window.__bsvAuthInited) {
+    window.__bsvAuthInited = true;
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initDiscordAuth);
+    } else {
+      initDiscordAuth();
+    }
   }
 
   window.initDiscordAuth = initDiscordAuth;
   window.startDiscordLogin = startDiscordLogin;
+  window.startRobloxLogin = startRobloxLogin;
+  window.bsvLinkRobloxUsername = linkRobloxUsername;
   window.bsvGetAuthToken = getAuthToken;
+  window.bsvGetAuthSession = getAuthSession;
+  window.bsvClearRobloxLink = clearRobloxLink;
 })();

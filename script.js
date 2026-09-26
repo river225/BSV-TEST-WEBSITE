@@ -3170,6 +3170,11 @@ function ensureSectionRendered(title) {
     _sectionsDomReady[title] = true;
     return;
   }
+  var earlyCfg = typeof getSectionConfig === "function" ? getSectionConfig(title) : null;
+  if (earlyCfg && earlyCfg.pageHref) {
+    _sectionsDomReady[title] = true;
+    return;
+  }
   if (title === "Money & Game Guide") {
     renderSection(title, []);
     return;
@@ -3707,7 +3712,20 @@ function initSectionsNav() {
     const btn = document.createElement("button");
     btn.dataset.section = name;
     btn.textContent = i18nSection(name);
-    btn.addEventListener("click", () => showSection(name));
+    if (cfg && cfg.id === "live-trading") {
+      btn.classList.add("nav-live-trading");
+    }
+    btn.addEventListener("click", function () {
+      if (cfg && cfg.pageHref) {
+        var href =
+          typeof window.bsvSitePath === "function"
+            ? window.bsvSitePath(cfg.pageHref)
+            : cfg.pageHref;
+        window.location.href = href;
+        return;
+      }
+      showSection(name);
+    });
     nav.appendChild(btn);
   });
 }
@@ -4037,6 +4055,13 @@ function setSectionDisplay(el, sectionCfg, visible) {
 function showSection(name) {
   const cfg = typeof getSectionConfig === "function" ? getSectionConfig(name) : null;
   if (!cfg) return;
+
+  if (cfg.pageHref) {
+    var pageHref =
+      typeof window.bsvSitePath === "function" ? window.bsvSitePath(cfg.pageHref) : cfg.pageHref;
+    window.location.href = pageHref;
+    return;
+  }
 
   // Sheets load async. Early nav clicks used to hide #home before the target
   // section existed, leaving a blank main pane.
@@ -4867,7 +4892,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     let items = [];
     const cfg = typeof getSectionConfig === "function" ? getSectionConfig(sec) : null;
     try {
-      if (cfg && cfg.dataSource === "richest") {
+      if (cfg && cfg.pageHref) {
+        items = [];
+      } else if (cfg && cfg.dataSource === "richest") {
         items = await fetchRichestPlayers();
         console.log(`Got ${items.length} items for ${sec} from NEW spreadsheet`);
       } else if (cfg && cfg.dataSource === "sheet") {
@@ -4902,6 +4929,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (requested === "Uncommon") requested = "Common / Uncommon";
     if (requested === "richest-players" || requested === "Richest Players") {
       requested = "💰 Richest Players";
+    }
+    if (requested === "live-trading" || requested === "Live Trading") {
+      var liveHref =
+        typeof window.bsvSitePath === "function"
+          ? window.bsvSitePath("live-trading.html")
+          : "live-trading.html";
+      window.location.replace(liveHref);
+      return;
     }
     if (requested === "Untradable Items") requested = ACCESSORIES_SECTION_NAME;
     if (SECTION_NAMES.includes(requested)) {

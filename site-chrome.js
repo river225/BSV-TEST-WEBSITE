@@ -47,7 +47,7 @@
     if (root === "/") return;
     var scope = rootEl || document;
     var nodes = scope.querySelectorAll(
-      '[src^="/assets/"], [href^="/assets/"], [href^="/favicon"], [href^="/apple-touch"], [href^="/x-"], [href^="/z-"], [href^="/sponsors"]'
+      '[src^="/assets/"], [href^="/assets/"], [href^="/favicon"], [href^="/apple-touch"], [href^="/x-"], [href^="/z-"], [href^="/sponsors"], [href^="/live-trading"]'
     );
     for (var i = 0; i < nodes.length; i++) {
       var el = nodes[i];
@@ -574,11 +574,12 @@
   }
 
   function renderHeader(activePage) {
-    var dev = isDevSite();
+    // Same home header on every page (login + settings) so logged-in / logged-out
+    // visitors always get identical chrome HTML — auth only fills #nav-login after load.
     var isHome = activePage === "home";
-    var login = (dev || isHome) ? '<div class="nav-login" id="nav-login"></div>' : "";
+    var login = '<div class="nav-login" id="nav-login"></div>';
     var brandHref = isHome ? "#" : sitePath("");
-    var brandOnclick = isHome ? ' onclick="showSection(\'Home\'); return false;"' : "";
+    var brandOnclick = isHome ? ' onclick="if(typeof showSection===\'function\'){showSection(\'Home\');} return false;"' : "";
     var search = isHome ? headerSearch() : "";
     return (
       '<header class="site-header-shell">' +
@@ -597,7 +598,8 @@
             '<div class="nav-right">' +
               (THEMES_DISABLED ? "" : themeSwitcher()) +
               SOCIAL +
-              (isHome ? '<span class="nav-right-divider" aria-hidden="true"></span>' + navTools() : '') +
+              '<span class="nav-right-divider" aria-hidden="true"></span>' +
+              navTools() +
               login +
             "</div>" +
           "</div>" +
@@ -611,9 +613,98 @@
           '<span class="header-subnav__sep" aria-hidden="true">·</span>' +
           navLink(sitePath("x-faq.html"), "FAQ", activePage, "faq") +
         "</nav>" +
-        '<div class="nav-mobile-toolbar' + (isHome ? ' is-active' : '') + '" aria-label="Mobile shortcuts"></div>' +
+        '<div class="nav-mobile-toolbar is-active" aria-label="Mobile shortcuts"></div>' +
       "</div>"
     );
+  }
+
+  function settingsModalHtml() {
+    return (
+      '<div class="site-settings-modal" id="site-settings-modal" hidden>' +
+        '<div class="site-settings-modal__backdrop" id="site-settings-backdrop"></div>' +
+        '<div class="site-settings-modal__box" role="dialog" aria-modal="true" aria-labelledby="site-settings-title">' +
+          '<div class="site-settings-modal__head">' +
+            '<h2 class="site-settings-modal__title" id="site-settings-title" data-i18n="settings.title">Settings</h2>' +
+            '<button type="button" class="site-settings-modal__close" id="site-settings-close" data-i18n-aria="settings.close" aria-label="Close settings">&times;</button>' +
+          "</div>" +
+          '<div class="site-settings-modal__body">' +
+            '<section class="site-settings-section">' +
+              '<h3 class="site-settings-section__title" data-i18n="settings.language">Language</h3>' +
+              '<div class="site-settings-segmented site-settings-segmented--lang" role="group" data-i18n-aria="settings.ariaLanguage" aria-label="Language">' +
+                '<button type="button" class="site-settings-segment" data-lang="en">English</button>' +
+                '<button type="button" class="site-settings-segment" data-lang="fr">Français</button>' +
+                '<button type="button" class="site-settings-segment" data-lang="es">Español</button>' +
+              "</div>" +
+            "</section>" +
+            '<section class="site-settings-section">' +
+              '<h3 class="site-settings-section__title" data-i18n="settings.font">Font</h3>' +
+              '<div class="site-settings-font-grid" id="font-picker-grid" role="listbox" data-i18n-aria="settings.ariaFont" aria-label="Font"></div>' +
+            "</section>" +
+            '<section class="site-settings-section">' +
+              '<h3 class="site-settings-section__title">Style</h3>' +
+              '<div class="site-settings-segmented site-settings-segmented--style" role="group" aria-label="Background style">' +
+                '<button type="button" class="site-settings-segment is-active" data-bg-style="standard">Standard</button>' +
+                '<button type="button" class="site-settings-segment" data-bg-style="dark">Dark</button>' +
+                '<button type="button" class="site-settings-segment" data-bg-style="colorized">Colorized</button>' +
+              "</div>" +
+            "</section>" +
+            '<section class="site-settings-section site-settings-color-row" id="site-settings-color-row" hidden>' +
+              '<h3 class="site-settings-section__title">Color</h3>' +
+              '<label class="site-settings-visually-hidden" for="bsv-bg-hue">Background color</label>' +
+              '<input type="range" id="bsv-bg-hue" class="site-settings-hue" min="0" max="360" value="210" step="1" aria-label="Background hue" />' +
+            "</section>" +
+          "</div>" +
+        "</div>" +
+      "</div>"
+    );
+  }
+
+  function ensureSettingsModal() {
+    if (document.getElementById("site-settings-modal")) return;
+    var wrap = document.createElement("div");
+    wrap.innerHTML = settingsModalHtml();
+    var modal = wrap.firstElementChild;
+    if (!modal) return;
+    var header = document.querySelector(".site-header-shell");
+    if (header && header.parentNode) {
+      header.parentNode.insertBefore(modal, header.nextSibling);
+    } else {
+      document.body.insertBefore(modal, document.body.firstChild);
+    }
+  }
+
+  function hasScriptFile(fileName) {
+    var scripts = document.getElementsByTagName("script");
+    for (var i = 0; i < scripts.length; i++) {
+      var src = scripts[i].getAttribute("src") || "";
+      if (src.indexOf(fileName) !== -1) return true;
+    }
+    return false;
+  }
+
+  function loadScriptOnce(fileName, version) {
+    if (hasScriptFile(fileName)) return Promise.resolve();
+    return new Promise(function (resolve, reject) {
+      var s = document.createElement("script");
+      s.src = sitePath(fileName) + (version ? "?v=" + version : "");
+      s.async = false;
+      s.onload = function () { resolve(); };
+      s.onerror = function () { reject(new Error("failed_load_" + fileName)); };
+      document.head.appendChild(s);
+    });
+  }
+
+  var CHROME_ASSET_V = "20260926-live-trading";
+
+  function ensureHomeHeaderDeps() {
+    ensureSettingsModal();
+    // Load in order so settings/auth always attach to the same header shell.
+    return loadScriptOnce("site-i18n.js", CHROME_ASSET_V)
+      .then(function () { return loadScriptOnce("auth.js", CHROME_ASSET_V); })
+      .then(function () { return loadScriptOnce("site-settings.js", CHROME_ASSET_V); })
+      .catch(function (err) {
+        try { console.warn("BSV chrome deps:", err); } catch (_) {}
+      });
   }
 
   function footerSideNavBlock() {
@@ -716,6 +807,7 @@
     var boosters = document.getElementById("footer-boosters");
     if (boostersSlot && boosters) boostersSlot.appendChild(boosters);
     initMobileHeaderToolbar();
+    ensureHomeHeaderDeps();
     initConsent();
     initFooterBoostersLazy();
     rewriteRootAbsoluteAssets(document);

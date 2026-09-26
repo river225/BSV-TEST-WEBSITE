@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html data-bsv-env="test" lang="en" data-sidenav-style="glass">
+<head>
+<script>
+(function () {
+  try {
+    var R = "/";
+    if (/\.github\.io$/i.test(location.hostname)) {
+      var seg = (location.pathname || "/").split("/").filter(Boolean)[0];
+      if (seg) R = "/" + seg + "/";
+    }
+    window.BSV_SITE_ROOT = R;
+    window.bsvSitePath = function (p) { return R + String(p || "").replace(/^\//, ""); };
+    function fixAttr(sel, attr) {
+      document.querySelectorAll(sel).forEach(function (el) {
+        var v = el.getAttribute(attr);
+        if (v && v.charAt(0) === "/" && v.indexOf(R) !== 0 && v.indexOf("//") !== 0) {
+          el.setAttribute(attr, R + v.slice(1));
+        }
+      });
+    }
+    function addIcon(rel, file, type, sizes) {
+      var l = document.createElement("link");
+      l.rel = rel;
+      l.href = R + file;
+      if (type) l.type = type;
+      if (sizes) l.setAttribute("sizes", sizes);
+      document.head.appendChild(l);
+    }
+    addIcon("icon", "favicon.ico", null, "any");
+    addIcon("icon", "favicon.png", "image/png", null);
+    addIcon("apple-touch-icon", "apple-touch-icon.png", null, null);
+    document.addEventListener("DOMContentLoaded", function () {
+      document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]').forEach(function (el) {
+        var v = el.getAttribute("href") || "";
+        if (v.charAt(0) === "/" && v.indexOf(R) !== 0) el.remove();
+      });
+      fixAttr('link[href^="/assets/"], a[href^="/assets/"], a[href^="/x-"], a[href^="/z-"], a[href^="/sponsors"]', "href");
+      fixAttr('img[src^="/assets/"]', "src");
+    });
+  } catch (e) {}
+})();
+</script>
+<meta name="robots" content="noindex, nofollow" />
+<meta name="bsv-env" content="test" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light only" />
+<meta name="theme-color" content="#0f1724" />
+<style>html{color-scheme:light only;-webkit-color-scheme:light;--bsv-hue:217;--bsv-accent-hue:188;background-color:hsl(217,41%,10%)}</style>
+<script>
+(function () {
+  try {
+    var style = localStorage.getItem("bsv-bg-style") || "standard";
+    var hue = parseInt(localStorage.getItem("bsv-bg-hue") || "210", 10);
+    var root = document.documentElement;
+    if (style === "colorized") {
+      if (isNaN(hue)) hue = 210;
+      hue = Math.max(0, Math.min(360, Math.round(hue)));
+      root.style.setProperty("--bsv-hue", String(hue));
+      root.style.setProperty("--bsv-accent-hue", String(hue));
+      root.style.backgroundColor = "hsl(" + hue + ", 41%, 10%)";
+      root.setAttribute("data-bsv-bg", "colorized");
+    } else if (style === "dark") {
+      root.style.setProperty("--bsv-hue", "220");
+      root.style.setProperty("--bsv-accent-hue", "188");
+      root.style.backgroundColor = "hsl(220, 20%, 4%)";
+      root.setAttribute("data-bsv-bg", "dark");
+    }
+  } catch (e) {}
+})();
+</script>
+<script>
+(function () {
+  function removeWrongSiteBanner() {
+    var el = document.getElementById("auth-wrong-site-banner");
+    if (el) el.remove();
+  }
+  removeWrongSiteBanner();
+  document.addEventListener("DOMContentLoaded", removeWrongSiteBanner);
+  window.addEventListener("pageshow", removeWrongSiteBanner);
+})();
+</script>
+<script defer src="auth-oauth-bounce.js?v=20260926-live-trading"></script>
+<title>Live Trading — BlockSpin Values (Dev)</title>
+<meta name="description" content="Live Trading — development build of BlockSpin Values." />
+<link rel="stylesheet" href="style.css?v=20260926-live-trading" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Paytone+One&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Paytone+One&display=swap" /></noscript>
+<style>#bsv-site-header { min-height: 70px; }</style>
+<script>
+(function () {
+  try {
+    var f = localStorage.getItem("bsv-font") || "default";
+    if (!f || f === "default" || f === "paytone") return;
+    var link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&family=Nunito+Sans:ital,wght@0,600;0,700;1,600&family=Oswald:wght@500;600;700&family=Poppins:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap";
+    document.head.appendChild(link);
+  } catch (e) {}
+})();
+</script>
+<script>
+(function () {
+  try {
+    var fonts = {
+      default: "system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif",
+      paytone: "'Paytone One', sans-serif",
+      nunito: "'Nunito Sans', sans-serif",
+      bebas: "'Bebas Neue', sans-serif",
+      inter: "'Inter', sans-serif",
+      roboto: "'Roboto', sans-serif",
+      poppins: "'Poppins', sans-serif",
+      oswald: "'Oswald', sans-serif"
+    };
+    var f = localStorage.getItem("bsv-font") || "default";
+    var root = document.documentElement;
+    root.style.setProperty("--bsv-site-font", fonts[f] || fonts.default);
+    if (f && f !== "default") root.setAttribute("data-bsv-font", f);
+  } catch (e) {}
+})();
+</script>
+</head>
+<body data-bsv-page="live-trading" class="live-trading-page">
+
+<div id="bsv-site-header"></div>
+
+<button type="button" class="sections-menu-toggle" id="sections-menu-toggle" aria-label="Open sections menu" aria-expanded="false" aria-controls="sections-sidebar">
+  <span class="sections-menu-toggle__bar" aria-hidden="true"></span>
+  <span class="sections-menu-toggle__bar" aria-hidden="true"></span>
+  <span class="sections-menu-toggle__bar" aria-hidden="true"></span>
+</button>
+
+<div class="menu-overlay" id="sections-menu-overlay" hidden></div>
+
+<div class="main-container">
+  <div class="sections-sidebar" id="sections-sidebar">
+    <nav class="sections-nav" id="sections-nav" aria-label="Site sections"></nav>
+  </div>
+
+  <main id="sections" class="sections live-trading-main">
+    <section class="section live-trading-section" id="live-trading" style="display:block;">
+      <div class="live-trading-gate" id="live-trading-gate">
+        <div class="live-trading-gate__card">
+          <h1 class="live-trading-gate__title" data-i18n="liveTrading.needLogin">You need to Log in</h1>
+          <p class="live-trading-gate__body" data-i18n="liveTrading.needLoginBody">To use the Live Trading feature you must login</p>
+          <button type="button" class="live-trading-gate__login-btn" id="live-trading-open-login" data-i18n="liveTrading.loginBtn">Log in</button>
+        </div>
+      </div>
+
+      <div class="live-trading-workspace" id="live-trading-workspace" hidden>
+        <!-- Trading board lands here in a later pass -->
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="live-trading-login-modal" id="live-trading-login-modal" hidden>
+  <div class="live-trading-login-modal__backdrop" id="live-trading-login-backdrop"></div>
+  <div class="live-trading-login-modal__box" role="dialog" aria-modal="true" aria-labelledby="live-trading-login-title">
+    <button type="button" class="live-trading-login-modal__close" id="live-trading-login-close" data-i18n-aria="liveTrading.close" aria-label="Close">&times;</button>
+    <h2 class="live-trading-login-modal__title" id="live-trading-login-title" data-i18n="liveTrading.loginBtn">Log in</h2>
+
+    <ol class="live-trading-steps">
+      <li class="live-trading-step" id="live-trading-step-discord" data-step="discord">
+        <div class="live-trading-step__badge" data-i18n="liveTrading.step1">Step 1</div>
+        <div class="live-trading-step__body">
+          <h3 class="live-trading-step__title" data-i18n="liveTrading.step1Title">Log in with Discord</h3>
+          <p class="live-trading-step__status" id="live-trading-discord-status"></p>
+          <button type="button" class="live-trading-step__btn live-trading-step__btn--discord" id="live-trading-discord-btn" data-i18n="liveTrading.discordBtn">Log in with Discord</button>
+        </div>
+      </li>
+      <li class="live-trading-step" id="live-trading-step-roblox" data-step="roblox">
+        <div class="live-trading-step__badge" data-i18n="liveTrading.step2">Step 2</div>
+        <div class="live-trading-step__body">
+          <h3 class="live-trading-step__title" data-i18n="liveTrading.step2Title">Log in with Roblox</h3>
+          <p class="live-trading-step__status" id="live-trading-roblox-status"></p>
+          <button type="button" class="live-trading-step__btn live-trading-step__btn--roblox" id="live-trading-roblox-btn" data-i18n="liveTrading.robloxBtn">Log in with Roblox</button>
+          <div class="live-trading-roblox-fallback" id="live-trading-roblox-fallback" hidden>
+            <p class="live-trading-roblox-fallback__hint" data-i18n="liveTrading.robloxHint">Enter your Roblox username to link your account.</p>
+            <label class="live-trading-roblox-fallback__label" for="live-trading-roblox-username">
+              <span class="visually-hidden" data-i18n="liveTrading.robloxPlaceholder">Roblox username</span>
+              <input type="text" id="live-trading-roblox-username" class="live-trading-roblox-fallback__input" maxlength="20" autocomplete="username" data-i18n-placeholder="liveTrading.robloxPlaceholder" placeholder="Roblox username" />
+            </label>
+            <button type="button" class="live-trading-step__btn live-trading-step__btn--roblox" id="live-trading-roblox-connect" data-i18n="liveTrading.robloxConnect">Connect Roblox</button>
+            <p class="live-trading-roblox-fallback__error" id="live-trading-roblox-error" hidden data-i18n="liveTrading.robloxError">Could not find that Roblox user. Check the username and try again.</p>
+          </div>
+        </div>
+      </li>
+    </ol>
+  </div>
+</div>
+
+<div id="bsv-sponsor-banner-slot" class="bsv-sponsor-banner-slot"></div>
+<div id="bsv-site-footer"></div>
+
+<script defer src="site-chrome.js?v=20260926-live-trading"></script>
+<script defer src="auth.js?v=20260926-live-trading"></script>
+<script defer src="site-i18n.js?v=20260926-live-trading"></script>
+<script defer src="site-settings.js?v=20260926-live-trading"></script>
+<script defer src="section-config.js?v=20260926-live-trading"></script>
+<script defer src="live-trading.js?v=20260926-live-trading"></script>
+</body>
+</html>
