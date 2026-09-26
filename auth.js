@@ -468,8 +468,10 @@
     var robloxBtn = document.getElementById("bsv-login-roblox-btn");
     var note = document.getElementById("bsv-login-note");
     var title = document.getElementById("bsv-login-title");
+    var robloxError = document.getElementById("bsv-login-roblox-error");
 
     if (title) title.textContent = t("auth.login", "Log In");
+    if (robloxError && !robloxError.dataset.forceShow) robloxError.hidden = true;
     if (stepDiscord) stepDiscord.classList.toggle("is-complete", !!discord);
     if (stepRoblox) {
       stepRoblox.classList.toggle("is-complete", !!roblox);
@@ -800,6 +802,7 @@
       ensureLoginModal();
       var robloxError = document.getElementById("bsv-login-roblox-error");
       if (robloxError) {
+        robloxError.dataset.forceShow = "1";
         robloxError.hidden = false;
         robloxError.textContent = t(
           "auth.robloxServerError",
