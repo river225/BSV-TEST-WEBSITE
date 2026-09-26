@@ -27,14 +27,17 @@
       if (sizes) l.setAttribute("sizes", sizes);
       document.head.appendChild(l);
     }
-    // Prefer correctly-prefixed icons on GitHub project Pages.
-    if (R !== "/") {
-      addIcon("icon", "favicon.ico", null, "any");
-      addIcon("icon", "favicon.png", "image/png", null);
-      addIcon("apple-touch-icon", "apple-touch-icon.png", null, null);
-    }
+    // Always inject site-rooted icons (avoids /favicon.ico 404 on GitHub project Pages).
+    addIcon("icon", "favicon.ico", null, "any");
+    addIcon("icon", "favicon.png", "image/png", null);
+    addIcon("apple-touch-icon", "apple-touch-icon.png", null, null);
     document.addEventListener("DOMContentLoaded", function () {
-      fixAttr('link[rel="icon"], link[rel="apple-touch-icon"], link[href^="/assets/"], a[href^="/assets/"], a[href^="/x-"], a[href^="/z-"], a[href^="/sponsors"]', "href");
+      // Drop any leftover root-absolute icon tags that would win over the good ones.
+      document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]').forEach(function (el) {
+        var v = el.getAttribute("href") || "";
+        if (v.charAt(0) === "/" && v.indexOf(R) !== 0) el.remove();
+      });
+      fixAttr('link[href^="/assets/"], a[href^="/assets/"], a[href^="/x-"], a[href^="/z-"], a[href^="/sponsors"]', "href");
       fixAttr('img[src^="/assets/"]', "src");
     });
   } catch (e) {}
@@ -154,9 +157,8 @@
 <script defer src="auth-oauth-bounce.js?v=20260712-auth-fix2"></script>
 <title>BlockSpin Values — Dev</title>
 <meta name="description" content="Development copy of BlockSpin Values — not the public site." />
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/png" href="/favicon.png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+
 <meta property="og:image" content="https://i.ibb.co/VYjk9L14/Block-Spin-Values-Logo.png">
 <meta property="og:title" content="BlockSpin Values (Dev / staging)">
 <meta property="og:description" content="Development / staging build — not the public BlockSpin Values site.">
