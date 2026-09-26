@@ -776,12 +776,27 @@
   }
 
   function postSummaryHtml(post) {
+    var wanting = post.wanting || {};
+    var name = authorDisplayName(post.author);
+    var offerLine = "";
+    if (wanting.lookingForOffers) {
+      offerLine =
+        '<p class="lt-post__summary-offer lt-post__summary-offer--lfo">' +
+        escapeHtml(name) +
+        " is accepting offers</p>";
+    } else if (wanting.notLookingForOffers) {
+      offerLine =
+        '<p class="lt-post__summary-offer lt-post__summary-offer--nlfo">' +
+        escapeHtml(name) +
+        " is not accepting offers</p>";
+    }
     return (
       '<p class="lt-post__summary-text">' +
       escapeHtml(sideTradePhrase(post.giving, "nothing")) +
       ' <strong class="lt-post__summary-for">for</strong> ' +
       escapeHtml(sideTradePhrase(post.wanting, "nothing")) +
-      "</p>"
+      "</p>" +
+      offerLine
     );
   }
 
@@ -863,13 +878,23 @@
       '" aria-label="' +
       escapeAttr(label) +
       '">' +
+      '<div class="lt-icard__art lt-icard__art--offers" aria-hidden="true">' +
       '<div class="lt-offers-badge' +
       (isLfo ? "" : " lt-offers-badge--no") +
-      '" aria-hidden="true">' +
+      '">' +
+      '<span class="lt-offers-badge__icon">' +
+      (isLfo ? "✓" : "✕") +
+      "</span>" +
       '<span class="lt-offers-badge__text">' +
       (isLfo
-        ? '<span class="lt-offers-badge__line">Accepting</span><span class="lt-offers-badge__line">offers</span>'
-        : '<span class="lt-offers-badge__line">Not accepting</span><span class="lt-offers-badge__line">offers</span>') +
+        ? '<span class="lt-offers-badge__line">Accepting</span><span class="lt-offers-badge__line lt-offers-badge__line--em">offers</span>'
+        : '<span class="lt-offers-badge__line">Not accepting</span><span class="lt-offers-badge__line lt-offers-badge__line--em">offers</span>') +
+      "</span>" +
+      "</div>" +
+      "</div>" +
+      '<div class="lt-icard__bar lt-icard__bar--offers">' +
+      '<span class="lt-icard__name">' +
+      escapeHtml(label) +
       "</span>" +
       "</div>" +
       "</div>"
