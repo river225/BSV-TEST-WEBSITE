@@ -1,6 +1,356 @@
 (function (global) {
   "use strict";
 
+  var CONSENT_KEY = "bsv-cookie-consent";
+  var GA_ID = "G-0T25993BCC";
+  // Bump this when you need every visitor to hard-refresh once (clears old SW/cache/cookies).
+  var BSV_BUILD = "20260915-tech-fix";
+  var BUILD_KEY = "bsv-build";
+  var BUILD_RELOAD_KEY = "bsv-build-reloading";
+  // Keep in sync with script.js THEMES_DISABLED — theme UI is not shipping.
+  var THEMES_DISABLED = true;
+
+  // Monetag fully removed. Strip any leftover tags/workers from older visits.
+  var MONETAG_HOST_RE =
+    /quge5\.com|5gvci\.com|omg10\.com|n6wxm\.com|nap5k\.com|tzegilo\.com|monetag|11550419|11550420|11550421|11548891|268935/i;
+  var MONETAG_TAG_IDS = ["bsv-ad-vignette", "bsv-ad-ipp", "bsv-ad-push"];
+
+  function isSponsorsPage() {
+    try {
+      if (/\/sponsors(\/|$)/i.test(location.pathname || "")) return true;
+      var body = document.body;
+      if (!body) return false;
+      return (
+        body.getAttribute("data-bsv-page") === "sponsors" ||
+        body.classList.contains("sponsors-body")
+      );
+    } catch (_) {
+      return false;
+    }
+  }
+
+  // Apply Colorized hue on every page that uses site chrome; keep /sponsors/ stock.
+  function paintSavedBackground() {
+    var root = document.documentElement;
+    if (isSponsorsPage()) {
+      root.style.setProperty("--bsv-hue", "217");
+      root.style.setProperty("--bsv-accent-hue", "188");
+      root.style.backgroundColor = "hsl(217, 41%, 10%)";
+      root.removeAttribute("data-bsv-bg");
+      root.setAttribute("data-bsv-sponsors-lock", "1");
+      return;
+    }
+    root.removeAttribute("data-bsv-sponsors-lock");
+    try {
+      var style = localStorage.getItem("bsv-bg-style") || "standard";
+      var hue = parseInt(localStorage.getItem("bsv-bg-hue") || "210", 10);
+      if (style === "colorized") {
+        if (isNaN(hue)) hue = 210;
+        hue = Math.max(0, Math.min(360, Math.round(hue)));
+        root.style.setProperty("--bsv-hue", String(hue));
+        root.style.setProperty("--bsv-accent-hue", String(hue));
+        root.style.backgroundColor = "hsl(" + hue + ", 41%, 10%)";
+        root.setAttribute("data-bsv-bg", "colorized");
+        return;
+      }
+      if (style === "dark") {
+        root.style.setProperty("--bsv-hue", "220");
+        root.style.setProperty("--bsv-accent-hue", "188");
+        root.style.backgroundColor = "hsl(220, 20%, 4%)";
+        root.setAttribute("data-bsv-bg", "dark");
+        return;
+      }
+      root.style.setProperty("--bsv-hue", "217");
+      root.style.setProperty("--bsv-accent-hue", "188");
+      root.style.backgroundColor = "hsl(217, 41%, 10%)";
+      root.removeAttribute("data-bsv-bg");
+    } catch (_) {}
+  }
+
+  paintSavedBackground();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", paintSavedBackground);
+  }
+
+  function clearSiteCookies() {
+    try {
+      var parts = document.cookie ? document.cookie.split(";") : [];
+      var host = location.hostname || "";
+      var domains = ["", host, "." + host];
+      if (host.indexOf(".") !== -1) {
+        var root = host.split(".").slice(-2).join(".");
+        domains.push(root, "." + root);
+      }
+      parts.forEach(function (part) {
+        var name = (part.split("=")[0] || "").trim();
+        if (!name) return;
+        domains.forEach(function (domain) {
+          var base = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;Max-Age=0";
+          document.cookie = domain ? base + ";domain=" + domain : base;
+          document.cookie = base + ";SameSite=Lax";
+        });
+      });
+    } catch (_) {}
+  }
+
+  function clearClientCaches() {
+    try {
+      if (window.caches && caches.keys) {
+        caches.keys().then(function (keys) {
+          keys.forEach(function (key) {
+            caches.delete(key).catch(function () {});
+          });
+        });
+      }
+    } catch (_) {}
+    try {
+      if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
+        navigator.serviceWorker.getRegistrations().then(function (regs) {
+          regs.forEach(function (reg) {
+            reg.unregister().catch(function () {});
+          });
+        });
+      }
+    } catch (_) {}
+  }
+
+  function wipeClientStateForBuild() {
+    clearSiteCookies();
+    purgeMonetagArtifacts();
+    clearClientCaches();
+    try {
+      localStorage.clear();
+    } catch (_) {}
+    try {
+      sessionStorage.clear();
+    } catch (_) {}
+  }
+
+  function stripBuildCacheBustParams() {
+    try {
+      var url = new URL(window.location.href);
+      if (!url.searchParams.has("bsv_r") && !url.searchParams.has("_")) return;
+      url.searchParams.delete("bsv_r");
+      url.searchParams.delete("_");
+      var qs = url.searchParams.toString();
+      history.replaceState(null, "", url.pathname + (qs ? "?" + qs : "") + url.hash);
+    } catch (_) {}
+  }
+
+  function forceRefreshIfNeeded() {
+    try {
+      // Remove one-time cache-bust params before analytics reads the URL.
+      stripBuildCacheBustParams();
+      var seen = localStorage.getItem(BUILD_KEY);
+      if (seen === BSV_BUILD) {
+        try {
+          sessionStorage.removeItem(BUILD_RELOAD_KEY);
+        } catch (_) {}
+        return false;
+      }
+      if (sessionStorage.getItem(BUILD_RELOAD_KEY) === BSV_BUILD) {
+        // Second pass after wipe+reload: mark build seen, keep storage clean otherwise.
+        try {
+          localStorage.clear();
+        } catch (_) {}
+        try {
+          sessionStorage.removeItem(BUILD_RELOAD_KEY);
+        } catch (_) {}
+        localStorage.setItem(BUILD_KEY, BSV_BUILD);
+        return false;
+      }
+      sessionStorage.setItem(BUILD_RELOAD_KEY, BSV_BUILD);
+      wipeClientStateForBuild();
+      try {
+        sessionStorage.setItem(BUILD_RELOAD_KEY, BSV_BUILD);
+      } catch (_) {}
+      var url = new URL(window.location.href);
+      url.searchParams.delete("bsv_r");
+      // Bypass HTTP cache on the reload itself; stripped immediately on next load.
+      url.searchParams.set("_", String(Date.now()));
+      var qs = url.searchParams.toString();
+      window.location.replace(url.pathname + (qs ? "?" + qs : "") + url.hash);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function getConsent() {
+    try {
+      return localStorage.getItem(CONSENT_KEY);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function setConsent(value) {
+    try {
+      localStorage.setItem(CONSENT_KEY, value);
+    } catch (_) {}
+  }
+
+  function hasMarketingConsent() {
+    return getConsent() === "accepted";
+  }
+
+  function purgeMonetagArtifacts() {
+    try {
+      MONETAG_TAG_IDS.forEach(function (id) {
+        var byId = document.getElementById(id);
+        if (byId) byId.remove();
+      });
+      document.querySelectorAll("script[src], iframe[src], img[src], link[href]").forEach(function (el) {
+        var url = el.src || el.href || "";
+        if (MONETAG_HOST_RE.test(url)) el.remove();
+      });
+      try {
+        delete document.documentElement.dataset.bsvSoftAds;
+      } catch (_) {
+        document.documentElement.removeAttribute("data-bsv-soft-ads");
+      }
+      try {
+        delete document.documentElement.dataset.bsvSponsorsNoAds;
+      } catch (_) {
+        document.documentElement.removeAttribute("data-bsv-sponsors-no-ads");
+      }
+    } catch (_) {}
+    unregisterMonetagServiceWorker();
+  }
+
+  function unregisterMonetagServiceWorker() {
+    try {
+      if (!navigator.serviceWorker || !navigator.serviceWorker.getRegistrations) return;
+      navigator.serviceWorker.getRegistrations().then(function (regs) {
+        regs.forEach(function (reg) {
+          var url =
+            (reg.active && reg.active.scriptURL) ||
+            (reg.installing && reg.installing.scriptURL) ||
+            (reg.waiting && reg.waiting.scriptURL) ||
+            "";
+          // Unregister leftover Monetag / Multitag workers and root sw.js.
+          if (/\/sw\.js(\?|$)/.test(url) || MONETAG_HOST_RE.test(url)) {
+            reg.unregister().catch(function () {});
+          }
+        });
+      });
+      if (navigator.serviceWorker.getRegistration) {
+        navigator.serviceWorker.getRegistration("/").then(function (reg) {
+          if (reg) reg.unregister().catch(function () {});
+        });
+      }
+    } catch (_) {}
+  }
+
+  function ensureAnalytics() {
+    try {
+      if (isDevSite()) return;
+      if (!hasMarketingConsent()) return;
+      window.dataLayer = window.dataLayer || [];
+      if (typeof window.gtag !== "function") {
+        window.gtag = function () {
+          window.dataLayer.push(arguments);
+        };
+      }
+      if (!document.querySelector('script[src*="googletagmanager.com/gtag/js?id=' + GA_ID + '"]')) {
+        var s = document.createElement("script");
+        s.async = true;
+        s.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(GA_ID);
+        document.head.appendChild(s);
+      }
+      if (document.documentElement.dataset.bsvGaConfigured !== "1") {
+        document.documentElement.dataset.bsvGaConfigured = "1";
+        window.gtag("js", new Date());
+        var pagePath = window.location.pathname || "/";
+        if (/\/index\.html$/i.test(pagePath)) {
+          pagePath = pagePath.replace(/\/index\.html$/i, "/") || "/";
+        }
+        var ignoreReferrer = false;
+        try {
+          ignoreReferrer = /bsv-bot-production\.up\.railway\.app/i.test(document.referrer || "");
+        } catch (_) {}
+        window.gtag("config", GA_ID, {
+          anonymize_ip: true,
+          send_page_view: true,
+          page_path: pagePath,
+          page_location: window.location.origin + pagePath,
+          ignore_referrer: ignoreReferrer
+        });
+      }
+    } catch (_) {}
+  }
+
+  function applyConsent(value) {
+    setConsent(value);
+    var banner = document.getElementById("bsv-consent-banner");
+    if (banner) banner.remove();
+    purgeMonetagArtifacts();
+    if (value === "accepted") {
+      ensureAnalytics();
+    }
+  }
+
+  function ensureConsentStyles() {
+    if (document.getElementById("bsv-consent-styles")) return;
+    var style = document.createElement("style");
+    style.id = "bsv-consent-styles";
+    style.textContent =
+      "#bsv-consent-banner{position:fixed;left:16px;right:16px;bottom:16px;z-index:100000;max-width:720px;margin:0 auto;padding:18px 20px;border-radius:16px;background:rgba(12,18,30,.97);border:1px solid rgba(255,255,255,.14);box-shadow:0 16px 48px rgba(0,0,0,.5);color:#e8eef8;font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;contain:layout style}" +
+      "#bsv-consent-banner p{margin:0 0 14px;color:#d5deec}" +
+      "#bsv-consent-banner a{color:#9ec1ff;text-decoration:underline}" +
+      "#bsv-consent-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}" +
+      "#bsv-consent-actions button{appearance:none;border:0;border-radius:11px;padding:11px 18px;font:600 14px/1 system-ui,-apple-system,Segoe UI,sans-serif;cursor:pointer}" +
+      "#bsv-consent-accept{background:#3b82f6;color:#fff;box-shadow:0 6px 18px rgba(59,130,246,.35)}" +
+      "#bsv-consent-accept:hover{background:#2563eb}" +
+      "#bsv-consent-reject{background:transparent;color:#8b97a8;border:1px solid rgba(255,255,255,.1);font-weight:500}" +
+      "#bsv-consent-reject:hover{color:#a8b3c4;border-color:rgba(255,255,255,.16)}" +
+      "@media (max-width:520px){#bsv-consent-banner{left:10px;right:10px;bottom:10px;padding:16px}" +
+      "#bsv-consent-actions{flex-direction:column;align-items:stretch}" +
+      "#bsv-consent-actions button{width:100%}}";
+    document.head.appendChild(style);
+  }
+
+  function showConsentBanner() {
+    if (document.getElementById("bsv-consent-banner")) return;
+    ensureConsentStyles();
+    var el = document.createElement("div");
+    el.id = "bsv-consent-banner";
+    el.setAttribute("role", "dialog");
+    el.setAttribute("aria-live", "polite");
+    el.setAttribute("aria-label", "Cookie consent");
+    el.innerHTML =
+      "<p>We use cookies to improve your experience and analyze site traffic. Read our <a href=\"/z-cookie.html\">Cookie Policy</a> to learn more.</p>" +
+      '<div id="bsv-consent-actions">' +
+      '<button type="button" id="bsv-consent-accept">Accept</button>' +
+      '<button type="button" id="bsv-consent-reject">Reject</button>' +
+      "</div>";
+    document.body.appendChild(el);
+    document.getElementById("bsv-consent-accept").addEventListener("click", function () {
+      applyConsent("accepted");
+    });
+    document.getElementById("bsv-consent-reject").addEventListener("click", function () {
+      applyConsent("rejected");
+    });
+  }
+
+  function openConsentSettings() {
+    showConsentBanner();
+  }
+
+  function initConsent() {
+    purgeMonetagArtifacts();
+    if (isDevSite()) return;
+    var choice = getConsent();
+    if (choice === "accepted") {
+      ensureAnalytics();
+      return;
+    }
+    if (choice === "rejected") {
+      return;
+    }
+    showConsentBanner();
+  }
+
   function isDevSite() {
     var html = document.documentElement;
     if (html.getAttribute("data-bsv-env") === "test") return true;
@@ -38,6 +388,119 @@
     return '<a href="' + href + '"' + cls + ">" + label + "</a>";
   }
 
+  function ensureSponsorBannerStyles() {
+    var old = document.getElementById("bsv-sponsor-banner-styles-v2");
+    if (old) old.remove();
+    var old3 = document.getElementById("bsv-sponsor-banner-styles-v3");
+    if (old3) old3.remove();
+    if (document.getElementById("bsv-sponsor-banner-styles-v4")) return;
+    var style = document.createElement("style");
+    style.id = "bsv-sponsor-banner-styles-v4";
+    style.textContent =
+      /* Sit in the content column; match .what-is-section width so it lines up with section content */
+      ".bsv-sponsor-promo{display:flex;justify-content:center;width:100%;margin:12px 0 8px;padding:0;box-sizing:border-box;position:relative;left:auto!important;transform:none!important}" +
+      ".bsv-sponsor-promo[hidden],.bsv-sponsor-promo.is-hidden{display:none!important}" +
+      ".bsv-sponsor-promo__shell{position:relative;display:block;width:100%;max-width:800px;margin:0 auto;padding:12px 0 8px;box-sizing:border-box}" +
+      ".bsv-sponsor-promo__shell::before{content:'';position:absolute;pointer-events:none;z-index:0;inset:-8% -6% -10%;border-radius:50%;background:radial-gradient(ellipse 55% 50% at 50% 45%,rgba(155,45,220,.28),rgba(155,45,220,.08) 45%,transparent 70%);filter:blur(22px);opacity:.9}" +
+      "@media (prefers-reduced-motion:reduce){.bsv-sponsor-promo__shell::before{opacity:.8}}" +
+      ".bsv-sponsor-promo__frame{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;margin:0 auto;padding:22px 20px 18px;border-radius:16px;background:linear-gradient(165deg,#16111f 0%,#120e1a 100%);border:1px solid rgba(155,45,220,.32);box-shadow:0 0 0 1px rgba(155,45,220,.08),0 14px 32px rgba(0,0,0,.4);overflow:hidden;text-align:center;box-sizing:border-box}" +
+      ".bsv-sponsor-promo__frame::before,.bsv-sponsor-promo__frame::after{content:'';position:absolute;width:42%;height:1px;pointer-events:none;opacity:.35}" +
+      ".bsv-sponsor-promo__frame::before{top:18px;left:-6%;background:linear-gradient(90deg,transparent,rgba(155,45,220,.75),transparent);transform:rotate(-28deg)}" +
+      ".bsv-sponsor-promo__frame::after{bottom:22px;right:-6%;background:linear-gradient(90deg,transparent,rgba(76,175,30,.65),transparent);transform:rotate(-28deg)}" +
+      ".bsv-sponsor-promo__logo{position:relative;z-index:1;width:72px;height:72px;object-fit:contain;display:block;margin:0 auto;image-rendering:-webkit-optimize-contrast}" +
+      ".bsv-sponsor-promo__title{position:relative;z-index:1;margin:2px 0 0;font:800 clamp(1.55rem,4.5vw,2.05rem)/1.1 Poppins,system-ui,sans-serif;letter-spacing:-.02em;color:#fff}" +
+      ".bsv-sponsor-promo__title span{color:#4caf1e}" +
+      ".bsv-sponsor-promo__sub{position:relative;z-index:1;margin:0;max-width:34rem;font:500 0.92rem/1.45 Poppins,system-ui,sans-serif;color:#c7cce0}" +
+      ".bsv-sponsor-promo__cta{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;margin-top:6px;padding:11px 26px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:linear-gradient(180deg,#62d12f 0%,#3fad1a 100%);color:#fff;font:700 0.95rem/1 Poppins,system-ui,sans-serif;letter-spacing:.03em;text-decoration:none;text-shadow:0 1px 0 rgba(0,0,0,.28);transition:transform .2s ease,filter .2s ease,border-color .2s ease;white-space:nowrap}" +
+      ".bsv-sponsor-promo__cta:hover{transform:translateY(-1px);filter:brightness(1.06);border-color:rgba(255,255,255,.3)}" +
+      ".bsv-sponsor-promo__cta:focus-visible{outline:2px solid #9B2DDC;outline-offset:3px}" +
+      ".bsv-sponsor-banner-slot{display:block;width:100%;max-width:1800px;margin:0 auto;padding:0 20px;box-sizing:border-box}" +
+      /* Values-list: banner lives inside #sections so it shares the content column */
+      "#sections > .bsv-sponsor-promo{flex:0 0 auto;width:100%;max-width:100%;padding:0;margin:8px 0 12px}" +
+      ".bsv-sponsor-banner-slot:empty{display:none}";
+    document.head.appendChild(style);
+  }
+
+  function renderSponsorBanner() {
+    return (
+      '<aside class="bsv-sponsor-promo" aria-label="Sponsorship">' +
+        '<div class="bsv-sponsor-promo__shell">' +
+          '<div class="bsv-sponsor-promo__frame">' +
+            '<img class="bsv-sponsor-promo__logo" src="/assets/bsv-logo.png" width="72" height="72" alt="" decoding="async">' +
+            '<p class="bsv-sponsor-promo__title">Work with <span>us</span></p>' +
+            '<p class="bsv-sponsor-promo__sub">Sponsor slots are open. Get your brand in front of 12,700+ active traders every month.</p>' +
+            '<a class="bsv-sponsor-promo__cta" href="/sponsors/">Work with us</a>' +
+          "</div>" +
+        "</div>" +
+      "</aside>"
+    );
+  }
+
+  // Pin the banner under the Home section only (not Rare / Legendary / etc.).
+  function alignSponsorBannerToHomeContent() {
+    var promo = document.querySelector(".bsv-sponsor-promo");
+    if (!promo) return;
+    promo.style.left = "";
+    promo.style.transform = "";
+
+    // body.is-home is toggled by showSection — do not use data-bsv-page (always "home").
+    var onHome = document.body.classList.contains("is-home");
+
+    if (!onHome) {
+      promo.hidden = true;
+      promo.classList.add("is-hidden");
+      return;
+    }
+    promo.hidden = false;
+    promo.classList.remove("is-hidden");
+
+    var sections = document.querySelector(".main-container > #sections");
+    var home = document.getElementById("home");
+    if (sections && home) {
+      if (home.nextSibling !== promo) {
+        sections.insertBefore(promo, home.nextSibling);
+      }
+      return;
+    }
+
+    var slot = document.getElementById("bsv-sponsor-banner-slot");
+    if (slot && promo.parentElement !== slot) {
+      slot.appendChild(promo);
+    }
+  }
+
+  function placeSponsorBanner(activePage) {
+    // Homepage only. Sponsors has its own hero CTA; other pages should stay clean.
+    var existing = document.querySelector(".bsv-sponsor-promo");
+    if (activePage !== "home") {
+      if (existing) existing.remove();
+      return;
+    }
+    ensureSponsorBannerStyles();
+    if (existing) existing.remove();
+
+    var wrap = document.createElement("div");
+    wrap.innerHTML = renderSponsorBanner();
+    var el = wrap.firstElementChild;
+    if (!el) return;
+
+    var sections = document.querySelector(".main-container > #sections");
+    var home = document.getElementById("home");
+    if (sections && home) {
+      sections.insertBefore(el, home.nextSibling);
+      return;
+    }
+    if (sections) {
+      sections.appendChild(el);
+      return;
+    }
+
+    var slot = document.getElementById("bsv-sponsor-banner-slot");
+    if (slot) {
+      slot.appendChild(el);
+    }
+  }
+
   function headerSearch() {
     return (
       '<div class="search-container is-hidden" id="header-search">' +
@@ -54,11 +517,24 @@
     );
   }
 
+  function navTools() {
+    return (
+      '<div class="nav-tools" id="nav-tools">' +
+        '<button type="button" class="nav-settings-btn" id="nav-settings-btn" aria-label="Settings" aria-expanded="false" title="Settings">' +
+          '<svg class="nav-settings-btn__icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' +
+            '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>' +
+            '<circle cx="12" cy="12" r="3"/>' +
+          '</svg>' +
+        '</button>' +
+      '</div>'
+    );
+  }
+
   function renderHeader(activePage) {
     var dev = isDevSite();
-    var login = dev ? '<div class="nav-login" id="nav-login"></div>' : "";
     var isHome = activePage === "home";
-    var brandHref = isHome ? "#" : "index.html";
+    var login = (dev || isHome) ? '<div class="nav-login" id="nav-login"></div>' : "";
+    var brandHref = isHome ? "#" : "/";
     var brandOnclick = isHome ? ' onclick="showSection(\'Home\'); return false;"' : "";
     var search = isHome ? headerSearch() : "";
     return (
@@ -67,16 +543,18 @@
           '<div class="nav-container-full">' +
             '<div class="nav-left">' +
               '<a href="' + brandHref + '" class="nav-brand"' + brandOnclick + ">" +
-                '<img src="https://i.ibb.co/VYjk9L14/Block-Spin-Values-Logo.png" alt="BlockSpin Values Logo" class="nav-logo-img">' +
+                '<img src="/assets/bsv-logo.png" alt="BlockSpin Values Logo" class="nav-logo-img" width="60" height="60" decoding="async">' +
                 '<span class="nav-title">Block<span class="brand-spin">Spin</span> Values</span>' +
               "</a>" +
-              navLink("x-about.html", "About Us", activePage, "about") +
-              navLink("x-faq.html", "FAQ", activePage, "faq") +
+              navLink("/x-about.html", "About Us", activePage, "about") +
+              navLink("/sponsors/", "Sponsors", activePage, "sponsors") +
+              navLink("/x-faq.html", "FAQ", activePage, "faq") +
             "</div>" +
             search +
             '<div class="nav-right">' +
-              themeSwitcher() +
+              (THEMES_DISABLED ? "" : themeSwitcher()) +
               SOCIAL +
+              (isHome ? '<span class="nav-right-divider" aria-hidden="true"></span>' + navTools() : '') +
               login +
             "</div>" +
           "</div>" +
@@ -84,11 +562,13 @@
       "</header>" +
       '<div class="site-mobile-below-header">' +
         '<nav class="header-subnav" aria-label="Site pages">' +
-          navLink("x-about.html", "About Us", activePage, "about") +
+          navLink("/x-about.html", "About Us", activePage, "about") +
           '<span class="header-subnav__sep" aria-hidden="true">·</span>' +
-          navLink("x-faq.html", "FAQ", activePage, "faq") +
+          navLink("/sponsors/", "Sponsors", activePage, "sponsors") +
+          '<span class="header-subnav__sep" aria-hidden="true">·</span>' +
+          navLink("/x-faq.html", "FAQ", activePage, "faq") +
         "</nav>" +
-        '<div class="nav-mobile-toolbar" aria-label="Mobile shortcuts"></div>' +
+        '<div class="nav-mobile-toolbar' + (isHome ? ' is-active' : '') + '" aria-label="Mobile shortcuts"></div>' +
       "</div>"
     );
   }
@@ -99,9 +579,9 @@
         '<div class="footer-side-nav__group" aria-label="Contact">' +
           '<p class="footer-side-nav__title">Contact</p>' +
           '<ul class="footer-side-nav__list">' +
-            '<li><a class="footer-side-nav__link" href="mailto:riverytacc11@gmail.com">' +
-              '<svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>' +
-              "<span>Email</span></a></li>" +
+            '<li><a class="footer-side-nav__link" href="/z-contact.html">' +
+              '<svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/></svg>' +
+              "<span>Contact</span></a></li>" +
             '<li><a class="footer-side-nav__link" href="https://discord.gg/blockspinvalues" target="_blank" rel="noopener noreferrer">' +
               '<svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.445.865-.608 1.25-1.845-.276-3.68-.276-5.487 0-.164-.393-.406-.874-.618-1.25a.077.077 0 0 0-.078-.037 19.736 19.736 0 0 0-4.885 1.515.07.07 0 0 0-.032.028C.533 9.046-.319 13.58.099 18.058a.082.082 0 0 0 .031.056c2.053 1.508 4.041 2.423 5.993 3.029a.078.078 0 0 0 .084-.028c.462-.63.873-1.295 1.226-1.994a.076.076 0 0 0-.042-.106c-.653-.248-1.274-.55-1.872-.892a.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.099.246.198.373.292a.077.077 0 0 1-.007.128 12.299 12.299 0 0 1-1.873.891.077.077 0 0 0-.041.107c.36.698.772 1.363 1.225 1.993a.076.076 0 0 0 .084.028c1.961-.607 3.95-1.522 6.002-3.029a.077.077 0 0 0 .031-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.029zM8.02 15.331c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.211 0 2.176 1.095 2.157 2.419 0 1.333-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.211 0 2.176 1.095 2.157 2.419 0 1.333-.946 2.419-2.157 2.419z"/></svg>' +
               "<span>Discord</span></a></li>" +
@@ -110,28 +590,32 @@
         '<div class="footer-side-nav__group" aria-label="Legal">' +
           '<p class="footer-side-nav__title">Legal</p>' +
           '<ul class="footer-side-nav__list">' +
-            '<li><a class="footer-side-nav__link" href="z-terms.html">' +
+            '<li><a class="footer-side-nav__link" href="/z-terms.html">' +
               '<svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>' +
               "<span>Terms of Service</span></a></li>" +
-            '<li><a class="footer-side-nav__link" href="z-privacy.html">' +
+            '<li><a class="footer-side-nav__link" href="/z-privacy.html">' +
               '<svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 6h2v2h-2V7zm0 4h2v6h-2v-6z"/></svg>' +
               "<span>Privacy Policy</span></a></li>" +
+            '<li><a class="footer-side-nav__link" href="/z-cookie.html">' +
+              '<svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6zm5 4h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>' +
+              "<span>Cookie Policy</span></a></li>" +
           "</ul>" +
         "</div>" +
       "</div>"
     );
   }
 
-  function renderFooter() {
+  function renderFooter(activePage) {
     var copy = "© 2026 BlockSpin Values";
+    // Boosters sit above the footer element so they are not on the footer background.
     return (
+      '<section class="footer-boosters" id="footer-boosters" aria-label="Current Discord boosters" hidden>' +
+        '<h3 class="footer-boosters-title">Special Thanks to our Discord Server Boosters</h3>' +
+        '<div class="footer-boosters-viewport">' +
+          '<div class="footer-boosters-track" id="footer-boosters-track"></div>' +
+        "</div>" +
+      "</section>" +
       '<footer class="site-footer">' +
-        '<section class="footer-boosters" id="footer-boosters" aria-label="Current Discord boosters" hidden>' +
-          '<h3 class="footer-boosters-title">Special Thanks to our Discord Server Boosters</h3>' +
-          '<div class="footer-boosters-viewport">' +
-            '<div class="footer-boosters-track" id="footer-boosters-track"></div>' +
-          "</div>" +
-        "</section>" +
         '<div class="footer-content">' +
           "<p>" + copy + "</p>" +
         "</div>" +
@@ -174,21 +658,160 @@
   }
 
   function mount(activePage) {
+    if (THEMES_DISABLED) {
+      try {
+        document.body.classList.add("themes-disabled");
+        document.body.removeAttribute("data-theme");
+      } catch (_) {}
+    }
     var headerMount = document.getElementById("bsv-site-header");
     var footerMount = document.getElementById("bsv-site-footer");
     if (headerMount) headerMount.outerHTML = renderHeader(activePage || "");
-    if (footerMount) footerMount.innerHTML = renderFooter();
+    if (footerMount) footerMount.innerHTML = renderFooter(activePage || "");
+    placeSponsorBanner(activePage || "");
     var boostersSlot = document.getElementById("bsv-discord-boosters-slot");
     var boosters = document.getElementById("footer-boosters");
     if (boostersSlot && boosters) boostersSlot.appendChild(boosters);
     initMobileHeaderToolbar();
+    initConsent();
+    initFooterBoostersLazy();
+  }
+
+  function shrinkDiscordAvatarUrl(url) {
+    try {
+      var u = new URL(String(url || ""), window.location.origin);
+      if (!/cdn\.discordapp\.com|media\.discordapp\.net/i.test(u.hostname)) return String(url || "");
+      // Animated GIF avatars are often 100–700KB; force a tiny static still.
+      u.pathname = u.pathname.replace(/\.gif$/i, ".webp");
+      if (/\/avatars\//i.test(u.pathname) && !/\.[a-z0-9]+$/i.test(u.pathname)) {
+        u.pathname += ".webp";
+      }
+      u.searchParams.set("size", "32");
+      return u.toString();
+    } catch (_) {
+      return String(url || "");
+    }
+  }
+
+  function escapeBoostHtml(str) {
+    return String(str || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function initFooterBoostersLazy() {
+    var footer = document.getElementById("footer-boosters");
+    var track = document.getElementById("footer-boosters-track");
+    if (!footer || !track || footer.dataset.bsvBoostersInit === "1") return;
+    footer.dataset.bsvBoostersInit = "1";
+
+    var apiBase =
+      (typeof window.bsvBotApiUrl === "function" && window.bsvBotApiUrl("api/boosters")) ||
+      "https://bsv-bot-production.up.railway.app/api/boosters";
+
+    function renderBoosters(boosters) {
+      if (!boosters.length) return;
+      var html = boosters
+        .map(function (b) {
+          var name = escapeBoostHtml(b && b.name ? b.name : "Unknown");
+          var avatar = escapeBoostHtml(shrinkDiscordAvatarUrl(b && b.avatarUrl));
+          return (
+            '<article class="footer-booster-card" aria-label="' +
+            name +
+            '">' +
+            '<img src="' +
+            avatar +
+            '" alt="" width="23" height="23" loading="lazy" decoding="async" fetchpriority="low" />' +
+            "<span>" +
+            name +
+            "</span></article>"
+          );
+        })
+        .join("");
+      // Second copy for marquee; browser cache means no extra network after first paint.
+      track.innerHTML = html + html;
+      footer.hidden = false;
+    }
+
+    function load() {
+      if (footer.dataset.bsvBoostersLoaded === "1") return;
+      footer.dataset.bsvBoostersLoaded = "1";
+      fetch(apiBase, { cache: "default" })
+        .then(function (res) {
+          if (!res.ok) throw new Error("boosters " + res.status);
+          return res.json();
+        })
+        .then(function (data) {
+          var list = Array.isArray(data && data.boosters) ? data.boosters : [];
+          renderBoosters(list);
+        })
+        .catch(function () {
+          // Allow a later retry (e.g. after nav) if the first fetch fails.
+          delete footer.dataset.bsvBoostersLoaded;
+        });
+    }
+
+    function scheduleLoad() {
+      if (footer.dataset.bsvBoostersScheduled === "1") return;
+      footer.dataset.bsvBoostersScheduled = "1";
+      // Small idle defer so LCP still wins, but do not depend on intersecting a
+      // [hidden] node (display:none never intersects → boosters never appeared).
+      if (typeof requestIdleCallback === "function") {
+        requestIdleCallback(function () { setTimeout(load, 400); }, { timeout: 2000 });
+      } else {
+        setTimeout(load, 1200);
+      }
+    }
+
+    // Observe a visible footer sentinel — #footer-boosters starts hidden.
+    var observeTarget =
+      document.querySelector(".site-footer") ||
+      document.getElementById("bsv-site-footer") ||
+      footer.parentElement ||
+      footer;
+
+    if ("IntersectionObserver" in window && observeTarget) {
+      var io = new IntersectionObserver(
+        function (entries) {
+          for (var i = 0; i < entries.length; i++) {
+            if (entries[i].isIntersecting) {
+              io.disconnect();
+              scheduleLoad();
+              break;
+            }
+          }
+        },
+        { rootMargin: "240px 0px" }
+      );
+      io.observe(observeTarget);
+      // Safety net if the sentinel never intersects (short pages / odd layout).
+      setTimeout(scheduleLoad, 6000);
+    } else {
+      scheduleLoad();
+    }
   }
 
   function autoMount() {
     var page = document.body.getAttribute("data-bsv-page") || "";
     if (document.getElementById("bsv-site-header") || document.getElementById("bsv-site-footer")) {
       mount(page);
+    } else {
+      initConsent();
     }
+    var cookieSettings = document.getElementById("bsv-cookie-settings");
+    if (cookieSettings && !cookieSettings.dataset.bsvBound) {
+      cookieSettings.dataset.bsvBound = "1";
+      cookieSettings.addEventListener("click", function (e) {
+        e.preventDefault();
+        openConsentSettings();
+      });
+    }
+  }
+
+  if (forceRefreshIfNeeded()) {
+    return;
   }
 
   if (document.readyState === "loading") {
@@ -197,7 +820,15 @@
     autoMount();
   }
 
+  window.addEventListener("resize", function () {
+    alignSponsorBannerToHomeContent();
+  });
+
   global.bsvMountSiteChrome = mount;
   global.bsvInitMobileHeaderToolbar = initMobileHeaderToolbar;
   global.initMobileHeaderToolbar = initMobileHeaderToolbar;
+  global.bsvHasMarketingConsent = hasMarketingConsent;
+  global.bsvOpenCookieSettings = openConsentSettings;
+  global.bsvPlaceSponsorBanner = placeSponsorBanner;
+  global.bsvAlignSponsorBanner = alignSponsorBannerToHomeContent;
 })(typeof window !== "undefined" ? window : globalThis);

@@ -1,7 +1,7 @@
-const SPREADSHEET_ID = "1rhptMcfWB2I-x3i9TNMwePcDD9SWWwGsaLwELqxCKzo";
+const SPREADSHEET_ID = "1vAm9x7c5JPxpHxDHVcDgQifXsAvW9iW2wPVuQLENiYs";
 const SECTION_NAMES = typeof getSectionTitles === "function" ? getSectionTitles() : [];
 
-const GA_MEASUREMENT_ID = "G-XXXXXXXXXX";
+const GA_MEASUREMENT_ID = "G-0T25993BCC";
 const ACCESSORIES_SECTION_NAME = "Untradeable Items";
 const RICHEST_SECTION_NAME = "💰 Richest Players";
 const MONEY_GAME_GUIDE_SECTION = "Money & Game Guide";
@@ -56,6 +56,9 @@ const FISH_WEIGHT_STEP = 0.1;
 
 const GIVEAWAY_CAROUSEL_INTERVAL_MS = 10000;
 const DISCORD_CARD_CAROUSEL_INTERVAL_MS = 9000;
+const ANACONDA_GIVEAWAY_IMAGE_URL = "https://i.ibb.co/QqD6BSd/j-Sn2mv-Y-1-removebg-preview.png";
+const ANACONDA_GIVEAWAY_DISCORD_URL = "https://discord.gg/nKKkXyqCsv";
+const BSV_LOGO_URL = "https://i.ibb.co/VYjk9L14/Block-Spin-Values-Logo.png";
 const ROBUX_GIVEAWAY_IMAGE_URL = "https://i.ibb.co/7fC16qY/Screenshot-2026-05-06-at-02-28-05-removebg-preview.png";
 const ROBUX_GIVEAWAY_DISCORD_URL = "https://discord.gg/GufVWmACAh";
 const FISHING_GUIDE_FOOTER_IMAGE_URL = "https://i.ibb.co/pvBhZgf5/no-Filter-7-removebg-preview.png";
@@ -97,8 +100,32 @@ if (typeof window !== "undefined") {
 
 const DISCORD_JOIN_NUDGE_DELAY_MS = 45000;
 const DISCORD_JOIN_NUDGE_STORAGE_KEY = "bsv-discord-nudge-dismissed";
-const ROBUX_GIVEAWAY_SECTION_TITLES = new Set(["Common / Uncommon", "Rare", "Epic", "Omega", "Misc"]);
-const bannerVisibility = { humvee: false, robux: false };
+const ROBUX_GIVEAWAY_SECTION_TITLES = new Set([
+  "Common / Uncommon",
+  "Rare",
+  "Epic",
+  "Legendary",
+  "Omega",
+  "Vehicles"
+]);
+const GIVEAWAY_CONFIG_SPREADSHEET_ID = "1hjj8Pd21KOhI9bjUz4-UupADhJzksATcVDJfo186GFk";
+const GIVEAWAYS_SHEET_NAME = "Giveaways";
+const BANNERS_SHEET_NAME = "banner";
+const CONTENT_SHEET_NAME = "content";
+const TRUE_REGEX = /^(yes|true|1|on|y)$/i;
+const FALSE_REGEX = /^(no|false|0|off|n)$/i;
+const giveawayItems = new Set();
+const bannerVisibility = { anaconda: false, firework: false, legendary: true, humvee: false, robux: false };
+const sectionContentEmbeds = new Map();
+const CONTENT_SECTIONS = [
+  "Common / Uncommon",
+  "Rare",
+  "Epic",
+  "Legendary",
+  "Omega",
+  "Misc",
+  "Vehicles"
+];
 
 function isBsvTestEnvironment() {
   if (document.documentElement && document.documentElement.dataset.bsvEnv === "test") return true;
@@ -120,23 +147,32 @@ function i18nSection(title) {
 }
 
 var _renderedSectionCache = [];
+var _sectionsDomReady = Object.create(null);
+var _pendingSectionName = null;
 var _activeSectionName = "Home";
 
 function shouldShowGiveawayCarousel() {
   return false;
 }
 
-function applyStripGiveawayBannerVisibility() {
-  var show = shouldShowGiveawayCarousel() ? "block" : "none";
+function applyExternalBannerVisibility() {
+  var anacondaEl = document.getElementById("omega-anaconda-banner");
+  var fireworkEl = document.getElementById("epic-firework-banner");
+  var legendaryEl = document.getElementById("legendary-daily-giveaway-banner");
+  var carouselOn = shouldShowGiveawayCarousel() ? "block" : "none";
+  if (anacondaEl) anacondaEl.style.display = bannerVisibility.anaconda ? "flex" : "none";
+  if (fireworkEl) fireworkEl.style.display = bannerVisibility.firework ? "flex" : "none";
+  if (legendaryEl) legendaryEl.style.display = bannerVisibility.legendary ? "flex" : "none";
   document.querySelectorAll(".giveaway-strip-carousel").forEach(function (el) {
-    el.style.display = show;
+    el.style.display = carouselOn;
   });
 }
 
-function initGiveawayBannerCarousels() {
-  if (typeof window !== "undefined" && window.__giveawayCarouselInit) return;
-  if (typeof window !== "undefined") window.__giveawayCarouselInit = true;
+function applyStripGiveawayBannerVisibility() {
+  applyExternalBannerVisibility();
+}
 
+function initGiveawayBannerCarousels() {
   document.querySelectorAll(".giveaway-strip-carousel[data-rotate='1']").forEach(function (carousel) {
     if (carousel.dataset.carouselReady === "1") return;
     carousel.dataset.carouselReady = "1";
@@ -153,43 +189,92 @@ function initGiveawayBannerCarousels() {
   });
 }
 
-function buildGiveawayEndsSoonBadgeHtml() {
-  return `<span class="giveaway-ends-soon-badge">Ends Soon!</span>`;
+function buildHomeAnacondaBannerHtml() {
+  var img = escapeAttr(ANACONDA_GIVEAWAY_IMAGE_URL);
+  var href = escapeAttr(ANACONDA_GIVEAWAY_DISCORD_URL);
+  return (
+    '<article class="home-anaconda-banner" role="complementary" aria-label="Anaconda Giveaway">' +
+      '<div class="home-anaconda-banner__haze" aria-hidden="true"></div>' +
+      '<div class="home-anaconda-banner__scan" aria-hidden="true"></div>' +
+      '<div class="home-anaconda-banner__orb home-anaconda-banner__orb--a" aria-hidden="true"></div>' +
+      '<div class="home-anaconda-banner__orb home-anaconda-banner__orb--b" aria-hidden="true"></div>' +
+      '<div class="home-anaconda-banner__sparks" aria-hidden="true">' +
+        '<span></span><span></span><span></span><span></span>' +
+      "</div>" +
+      '<div class="home-anaconda-banner__inner">' +
+        '<span class="home-anaconda-banner__urgency">Ends Very Soon!</span>' +
+        '<div class="home-anaconda-banner__stage">' +
+          '<span class="home-anaconda-banner__ring" aria-hidden="true"></span>' +
+          '<span class="home-anaconda-banner__pedestal" aria-hidden="true"></span>' +
+          '<img src="' + img + '" alt="Anaconda" class="home-anaconda-banner__gun" width="280" height="170" loading="lazy" decoding="async">' +
+        "</div>" +
+        '<div class="home-anaconda-banner__copy">' +
+          '<p class="home-anaconda-banner__eyebrow">Omega Giveaway</p>' +
+          '<h3 class="home-anaconda-banner__title">Anaconda Giveaway</h3>' +
+          '<p class="home-anaconda-banner__hook">Join our discord server to enter!</p>' +
+        "</div>" +
+        '<a href="' + href + '" target="_blank" rel="noopener noreferrer" class="home-anaconda-banner__cta">Enter Now <span aria-hidden="true">→</span></a>' +
+      "</div>" +
+    "</article>"
+  );
 }
 
-function buildRobuxStripSlideHtml() {
-  var img = escapeAttr(ROBUX_GIVEAWAY_IMAGE_URL);
-  var href = escapeAttr(ROBUX_GIVEAWAY_DISCORD_URL);
-  return `
-        ${buildGiveawayEndsSoonBadgeHtml()}
-        <div class="robux-banner-figure">
-          <img src="${img}" alt="5,000 Robux giveaway prize" class="robux-banner-prize-image" loading="lazy" decoding="async" />
-        </div>
-        <div class="robux-banner-body">
-          <p class="legendary-banner-text humvee-banner-copy humvee-banner-copy--stack">
-            <span class="humvee-banner-title">5,000 Robux Giveaway!</span>
-          </p>
-          <div class="legendary-banner-right humvee-banner-actions">
-            <a href="${href}" target="_blank" rel="noopener" class="legendary-banner-btn humvee-banner-btn-holo robux-banner-btn-holo">Enter Giveaway</a>
-          </div>
-        </div>
-        <div class="giveaway-strip-side-spacer" aria-hidden="true"></div>`;
+function buildHomeRobuxBannerHtml() {
+  var href = escapeAttr(BSV_DISCORD_INVITE_URL);
+  return (
+    '<article class="home-robux-banner home-robux-banner--birthday" role="complementary" aria-label="BlockSpin Values 1 Year Birthday — 10K Robux Giveaway">' +
+      '<div class="home-robux-banner__stars" aria-hidden="true"></div>' +
+      '<div class="home-robux-banner__nebula" aria-hidden="true"></div>' +
+      '<div class="home-robux-banner__confetti" aria-hidden="true">' +
+        "<span></span><span></span><span></span><span></span><span></span><span></span>" +
+      "</div>" +
+      '<div class="home-robux-banner__inner">' +
+        '<span class="home-robux-banner__urgency">Happy 1 Year</span>' +
+        '<div class="home-robux-banner__copy">' +
+          '<p class="home-robux-banner__eyebrow">BlockSpin Values Birthday</p>' +
+          '<p class="home-robux-banner__amount">10,000 Robux</p>' +
+          '<h3 class="home-robux-banner__title">Birthday Giveaway</h3>' +
+          '<p class="home-robux-banner__hook">Celebrating one year with the community — join Discord to enter!</p>' +
+        "</div>" +
+        '<a href="' + href + '" target="_blank" rel="noopener noreferrer" class="home-robux-banner__cta">Enter Now <span aria-hidden="true">→</span></a>' +
+      "</div>" +
+    "</article>"
+  );
 }
 
-function buildRotatingGiveawayCarouselHtml(bannerId) {
-  var id = escapeAttr(bannerId);
-  return `
-      <div class="giveaway-strip-carousel" id="${id}" data-rotate="1" style="display: none;" aria-live="polite">
-        <div class="giveaway-strip-carousel__viewport">
-          <article class="giveaway-strip-carousel__slide legendary-banner giveaway-banner--robux giveaway-banner--robux-strip is-active" data-slide="robux" aria-hidden="false">
-            ${buildRobuxStripSlideHtml()}
-          </article>
-        </div>
-      </div>`;
+function buildSectionRobuxSlotHtml(title) {
+  if (!ROBUX_GIVEAWAY_SECTION_TITLES.has(title)) return "";
+  return (
+    '<div class="section-robux-slot section-robux-slot--birthday" aria-label="Birthday giveaway">' +
+      buildHomeRobuxBannerHtml() +
+    "</div>"
+  );
+}
+
+function initHomeHeroBannerCarousel() {
+  document.querySelectorAll(".home-hero-banner-carousel[data-rotate='1']").forEach(function (carousel) {
+    if (carousel.dataset.carouselReady === "1") return;
+    carousel.dataset.carouselReady = "1";
+    var slides = carousel.querySelectorAll(".home-hero-banner-carousel__slide");
+    if (slides.length < 2) return;
+    var idx = 0;
+    setInterval(function () {
+      slides[idx].classList.remove("is-active");
+      slides[idx].setAttribute("aria-hidden", "true");
+      idx = (idx + 1) % slides.length;
+      slides[idx].classList.add("is-active");
+      slides[idx].setAttribute("aria-hidden", "false");
+    }, GIVEAWAY_CAROUSEL_INTERVAL_MS);
+  });
 }
 
 function buildHumveeGiveawayBannerHtml(bannerId) {
   return "";
+}
+
+function mountHomeGiveawayCarousel() {
+  var homeHumveeWrap = document.querySelector(".home-humvee-banner-wrap");
+  if (homeHumveeWrap) homeHumveeWrap.innerHTML = "";
 }
 
 function getDiscordPromoSectionCopy(sectionTitle) {
@@ -418,13 +503,21 @@ function mountHomeDiscordPromo() {
   slot.outerHTML =
     '<div class="home-hero-row">' +
       '<div class="home-hero-row__banner">' +
-        '<div class="home-discord-promo-slot">' +
-          buildDiscordPromoBannerHtml(false) +
+        '<div class="home-hero-banner-carousel" data-rotate="1" aria-live="polite">' +
+          '<div class="home-hero-banner-carousel__viewport">' +
+            '<div class="home-hero-banner-carousel__slide is-active" data-slide="discord" aria-hidden="false">' +
+              buildDiscordPromoBannerHtml(false) +
+            "</div>" +
+            '<div class="home-hero-banner-carousel__slide" data-slide="robux" aria-hidden="true">' +
+              buildHomeRobuxBannerHtml() +
+            "</div>" +
+          "</div>" +
         "</div>" +
       "</div>" +
       '<div class="home-hero-row__stats" id="home-site-stats-slot"></div>' +
     "</div>";
   mountHomeSiteStats();
+  initHomeHeroBannerCarousel();
 }
 
 function mountHomeSiteStats() {
@@ -592,23 +685,107 @@ function buildRobuxGiveawayBannerHtml(bannerId) {
   return "";
 }
 
-function initAnalytics() {
-  if (!GA_MEASUREMENT_ID || GA_MEASUREMENT_ID === "G-XXXXXXXXXX") return;
-  if (typeof window.gtag === "function") return;
-  window.dataLayer = window.dataLayer || [];
-  window.gtag = function() { window.dataLayer.push(arguments); };
-  window.gtag("js", new Date());
-  window.gtag("config", GA_MEASUREMENT_ID);
+function normalizeSectionNameForAnalytics(sectionName) {
+  var name = sectionName || "Home";
+  if (name === "Untradable Items") return ACCESSORIES_SECTION_NAME;
+  if (name === "Richest Players" || name === "richest-players") return "💰 Richest Players";
+  return name;
+}
 
-  var gaScript = document.createElement("script");
-  gaScript.async = true;
-  gaScript.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(GA_MEASUREMENT_ID);
-  document.head.appendChild(gaScript);
+function cleanAnalyticsPagePath() {
+  var path = window.location.pathname || "/";
+  if (/\/index\.html$/i.test(path)) path = path.replace(/\/index\.html$/i, "/") || "/";
+  return path;
+}
+
+function shouldIgnoreAnalyticsReferrer() {
+  try {
+    return /bsv-bot-production\.up\.railway\.app/i.test(document.referrer || "");
+  } catch (_) {
+    return false;
+  }
+}
+
+function initAnalytics() {
+  if (isBsvTestEnvironment()) return;
+  if (!GA_MEASUREMENT_ID || GA_MEASUREMENT_ID === "G-XXXXXXXXXX") return;
+  if (typeof window.bsvHasMarketingConsent === "function" && !window.bsvHasMarketingConsent()) {
+    return;
+  }
+  // If consent helper is not ready yet, wait for site-chrome to gate loading.
+  try {
+    if (localStorage.getItem("bsv-cookie-consent") !== "accepted") return;
+  } catch (_) {
+    return;
+  }
+
+  window.dataLayer = window.dataLayer || [];
+  if (typeof window.gtag !== "function") {
+    window.gtag = function () {
+      window.dataLayer.push(arguments);
+    };
+  }
+
+  // Avoid double-loading the GA library if consent already added it.
+  var alreadyLoaded = !!document.querySelector(
+    'script[src*="googletagmanager.com/gtag/js?id=' + GA_MEASUREMENT_ID + '"]'
+  );
+  if (!alreadyLoaded) {
+    var gaScript = document.createElement("script");
+    gaScript.async = true;
+    gaScript.src =
+      "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(GA_MEASUREMENT_ID);
+    document.head.appendChild(gaScript);
+  }
+
+  if (document.documentElement.dataset.bsvGaConfigured === "1") return;
+  document.documentElement.dataset.bsvGaConfigured = "1";
+  window.gtag("js", new Date());
+  var pagePath = cleanAnalyticsPagePath();
+  window.gtag("config", GA_MEASUREMENT_ID, {
+    anonymize_ip: true,
+    send_page_view: true,
+    page_path: pagePath,
+    page_location: window.location.origin + pagePath,
+    ignore_referrer: shouldIgnoreAnalyticsReferrer()
+  });
 }
 
 function trackEvent(name, params) {
   if (typeof window.gtag !== "function") return;
   window.gtag("event", name, params || {});
+}
+
+function trackSectionPageView(sectionName) {
+  if (typeof window.gtag !== "function") return;
+  var normalized = normalizeSectionNameForAnalytics(sectionName);
+  // Keep section_name on subsequent auto events in this page lifecycle.
+  window.gtag("set", { section_name: normalized });
+
+  // Initial Home page_view already fires from gtag config; only send view_section once.
+  if (
+    normalized === "Home" &&
+    document.documentElement.dataset.bsvGaHomePv !== "1"
+  ) {
+    document.documentElement.dataset.bsvGaHomePv = "1";
+    trackEvent("view_section", { section_name: "Home" });
+    return;
+  }
+  document.documentElement.dataset.bsvGaHomePv = "1";
+
+  var path = cleanAnalyticsPagePath();
+  try {
+    if (normalized && normalized !== "Home") {
+      path = (path.split("#")[0] || "/") + "#sec=" + encodeURIComponent(normalized);
+    }
+  } catch (_) {}
+  window.gtag("event", "page_view", {
+    page_title: normalized ? "BlockSpin Values — " + normalized : "BlockSpin Values",
+    page_path: path,
+    page_location: window.location.origin + path,
+    section_name: normalized
+  });
+  trackEvent("view_section", { section_name: normalized });
 }
 
 function setupDiscordClickTracking() {
@@ -677,9 +854,10 @@ function initDiscordJoinNudge() {
   }, DISCORD_JOIN_NUDGE_DELAY_MS);
 }
 
-const TAX_RECEIVE_RATIO = 29091 / 40000;
-const TAX_MAX_DROP = 40000;
-const TAX_RECEIVE_PER_40K = 29091;
+// Verified in-game: dropping $60,000 gives $43,636 after tax.
+const TAX_MAX_DROP = 60000;
+const TAX_RECEIVE_PER_MAX_DROP = 43636;
+const TAX_RECEIVE_RATIO = TAX_RECEIVE_PER_MAX_DROP / TAX_MAX_DROP;
 
 function formatNetWorth(value) {
   const cleanValue = String(value).replace(/[$,]/g, '');
@@ -733,7 +911,6 @@ function getRichestPlayerFields(player, index) {
     rankTier: getRankTierClass(rank),
     rankClass: String(rank).length >= 3 ? "rank-long" : "",
     playerName: playerName,
-    level: player["Level"] || "N/A",
     worth: formatNetWorth(player["Networth"] || player["Net Worth"] || 0),
     profileUrl: "https://www.roblox.com/search/users?keyword=" + encodeURIComponent(playerName)
   };
@@ -765,9 +942,6 @@ function buildRichestPlayerCard(player, index) {
     '<div class="player-name">' +
     escapeHtml(p.playerName) +
     "</div>" +
-    '<div class="player-level"><span class="player-level-label">' + escapeHtml(i18n("richest.level") + ": ") + '</span><span class="player-level-value">' +
-    escapeHtml(p.level) +
-    "</span></div>" +
     '<div class="player-worth"><span class="player-worth-label">' + escapeHtml(i18n("richest.netWorth") + ": ") + '</span>' +
     escapeHtml(p.worth) +
     "</div>" +
@@ -826,9 +1000,36 @@ function createRichestPlayersSection(data) {
     '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>' +
     '<path d="M3 3v5h5"/>' +
     '</svg></button></div>' +
+    buildRichestLevelsNoticeHtml() +
     "</div>" +
     buildRichestCardsContainer(data)
   );
+}
+
+function buildRichestLevelsNoticeHtml() {
+  return (
+    '<div class="richest-levels-notice" id="richest-levels-notice" role="status">' +
+      '<p class="richest-levels-notice__text">We\'re aware of an issue with player levels and have temporarily disabled them.</p>' +
+      '<button type="button" class="richest-levels-notice__close" id="richest-levels-notice-close" aria-label="Dismiss notice">' +
+        '<span aria-hidden="true">×</span>' +
+      "</button>" +
+    "</div>"
+  );
+}
+
+function showRichestLevelsNotice() {
+  var notice = document.getElementById("richest-levels-notice");
+  if (notice) notice.hidden = false;
+}
+
+function initRichestLevelsNotice() {
+  var notice = document.getElementById("richest-levels-notice");
+  var closeBtn = document.getElementById("richest-levels-notice-close");
+  if (!notice || !closeBtn || closeBtn.dataset.ready === "1") return;
+  closeBtn.dataset.ready = "1";
+  closeBtn.addEventListener("click", function () {
+    notice.hidden = true;
+  });
 }
 
 function filterRichestPlayers(query) {
@@ -891,6 +1092,8 @@ async function loadRichestPlayerAvatars() {
 
         const img = card.querySelector(".player-avatar");
         if (img) {
+          img.loading = "lazy";
+          img.decoding = "async";
           img.src = entry.imageUrl;
           img.alt = name;
         }
@@ -982,6 +1185,408 @@ async function fetchRichestPlayers() {
   }
 }
 
+async function fetchExternalSheet(spreadsheetId, sheetName) {
+  try {
+    const base = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq`;
+    const url = `${base}?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&headers=1`;
+    const res = await fetch(url);
+    const text = await res.text();
+    const json = JSON.parse(text.substring(47, text.length - 2));
+    const cols = json.table.cols.map((c) => c.label?.trim() || "");
+    const rows = json.table.rows || [];
+    return rows.map((r) => {
+      const obj = {};
+      cols.forEach((label, i) => {
+        obj[label] = getCellDisplayValue(r.c?.[i]);
+      });
+      return obj;
+    });
+  } catch (err) {
+    console.error(`Failed to fetch external sheet: ${sheetName}`, err);
+    return [];
+  }
+}
+
+function parseBooleanCell(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return null;
+  if (TRUE_REGEX.test(raw)) return true;
+  if (FALSE_REGEX.test(raw)) return false;
+  return null;
+}
+
+function normalizeItemName(name) {
+  return String(name || "").trim().toLowerCase();
+}
+
+function extractCellValueByIncludes(row, keyword) {
+  const keys = Object.keys(row || {});
+  for (const key of keys) {
+    if (key.toLowerCase().includes(keyword)) return row[key];
+  }
+  return "";
+}
+
+function rowHasKeyword(row, keyword) {
+  const needle = String(keyword || "").toLowerCase();
+  if (!needle) return false;
+  const keys = Object.keys(row || {});
+  for (const key of keys) {
+    const keyLower = String(key || "").toLowerCase();
+    const valueLower = String(row[key] || "").toLowerCase();
+    if (keyLower.includes(needle) || valueLower.includes(needle)) return true;
+  }
+  return false;
+}
+
+function parseBannerDecisionForKeyword(row, keyword) {
+  const keys = Object.keys(row || {});
+  const keywordLower = String(keyword || "").toLowerCase();
+  if (!keywordLower) return null;
+
+  // If a yes/no is directly under a keyword-like header (e.g. "Firework Launcher Giveawat")
+  for (const key of keys) {
+    const keyLower = String(key || "").toLowerCase();
+    if (!keyLower.includes(keywordLower)) continue;
+    const parsed = parseBooleanCell(row[key]);
+    if (parsed !== null) return parsed;
+  }
+
+  // If keyword appears in a value cell and yes/no is in another cell on the same row.
+  if (rowHasKeyword(row, keywordLower)) {
+    for (const key of keys) {
+      const parsed = parseBooleanCell(row[key]);
+      if (parsed !== null) return parsed;
+    }
+  }
+  return null;
+}
+
+function normalizeContentSectionName(name) {
+  const raw = String(name || "").trim().toLowerCase();
+  if (!raw) return "";
+  if (raw.includes("uncommon") || raw === "common") return "Common / Uncommon";
+  if (raw.includes("rare")) return "Rare";
+  if (raw.includes("epic")) return "Epic";
+  if (raw.includes("legendary")) return "Legendary";
+  if (raw.includes("omega")) return "Omega";
+  if (raw.includes("misc")) return "Misc";
+  if (raw.includes("vehicle")) return "Vehicles";
+  return "";
+}
+
+function sectionFromVideoColumnHeader(header) {
+  const compact = String(header || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "");
+  const m = compact.match(/^video([crelomv])$/);
+  if (!m) return "";
+  const byLetter = {
+    c: "Common / Uncommon",
+    r: "Rare",
+    e: "Epic",
+    l: "Legendary",
+    o: "Omega",
+    m: "Misc",
+    v: "Vehicles"
+  };
+  return byLetter[m[1]] || "";
+}
+
+function resolveContentSectionLabel(label) {
+  return sectionFromVideoColumnHeader(label) || normalizeContentSectionName(label);
+}
+
+function extractVideoEmbedUrl(url) {
+  const raw = String(url || "").trim();
+  if (!raw) return "";
+  let parsed;
+  try {
+    parsed = new URL(raw);
+  } catch (_) {
+    return "";
+  }
+  const host = parsed.hostname.toLowerCase();
+  if (host.includes("youtube.com")) {
+    const videoId = parsed.searchParams.get("v");
+    if (videoId) return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}`;
+    const parts = parsed.pathname.split("/").filter(Boolean);
+    const maybeEmbed = parts[0] === "embed" && parts[1] ? parts[1] : "";
+    if (maybeEmbed) return `https://www.youtube.com/embed/${encodeURIComponent(maybeEmbed)}`;
+  }
+  if (host.includes("youtu.be")) {
+    const id = parsed.pathname.split("/").filter(Boolean)[0];
+    if (id) return `https://www.youtube.com/embed/${encodeURIComponent(id)}`;
+  }
+  if (host.includes("tiktok.com")) {
+    const parts = parsed.pathname.split("/").filter(Boolean);
+    const videoIdx = parts.indexOf("video");
+    if (videoIdx >= 0 && parts[videoIdx + 1]) {
+      return `https://www.tiktok.com/embed/v2/${encodeURIComponent(parts[videoIdx + 1])}`;
+    }
+  }
+  return "";
+}
+
+function extractSectionContentFields(row) {
+  const sectionValue =
+    row.Section ||
+    row.section ||
+    row["Section Name"] ||
+    row["section name"] ||
+    extractCellValueByIncludes(row, "section");
+  const linkValue =
+    row.Link ||
+    row.link ||
+    row.URL ||
+    row.url ||
+    row.Video ||
+    row.video ||
+    extractCellValueByIncludes(row, "http");
+
+  return {
+    section: String(sectionValue || "").trim(),
+    link: String(linkValue || "").trim()
+  };
+}
+
+async function loadSectionContentConfig() {
+  sectionContentEmbeds.clear();
+  const rows = await fetchExternalSheet(GIVEAWAY_CONFIG_SPREADSHEET_ID, CONTENT_SHEET_NAME);
+  const grouped = new Map();
+
+  function pushEmbed(sectionName, rawUrl) {
+    const normalizedSection = resolveContentSectionLabel(sectionName);
+    if (!normalizedSection) return;
+    const embedUrl = extractVideoEmbedUrl(rawUrl);
+    if (!embedUrl) return;
+    if (!grouped.has(normalizedSection)) grouped.set(normalizedSection, []);
+    grouped.get(normalizedSection).push(embedUrl);
+  }
+
+  // Format C (horizontal): Google GViz with headers=1 puts spreadsheet row 1 into **column keys**,
+  // not into rows[0]. rows[] are data rows only — each object is keyed by section names.
+  let usedColumnLayout = false;
+  if (rows.length > 0) {
+    const columnKeys = Object.keys(rows[0] || {});
+    const sectionByColumnKey = new Map();
+    columnKeys.forEach((colKey) => {
+      const normalized = resolveContentSectionLabel(colKey);
+      if (normalized) sectionByColumnKey.set(colKey, normalized);
+    });
+    if (sectionByColumnKey.size > 0) {
+      usedColumnLayout = true;
+      rows.forEach((row) => {
+        sectionByColumnKey.forEach((sectionName, colKey) => {
+          const cellValue = String((row && row[colKey]) || "").trim();
+          if (!cellValue || !/^https?:\/\//i.test(cellValue)) return;
+          pushEmbed(sectionName, cellValue);
+        });
+      });
+    }
+  }
+
+  if (!usedColumnLayout) {
+    // Format A support: headers like Section + Link (existing behavior).
+    rows.forEach((row) => {
+      const fields = extractSectionContentFields(row);
+      if (!fields.section || !fields.link) return;
+      pushEmbed(fields.section, fields.link);
+    });
+
+    // Format B support: section name rows, with links listed beneath.
+    let activeSection = "";
+    rows.forEach((row) => {
+      const cells = Object.values(row || {})
+        .map((v) => String(v || "").trim())
+        .filter(Boolean);
+      if (!cells.length) return;
+
+      const detectedSection = cells
+        .map((v) => resolveContentSectionLabel(v))
+        .find(Boolean) || "";
+
+      const rawUrls = cells.filter((v) => /^https?:\/\//i.test(v));
+
+      if (detectedSection) {
+        activeSection = detectedSection;
+        if (rawUrls.length) {
+          rawUrls.forEach((url) => pushEmbed(activeSection, url));
+        }
+        return;
+      }
+
+      if (activeSection && rawUrls.length) {
+        rawUrls.forEach((url) => pushEmbed(activeSection, url));
+      }
+    });
+  }
+
+  grouped.forEach((links, section) => {
+    if (!links.length) return;
+    const unique = [...new Set(links)];
+    const pool = unique.length ? unique : links;
+    const selected = pool[Math.floor(Math.random() * pool.length)];
+    sectionContentEmbeds.set(section, selected);
+  });
+}
+
+function embedUrlWithScrollAutoplay(embedUrl) {
+  try {
+    const u = new URL(String(embedUrl || "").trim(), "https://example.com");
+    const host = u.hostname.toLowerCase();
+    if (host.includes("youtube.com")) {
+      u.searchParams.set("autoplay", "1");
+      u.searchParams.set("mute", "1");
+      u.searchParams.set("playsinline", "1");
+      u.searchParams.set("rel", "0");
+      return u.toString();
+    }
+    if (host.includes("tiktok.com")) {
+      u.searchParams.set("autoplay", "1");
+      u.searchParams.set("mute", "1");
+      return u.toString();
+    }
+  } catch (_) {}
+  return String(embedUrl || "").trim();
+}
+
+function setupSectionEmbedScrollAutoplay() {
+  const boxes = document.querySelectorAll(".section-content-embed");
+  if (!boxes.length || typeof IntersectionObserver === "undefined") return;
+
+  const obs = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const box = entry.target;
+        if (!(box instanceof HTMLElement)) return;
+        if (box.dataset.autoplayDone === "1") return;
+        const iframe = box.querySelector("iframe");
+        if (!(iframe instanceof HTMLIFrameElement)) return;
+        const baseSrc = iframe.dataset.baseSrc || iframe.getAttribute("src") || "";
+        if (!baseSrc) return;
+        box.dataset.autoplayDone = "1";
+        iframe.src = embedUrlWithScrollAutoplay(baseSrc);
+        obs.unobserve(box);
+      });
+    },
+    { threshold: 0.32, rootMargin: "0px 0px -8% 0px" }
+  );
+
+  boxes.forEach((box) => {
+    const iframe = box.querySelector("iframe");
+    if (iframe) {
+      const src = iframe.getAttribute("src") || "";
+      iframe.dataset.baseSrc = src;
+    }
+    obs.observe(box);
+  });
+}
+
+function renderSectionContentEmbeds() {
+  CONTENT_SECTIONS.forEach((sectionName) => {
+    const embedUrl = sectionContentEmbeds.get(sectionName);
+    if (!embedUrl) return;
+    const sectionEl = document.getElementById(slugify(sectionName));
+    if (!sectionEl) return;
+
+    const existing = sectionEl.querySelector(".section-content-embed");
+    if (existing) existing.remove();
+
+    const isTikTok = /tiktok\.com/i.test(embedUrl);
+    const embedKindClass = isTikTok ? "section-content-embed--tiktok" : "section-content-embed--youtube";
+    const frameRatioClass = isTikTok
+      ? "section-content-embed-frame-wrap--portrait"
+      : "section-content-embed-frame-wrap--landscape";
+
+    const wrapper = document.createElement("div");
+    wrapper.className = `section-content-embed ${embedKindClass}`;
+    wrapper.innerHTML = `
+      <h3 class="section-content-embed-title">You might like this BlockSpin Video!</h3>
+      <div class="section-content-embed-frame-wrap ${frameRatioClass}">
+        <iframe
+          src="${escapeAttr(embedUrl)}"
+          data-base-src="${escapeAttr(embedUrl)}"
+          title="${escapeAttr(sectionName)} featured video"
+          loading="lazy"
+          allowfullscreen
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share">
+        </iframe>
+      </div>
+    `;
+    var robuxSlot = sectionEl.querySelector(".section-robux-slot");
+    if (robuxSlot) {
+      sectionEl.insertBefore(wrapper, robuxSlot);
+    } else {
+      sectionEl.appendChild(wrapper);
+    }
+  });
+  setupSectionEmbedScrollAutoplay();
+}
+
+async function loadExternalGiveawayConfig() {
+  giveawayItems.clear();
+  bannerVisibility.anaconda = false;
+  bannerVisibility.firework = false;
+  bannerVisibility.legendary = true;
+  bannerVisibility.humvee = false;
+  bannerVisibility.robux = false;
+
+  const [giveawayRows, bannerRows] = await Promise.all([
+    fetchExternalSheet(GIVEAWAY_CONFIG_SPREADSHEET_ID, GIVEAWAYS_SHEET_NAME),
+    fetchExternalSheet(GIVEAWAY_CONFIG_SPREADSHEET_ID, BANNERS_SHEET_NAME)
+  ]);
+
+  giveawayRows.forEach((row) => {
+    const item = String(row.Item || row.item || extractCellValueByIncludes(row, "item") || "").trim();
+    const giveawayValue = row.Giveaway || row.giveaway || extractCellValueByIncludes(row, "giveaway");
+    if (!item) return;
+    if (parseBooleanCell(giveawayValue) === true) {
+      giveawayItems.add(normalizeItemName(item));
+    }
+  });
+
+  bannerRows.forEach((row) => {
+    Object.keys(row || {}).forEach((key) => {
+      const keyLower = String(key || "").toLowerCase();
+      const valueParsed = parseBooleanCell(row[key]);
+      if (valueParsed === null) return;
+      if (keyLower.includes("firework")) bannerVisibility.firework = valueParsed;
+      if (keyLower.includes("legendary")) bannerVisibility.legendary = valueParsed;
+    });
+
+    const rawName = String(
+      row.Name ||
+      row.name ||
+      row.Item ||
+      row.item ||
+      row.Title ||
+      row.title ||
+      extractCellValueByIncludes(row, "giveaway")
+    ).trim();
+    if (!rawName) return;
+    const lowerName = rawName.toLowerCase();
+    const rawValue = row.Enabled || row.enabled || row.Value || row.value || row.Show || row.show || extractCellValueByIncludes(row, "show");
+    const parsed = parseBooleanCell(rawValue);
+    if (parsed === null) return;
+    if (lowerName.includes("firework")) bannerVisibility.firework = parsed;
+    if (lowerName.includes("legendary")) bannerVisibility.legendary = parsed;
+  });
+
+  // Fallback parser: supports typos/alternate layouts like "Giveawat"/different columns.
+  bannerRows.forEach((row) => {
+    const fireworkDecision = parseBannerDecisionForKeyword(row, "firework");
+    if (fireworkDecision !== null) bannerVisibility.firework = fireworkDecision;
+    const legendaryDecision = parseBannerDecisionForKeyword(row, "legendary");
+    if (legendaryDecision !== null) bannerVisibility.legendary = legendaryDecision;
+  });
+
+  applyExternalBannerVisibility();
+}
+
+
 function buildCardSaveButtonHtml() {
   return (
     '<button type="button" class="card-save-btn" aria-label="' + escapeAttr(i18n("savedCards.saveAria")) + '" title="' + escapeAttr(i18n("savedCards.saveTitle")) + '" aria-pressed="false">' +
@@ -1019,34 +1624,32 @@ function nextExclusiveBadgeIconId(suffix) {
 }
 
 function buildExclusiveBadgeIconSvg(tier) {
+  // Scarlet-star shape: gold for Exclusive, red for Very Exclusive
+  var g = nextExclusiveBadgeIconId(tier === "veryexclusive" ? "Vx" : "Ex");
   if (tier === "veryexclusive") {
-    var g = nextExclusiveBadgeIconId("Bd");
     return (
       '<svg class="card-exclusive-badge__icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">' +
         "<defs>" +
-          '<linearGradient id="' + g + '" x1="20%" y1="0%" x2="80%" y2="100%">' +
-            '<stop offset="0%" stop-color="#fda4af"/>' +
-            '<stop offset="40%" stop-color="#be123c"/>' +
-            '<stop offset="100%" stop-color="#1a0510"/>' +
+          '<linearGradient id="' + g + '" x1="0%" y1="0%" x2="100%" y2="100%">' +
+            '<stop offset="0%" stop-color="#fecaca"/>' +
+            '<stop offset="40%" stop-color="#ef4444"/>' +
+            '<stop offset="100%" stop-color="#7f1d1d"/>' +
           "</linearGradient>" +
         "</defs>" +
-        '<path fill="url(#' + g + ')" stroke="#4c0519" stroke-width="1" stroke-linejoin="round" d="M12 3 19.5 9 12 21 4.5 9z"/>' +
-        '<path fill="none" stroke="#fecdd3" stroke-opacity="0.35" stroke-width="0.7" d="M4.5 9h15M12 3v18"/>' +
+        '<path fill="url(#' + g + ')" stroke="#7f1d1d" stroke-width="1" d="M12 2.8 14.6 9.2 21.5 9.8 16.2 14.4 17.8 21.2 12 17.8 6.2 21.2 7.8 14.4 2.5 9.8 9.4 9.2z"/>' +
       "</svg>"
     );
   }
-
-  var g = nextExclusiveBadgeIconId("Ss");
   return (
     '<svg class="card-exclusive-badge__icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">' +
       "<defs>" +
-        '<linearGradient id="' + g + '" x1="0%" y1="0%" x2="0%" y2="100%">' +
-          '<stop offset="0%" stop-color="#fde68a"/>' +
-          '<stop offset="100%" stop-color="#d97706"/>' +
+        '<linearGradient id="' + g + '" x1="0%" y1="0%" x2="100%" y2="100%">' +
+          '<stop offset="0%" stop-color="#fef08a"/>' +
+          '<stop offset="40%" stop-color="#fbbf24"/>' +
+          '<stop offset="100%" stop-color="#a16207"/>' +
         "</linearGradient>" +
       "</defs>" +
-      '<path fill="url(#' + g + ')" stroke="#78350f" stroke-width="1" d="M12 2.5 20 7v7c0 5-3.5 8.5-8 9.5-4.5-1-8-4.5-8-9.5V7z"/>' +
-      '<path fill="#fef3c7" stroke="#92400e" stroke-width="0.5" d="M12 8.5l1.3 2.6 2.9.4-2.1 2 .5 2.9L12 15l-2.6 1.4.5-2.9-2.1-2 2.9-.4z"/>' +
+      '<path fill="url(#' + g + ')" stroke="#78350f" stroke-width="1" d="M12 2.8 14.6 9.2 21.5 9.8 16.2 14.4 17.8 21.2 12 17.8 6.2 21.2 7.8 14.4 2.5 9.8 9.4 9.2z"/>' +
     "</svg>"
   );
 }
@@ -1061,7 +1664,7 @@ function buildCardExclusiveBadgeHtml(tier) {
     '<div class="card-exclusive-badge-wrapper ' + modClass + '">' +
       '<div class="card-exclusive-badge" role="img" aria-label="' + escapeAttr(i18n(ariaKey)) + '">' +
         buildExclusiveBadgeIconSvg(tier) +
-      '</div>' +
+      "</div>" +
       '<div class="card-exclusive-badge-tooltip" role="tooltip">' + escapeHtml(i18n(tooltipKey)) + "</div>" +
     "</div>"
   );
@@ -1102,7 +1705,7 @@ function createCard(item) {
 
   let imgTag = "";
   if (img) {
-    imgTag = `<img src="${img}" alt="${name}" onerror="this.style.display='none'">`;
+    imgTag = `<img src="${img}" alt="${escapeAttr(name)}" width="140" height="140" loading="lazy" decoding="async" onerror="this.style.display='none'">`;
   }
 
   let durabilityHTML = '';
@@ -1166,7 +1769,7 @@ if (showPawn) {
   pawnAmount = `$${pawnAmount.toLocaleString()}`;
 }
   
-  const hasGiveaway = giveawayFlag && giveawayFlag.toString().trim().toLowerCase() === 'yes';
+  const hasGiveaway = (giveawayFlag && giveawayFlag.toString().trim().toLowerCase() === 'yes') || giveawayItems.has(normalizeItemName(name));
   const exclusiveTier = getItemExclusiveTier(item);
   const sectionLabel = safe(item.__sheet || "Unknown");
   
@@ -1237,7 +1840,7 @@ function createCrewLogoCard(item) {
   const id = safe(item["ID"]);
 
   const imgTag = img
-    ? `<img src="${img}" alt="${name}" onerror="this.style.display='none'">`
+    ? `<img src="${img}" alt="${escapeAttr(name)}" width="140" height="140" loading="lazy" decoding="async" onerror="this.style.display='none'">`
     : "";
   return `
     <div class="card crew-logo-card" data-name="${escapeAttr(name)}">
@@ -1319,7 +1922,7 @@ function createAccessoryCard(item) {
     rarityNorm === "common" ? "rarity-common" :
     "rarity-default";
   const imgTag = img
-    ? `<img src="${img}" alt="${name}" onerror="this.style.display='none'">`
+    ? `<img src="${img}" alt="${escapeAttr(name)}" width="140" height="140" loading="lazy" decoding="async" onerror="this.style.display='none'">`
     : "";
   const exclusiveTier = getItemExclusiveTier(item);
 
@@ -1549,7 +2152,7 @@ function createGuideItemCard(item, config) {
   const description = guideField(item, config.descriptionKeys);
   const price = guideField(item, config.priceKeys);
   const imageHtml = imageUrl
-    ? `<div class="card-item-image-wrap"><img src="${escapeAttr(imageUrl)}" alt="${escapeAttr(name)}" loading="lazy" onerror="this.style.display='none'"></div>`
+    ? `<div class="card-item-image-wrap"><img src="${escapeAttr(imageUrl)}" alt="${escapeAttr(name)}" width="140" height="140" loading="lazy" decoding="async" onerror="this.style.display='none'"></div>`
     : "";
 
   return `
@@ -1595,7 +2198,7 @@ function createFishingTypeCard(item) {
   const initialBlockSpinPrice = calculateFishBlockSpinPrice(sellAmount, initialWeight);
   const rarityClass = getGuideRarityClass(rarity);
   const imageHtml = imageUrl
-    ? `<div class="card-item-image-wrap"><img src="${escapeAttr(imageUrl)}" alt="${escapeAttr(name)}" onerror="this.style.display='none'"></div>`
+    ? `<div class="card-item-image-wrap"><img src="${escapeAttr(imageUrl)}" alt="${escapeAttr(name)}" width="140" height="140" loading="lazy" decoding="async" onerror="this.style.display='none'"></div>`
     : "";
 
   return `
@@ -2492,25 +3095,24 @@ window.bsvActivateMoneyGuideTab = activateMoneyGuideTab;
 function renderSection(title, items) {
   if (title === "BlockSpin Map") {
     renderBlockSpinMapSection();
+    _sectionsDomReady[title] = true;
     return;
   }
 
   if (title === "Home") {
-    const html = `
-      <section class="section" id="${slugify(title)}">
-        <h2>${escapeHtml(i18nSection(title))}</h2>
-        <div class="home-content">
-        </div>
-      </section>
-    `;
-    document.getElementById("sections").insertAdjacentHTML("beforeend", html);
+    // Home markup lives in index.html — do not inject a duplicate #home section.
+    _sectionsDomReady[title] = true;
     return;
   }
   if (title === "Money & Game Guide") {
     renderMoneyGameGuideSection();
+    _sectionsDomReady[title] = true;
     return;
   }
-  if (!items || items.length === 0) return;
+  if (!items || items.length === 0) {
+    _sectionsDomReady[title] = true;
+    return;
+  }
 
   if (title === "💰 Richest Players") {
     renderRichestPlayersSection(items);
@@ -2527,6 +3129,7 @@ function renderSection(title, items) {
         <div class="cards">
           ${buildCardsHtmlWithDiscordPromo(items, createCard, "Omega")}
         </div>
+        ${buildSectionRobuxSlotHtml("Omega")}
       </section>
     `;
     document.getElementById("sections").insertAdjacentHTML("beforeend", html);
@@ -2537,6 +3140,7 @@ function renderSection(title, items) {
         <div class="cards">
           ${buildCardsHtmlWithDiscordPromo(items, createCard, "Epic")}
         </div>
+        ${buildSectionRobuxSlotHtml("Epic")}
       </section>
     `;
     document.getElementById("sections").insertAdjacentHTML("beforeend", html);
@@ -2547,13 +3151,34 @@ function renderSection(title, items) {
         <div class="cards">
           ${buildCardsHtmlWithDiscordPromo(items, createCard, title)}
         </div>
+        ${buildSectionRobuxSlotHtml(title)}
       </section>
     `;
     document.getElementById("sections").insertAdjacentHTML("beforeend", html);
   }
 
+  _sectionsDomReady[title] = true;
+
   if (typeof window.bsvRefreshSavedCardButtons === "function") {
     window.bsvRefreshSavedCardButtons();
+  }
+}
+
+function ensureSectionRendered(title) {
+  if (!title || _sectionsDomReady[title]) return;
+  if (title === "Home") {
+    _sectionsDomReady[title] = true;
+    return;
+  }
+  if (title === "Money & Game Guide") {
+    renderSection(title, []);
+    return;
+  }
+  const cached = _renderedSectionCache.find(function (r) {
+    return r.section === title;
+  });
+  if (cached) {
+    renderSection(cached.section, cached.items);
   }
 }
 
@@ -2565,6 +3190,7 @@ function renderVehiclesSectionWithBanner(items) {
       <div class="cards">
         ${buildCardsHtmlWithDiscordPromo(items, createCard, "Vehicles")}
       </div>
+      ${buildSectionRobuxSlotHtml("Vehicles")}
     </section>
   `;
   document.getElementById("sections").insertAdjacentHTML("beforeend", html);
@@ -2591,17 +3217,32 @@ function fetchDiscordMemberCount() {
 
 function createFooterBoosterCard(booster) {
   const name = escapeHtml(String(booster?.name || "Unknown"));
-  const avatarUrl = escapeAttr(String(booster?.avatarUrl || ""));
+  let avatarUrl = String(booster?.avatarUrl || "");
+  try {
+    const u = new URL(avatarUrl);
+    if (/cdn\.discordapp\.com|media\.discordapp\.net/i.test(u.hostname)) {
+      u.pathname = u.pathname.replace(/\.gif$/i, ".webp");
+      if (/\/avatars\//i.test(u.pathname) && !/\.[a-z0-9]+$/i.test(u.pathname)) {
+        u.pathname += ".webp";
+      }
+      u.searchParams.set("size", "32");
+      avatarUrl = u.toString();
+    }
+  } catch (_) {}
+  avatarUrl = escapeAttr(avatarUrl);
   return `
     <article class="footer-booster-card" aria-label="${name}">
-      <img src="${avatarUrl}" alt="${name}" loading="lazy" decoding="async" />
+      <img src="${avatarUrl}" alt="" width="23" height="23" loading="lazy" decoding="async" fetchpriority="low" />
       <span>${name}</span>
     </article>
   `;
 }
 
 async function loadFooterBoosters() {
+  // Boosters are loaded lazily by site-chrome.js to protect mobile LCP.
+  // Keep this as a no-op when chrome already owns the footer.
   const footer = document.getElementById("footer-boosters");
+  if (footer && footer.dataset.bsvBoostersInit === "1") return;
   const track = document.getElementById("footer-boosters-track");
   if (!footer || !track) return;
 
@@ -2610,7 +3251,7 @@ async function loadFooterBoosters() {
   }
 
   try {
-    const res = await fetch(BOOSTERS_API_URL, { cache: "no-store" });
+    const res = await fetch(BOOSTERS_API_URL, { cache: "default" });
     if (!res.ok) throw new Error(`Boosters endpoint failed: ${res.status}`);
     const data = await res.json();
     const boosters = Array.isArray(data?.boosters) ? data.boosters : [];
@@ -3025,6 +3666,8 @@ function renderScammerSection(items) {
     }
 
     updateRichestResetVisibility();
+    initRichestLevelsNotice();
+    showRichestLevelsNotice();
 
     const backToTop = document.getElementById("richest-back-to-top");
     const section = document.querySelector(".richest-players-section");
@@ -3375,46 +4018,117 @@ function initMobileSectionSearch() {
   });
 }
 
-function showSection(name) {
-  console.log(`Showing section: ${name}`);
-  _activeSectionName = name;
+function setSectionDisplay(el, sectionCfg, visible) {
+  if (!el) return;
+  if (!visible) {
+    el.style.display = "none";
+    el.style.flexDirection = "";
+    return;
+  }
+  if (sectionCfg && sectionCfg.id === "richest-players") {
+    el.style.display = "flex";
+    el.style.flexDirection = "column";
+  } else {
+    el.style.display = "block";
+    el.style.flexDirection = "";
+  }
+}
 
+function showSection(name) {
   const cfg = typeof getSectionConfig === "function" ? getSectionConfig(name) : null;
   if (!cfg) return;
 
-  document.querySelectorAll('.durability-input').forEach(input => {
-    const card = input.closest('.card');
-    const maxDurability = card.dataset.maxDurability;
-    input.value = maxDurability;
-    updateCardValues(input);
-  });
+  // Sheets load async. Early nav clicks used to hide #home before the target
+  // section existed, leaving a blank main pane.
+  if (name !== "Home" && !_renderedSectionCache.length) {
+    _pendingSectionName = name;
+    const nav = document.getElementById("sections-nav");
+    if (nav) {
+      nav.querySelectorAll("button").forEach(function (b) {
+        b.classList.toggle("active", b.dataset.section === name);
+      });
+    }
+    return;
+  }
 
-  const taxSidebarColumn = document.getElementById('tax-sidebar-column');
-  const homeValueChanges = document.getElementById('home-value-changes');
-  const taxCalc = taxSidebarColumn ? taxSidebarColumn.querySelector('.tax-calculator') : null;
-  const middlemanPromo = taxSidebarColumn ? taxSidebarColumn.querySelector('.discord-mm-promo--sidebar') : null;
-  const accessoriesFastNav = document.getElementById(GUIDE_FAST_NAV_BOX_ID);
-  const isHome = cfg.id === 'home';
+  ensureSectionRendered(name);
 
-  document.body.classList.toggle('is-home', isHome);
-
-  if (taxSidebarColumn) {
-    if (isHome || cfg.sidebarColumn === 'hide') {
-      taxSidebarColumn.style.display = 'flex';
-      taxSidebarColumn.style.visibility = 'hidden';
-      taxSidebarColumn.style.opacity = '0';
-      taxSidebarColumn.style.pointerEvents = 'none';
-    } else {
-      taxSidebarColumn.style.visibility = 'visible';
-      taxSidebarColumn.style.opacity = '1';
-      taxSidebarColumn.style.display = 'flex';
-      taxSidebarColumn.style.pointerEvents = 'auto';
+  // If render still couldn't create DOM (empty fetch), stay on Home.
+  if (name !== "Home") {
+    const targetCfg = cfg;
+    const targetEl = targetCfg && document.getElementById(targetCfg.id);
+    if (!targetEl) {
+      _pendingSectionName = name;
+      return;
     }
   }
 
-  if (typeof applyVisibilityMode === 'function') {
-    applyVisibilityMode(taxCalc, cfg.taxCalc, cfg.id === 'home' ? 'none' : 'block');
-    applyVisibilityMode(middlemanPromo, cfg.middlemanPromo, 'block');
+  _pendingSectionName = null;
+  _activeSectionName = name;
+
+  const isHome = cfg.id === "home";
+  document.body.classList.toggle("is-home", isHome);
+  if (name === RICHEST_SECTION_NAME) {
+    showRichestLevelsNotice();
+  }
+  if (typeof window.bsvAlignSponsorBanner === "function") {
+    window.bsvAlignSponsorBanner();
+  }
+
+  // Always sync section visibility. Some sections (e.g. #richest-players) have CSS
+  // that can override .section { display:none }, so newly rendered sections leak
+  // under Home if we only toggle prev/next.
+  getSectionRegistry().forEach(function (sectionCfg) {
+    const el = document.getElementById(sectionCfg.id);
+    if (!el) return;
+    setSectionDisplay(el, sectionCfg, sectionCfg.title === name);
+  });
+
+  const nav = document.getElementById("sections-nav");
+  if (nav) {
+    nav.querySelectorAll("button").forEach(function (b) {
+      const on = b.dataset.section === name;
+      if (b.classList.contains("active") !== on) b.classList.toggle("active", on);
+    });
+  }
+
+  closeSectionsMenu();
+
+  // Defer everything that is not needed for the tap paint.
+  requestAnimationFrame(function () {
+    showSectionDeferred(name, cfg, isHome);
+  });
+}
+
+function showSectionDeferred(name, cfg, isHome) {
+  const useMobileSectionSearch =
+    window.matchMedia("(max-width: 900px)").matches && shouldUseMobileSectionSearch(name);
+  setHeaderSearchVisible(useMobileSectionSearch || cfg.search !== "hide");
+  syncHeaderSearchPlacement(name);
+  syncBackToTopVisibility();
+
+  const taxSidebarColumn = document.getElementById("tax-sidebar-column");
+  const homeValueChanges = document.getElementById("home-value-changes");
+  const taxCalc = taxSidebarColumn ? taxSidebarColumn.querySelector(".tax-calculator") : null;
+  const middlemanPromo = taxSidebarColumn ? taxSidebarColumn.querySelector(".discord-mm-promo--sidebar") : null;
+
+  if (taxSidebarColumn) {
+    if (isHome || cfg.sidebarColumn === "hide") {
+      taxSidebarColumn.style.display = "flex";
+      taxSidebarColumn.style.visibility = "hidden";
+      taxSidebarColumn.style.opacity = "0";
+      taxSidebarColumn.style.pointerEvents = "none";
+    } else {
+      taxSidebarColumn.style.visibility = "visible";
+      taxSidebarColumn.style.opacity = "1";
+      taxSidebarColumn.style.display = "flex";
+      taxSidebarColumn.style.pointerEvents = "auto";
+    }
+  }
+
+  if (typeof applyVisibilityMode === "function") {
+    applyVisibilityMode(taxCalc, cfg.taxCalc, cfg.id === "home" ? "none" : "block");
+    applyVisibilityMode(middlemanPromo, cfg.middlemanPromo, "block");
   }
 
   if (cfg.accessoriesFastNav) {
@@ -3442,39 +4156,13 @@ function showSection(name) {
   }
 
   if (homeValueChanges) {
-    homeValueChanges.style.visibility = cfg.homeValueChanges ? 'visible' : 'hidden';
-    homeValueChanges.style.opacity = cfg.homeValueChanges ? '1' : '0';
-    homeValueChanges.style.display = cfg.homeValueChanges ? 'block' : 'none';
+    homeValueChanges.style.visibility = cfg.homeValueChanges ? "visible" : "hidden";
+    homeValueChanges.style.opacity = cfg.homeValueChanges ? "1" : "0";
+    homeValueChanges.style.display = cfg.homeValueChanges ? "block" : "none";
   }
 
-  const useMobileSectionSearch = window.matchMedia("(max-width: 900px)").matches &&
-    shouldUseMobileSectionSearch(name);
-  setHeaderSearchVisible(useMobileSectionSearch || cfg.search !== "hide");
-  syncHeaderSearchPlacement(name);
-  syncBackToTopVisibility();
-
-  getSectionRegistry().forEach(function (sectionCfg) {
-    const el = document.getElementById(sectionCfg.id);
-    if (!el) return;
-    if (sectionCfg.title === name) {
-      if (sectionCfg.id === "richest-players") {
-        el.style.display = "flex";
-        el.style.flexDirection = "column";
-      } else {
-        el.style.display = "block";
-        el.style.flexDirection = "";
-      }
-    } else {
-      el.style.display = "none";
-    }
-  });
-
-  document.querySelectorAll("#sections-nav button").forEach(b => {
-    b.classList.toggle("active", b.dataset.section === name);
-  });
-
-  closeSectionsMenu();
-  trackEvent("view_section", { section_name: name });
+  trackSectionPageView(name);
+  syncMobileTaxPanel(cfg);
 }
 
 window.showSection = showSection;
@@ -3484,12 +4172,50 @@ function initSearch() {
   const resetBtn = document.getElementById("search-reset");
   if (!input) return;
 
+  let searchTimer = 0;
+  let searchToken = 0;
+
+  function getActiveSearchScope() {
+    const cfg = typeof getSectionConfig === "function" ? getSectionConfig(_activeSectionName) : null;
+    if (cfg && cfg.id) {
+      const sectionEl = document.getElementById(cfg.id);
+      if (sectionEl) return sectionEl;
+    }
+    return document.getElementById("sections") || document;
+  }
+
   function applySearchFilter() {
     const val = input.value.toLowerCase();
-    document.querySelectorAll(".card").forEach(card => {
-      const name = card.dataset.name.toLowerCase();
-      card.classList.toggle("hidden", !name.includes(val));
-    });
+    const scope = getActiveSearchScope();
+    const cards = scope.querySelectorAll(".card");
+    const token = ++searchToken;
+    let i = 0;
+    const CHUNK = 60;
+
+    function step() {
+      if (token !== searchToken) return;
+      const end = Math.min(i + CHUNK, cards.length);
+      for (; i < end; i++) {
+        const card = cards[i];
+        const name = (card.dataset.name || "").toLowerCase();
+        const hide = val.length > 0 && name.indexOf(val) === -1;
+        if (card.classList.contains("hidden") !== hide) {
+          card.classList.toggle("hidden", hide);
+        }
+      }
+      if (i < cards.length) {
+        setTimeout(step, 0);
+      }
+    }
+    step();
+  }
+
+  function scheduleSearchFilter() {
+    if (searchTimer) clearTimeout(searchTimer);
+    searchTimer = setTimeout(function () {
+      searchTimer = 0;
+      applySearchFilter();
+    }, 120);
   }
 
   function updateResetVisibility() {
@@ -3497,14 +4223,19 @@ function initSearch() {
     resetBtn.hidden = !input.value;
   }
 
-  input.addEventListener("input", () => {
-    applySearchFilter();
+  input.addEventListener("input", function () {
+    scheduleSearchFilter();
     updateResetVisibility();
   });
 
   if (resetBtn) {
-    resetBtn.addEventListener("click", () => {
+    resetBtn.addEventListener("click", function () {
       input.value = "";
+      searchToken += 1;
+      if (searchTimer) {
+        clearTimeout(searchTimer);
+        searchTimer = 0;
+      }
       applySearchFilter();
       updateResetVisibility();
       input.focus();
@@ -3517,30 +4248,35 @@ function initSearch() {
 function getTaxBreakdown(amountWant) {
   const want = Math.round(Number(amountWant) || 0);
   if (want <= 0) return { totalWithdraw: 0, lines: [], singleDrop: true };
-  const totalWithdraw = Math.round(want / TAX_RECEIVE_RATIO);
-  if (totalWithdraw <= TAX_MAX_DROP) {
+
+  const oneDropCash = Math.round(want / TAX_RECEIVE_RATIO);
+  if (oneDropCash <= TAX_MAX_DROP) {
     return {
-      totalWithdraw,
-      lines: [i18n("tax.dropAmount", { amount: "$" + totalWithdraw.toLocaleString() })],
+      totalWithdraw: oneDropCash,
+      lines: [i18n("tax.dropAmount", { amount: formatDollar(oneDropCash) })],
       singleDrop: true
     };
   }
-  const full40kCount = Math.floor(totalWithdraw / TAX_MAX_DROP);
-  const receivedFromFull = full40kCount * TAX_RECEIVE_PER_40K;
+
+  const fullDropCount = Math.floor(want / TAX_RECEIVE_PER_MAX_DROP);
+  const receivedFromFull = fullDropCount * TAX_RECEIVE_PER_MAX_DROP;
   const lastReceive = want - receivedFromFull;
-  const lastWithdraw = Math.round(lastReceive / TAX_RECEIVE_RATIO);
+  const lastWithdraw = lastReceive > 0 ? Math.round(lastReceive / TAX_RECEIVE_RATIO) : 0;
+  const totalWithdraw = fullDropCount * TAX_MAX_DROP + lastWithdraw;
   const lines = [];
 
-  if (full40kCount === 1 && lastWithdraw > 0) {
-    lines.push(i18n("tax.drop40kTimesOnce"));
-    lines.push(i18n("tax.thenDrop", { amount: "$" + lastWithdraw.toLocaleString() }));
+  if (fullDropCount === 1 && lastWithdraw > 0) {
+    lines.push(i18n("tax.dropMaxTimesOnce"));
+    lines.push(i18n("tax.thenDrop", { amount: formatDollar(lastWithdraw) }));
   } else if (lastWithdraw > 0) {
-    lines.push(i18n("tax.drop40kTimes", { count: full40kCount.toLocaleString() }));
-    lines.push(i18n("tax.thenDrop", { amount: "$" + lastWithdraw.toLocaleString() }));
+    lines.push(i18n("tax.dropMaxTimes", { count: fullDropCount.toLocaleString() }));
+    lines.push(i18n("tax.thenDrop", { amount: formatDollar(lastWithdraw) }));
+  } else if (fullDropCount === 1) {
+    lines.push(i18n("tax.dropMaxTimesOnce") + ".");
   } else {
-    lines.push(i18n("tax.drop40kTimes", { count: full40kCount.toLocaleString() }) + ".");
+    lines.push(i18n("tax.dropMaxTimes", { count: fullDropCount.toLocaleString() }) + ".");
   }
-  return { totalWithdraw, lines, singleDrop: false };
+  return { totalWithdraw: totalWithdraw, lines: lines, singleDrop: false };
 }
 
 function formatDollar(amount) {
@@ -3612,7 +4348,7 @@ function initTaxCalculator() {
     const raw = taxInput.value.replace(/[^\d]/g, '');
     const want = parseInt(raw, 10) || 0;
     const b = getTaxBreakdown(want);
-    taxAmount.innerHTML = b.totalWithdraw.toLocaleString() + ' <span class="tax-after-label">After Tax</span>';
+    taxAmount.innerHTML = b.totalWithdraw.toLocaleString() + ' <span class="tax-after-label">' + escapeHtml(i18n("tax.afterLabel")) + '</span>';
     if (taxBreakdown) {
       if (b.totalWithdraw <= 0) {
         taxBreakdown.innerHTML = '';
@@ -3641,6 +4377,125 @@ function initTaxCalculator() {
   });
 
   update();
+}
+
+var MOBILE_TAX_MQ = "(max-width: 1024px)";
+
+function isMobileTaxViewport() {
+  return window.matchMedia(MOBILE_TAX_MQ).matches;
+}
+
+function getMobileTaxArrowSectionIds() {
+  if (typeof getSectionRegistry === "function") {
+    return getSectionRegistry()
+      .filter(function (entry) {
+        return entry.mobileTaxArrow === true || entry.taxCalc === "show";
+      })
+      .map(function (entry) {
+        return entry.id;
+      });
+  }
+  return ["home", "uncommon", "rare", "epic", "legendary", "omega", "misc", "vehicles"];
+}
+
+function setMobileTaxPanelOpen(open) {
+  var fab = document.getElementById("mobile-calc-arrow");
+  var panel = document.getElementById("mobile-tax-calc");
+  if (!panel) return;
+
+  if (open) {
+    panel.hidden = false;
+    requestAnimationFrame(function () {
+      panel.classList.add("is-open");
+      if (fab) fab.classList.add("is-open");
+    });
+  } else {
+    panel.classList.remove("is-open");
+    if (fab) fab.classList.remove("is-open");
+    window.setTimeout(function () {
+      if (!panel.classList.contains("is-open")) panel.hidden = true;
+    }, 220);
+  }
+
+  if (fab) fab.setAttribute("aria-expanded", open ? "true" : "false");
+
+  if (open) {
+    var input = document.getElementById("mobile-tax-input");
+    if (input) {
+      setTimeout(function () {
+        input.focus({ preventScroll: true });
+      }, 180);
+    }
+  }
+}
+
+function syncMobileTaxPanel(cfg) {
+  var fab = document.getElementById("mobile-calc-arrow");
+  if (!fab) return;
+
+  var sectionId = cfg && cfg.id ? cfg.id : "";
+  var allowFab =
+    isMobileTaxViewport() &&
+    !!sectionId &&
+    getMobileTaxArrowSectionIds().indexOf(sectionId) !== -1;
+
+  fab.hidden = !allowFab;
+  fab.classList.toggle("is-visible", allowFab);
+
+  if (!allowFab) setMobileTaxPanelOpen(false);
+}
+
+function initMobileTaxPanel() {
+  var fab = document.getElementById("mobile-calc-arrow");
+  var panel = document.getElementById("mobile-tax-calc");
+  var closeBtn = document.getElementById("mobile-calc-close");
+  if (!fab || !panel) return;
+  if (fab.dataset.bsvMobileTaxInit === "1") return;
+  fab.dataset.bsvMobileTaxInit = "1";
+
+  bindTaxCalcWidget(panel);
+
+  fab.addEventListener("click", function () {
+    if (fab.hidden) return;
+    setMobileTaxPanelOpen(!panel.classList.contains("is-open"));
+  });
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", function () {
+      setMobileTaxPanelOpen(false);
+    });
+  }
+
+  // Tap outside closes the panel but keeps the entered amount.
+  document.addEventListener(
+    "pointerdown",
+    function (e) {
+      if (!panel.classList.contains("is-open")) return;
+      if (panel.contains(e.target) || fab.contains(e.target)) return;
+      setMobileTaxPanelOpen(false);
+    },
+    true
+  );
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && panel.classList.contains("is-open")) {
+      setMobileTaxPanelOpen(false);
+    }
+  });
+
+  var mq = window.matchMedia(MOBILE_TAX_MQ);
+  function onViewportChange() {
+    var cfg =
+      typeof getSectionConfig === "function" ? getSectionConfig(_activeSectionName) : null;
+    syncMobileTaxPanel(cfg);
+  }
+  if (typeof mq.addEventListener === "function") {
+    mq.addEventListener("change", onViewportChange);
+  } else if (typeof mq.addListener === "function") {
+    mq.addListener(onViewportChange);
+  }
+
+  onViewportChange();
 }
 
 function copyToClipboard(text) {
@@ -3700,8 +4555,8 @@ function adjustDurability(btn, direction, evt) {
       evt.type === 'touchstart' ||
       (evt.pointerType && evt.pointerType === 'touch')
     );
-  const holdDelayMs = isTouch ? 120 : 200;
-  const repeatEveryMs = isTouch ? 30 : 50;
+  const holdDelayMs = isTouch ? 180 : 200;
+  const repeatEveryMs = isTouch ? 70 : 50;
   
   function adjust() {
     let newValue = (parseInt(input.value) || 0) + direction;
@@ -3956,6 +4811,16 @@ function slugify(str) {
 
 document.addEventListener("DOMContentLoaded", async () => {
   console.log('DOM loaded, initializing...');
+
+  const sectionsContainer = document.getElementById("sections");
+  const loadingScreen = document.getElementById("loading-screen");
+  const progressBar = document.getElementById("progress-bar");
+  const progressText = document.getElementById("progress-text");
+
+  // Paint home hero immediately — don't block LCP on spreadsheet fetches
+  if (sectionsContainer) sectionsContainer.classList.add("loaded");
+  if (loadingScreen) loadingScreen.style.display = "none";
+
   initAnalytics();
   setupDiscordClickTracking();
   initDiscordJoinNudge();
@@ -3968,10 +4833,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }, 15000);
   
-  const sectionsContainer = document.getElementById("sections");
-  const progressBar = document.getElementById("progress-bar");
-  const progressText = document.getElementById("progress-text");
-
   if (!sectionsContainer || !progressBar || !progressText) {
     loadFooterBoosters();
     return;
@@ -3979,7 +4840,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   var homeHumveeWrap = document.querySelector(".home-humvee-banner-wrap");
   if (homeHumveeWrap) {
-    homeHumveeWrap.innerHTML = "";
+    mountHomeGiveawayCarousel();
   }
   mountHomeDiscordPromo();
 
@@ -3990,6 +4851,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   initMobileSectionSearch();
   initSearch();
   initTaxCalculator();
+  initMobileTaxPanel();
+  showSection("Home");
+
+  const giveawayPromise = loadExternalGiveawayConfig();
+  const contentPromise = loadSectionContentConfig();
 
   const totalSections = SECTION_NAMES.length;
   let loadedSections = 0;
@@ -4015,35 +4881,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     loadedSections++;
     const progress = Math.round((loadedSections / totalSections) * 100);
-    progressBar.style.width = progress + '%';
-    progressText.textContent = progress + '%';
+    if (progressBar) progressBar.style.width = progress + "%";
+    if (progressText) progressText.textContent = progress + "%";
     
     return { section: sec, items };
   });
 
   const results = await Promise.all(fetchPromises);
 
-  sectionsContainer.classList.add("loaded");
+  await giveawayPromise;
+  await contentPromise;
 
-  results.forEach(function (result) {
-    _renderedSectionCache.push(result);
-    renderSection(result.section, result.items);
-  });
-  if (typeof window.bsvRefreshSavedCardButtons === "function") {
-    window.bsvRefreshSavedCardButtons();
-  }
-  if (typeof window.bsvFetchSavedCards === "function") {
-    window.bsvFetchSavedCards();
-  }
-  updateHomeSiteStatsFromResults(results);
-  applyStripGiveawayBannerVisibility();
-  initGiveawayBannerCarousels();
-  initDiscordPromoCardCarousels();
-
-  setTimeout(function () {
-    var loadingScreen = document.getElementById("loading-screen");
-    if (loadingScreen) loadingScreen.style.display = "none";
-  }, 150);
+  _renderedSectionCache = results.slice();
+  _sectionsDomReady = Object.create(null);
+  _sectionsDomReady["Home"] = true;
 
   let initialSection = "Home";
   if (window.location.hash && window.location.hash.startsWith('#sec=')) {
@@ -4058,10 +4909,61 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // Only paint the active section up front — rendering every rarity into the DOM
+  // was creating 14k+ nodes and ~19MB of images on mobile LCP.
+  if (_pendingSectionName && SECTION_NAMES.includes(_pendingSectionName)) {
+    initialSection = _pendingSectionName;
+  }
+  ensureSectionRendered(initialSection);
+  if (typeof window.bsvRefreshSavedCardButtons === "function") {
+    window.bsvRefreshSavedCardButtons();
+  }
+  if (typeof window.bsvFetchSavedCards === "function") {
+    window.bsvFetchSavedCards();
+  }
+  updateHomeSiteStatsFromResults(results);
+  applyStripGiveawayBannerVisibility();
+  initGiveawayBannerCarousels();
+  initDiscordPromoCardCarousels();
+  renderSectionContentEmbeds();
+
   showSection(initialSection);
   loadValueChanges();
   fetchDiscordMemberCount();
   loadFooterBoosters();
+  if (typeof window.bsvPlaceSponsorBanner === "function") {
+    window.bsvPlaceSponsorBanner("home");
+  }
+  if (typeof window.bsvAlignSponsorBanner === "function") {
+    window.bsvAlignSponsorBanner();
+  }
+
+  // Warm other sections only after real user activity (or a long idle),
+  // so mobile LCP / CrUX aren't crushed by building the full card DOM.
+  var warmed = false;
+  function warmRemainingSections() {
+    if (warmed) return;
+    warmed = true;
+    var i = 0;
+    function step() {
+      while (i < results.length) {
+        var sec = results[i++].section;
+        if (sec === "Home" || _sectionsDomReady[sec]) continue;
+        ensureSectionRendered(sec);
+        setTimeout(step, 0);
+        return;
+      }
+      if (typeof window.bsvRefreshSavedCardButtons === "function") {
+        window.bsvRefreshSavedCardButtons();
+      }
+      renderSectionContentEmbeds();
+    }
+    step();
+  }
+  ["pointerdown", "keydown", "touchstart", "scroll"].forEach(function (evt) {
+    window.addEventListener(evt, warmRemainingSections, { once: true, passive: true });
+  });
+  setTimeout(warmRemainingSections, 12000);
 });
 
 function refreshDynamicContentForLanguage() {
@@ -4069,18 +4971,44 @@ function refreshDynamicContentForLanguage() {
     el.remove();
   });
 
+  _sectionsDomReady = Object.create(null);
+  _sectionsDomReady["Home"] = true;
+
+  // Re-render only the active section immediately; warm the rest idle.
+  ensureSectionRendered(_activeSectionName || "Home");
   _renderedSectionCache.forEach(function (result) {
-    renderSection(result.section, result.items);
+    if (result.section === (_activeSectionName || "Home")) return;
+    // Mark as not ready so idle warm / next nav rebuilds with new i18n strings.
   });
 
   applyStripGiveawayBannerVisibility();
   initGiveawayBannerCarousels();
   initDiscordPromoCardCarousels();
+  renderSectionContentEmbeds();
   initSectionsNav();
   showSection(_activeSectionName);
 
   var taxInput = document.getElementById("taxInput");
   if (taxInput) taxInput.dispatchEvent(new Event("input"));
+  if (typeof window.bsvAlignSponsorBanner === "function") {
+    window.bsvAlignSponsorBanner();
+  }
+
+  function warm() {
+    var i = 0;
+    function step() {
+      while (i < _renderedSectionCache.length) {
+        var sec = _renderedSectionCache[i++].section;
+        if (sec === "Home" || _sectionsDomReady[sec]) continue;
+        ensureSectionRendered(sec);
+        setTimeout(step, 0);
+        return;
+      }
+      renderSectionContentEmbeds();
+    }
+    step();
+  }
+  setTimeout(warm, 300);
 }
 
 document.addEventListener("bsv:languagechange", function () {
