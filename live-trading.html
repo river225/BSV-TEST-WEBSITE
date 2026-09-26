@@ -178,15 +178,7 @@
           <h3 class="live-trading-step__title" data-i18n="liveTrading.step2Title">Log in with Roblox</h3>
           <p class="live-trading-step__status" id="live-trading-roblox-status"></p>
           <button type="button" class="live-trading-step__btn live-trading-step__btn--roblox" id="live-trading-roblox-btn" data-i18n="liveTrading.robloxBtn">Log in with Roblox</button>
-          <div class="live-trading-roblox-fallback" id="live-trading-roblox-fallback" hidden>
-            <p class="live-trading-roblox-fallback__hint" data-i18n="liveTrading.robloxHint">Enter your Roblox username to link your account.</p>
-            <label class="live-trading-roblox-fallback__label" for="live-trading-roblox-username">
-              <span class="visually-hidden" data-i18n="liveTrading.robloxPlaceholder">Roblox username</span>
-              <input type="text" id="live-trading-roblox-username" class="live-trading-roblox-fallback__input" maxlength="20" autocomplete="username" data-i18n-placeholder="liveTrading.robloxPlaceholder" placeholder="Roblox username" />
-            </label>
-            <button type="button" class="live-trading-step__btn live-trading-step__btn--roblox" id="live-trading-roblox-connect" data-i18n="liveTrading.robloxConnect">Connect Roblox</button>
-            <p class="live-trading-roblox-fallback__error" id="live-trading-roblox-error" hidden data-i18n="liveTrading.robloxError">Could not find that Roblox user. Check the username and try again.</p>
-          </div>
+          <p class="live-trading-step__error" id="live-trading-roblox-error" hidden>Roblox login is not configured yet. Try again shortly.</p>
         </div>
       </li>
     </ol>
@@ -197,10 +189,10 @@
 <div id="bsv-site-footer"></div>
 
 <script defer src="site-chrome.js?v=20260926-live-trading"></script>
-<script defer src="auth.js?v=20260926-live-trading"></script>
+<script defer src="auth.js?v=20260926-roblox-oauth"></script>
 <script defer src="site-i18n.js?v=20260926-live-trading"></script>
 <script defer src="site-settings.js?v=20260926-live-trading"></script>
 <script defer src="section-config.js?v=20260926-live-trading"></script>
-<script defer src="live-trading.js?v=20260926-live-trading-resume"></script>
+<script defer src="live-trading.js?v=20260926-roblox-oauth"></script>
 </body>
 </html>

@@ -158,9 +158,11 @@
     if (typeof window.startDiscordLogin === "function") window.startDiscordLogin();
   }
 
-  function showRobloxFallback(show) {
-    var el = document.getElementById("live-trading-roblox-fallback");
-    if (el) el.hidden = !show;
+  function startRobloxLoginAndResume() {
+    markResumeLoginModal();
+    var err = document.getElementById("live-trading-roblox-error");
+    if (err) err.hidden = true;
+    if (typeof window.startRobloxLogin === "function") window.startRobloxLogin();
   }
 
   function applySession(session) {
@@ -206,7 +208,6 @@
       robloxBtn.disabled = !discord || !!roblox;
       robloxBtn.hidden = !!roblox;
     }
-    if (roblox) showRobloxFallback(false);
 
     if (ready) setModalOpen(false);
     return {
@@ -239,8 +240,6 @@
     var backdrop = document.getElementById("live-trading-login-backdrop");
     var discordBtn = document.getElementById("live-trading-discord-btn");
     var robloxBtn = document.getElementById("live-trading-roblox-btn");
-    var robloxConnect = document.getElementById("live-trading-roblox-connect");
-    var robloxInput = document.getElementById("live-trading-roblox-username");
     var robloxError = document.getElementById("live-trading-roblox-error");
 
     if (openBtn) {
@@ -272,53 +271,19 @@
     );
 
     if (robloxBtn) {
-      robloxBtn.addEventListener("click", function () {
-        if (typeof window.startRobloxLogin !== "function") {
-          showRobloxFallback(true);
-          return;
-        }
-        window.startRobloxLogin({
-          onUnavailable: function () {
-            showRobloxFallback(true);
-            if (robloxInput) robloxInput.focus();
-          }
-        });
-      });
+      robloxBtn.addEventListener("click", startRobloxLoginAndResume);
     }
 
-    function connectRobloxUsername() {
-      if (robloxError) robloxError.hidden = true;
-      if (typeof window.bsvLinkRobloxUsername !== "function") return;
-      var name = robloxInput ? robloxInput.value : "";
-      robloxConnect.disabled = true;
-      window
-        .bsvLinkRobloxUsername(name)
-        .then(function () {
-          return refreshSession();
-        })
-        .catch(function () {
-          if (robloxError) robloxError.hidden = false;
-        })
-        .then(function () {
-          robloxConnect.disabled = false;
-        });
-    }
-
-    if (robloxConnect) robloxConnect.addEventListener("click", connectRobloxUsername);
-    if (robloxInput) {
-      robloxInput.addEventListener("keydown", function (e) {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          connectRobloxUsername();
-        }
-      });
-    }
+    try {
+      if (new URLSearchParams(window.location.search || "").get("bsv_roblox_error") ||
+          (window.location.hash || "").indexOf("bsv_roblox_error=") !== -1) {
+        if (robloxError) robloxError.hidden = false;
+        setModalOpen(true);
+      }
+    } catch (_) {}
 
     document.addEventListener("bsv:authchange", function (e) {
       applySession(e.detail || {});
-    });
-    document.addEventListener("bsv:roblox-oauth-unavailable", function () {
-      showRobloxFallback(true);
     });
     document.addEventListener("bsv:languagechange", function () {
       buildSectionsNav();

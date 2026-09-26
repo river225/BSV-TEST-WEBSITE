@@ -16055,36 +16055,12 @@ body.sponsors-body .site-footer {
 .live-trading-step__btn--roblox {
   background: linear-gradient(180deg, #f0436a 0%, #be123c 100%);
 }
-.live-trading-roblox-fallback {
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.live-trading-roblox-fallback[hidden] {
-  display: none !important;
-}
-.live-trading-roblox-fallback__hint {
-  margin: 0;
-  color: #c7cce0;
-  font-size: 0.9rem;
-}
-.live-trading-roblox-fallback__input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 11px 12px;
-  border-radius: 8px;
-  border: 2px solid #000;
-  background: #0f1724;
-  color: #fff;
-  font-size: 1rem;
-}
-.live-trading-roblox-fallback__error {
-  margin: 0;
+.live-trading-step__error {
+  margin: 10px 0 0;
   color: #fca5a5;
   font-size: 0.88rem;
 }
-.live-trading-roblox-fallback__error[hidden] {
+.live-trading-step__error[hidden] {
   display: none !important;
 }
 body.live-trading-login-open {

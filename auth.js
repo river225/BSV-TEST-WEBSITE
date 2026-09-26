@@ -218,62 +218,10 @@
     window.location.href = authUrl("api/auth/discord?return_to=" + encodeURIComponent(returnTo));
   }
 
-  function startRobloxLogin(options) {
-    options = options || {};
+  function startRobloxLogin() {
     saveOAuthReturnTo();
     var returnTo = window.location.href.split("#")[0];
-    var url = authUrl("api/auth/roblox?return_to=" + encodeURIComponent(returnTo));
-
-    return fetch(url, { method: "GET", redirect: "manual", credentials: "omit" })
-      .then(function (res) {
-        if (res.status === 404 || res.status === 405) {
-          document.dispatchEvent(new CustomEvent("bsv:roblox-oauth-unavailable"));
-          if (typeof options.onUnavailable === "function") options.onUnavailable();
-          return { ok: false, reason: "unavailable" };
-        }
-        window.location.href = url;
-        return { ok: true };
-      })
-      .catch(function () {
-        // Network probe failed — still attempt the OAuth URL (same as Discord).
-        window.location.href = url;
-        return { ok: true };
-      });
-  }
-
-  function linkRobloxUsername(username) {
-    var name = String(username || "").trim();
-    if (!name || name.length < 3 || name.length > 20) {
-      return Promise.reject(new Error("invalid_username"));
-    }
-    if (!cachedDiscordUser && !getAuthToken()) {
-      return Promise.reject(new Error("discord_required"));
-    }
-    return fetch(authUrl("api/roblox-avatars"), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ usernames: [name] })
-    })
-      .then(function (res) {
-        if (!res.ok) throw new Error("roblox_lookup_failed");
-        return res.json();
-      })
-      .then(function (data) {
-        var avatars = (data && data.avatars) || {};
-        var key = name.toLowerCase();
-        var info = avatars[key] || avatars[name] || null;
-        if (!info || !info.userId) throw new Error("roblox_not_found");
-        var link = {
-          username: name,
-          userId: info.userId,
-          imageUrl: info.imageUrl || "",
-          profileUrl: info.profileUrl || ("https://www.roblox.com/users/" + info.userId + "/profile"),
-          linkedAt: Date.now()
-        };
-        writeRobloxLink(link);
-        emitAuthChange(cachedDiscordUser);
-        return link;
-      });
+    window.location.href = authUrl("api/auth/roblox?return_to=" + encodeURIComponent(returnTo));
   }
 
   function logoutDiscord() {
@@ -421,10 +369,12 @@
   }
 
   function fetchRobloxSession() {
-    cachedRobloxLink = readRobloxLink();
     var token = getRobloxToken();
-    if (!token) return Promise.resolve(cachedRobloxLink);
-    // Future OAuth token path — keep local link if /me/roblox is not available yet.
+    if (!token) {
+      // Drop legacy username-only links — Live Trading requires real Roblox OAuth.
+      clearRobloxLink();
+      return Promise.resolve(null);
+    }
     return fetch(authUrl("api/auth/roblox/me"), {
       headers: { Authorization: "Bearer " + token }
     })
@@ -433,21 +383,25 @@
         return res.json();
       })
       .then(function (data) {
-        if (data && data.user) {
-          var link = {
-            username: data.user.username || data.user.name || "Roblox",
-            userId: data.user.id || data.user.userId,
-            imageUrl: data.user.avatarUrl || data.user.imageUrl || "",
-            profileUrl: data.user.profileUrl || "",
-            linkedAt: Date.now()
-          };
-          writeRobloxLink(link);
-          return link;
+        if (!data || !data.loggedIn || !data.user) {
+          clearRobloxLink();
+          return null;
         }
-        return cachedRobloxLink;
+        var link = {
+          username: data.user.username || data.user.name || "Roblox",
+          userId: data.user.id || data.user.userId,
+          imageUrl: data.user.avatarUrl || data.user.imageUrl || "",
+          profileUrl: data.user.profileUrl || "",
+          oauth: true,
+          linkedAt: Date.now()
+        };
+        writeRobloxLink(link);
+        return link;
       })
       .catch(function () {
-        return cachedRobloxLink;
+        setRobloxToken(null);
+        writeRobloxLink(null);
+        return null;
       });
   }
 
@@ -505,7 +459,6 @@
   window.initDiscordAuth = initDiscordAuth;
   window.startDiscordLogin = startDiscordLogin;
   window.startRobloxLogin = startRobloxLogin;
-  window.bsvLinkRobloxUsername = linkRobloxUsername;
   window.bsvGetAuthToken = getAuthToken;
   window.bsvGetAuthSession = getAuthSession;
   window.bsvClearRobloxLink = clearRobloxLink;
