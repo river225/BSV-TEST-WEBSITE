@@ -163,8 +163,8 @@
     return {
       user: cachedDiscordUser,
       discord: cachedDiscordUser,
-      roblox: cachedRobloxLink,
-      ready: !!(cachedDiscordUser && cachedRobloxLink)
+      roblox: null,
+      ready: !!cachedDiscordUser
     };
   }
 
@@ -202,12 +202,9 @@
       return false;
     }
 
+    // Roblox login removed — drop any leftover Roblox OAuth hash.
     if (hash.indexOf("bsv_roblox_auth=") !== -1) {
-      var robloxMatch = hash.match(/bsv_roblox_auth=([^&]+)/);
-      if (robloxMatch && robloxMatch[1]) {
-        setRobloxToken(decodeURIComponent(robloxMatch[1]));
-        justLoggedIn = true;
-      }
+      clearRobloxLink();
     }
 
     if (hash.indexOf("bsv_auth=") !== -1) {
@@ -253,23 +250,8 @@
   }
 
   function startRobloxLogin() {
-    markResumeLoginModal();
-    saveOAuthReturnTo();
-    var returnTo = window.location.href.split("#")[0];
-    var url = authUrl("api/auth/roblox?return_to=" + encodeURIComponent(returnTo));
-    fetch(url, { method: "GET", redirect: "manual", credentials: "omit" })
-      .then(function (res) {
-        if (res.status === 503 || res.status === 404 || res.status === 405) {
-          document.dispatchEvent(
-            new CustomEvent("bsv:roblox-oauth-unavailable", { detail: { status: res.status } })
-          );
-          return;
-        }
-        window.location.href = url;
-      })
-      .catch(function () {
-        window.location.href = url;
-      });
+    // Roblox login removed site-wide.
+    startDiscordLogin();
   }
 
   function refreshAfterLogout() {
@@ -396,13 +378,13 @@
 
   function ensureLoginModal() {
     var existing = document.getElementById("bsv-login-modal");
-    if (existing && existing.getAttribute("data-bsv-login-v") === "3") return;
+    if (existing && existing.getAttribute("data-bsv-login-v") === "4") return;
     if (existing) existing.remove();
 
     var wrap = document.createElement("div");
     wrap.className = "bsv-login-modal";
     wrap.id = "bsv-login-modal";
-    wrap.setAttribute("data-bsv-login-v", "3");
+    wrap.setAttribute("data-bsv-login-v", "4");
     wrap.hidden = true;
     wrap.innerHTML =
       '<div class="bsv-login-modal__backdrop" id="bsv-login-backdrop"></div>' +
@@ -413,20 +395,8 @@
         '<h2 class="bsv-login-modal__title" id="bsv-login-title">' +
           escapeHtml(t("auth.login", "Log In")) +
         "</h2>" +
-        '<ol class="bsv-login-steps">' +
-          '<li class="bsv-login-step" id="bsv-login-step-roblox" data-step="roblox">' +
-            '<div class="bsv-login-step__body">' +
-              '<h3 class="bsv-login-step__title">' + escapeHtml(t("auth.robloxTitle", "Log in with Roblox")) + "</h3>" +
-              '<p class="bsv-login-step__status" id="bsv-login-roblox-status"></p>' +
-              '<button type="button" class="bsv-login-step__btn bsv-login-step__btn--roblox" id="bsv-login-roblox-btn">' +
-                escapeHtml(t("auth.robloxBtn", "Log in with Roblox")) +
-              "</button>" +
-              '<p class="bsv-login-step__error" id="bsv-login-roblox-error" hidden>' +
-                escapeHtml(t("auth.robloxError", "Roblox login is not configured yet. Try again shortly.")) +
-              "</p>" +
-            "</div>" +
-          "</li>" +
-          '<li class="bsv-login-step" id="bsv-login-step-discord" data-step="discord">' +
+        '<div class="bsv-login-steps bsv-login-steps--single">' +
+          '<div class="bsv-login-step" id="bsv-login-step-discord" data-step="discord">' +
             '<div class="bsv-login-step__body">' +
               '<h3 class="bsv-login-step__title">' + escapeHtml(t("auth.discordTitle", "Log in with Discord")) + "</h3>" +
               '<p class="bsv-login-step__status" id="bsv-login-discord-status"></p>' +
@@ -434,20 +404,18 @@
                 escapeHtml(t("auth.discordBtn", "Log in with Discord")) +
               "</button>" +
             "</div>" +
-          "</li>" +
-        "</ol>" +
+          "</div>" +
+        "</div>" +
       "</div>";
     document.body.appendChild(wrap);
 
     var closeBtn = document.getElementById("bsv-login-close");
     var backdrop = document.getElementById("bsv-login-backdrop");
     var discordBtn = document.getElementById("bsv-login-discord-btn");
-    var robloxBtn = document.getElementById("bsv-login-roblox-btn");
 
     if (closeBtn) closeBtn.addEventListener("click", closeLoginModal);
     if (backdrop) backdrop.addEventListener("click", closeLoginModal);
     if (discordBtn) discordBtn.addEventListener("click", startDiscordLogin);
-    if (robloxBtn) robloxBtn.addEventListener("click", startRobloxLogin);
 
     if (!window.__bsvLoginEscBound) {
       window.__bsvLoginEscBound = true;
@@ -461,44 +429,22 @@
     ensureLoginModal();
     session = session || currentSession();
     var discord = session.discord || session.user || null;
-    var roblox = session.roblox || null;
     var stepDiscord = document.getElementById("bsv-login-step-discord");
-    var stepRoblox = document.getElementById("bsv-login-step-roblox");
     var discordStatus = document.getElementById("bsv-login-discord-status");
-    var robloxStatus = document.getElementById("bsv-login-roblox-status");
     var discordBtn = document.getElementById("bsv-login-discord-btn");
-    var robloxBtn = document.getElementById("bsv-login-roblox-btn");
     var title = document.getElementById("bsv-login-title");
-    var robloxError = document.getElementById("bsv-login-roblox-error");
 
     if (title) title.textContent = t("auth.login", "Log In");
-    if (robloxError && !robloxError.dataset.forceShow) robloxError.hidden = true;
-    if (stepRoblox) stepRoblox.classList.toggle("is-complete", !!roblox);
-    if (stepDiscord) {
-      stepDiscord.classList.toggle("is-complete", !!discord);
-      stepDiscord.classList.toggle("is-locked", !roblox);
-    }
-    if (robloxStatus) {
-      robloxStatus.textContent = roblox
-        ? t("auth.robloxDone", "Connected") + (roblox.username ? " · " + roblox.username : "")
-        : "";
-    }
+    if (stepDiscord) stepDiscord.classList.toggle("is-complete", !!discord);
     if (discordStatus) {
       discordStatus.textContent = discord
         ? t("auth.discordDone", "Connected") +
           (discord.displayName || discord.username ? " · " + (discord.displayName || discord.username) : "")
-        : !roblox
-          ? t("auth.discordNeedsRoblox", "Connect Roblox first")
-          : "";
-    }
-    if (robloxBtn) {
-      robloxBtn.hidden = !!roblox;
-      robloxBtn.disabled = !!roblox;
-      robloxBtn.textContent = t("auth.robloxBtn", "Log in with Roblox");
+        : "";
     }
     if (discordBtn) {
       discordBtn.hidden = !!discord;
-      discordBtn.disabled = !roblox || !!discord;
+      discordBtn.disabled = !!discord;
       discordBtn.textContent = t("auth.discordBtn", "Log in with Discord");
     }
     if (session.ready) closeLoginModal();
@@ -538,12 +484,6 @@
     var btn = document.getElementById("nav-login-btn");
     var menu = document.getElementById("nav-login-menu");
     var logoutBtn = document.getElementById("nav-login-logout");
-    var choices = document.getElementById("nav-login-logout-choices");
-    var logoutBoth = document.getElementById("nav-logout-both");
-    var logoutRoblox = document.getElementById("nav-logout-roblox");
-    var logoutDiscord = document.getElementById("nav-logout-discord");
-    var linkRoblox = document.getElementById("nav-link-roblox");
-    var linkDiscord = document.getElementById("nav-link-discord");
 
     if (btn && menu) {
       btn.addEventListener("click", function (e) {
@@ -551,38 +491,10 @@
         var open = menu.hidden;
         menu.hidden = !open;
         btn.setAttribute("aria-expanded", open ? "true" : "false");
-        if (!open) {
-          logoutChoicesOpen = false;
-          if (choices) choices.hidden = true;
-        }
       });
     }
 
-    if (logoutBtn && choices) {
-      logoutBtn.addEventListener("click", function (e) {
-        e.stopPropagation();
-        logoutChoicesOpen = !logoutChoicesOpen;
-        choices.hidden = !logoutChoicesOpen;
-      });
-    }
-
-    if (logoutBoth) logoutBoth.addEventListener("click", logoutAll);
-    if (logoutRoblox) logoutRoblox.addEventListener("click", logoutRobloxOnly);
-    if (logoutDiscord) logoutDiscord.addEventListener("click", logoutDiscordOnly);
-
-    if (linkRoblox) {
-      linkRoblox.addEventListener("click", function () {
-        closeLoginMenu();
-        startRobloxLogin();
-      });
-    }
-    if (linkDiscord) {
-      linkDiscord.addEventListener("click", function () {
-        closeLoginMenu();
-        if (!session.roblox) openLoginModal();
-        else startDiscordLogin();
-      });
-    }
+    if (logoutBtn) logoutBtn.addEventListener("click", logoutAll);
   }
 
   function statusRowHtml(avatarUrl, statusText) {
@@ -607,13 +519,12 @@
 
     session = session || currentSession();
     cachedDiscordUser = session.discord || session.user || null;
-    cachedRobloxLink = session.roblox || null;
+    cachedRobloxLink = null;
     emitAuthChange();
     syncLoginModal(session);
 
     var discord = session.discord || null;
-    var roblox = session.roblox || null;
-    var hasAny = !!(discord || roblox);
+    var hasAny = !!discord;
 
     if (!hasAny) {
       var loginLabel = t("auth.login", "Log In");
@@ -635,41 +546,30 @@
       return;
     }
 
-    var chipName = roblox
-      ? roblox.username
-      : t("auth.accountChip", "Account");
-    var chipAvatar = roblox ? robloxAvatar(roblox) : DEFAULT_AVATAR;
-    var accountMenuLabel = t("auth.accountMenu", "Profile menu");
-
-    var robloxStatusHtml = roblox
-      ? statusRowHtml(
-          robloxAvatar(roblox),
-          t("auth.statusConnected", "Logged in") + (roblox.username ? " · @" + roblox.username : "")
-        )
-      : '<button type="button" class="nav-login-menu__link-btn nav-login-menu__link-btn--roblox" id="nav-link-roblox">' +
-        escapeHtml(t("auth.robloxBtn", "Log in with Roblox")) +
-        "</button>";
-
     var discordName = discord ? discord.displayName || discord.username || "Discord" : "";
-    var discordAvatar = discord && discord.avatarUrl ? discord.avatarUrl : DEFAULT_AVATAR;
-    var discordStatusHtml = discord
-      ? statusRowHtml(
-          discordAvatar,
-          t("auth.statusConnected", "Logged in") + (discordName ? " · " + discordName : "")
-        )
-      : '<button type="button" class="nav-login-menu__link-btn nav-login-menu__link-btn--discord" id="nav-link-discord">' +
-        escapeHtml(t("auth.discordBtn", "Log in with Discord")) +
-        "</button>";
+    var discordHandle = discord && discord.username ? "@" + discord.username : "";
+    var chipName = discordName || t("auth.accountChip", "Account");
+    var chipAvatar = discord && discord.avatarUrl ? discord.avatarUrl : DEFAULT_AVATAR;
+    var accountMenuLabel = t("auth.accountMenu", "Profile menu");
+    var discordStatusHtml = statusRowHtml(
+      chipAvatar,
+      t("auth.statusConnected", "Logged in") +
+        (discordName ? " · " + discordName : "") +
+        (discordHandle ? " " + discordHandle : "")
+    );
 
     slot.innerHTML =
       '<div class="nav-login-user">' +
         '<button type="button" class="nav-login-btn nav-login-btn--signedin" id="nav-login-btn" title="' +
-          escapeAttr(chipName) +
+          escapeAttr(chipName + (discordHandle ? " " + discordHandle : "")) +
           '" aria-label="' +
           escapeAttr(accountMenuLabel) +
           '" aria-expanded="false" aria-haspopup="true">' +
           '<span class="nav-login-btn__name">' +
           escapeHtml(chipName) +
+          (discordHandle
+            ? '<span class="nav-login-btn__handle">' + escapeHtml(discordHandle) + "</span>"
+            : "") +
           "</span>" +
           '<span class="nav-login-btn__avatar-wrap">' +
             '<img src="' +
@@ -681,12 +581,6 @@
           '<p class="nav-login-menu__title">' +
           escapeHtml(t("auth.profileTitle", "Profile")) +
           "</p>" +
-          '<section class="nav-login-menu__section" aria-label="Roblox">' +
-            '<p class="nav-login-menu__section-label">' +
-            escapeHtml(t("auth.robloxSection", "Roblox")) +
-            "</p>" +
-            robloxStatusHtml +
-          "</section>" +
           '<section class="nav-login-menu__section" aria-label="Discord">' +
             '<p class="nav-login-menu__section-label">' +
             escapeHtml(t("auth.discordSection", "Discord")) +
@@ -697,23 +591,9 @@
             '<button type="button" class="nav-login-menu__logout" id="nav-login-logout">' +
             escapeHtml(t("auth.logout", "Log out")) +
             "</button>" +
-            '<div class="nav-login-menu__logout-choices" id="nav-login-logout-choices" hidden>' +
-              '<p class="nav-login-menu__logout-hint">' +
-              escapeHtml(t("auth.logoutWhere", "Where do you want to log out?")) +
-              "</p>" +
-              '<button type="button" class="nav-login-menu__logout-opt nav-login-menu__logout-opt--roblox" id="nav-logout-roblox">' +
-              escapeHtml(t("auth.logoutRoblox", "Roblox only")) +
-              "</button>" +
-              '<button type="button" class="nav-login-menu__logout-opt nav-login-menu__logout-opt--discord" id="nav-logout-discord">' +
-              escapeHtml(t("auth.logoutDiscord", "Discord only")) +
-              "</button>" +
-              '<button type="button" class="nav-login-menu__logout-opt nav-login-menu__logout-opt--both" id="nav-logout-both">' +
-              escapeHtml(t("auth.logoutBoth", "Both accounts")) +
-              "</button>" +
-              '<p class="nav-login-menu__trading-note">' +
-              escapeHtml(t("auth.liveTradingRequired", "Login is required for live trading")) +
-              "</p>" +
-            "</div>" +
+            '<p class="nav-login-menu__trading-note">' +
+            escapeHtml(t("auth.liveTradingRequired", "Login is required for live trading")) +
+            "</p>" +
           "</div>" +
         "</div>" +
       "</div>";
@@ -759,11 +639,10 @@
   }
 
   function getAuthSession() {
-    return Promise.all([fetchAuthUser(), fetchRobloxSession()]).then(function (pair) {
-      var user = pair[0];
-      var roblox = pair[1];
+    clearRobloxLink();
+    return fetchAuthUser().then(function (user) {
       cachedDiscordUser = user || null;
-      cachedRobloxLink = roblox || null;
+      cachedRobloxLink = null;
       return currentSession();
     });
   }
@@ -773,7 +652,7 @@
     watchForLogoutTestButton();
     ensureLoginModal();
     var justLoggedIn = parseAuthHash();
-    cachedRobloxLink = readRobloxLink();
+    clearRobloxLink();
     getAuthSession().then(function (session) {
       renderNavLogin(session);
       removeLogoutTestButton();
@@ -785,7 +664,6 @@
       }
       if (justLoggedIn) {
         var welcomeName =
-          (session.roblox && session.roblox.username) ||
           (session.user && (session.user.displayName || session.user.username)) ||
           "back";
         showWelcomeBanner(welcomeName);
@@ -799,19 +677,6 @@
       getAuthSession().then(function (session) {
         renderNavLogin(session);
       });
-    });
-    document.addEventListener("bsv:roblox-oauth-unavailable", function () {
-      ensureLoginModal();
-      var robloxError = document.getElementById("bsv-login-roblox-error");
-      if (robloxError) {
-        robloxError.dataset.forceShow = "1";
-        robloxError.hidden = false;
-        robloxError.textContent = t(
-          "auth.robloxServerError",
-          "Roblox login is not set up on the server yet. Try again shortly."
-        );
-      }
-      openLoginModal();
     });
     window.addEventListener("pageshow", function () {
       removeLogoutTestButton();

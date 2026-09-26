@@ -29,7 +29,7 @@
   var searchScope = "all";
   var searchQuery = "";
   var pickerRarity = "all";
-  var currentSession = { ready: false, discord: null, roblox: null };
+  var currentSession = { ready: false, discord: null, roblox: null, user: null };
 
   function t(key, fallback) {
     if (window.bsvI18n && typeof window.bsvI18n.t === "function") {
@@ -161,30 +161,60 @@
   }
 
   function authorFromSession() {
-    var roblox = currentSession.roblox || null;
     var discord = currentSession.discord || currentSession.user || null;
     return {
-      robloxUsername: roblox && roblox.username ? roblox.username : "Trader",
-      robloxUserId: roblox && roblox.userId ? String(roblox.userId) : "",
-      robloxAvatar: (roblox && (roblox.imageUrl || roblox.avatarUrl)) || "",
-      discordName: discord
-        ? discord.displayName || discord.username || ""
-        : "",
-      discordId: discord && discord.id ? String(discord.id) : ""
+      discordId: discord && discord.id ? String(discord.id) : "",
+      discordUsername: discord && discord.username ? String(discord.username) : "",
+      discordDisplayName: discord
+        ? discord.displayName || discord.username || "Trader"
+        : "Trader",
+      discordAvatar: (discord && discord.avatarUrl) || ""
     };
   }
 
   function isOwnPost(post) {
     var a = authorFromSession();
     if (!post || !post.author) return false;
-    if (a.robloxUserId && post.author.robloxUserId) {
-      return String(a.robloxUserId) === String(post.author.robloxUserId);
+    if (a.discordId && post.author.discordId) {
+      return String(a.discordId) === String(post.author.discordId);
     }
     return (
-      a.robloxUsername &&
-      post.author.robloxUsername &&
-      a.robloxUsername.toLowerCase() === String(post.author.robloxUsername).toLowerCase()
+      !!a.discordUsername &&
+      !!post.author.discordUsername &&
+      a.discordUsername.toLowerCase() ===
+        String(post.author.discordUsername).toLowerCase()
     );
+  }
+
+  function authorDisplayName(author) {
+    author = author || {};
+    return (
+      author.discordDisplayName ||
+      author.discordName ||
+      author.discordUsername ||
+      author.robloxUsername ||
+      "Trader"
+    );
+  }
+
+  function authorHandle(author) {
+    author = author || {};
+    var u = author.discordUsername || "";
+    return u ? "@" + u : "";
+  }
+
+  function authorAvatar(author) {
+    author = author || {};
+    if (author.discordAvatar) return author.discordAvatar;
+    if (author.robloxAvatar) return author.robloxAvatar;
+    if (author.robloxUserId) {
+      return (
+        "https://www.roblox.com/headshot-thumbnail/image?userId=" +
+        encodeURIComponent(author.robloxUserId) +
+        "&width=150&height=150&format=png"
+      );
+    }
+    return "";
   }
 
   function timeAgo(ts) {
@@ -300,11 +330,12 @@
 
   function applySession(session) {
     session = session || {};
+    var discord = session.discord || session.user || null;
     currentSession = {
-      ready: !!session.ready,
-      discord: session.discord || session.user || null,
-      user: session.discord || session.user || null,
-      roblox: session.roblox || null
+      ready: !!(session.ready || discord),
+      discord: discord,
+      user: discord,
+      roblox: null
     };
     var gate = document.getElementById("live-trading-gate");
     var workspace = document.getElementById("live-trading-workspace");
@@ -745,8 +776,7 @@
   }
 
   function postSummaryHtml(post) {
-    var user =
-      (post.author && post.author.robloxUsername) || "This trader";
+    var user = authorDisplayName(post.author) || "This trader";
     var trade =
       sideTradePhrase(post.giving, "nothing") +
       " for " +
@@ -876,13 +906,9 @@
 
   function postCardHtml(post) {
     var author = post.author || {};
-    var avatar =
-      author.robloxAvatar ||
-      (author.robloxUserId
-        ? "https://www.roblox.com/headshot-thumbnail/image?userId=" +
-          encodeURIComponent(author.robloxUserId) +
-          "&width=150&height=150&format=png"
-        : "");
+    var avatar = authorAvatar(author);
+    var displayName = authorDisplayName(author);
+    var handle = authorHandle(author);
     var own = isOwnPost(post);
     var wanting = post.wanting || {};
     var offerCorner = "";
@@ -914,7 +940,10 @@
         : '<span class="lt-post__avatar lt-post__avatar--ph"></span>') +
       '<div class="lt-post__who">' +
       '<p class="lt-post__name">' +
-      escapeHtml(author.robloxUsername || "Trader") +
+      escapeHtml(displayName) +
+      (handle
+        ? ' <span class="lt-post__handle">' + escapeHtml(handle) + "</span>"
+        : "") +
       "</p>" +
       '<p class="lt-post__time">' +
       escapeHtml(timeAgo(post.createdAt)) +

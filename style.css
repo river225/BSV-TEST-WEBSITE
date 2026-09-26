@@ -6292,6 +6292,10 @@ background-attachment: fixed;
   box-shadow: none;
   opacity: 0.88;
 }.nav-login-btn__name {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
   color: #fff;
   font-size: 1.08rem;
   font-weight: 700;
@@ -6300,6 +6304,16 @@ background-attachment: fixed;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 180px;
+  line-height: 1.15;
+}.nav-login-btn__handle {
+  display: block;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }.nav-login-btn__avatar-wrap {
   display: flex;
   align-items: center;
@@ -6426,11 +6440,11 @@ background-attachment: fixed;
 }.nav-login-menu__link-btn--discord {
   background: linear-gradient(180deg, #6875f5 0%, #4752c4 100%);
 }.nav-login-menu__trading-note {
-  margin: 4px 0 0;
+  margin: 8px 0 0;
   padding: 8px 8px 2px;
-  color: rgba(255, 255, 255, 0.55);
+  color: #fca5a5;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.35;
   text-align: center;
 }.nav-login-menu__logout-wrap {
@@ -16672,6 +16686,12 @@ body.live-trading-page .live-trading-layout-spacer {
   color: #fff;
   font-size: 0.95rem;
   font-weight: 800;
+  line-height: 1.25;
+}
+.lt-post__handle {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.78rem;
+  font-weight: 650;
 }
 .lt-post__time {
   margin: 2px 0 0;
