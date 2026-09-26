@@ -84,7 +84,7 @@
 <script defer src="auth-oauth-bounce.js?v=20260926-live-trading"></script>
 <title>Live Trading — BlockSpin Values (Dev)</title>
 <meta name="description" content="Live Trading — development build of BlockSpin Values." />
-<link rel="stylesheet" href="style.css?v=20260926-lt-board3" />
+<link rel="stylesheet" href="style.css?v=20260926-lt-board4" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Paytone+One&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
@@ -154,13 +154,6 @@
         <div class="lt-board" id="lt-board">
           <h2 class="lt-board__title">Live Trading</h2>
 
-          <div class="lt-board__create-row">
-            <button type="button" class="lt-board__create-btn" id="lt-open-create">
-              <span class="lt-board__create-plus" aria-hidden="true">+</span>
-              Create post
-            </button>
-          </div>
-
           <section class="lt-composer" id="lt-composer" hidden>
             <div class="lt-composer__head">
               <h3 class="lt-composer__title">New trade post</h3>
@@ -194,22 +187,28 @@
             </div>
           </section>
 
-          <section class="lt-search" aria-label="Search trades">
-            <div class="lt-search__label">
-              <svg class="lt-search__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"></circle>
-                <path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-              </svg>
-              <span>Search Items</span>
-            </div>
-            <input type="search" class="lt-search__input" id="lt-search" placeholder="Search items by name…" autocomplete="off" />
-            <div class="lt-search__in" role="group" aria-label="Search in">
-              <span class="lt-search__in-label">Search in:</span>
-              <button type="button" class="lt-search__scope is-active" data-scope="all">All</button>
-              <button type="button" class="lt-search__scope" data-scope="offering">Offering</button>
-              <button type="button" class="lt-search__scope" data-scope="requesting">Requesting</button>
-            </div>
-          </section>
+          <div class="lt-toolbar">
+            <section class="lt-search" aria-label="Search trades">
+              <div class="lt-search__label">
+                <svg class="lt-search__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"></circle>
+                  <path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                </svg>
+                <span>Search Items</span>
+              </div>
+              <input type="search" class="lt-search__input" id="lt-search" placeholder="Search items by name…" autocomplete="off" />
+              <div class="lt-search__in" role="group" aria-label="Search in">
+                <span class="lt-search__in-label">Search in:</span>
+                <button type="button" class="lt-search__scope is-active" data-scope="all">All</button>
+                <button type="button" class="lt-search__scope" data-scope="offering">Offering</button>
+                <button type="button" class="lt-search__scope" data-scope="requesting">Requesting</button>
+              </div>
+            </section>
+            <button type="button" class="lt-board__create-btn" id="lt-open-create">
+              <span class="lt-board__create-plus" aria-hidden="true">+</span>
+              Create post
+            </button>
+          </div>
 
           <section class="lt-feed-wrap">
             <div class="lt-feed" id="lt-feed" role="feed" aria-busy="true">
