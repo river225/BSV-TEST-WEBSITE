@@ -84,7 +84,7 @@
 <script defer src="auth-oauth-bounce.js?v=20260926-live-trading"></script>
 <title>Live Trading — BlockSpin Values (Dev)</title>
 <meta name="description" content="Live Trading — development build of BlockSpin Values." />
-<link rel="stylesheet" href="style.css?v=20260926-profile-ui2" />
+<link rel="stylesheet" href="style.css?v=20260926-lt-board1" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Paytone+One&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
@@ -151,7 +151,84 @@
       </div>
 
       <div class="live-trading-workspace" id="live-trading-workspace" hidden>
-        <!-- Trading board lands here in a later pass -->
+        <div class="lt-board" id="lt-board">
+          <header class="lt-board__header">
+            <div class="lt-board__header-copy">
+              <h1 class="lt-board__title">Live Trading</h1>
+              <p class="lt-board__sub">Pick items from the value list — no free-text posts.</p>
+            </div>
+            <button type="button" class="lt-board__create-btn" id="lt-open-create">Create post</button>
+          </header>
+
+          <section class="lt-composer" id="lt-composer" hidden>
+            <div class="lt-composer__head">
+              <h2 class="lt-composer__title">New trade post</h2>
+              <button type="button" class="lt-composer__close" id="lt-close-create" aria-label="Close">&times;</button>
+            </div>
+            <div class="lt-composer__sides">
+              <div class="lt-side" data-side="giving">
+                <h3 class="lt-side__label">What I'm giving</h3>
+                <div class="lt-side__chips" id="lt-giving-chips"></div>
+                <div class="lt-side__actions">
+                  <button type="button" class="lt-side__add" data-add="giving">+ Add item</button>
+                  <label class="lt-cash">
+                    <span>Cash</span>
+                    <input type="number" id="lt-giving-cash" min="0" step="1000" placeholder="0" inputmode="numeric" />
+                  </label>
+                </div>
+              </div>
+              <div class="lt-composer__swap" aria-hidden="true">→</div>
+              <div class="lt-side" data-side="wanting">
+                <h3 class="lt-side__label">What I want</h3>
+                <div class="lt-side__chips" id="lt-wanting-chips"></div>
+                <div class="lt-side__actions">
+                  <button type="button" class="lt-side__add" data-add="wanting">+ Add item</button>
+                  <button type="button" class="lt-side__lfo" id="lt-add-lfo" title="Looking for offers">Looking for offers</button>
+                  <label class="lt-cash">
+                    <span>Cash</span>
+                    <input type="number" id="lt-wanting-cash" min="0" step="1000" placeholder="0" inputmode="numeric" />
+                  </label>
+                </div>
+              </div>
+            </div>
+            <p class="lt-composer__error" id="lt-composer-error" hidden></p>
+            <div class="lt-composer__foot">
+              <button type="button" class="lt-composer__submit" id="lt-submit-post">Post trade</button>
+            </div>
+          </section>
+
+          <section class="lt-toolbar" aria-label="Search and filters">
+            <label class="lt-toolbar__search">
+              <span class="visually-hidden">Search posts</span>
+              <input type="search" id="lt-search" placeholder="Search items or players…" autocomplete="off" />
+            </label>
+            <div class="lt-toolbar__filters" role="group" aria-label="Filters">
+              <button type="button" class="lt-filter is-active" data-filter="all">All</button>
+              <button type="button" class="lt-filter" data-filter="mine">My posts</button>
+              <button type="button" class="lt-filter" data-filter="lfo">Looking for offers</button>
+            </div>
+          </section>
+
+          <section class="lt-feed-wrap">
+            <div class="lt-feed" id="lt-feed" role="feed" aria-busy="true">
+              <p class="lt-feed__empty" id="lt-feed-empty">Loading trades…</p>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div class="lt-picker" id="lt-picker" hidden>
+        <div class="lt-picker__backdrop" id="lt-picker-backdrop"></div>
+        <div class="lt-picker__box" role="dialog" aria-modal="true" aria-labelledby="lt-picker-title">
+          <div class="lt-picker__head">
+            <h2 class="lt-picker__title" id="lt-picker-title">Add item</h2>
+            <button type="button" class="lt-picker__close" id="lt-picker-close" aria-label="Close">&times;</button>
+          </div>
+          <input type="search" class="lt-picker__search" id="lt-picker-search" placeholder="Search value list…" autocomplete="off" />
+          <div class="lt-picker__rarities" id="lt-picker-rarities" role="tablist"></div>
+          <div class="lt-picker__grid" id="lt-picker-grid"></div>
+          <p class="lt-picker__status" id="lt-picker-status">Loading items…</p>
+        </div>
       </div>
     </section>
   </main>
@@ -168,6 +245,6 @@
 <script defer src="site-i18n.js?v=20260926-profile-ui2"></script>
 <script defer src="site-settings.js?v=20260926-profile-ui2"></script>
 <script defer src="section-config.js?v=20260926-live-trading"></script>
-<script defer src="live-trading.js?v=20260926-profile-ui2"></script>
+<script defer src="live-trading.js?v=20260926-lt-board1"></script>
 </body>
 </html>
