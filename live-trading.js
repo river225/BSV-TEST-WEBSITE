@@ -3,7 +3,7 @@
 
   var SPREADSHEET_ID = "1vAm9x7c5JPxpHxDHVcDgQifXsAvW9iW2wPVuQLENiYs";
   var POSTS_KEY = "bsv-live-trades-v1";
-  var LFO_ID = "__looking_for_offers__";
+  var EMPTY_SLOT_COUNT = 8;
   var TRADE_SHEETS = [
     { sheet: "Uncommon", rarity: "Common / Uncommon", color: "#4caf50" },
     { sheet: "Rare", rarity: "Rare", color: "#4a90e2" },
@@ -22,10 +22,11 @@
     wanting: [],
     givingCash: 0,
     wantingCash: 0,
-    lookingForOffers: false
+    lookingForOffers: false,
+    notLookingForOffers: false
   };
   var pickerSide = "giving";
-  var activeFilter = "all";
+  var searchScope = "all";
   var searchQuery = "";
   var pickerRarity = "all";
   var currentSession = { ready: false, discord: null, roblox: null };
@@ -348,7 +349,7 @@
     if (!composer) return;
     composer.hidden = !open;
     if (open) {
-      renderDraftChips();
+      renderDraftGrids();
       clearComposerError();
     }
   }
@@ -367,114 +368,119 @@
     err.textContent = msg;
   }
 
-  function chipHtml(entry, side) {
-    if (entry.id === LFO_ID) {
-      return (
-        '<div class="lt-chip lt-chip--lfo" data-id="' +
-        LFO_ID +
-        '">' +
-        '<span class="lt-chip__lfo-icon" aria-hidden="true">💬</span>' +
-        '<span class="lt-chip__name">Looking for offers</span>' +
-        '<button type="button" class="lt-chip__remove" data-side="' +
-        side +
-        '" data-id="' +
-        LFO_ID +
-        '" aria-label="Remove">&times;</button>' +
-        "</div>"
-      );
-    }
+  function itemSlotHtml(entry, side) {
+    var qty = Math.max(1, Number(entry.qty) || 1);
     return (
-      '<div class="lt-chip" data-id="' +
+      '<div class="lt-slot lt-slot--item" data-id="' +
       escapeAttr(entry.id) +
+      '" title="' +
+      escapeAttr(entry.name) +
       '">' +
-      (entry.image
-        ? '<img class="lt-chip__img" src="' +
-          escapeAttr(entry.image) +
-          '" alt="" width="36" height="36" loading="lazy" decoding="async">'
-        : '<span class="lt-chip__ph" aria-hidden="true"></span>') +
-      '<span class="lt-chip__meta">' +
-      '<span class="lt-chip__name">' +
-      escapeHtml(entry.name) +
-      "</span>" +
-      '<span class="lt-chip__rarity" style="color:' +
-      escapeAttr(entry.color || "#94a3b8") +
-      '">' +
-      escapeHtml(entry.rarity || "") +
-      "</span>" +
-      "</span>" +
-      '<button type="button" class="lt-chip__remove" data-side="' +
+      (qty > 1
+        ? '<span class="lt-slot__qty">' + escapeHtml(String(qty) + "×") + "</span>"
+        : "") +
+      '<button type="button" class="lt-slot__remove" data-side="' +
       side +
       '" data-id="' +
       escapeAttr(entry.id) +
-      '" aria-label="Remove">&times;</button>' +
+      '" aria-label="Remove one">&times;</button>' +
+      (entry.image
+        ? '<img class="lt-slot__img" src="' +
+          escapeAttr(entry.image) +
+          '" alt="" width="56" height="56" loading="lazy" decoding="async">'
+        : '<span class="lt-slot__ph" aria-hidden="true"></span>') +
+      '<span class="lt-slot__name">' +
+      escapeHtml(entry.name) +
+      "</span>" +
       "</div>"
     );
   }
 
-  function renderDraftChips() {
-    var givingEl = document.getElementById("lt-giving-chips");
-    var wantingEl = document.getElementById("lt-wanting-chips");
-    if (givingEl) {
-      givingEl.innerHTML = draft.giving.length
-        ? draft.giving.map(function (e) {
-            return chipHtml(e, "giving");
-          }).join("")
-        : '<p class="lt-side__hint">Add items from the value list</p>';
+  function renderSideGrid(side) {
+    var el = document.getElementById(
+      side === "giving" ? "lt-giving-grid" : "lt-wanting-grid"
+    );
+    if (!el) return;
+    var list = draft[side] || [];
+    var html = [];
+    html.push(
+      '<button type="button" class="lt-slot lt-slot--add" data-add="' +
+        side +
+        '">' +
+        '<span class="lt-slot__add-plus" aria-hidden="true">+</span>' +
+        '<span class="lt-slot__add-label">Add Item</span>' +
+        "</button>"
+    );
+    list.forEach(function (entry) {
+      html.push(itemSlotHtml(entry, side));
+    });
+    var empties = Math.max(0, EMPTY_SLOT_COUNT - list.length);
+    for (var i = 0; i < empties; i++) {
+      html.push('<div class="lt-slot lt-slot--empty" aria-hidden="true"></div>');
     }
-    if (wantingEl) {
-      if (draft.lookingForOffers) {
-        wantingEl.innerHTML = chipHtml(
-          { id: LFO_ID, name: "Looking for offers" },
-          "wanting"
-        );
-      } else if (draft.wanting.length) {
-        wantingEl.innerHTML = draft.wanting
-          .map(function (e) {
-            return chipHtml(e, "wanting");
-          })
-          .join("");
-      } else {
-        wantingEl.innerHTML =
-          '<p class="lt-side__hint">Add items, or Looking for offers</p>';
-      }
-    }
+    el.innerHTML = html.join("");
+  }
+
+  function renderDraftGrids() {
+    renderSideGrid("giving");
+    renderSideGrid("wanting");
     var lfoBtn = document.getElementById("lt-add-lfo");
-    if (lfoBtn) lfoBtn.classList.toggle("is-on", draft.lookingForOffers);
-    var wantAdd = document.querySelector('.lt-side__add[data-add="wanting"]');
-    if (wantAdd) wantAdd.disabled = draft.lookingForOffers;
+    var nlfoBtn = document.getElementById("lt-add-nlfo");
+    if (lfoBtn) lfoBtn.classList.toggle("is-on", !!draft.lookingForOffers);
+    if (nlfoBtn) nlfoBtn.classList.toggle("is-on", !!draft.notLookingForOffers);
   }
 
   function removeDraftItem(side, id) {
-    if (id === LFO_ID) {
-      draft.lookingForOffers = false;
-      renderDraftChips();
-      return;
+    var list = draft[side] || [];
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].id !== id) continue;
+      var qty = Math.max(1, Number(list[i].qty) || 1);
+      if (qty > 1) {
+        list[i].qty = qty - 1;
+      } else {
+        list.splice(i, 1);
+      }
+      break;
     }
-    draft[side] = (draft[side] || []).filter(function (e) {
-      return e.id !== id;
-    });
-    renderDraftChips();
+    draft[side] = list;
+    renderDraftGrids();
   }
 
   function addDraftItem(side, item) {
-    if (side === "wanting" && draft.lookingForOffers) {
-      draft.lookingForOffers = false;
-    }
     var list = draft[side] || [];
-    if (list.some(function (e) {
-      return e.id === item.id;
-    })) {
-      return;
+    var existing = null;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].id === item.id) {
+        existing = list[i];
+        break;
+      }
     }
-    list.push(item);
+    if (existing) {
+      existing.qty = Math.max(1, Number(existing.qty) || 1) + 1;
+    } else {
+      list.push({
+        id: item.id,
+        name: item.name,
+        rarity: item.rarity,
+        color: item.color,
+        image: item.image || "",
+        qty: 1
+      });
+    }
     draft[side] = list;
-    renderDraftChips();
+    renderDraftGrids();
   }
 
   function toggleLfo() {
     draft.lookingForOffers = !draft.lookingForOffers;
-    if (draft.lookingForOffers) draft.wanting = [];
-    renderDraftChips();
+    if (draft.lookingForOffers) draft.notLookingForOffers = false;
+    renderDraftGrids();
+  }
+
+  function toggleNlfo() {
+    draft.notLookingForOffers = !draft.notLookingForOffers;
+    if (draft.notLookingForOffers) draft.lookingForOffers = false;
+    renderDraftGrids();
   }
 
   function resetDraft() {
@@ -483,13 +489,14 @@
       wanting: [],
       givingCash: 0,
       wantingCash: 0,
-      lookingForOffers: false
+      lookingForOffers: false,
+      notLookingForOffers: false
     };
     var gc = document.getElementById("lt-giving-cash");
     var wc = document.getElementById("lt-wanting-cash");
     if (gc) gc.value = "";
     if (wc) wc.value = "";
-    renderDraftChips();
+    renderDraftGrids();
     clearComposerError();
   }
 
@@ -505,7 +512,7 @@
     }
     var title = document.getElementById("lt-picker-title");
     if (title) {
-      title.textContent = side === "giving" ? "Add item you're giving" : "Add item you want";
+      title.textContent = side === "giving" ? "Add to I Have" : "Add to I Want";
     }
     loadCatalog().then(function () {
       renderPickerRarities();
@@ -610,11 +617,16 @@
     );
 
     if (!draft.giving.length && !draft.givingCash) {
-      showComposerError("Add at least one item or cash on your giving side.");
+      showComposerError("Add at least one item or cash on I Have.");
       return;
     }
-    if (!draft.lookingForOffers && !draft.wanting.length && !draft.wantingCash) {
-      showComposerError("Add what you want, or choose Looking for offers.");
+    if (
+      !draft.lookingForOffers &&
+      !draft.notLookingForOffers &&
+      !draft.wanting.length &&
+      !draft.wantingCash
+    ) {
+      showComposerError("Add items or cash on I Want, or pick a tag.");
       return;
     }
 
@@ -623,13 +635,32 @@
       createdAt: Date.now(),
       author: authorFromSession(),
       giving: {
-        items: draft.giving.slice(),
+        items: draft.giving.map(function (e) {
+          return {
+            id: e.id,
+            name: e.name,
+            rarity: e.rarity,
+            color: e.color,
+            image: e.image || "",
+            qty: Math.max(1, Number(e.qty) || 1)
+          };
+        }),
         cash: draft.givingCash
       },
       wanting: {
-        items: draft.lookingForOffers ? [] : draft.wanting.slice(),
+        items: draft.wanting.map(function (e) {
+          return {
+            id: e.id,
+            name: e.name,
+            rarity: e.rarity,
+            color: e.color,
+            image: e.image || "",
+            qty: Math.max(1, Number(e.qty) || 1)
+          };
+        }),
         cash: draft.wantingCash,
-        lookingForOffers: !!draft.lookingForOffers
+        lookingForOffers: !!draft.lookingForOffers,
+        notLookingForOffers: !!draft.notLookingForOffers
       }
     };
 
@@ -650,47 +681,83 @@
     renderFeed();
   }
 
+  function sideItemNames(side) {
+    return ((side && side.items) || []).map(function (i) {
+      return String(i.name || "");
+    });
+  }
+
   function postMatchesFilters(post) {
-    if (activeFilter === "mine" && !isOwnPost(post)) return false;
-    if (activeFilter === "lfo" && !(post.wanting && post.wanting.lookingForOffers)) {
-      return false;
-    }
     var q = searchQuery.trim().toLowerCase();
     if (!q) return true;
-    var hay = [];
-    hay.push((post.author && post.author.robloxUsername) || "");
-    hay.push((post.author && post.author.discordName) || "");
-    (post.giving.items || []).forEach(function (i) {
-      hay.push(i.name);
+    var offering = sideItemNames(post.giving);
+    var requesting = sideItemNames(post.wanting);
+    var hay =
+      searchScope === "offering"
+        ? offering
+        : searchScope === "requesting"
+          ? requesting
+          : offering.concat(requesting);
+    return hay.some(function (name) {
+      return name.toLowerCase().indexOf(q) !== -1;
     });
-    (post.wanting.items || []).forEach(function (i) {
-      hay.push(i.name);
+  }
+
+  function itemPhrase(item) {
+    var qty = Math.max(1, Number(item.qty) || 1);
+    var name = String(item.name || "Item");
+    if (qty > 1) return qty + "× " + name;
+    return name;
+  }
+
+  function joinPhrases(parts) {
+    var list = (parts || []).filter(Boolean);
+    if (!list.length) return "";
+    if (list.length === 1) return list[0];
+    if (list.length === 2) return list[0] + " and " + list[1];
+    return list.slice(0, -1).join(", ") + " and " + list[list.length - 1];
+  }
+
+  function sidePhrase(side, emptyLabel) {
+    var parts = [];
+    ((side && side.items) || []).forEach(function (item) {
+      parts.push(itemPhrase(item));
     });
-    if (post.wanting.lookingForOffers) hay.push("looking for offers");
-    return hay.join(" ").toLowerCase().indexOf(q) !== -1;
+    if (side && side.cash) parts.push(formatCash(side.cash));
+    if (side && side.lookingForOffers) parts.push("Looking for offers");
+    if (side && side.notLookingForOffers) parts.push("Not looking for offers");
+    return joinPhrases(parts) || emptyLabel || "nothing";
+  }
+
+  function infoSummary(post) {
+    return (
+      sidePhrase(post.giving, "nothing") +
+      " for " +
+      sidePhrase(post.wanting, "nothing")
+    );
   }
 
   function stackHtml(side) {
     var items = (side && side.items) || [];
     var cash = side && side.cash ? Number(side.cash) : 0;
-    var lfo = !!(side && side.lookingForOffers);
     var parts = [];
-    if (lfo) {
-      parts.push(
-        '<span class="lt-stack__lfo"><span aria-hidden="true">💬</span> Looking for offers</span>'
-      );
-    }
     items.forEach(function (item) {
+      var qty = Math.max(1, Number(item.qty) || 1);
       parts.push(
         '<span class="lt-stack__item" title="' +
           escapeAttr(item.name) +
           '">' +
+          (qty > 1
+            ? '<span class="lt-stack__qty">' +
+              escapeHtml(String(qty) + "×") +
+              "</span>"
+            : "") +
           (item.image
             ? '<img src="' +
               escapeAttr(item.image) +
               '" alt="' +
               escapeAttr(item.name) +
-              '" width="40" height="40" loading="lazy" decoding="async">'
+              '" width="44" height="44" loading="lazy" decoding="async">'
             : '<span class="lt-stack__ph"></span>') +
           '<span class="lt-stack__name">' +
           escapeHtml(item.name) +
@@ -701,6 +768,14 @@
     if (cash > 0) {
       parts.push(
         '<span class="lt-stack__cash">' + escapeHtml(formatCash(cash)) + "</span>"
+      );
+    }
+    if (side && side.lookingForOffers) {
+      parts.push('<span class="lt-stack__tag lt-stack__tag--lfo">Looking for offers</span>');
+    }
+    if (side && side.notLookingForOffers) {
+      parts.push(
+        '<span class="lt-stack__tag lt-stack__tag--nlfo">Not looking for offers</span>'
       );
     }
     if (!parts.length) {
@@ -746,17 +821,22 @@
       "</header>" +
       '<div class="lt-post__trade">' +
       '<div class="lt-post__side">' +
-      '<p class="lt-post__side-label">Giving</p>' +
-      '<div class="lt-stack">' +
+      '<span class="lt-post__side-pill">I Have</span>' +
+      '<div class="lt-stack lt-stack--scroll">' +
       stackHtml(post.giving) +
       "</div></div>" +
-      '<div class="lt-post__arrow" aria-hidden="true">→</div>' +
       '<div class="lt-post__side">' +
-      '<p class="lt-post__side-label">Wanting</p>' +
-      '<div class="lt-stack">' +
+      '<span class="lt-post__side-pill">I Want</span>' +
+      '<div class="lt-stack lt-stack--scroll">' +
       stackHtml(post.wanting) +
       "</div></div>" +
       "</div>" +
+      '<details class="lt-post__info">' +
+      "<summary>Info</summary>" +
+      '<p class="lt-post__info-text">' +
+      escapeHtml(infoSummary(post)) +
+      "</p>" +
+      "</details>" +
       "</article>"
     );
   }
@@ -784,6 +864,7 @@
     var closeCreate = document.getElementById("lt-close-create");
     var submit = document.getElementById("lt-submit-post");
     var lfo = document.getElementById("lt-add-lfo");
+    var nlfo = document.getElementById("lt-add-nlfo");
     var search = document.getElementById("lt-search");
     var pickerClose = document.getElementById("lt-picker-close");
     var pickerBackdrop = document.getElementById("lt-picker-backdrop");
@@ -802,17 +883,20 @@
     }
     if (submit) submit.addEventListener("click", submitPost);
     if (lfo) lfo.addEventListener("click", toggleLfo);
-
-    document.querySelectorAll(".lt-side__add").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        openPicker(btn.getAttribute("data-add") || "giving");
-      });
-    });
+    if (nlfo) nlfo.addEventListener("click", toggleNlfo);
 
     document.addEventListener("click", function (e) {
-      var remove = e.target.closest && e.target.closest(".lt-chip__remove");
+      var addBtn = e.target.closest && e.target.closest(".lt-slot--add");
+      if (addBtn) {
+        openPicker(addBtn.getAttribute("data-add") || "giving");
+        return;
+      }
+      var remove = e.target.closest && e.target.closest(".lt-slot__remove");
       if (remove) {
-        removeDraftItem(remove.getAttribute("data-side"), remove.getAttribute("data-id"));
+        removeDraftItem(
+          remove.getAttribute("data-side"),
+          remove.getAttribute("data-id")
+        );
         return;
       }
       var del = e.target.closest && e.target.closest("[data-delete]");
@@ -834,11 +918,11 @@
         renderPickerGrid();
         return;
       }
-      var filter = e.target.closest && e.target.closest(".lt-filter");
-      if (filter) {
-        activeFilter = filter.getAttribute("data-filter") || "all";
-        document.querySelectorAll(".lt-filter").forEach(function (b) {
-          b.classList.toggle("is-active", b === filter);
+      var scope = e.target.closest && e.target.closest(".lt-search__scope");
+      if (scope) {
+        searchScope = scope.getAttribute("data-scope") || "all";
+        document.querySelectorAll(".lt-search__scope").forEach(function (b) {
+          b.classList.toggle("is-active", b === scope);
         });
         renderFeed();
       }
