@@ -16131,49 +16131,64 @@ body.live-trading-page .main-container {
   min-height: calc(100vh - 120px);
 }
 /*
-  Critical layout lock: the empty right spacer must KEEP its 240px flex footprint
-  (visibility:hidden, never display:none). Hiding it with display:none makes
-  .sections-sidebar (flex:1) balloon horizontally — the worst site layout bug.
-  Content then extends over that reserved gutter with a negative margin.
+  Critical layout lock (same 1:3 + 240px tax column as Home):
+  - Never display:none the right spacer — that balloons .sections-sidebar.
+  - Never put width/margin hacks on #sections itself — that also shifts flex shares.
+  - Only the INNER section paints across the reserved gutter.
 */
 body.live-trading-page .sections-sidebar {
-  flex: 1 1 0%;
-  min-width: 0;
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
   max-width: none;
+  overflow: hidden;
 }
 body.live-trading-page .live-trading-main {
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - 140px);
-  flex: 3 1 0%;
-  min-width: 0;
+  flex: 3 1 0% !important;
+  min-width: 0 !important;
   max-width: none;
+  width: auto !important;
+  margin-right: 0 !important;
+  overflow: visible;
   position: relative;
   z-index: 1;
-  /* Paint across the reserved right gutter without changing flex ratios. */
-  width: calc(100% + 260px);
-  margin-right: -260px;
   box-sizing: border-box;
 }
-body.live-trading-page .live-trading-layout-spacer {
+body.live-trading-page .live-trading-layout-spacer,
+body.live-trading-page #tax-sidebar-column.live-trading-layout-spacer {
+  /* Mirror .tax-sidebar-column exactly — keep Home flex ratios. */
   display: flex !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 14px !important;
   width: 240px !important;
   max-width: 240px !important;
   min-width: 240px !important;
   flex: 0 0 240px !important;
-  overflow: hidden;
-  min-height: 1px;
+  flex-shrink: 0 !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+  position: sticky !important;
+  top: 118px !important;
+  align-self: flex-start !important;
+  height: fit-content !important;
+  min-height: 1px !important;
 }
 .live-trading-section {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  width: 100%;
+  /* Extend visually over spacer + main-container gap (240 + 20). */
+  width: calc(100% + 260px);
+  max-width: none;
   box-sizing: border-box;
   min-height: 0;
+  position: relative;
+  z-index: 1;
 }
 .live-trading-gate {
   /* True viewport center (not just the middle content column). */
@@ -17281,8 +17296,11 @@ body.lt-picker-open {
   }
   body.live-trading-page .live-trading-main {
     min-height: calc(100vh - 160px);
+    width: auto !important;
+    margin-right: 0 !important;
+  }
+  body.live-trading-page .live-trading-section {
     width: 100%;
-    margin-right: 0;
   }
   body.live-trading-page .live-trading-layout-spacer {
     display: none !important;
