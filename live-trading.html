@@ -84,7 +84,7 @@
 <script defer src="auth-oauth-bounce.js?v=20260926-live-trading"></script>
 <title>Live Trading — BlockSpin Values (Dev)</title>
 <meta name="description" content="Live Trading — development build of BlockSpin Values." />
-<link rel="stylesheet" href="style.css?v=20260926-live-trading" />
+<link rel="stylesheet" href="style.css?v=20260926-lt-layout" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Paytone+One&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
@@ -155,6 +155,9 @@
       </div>
     </section>
   </main>
+
+  <!-- Keeps sidebar width identical to home (tax column still reserves 240px even when hidden). -->
+  <div class="tax-sidebar-column live-trading-layout-spacer" id="tax-sidebar-column" aria-hidden="true"></div>
 </div>
 
 <div class="live-trading-login-modal" id="live-trading-login-modal" hidden>
@@ -189,10 +192,10 @@
 <div id="bsv-site-footer"></div>
 
 <script defer src="site-chrome.js?v=20260926-live-trading"></script>
-<script defer src="auth.js?v=20260926-roblox-oauth"></script>
+<script defer src="auth.js?v=20260926-lt-layout"></script>
 <script defer src="site-i18n.js?v=20260926-live-trading"></script>
 <script defer src="site-settings.js?v=20260926-live-trading"></script>
 <script defer src="section-config.js?v=20260926-live-trading"></script>
-<script defer src="live-trading.js?v=20260926-roblox-oauth"></script>
+<script defer src="live-trading.js?v=20260926-lt-layout"></script>
 </body>
 </html>

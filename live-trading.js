@@ -285,6 +285,14 @@
     document.addEventListener("bsv:authchange", function (e) {
       applySession(e.detail || {});
     });
+    document.addEventListener("bsv:roblox-oauth-unavailable", function () {
+      if (robloxError) {
+        robloxError.hidden = false;
+        robloxError.textContent =
+          "Roblox login is not set up on the server yet. Add ROBLOX_CLIENT_ID and ROBLOX_CLIENT_SECRET on Railway, then try again.";
+      }
+      setModalOpen(true);
+    });
     document.addEventListener("bsv:languagechange", function () {
       buildSectionsNav();
       refreshSession();

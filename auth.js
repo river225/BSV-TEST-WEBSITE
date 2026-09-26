@@ -221,7 +221,21 @@
   function startRobloxLogin() {
     saveOAuthReturnTo();
     var returnTo = window.location.href.split("#")[0];
-    window.location.href = authUrl("api/auth/roblox?return_to=" + encodeURIComponent(returnTo));
+    var url = authUrl("api/auth/roblox?return_to=" + encodeURIComponent(returnTo));
+    // Probe first so a 503 "not configured" doesn't dump raw JSON into the tab.
+    fetch(url, { method: "GET", redirect: "manual", credentials: "omit" })
+      .then(function (res) {
+        if (res.status === 503 || res.status === 404 || res.status === 405) {
+          document.dispatchEvent(
+            new CustomEvent("bsv:roblox-oauth-unavailable", { detail: { status: res.status } })
+          );
+          return;
+        }
+        window.location.href = url;
+      })
+      .catch(function () {
+        window.location.href = url;
+      });
   }
 
   function logoutDiscord() {

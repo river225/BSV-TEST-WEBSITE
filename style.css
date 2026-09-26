@@ -15863,28 +15863,44 @@ body.sponsors-body .site-footer {
   box-shadow: 0 0 14px rgba(255, 50, 50, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-.live-trading-page .live-trading-main {
-  min-height: 60vh;
+body.live-trading-page .main-container {
+  align-items: stretch;
+  min-height: calc(100vh - 120px);
+}
+body.live-trading-page .live-trading-main {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 140px);
+  flex: 3 1 0%;
+}
+body.live-trading-page .live-trading-layout-spacer {
+  /* Same footprint as home tax column; empty so proportions match. */
+  min-height: 1px;
 }
 .live-trading-section {
-  display: block;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   box-sizing: border-box;
+  min-height: 0;
 }
 .live-trading-gate {
+  flex: 1 1 auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: min(70vh, 640px);
-  padding: 32px 16px;
+  width: 100%;
+  min-height: calc(100vh - 180px);
+  padding: 40px 24px;
   box-sizing: border-box;
 }
 .live-trading-gate[hidden] {
   display: none !important;
 }
 .live-trading-gate__card {
-  width: 100%;
-  max-width: 520px;
+  width: min(100%, 520px);
+  margin: 0 auto;
   text-align: center;
   padding: 40px 28px 36px;
   border-radius: 16px;
@@ -16079,6 +16095,19 @@ body.live-trading-login-open {
 }
 
 @media (max-width: 900px) {
+  body.live-trading-page .main-container {
+    min-height: 0;
+  }
+  body.live-trading-page .live-trading-main {
+    min-height: calc(100vh - 160px);
+  }
+  body.live-trading-page .live-trading-layout-spacer {
+    display: none !important;
+  }
+  .live-trading-gate {
+    min-height: calc(100vh - 200px);
+    padding: 28px 12px 48px;
+  }
   .live-trading-gate__card {
     padding: 32px 20px 28px;
   }
