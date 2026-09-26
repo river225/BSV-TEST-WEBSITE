@@ -852,6 +852,7 @@
   function offersBadgeCardHtml(kind) {
     var isLfo = kind === "lfo";
     var tip = isLfo ? TIP_LFO : TIP_NLFO;
+    var label = isLfo ? "Accepting offers" : "Not accepting offers";
     return (
       '<div class="lt-icard lt-icard--offers lt-icard--' +
       (isLfo ? "lfo" : "nlfo") +
@@ -859,15 +860,17 @@
       escapeAttr(tip) +
       '" title="' +
       escapeAttr(tip) +
+      '" aria-label="' +
+      escapeAttr(label) +
       '">' +
       '<div class="lt-offers-badge' +
       (isLfo ? "" : " lt-offers-badge--no") +
       '" aria-hidden="true">' +
-      '<span class="lt-offers-badge__top">' +
-      (isLfo ? "???" : "NO") +
+      '<span class="lt-offers-badge__text">' +
+      (isLfo
+        ? '<span class="lt-offers-badge__line">Accepting</span><span class="lt-offers-badge__line">offers</span>'
+        : '<span class="lt-offers-badge__line">Not accepting</span><span class="lt-offers-badge__line">offers</span>') +
       "</span>" +
-      '<span class="lt-offers-badge__word">OFFERS</span>' +
-      '<span class="lt-offers-badge__lines"></span>' +
       "</div>" +
       "</div>"
     );
