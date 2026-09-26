@@ -3,10 +3,6 @@
 
   var CONSENT_KEY = "bsv-cookie-consent";
   var GA_ID = "G-0T25993BCC";
-  // Bump this when you need every visitor to hard-refresh once (clears old SW/cache/cookies).
-  var BSV_BUILD = "20260915-tech-fix";
-  var BUILD_KEY = "bsv-build";
-  var BUILD_RELOAD_KEY = "bsv-build-reloading";
   // Keep in sync with script.js THEMES_DISABLED — theme UI is not shipping.
   var THEMES_DISABLED = true;
 
@@ -115,110 +111,6 @@
   paintSavedBackground();
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", paintSavedBackground);
-  }
-
-  function clearSiteCookies() {
-    try {
-      var parts = document.cookie ? document.cookie.split(";") : [];
-      var host = location.hostname || "";
-      var domains = ["", host, "." + host];
-      if (host.indexOf(".") !== -1) {
-        var root = host.split(".").slice(-2).join(".");
-        domains.push(root, "." + root);
-      }
-      parts.forEach(function (part) {
-        var name = (part.split("=")[0] || "").trim();
-        if (!name) return;
-        domains.forEach(function (domain) {
-          var base = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;Max-Age=0";
-          document.cookie = domain ? base + ";domain=" + domain : base;
-          document.cookie = base + ";SameSite=Lax";
-        });
-      });
-    } catch (_) {}
-  }
-
-  function clearClientCaches() {
-    try {
-      if (window.caches && caches.keys) {
-        caches.keys().then(function (keys) {
-          keys.forEach(function (key) {
-            caches.delete(key).catch(function () {});
-          });
-        });
-      }
-    } catch (_) {}
-    try {
-      if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
-        navigator.serviceWorker.getRegistrations().then(function (regs) {
-          regs.forEach(function (reg) {
-            reg.unregister().catch(function () {});
-          });
-        });
-      }
-    } catch (_) {}
-  }
-
-  function wipeClientStateForBuild() {
-    clearSiteCookies();
-    purgeMonetagArtifacts();
-    clearClientCaches();
-    try {
-      localStorage.clear();
-    } catch (_) {}
-    try {
-      sessionStorage.clear();
-    } catch (_) {}
-  }
-
-  function stripBuildCacheBustParams() {
-    try {
-      var url = new URL(window.location.href);
-      if (!url.searchParams.has("bsv_r") && !url.searchParams.has("_")) return;
-      url.searchParams.delete("bsv_r");
-      url.searchParams.delete("_");
-      var qs = url.searchParams.toString();
-      history.replaceState(null, "", url.pathname + (qs ? "?" + qs : "") + url.hash);
-    } catch (_) {}
-  }
-
-  function forceRefreshIfNeeded() {
-    try {
-      // Remove one-time cache-bust params before analytics reads the URL.
-      stripBuildCacheBustParams();
-      var seen = localStorage.getItem(BUILD_KEY);
-      if (seen === BSV_BUILD) {
-        try {
-          sessionStorage.removeItem(BUILD_RELOAD_KEY);
-        } catch (_) {}
-        return false;
-      }
-      if (sessionStorage.getItem(BUILD_RELOAD_KEY) === BSV_BUILD) {
-        // Second pass after wipe+reload: mark build seen, keep storage clean otherwise.
-        try {
-          localStorage.clear();
-        } catch (_) {}
-        try {
-          sessionStorage.removeItem(BUILD_RELOAD_KEY);
-        } catch (_) {}
-        localStorage.setItem(BUILD_KEY, BSV_BUILD);
-        return false;
-      }
-      sessionStorage.setItem(BUILD_RELOAD_KEY, BSV_BUILD);
-      wipeClientStateForBuild();
-      try {
-        sessionStorage.setItem(BUILD_RELOAD_KEY, BSV_BUILD);
-      } catch (_) {}
-      var url = new URL(window.location.href);
-      url.searchParams.delete("bsv_r");
-      // Bypass HTTP cache on the reload itself; stripped immediately on next load.
-      url.searchParams.set("_", String(Date.now()));
-      var qs = url.searchParams.toString();
-      window.location.replace(url.pathname + (qs ? "?" + qs : "") + url.hash);
-      return true;
-    } catch (_) {
-      return false;
-    }
   }
 
   function getConsent() {
@@ -960,10 +852,6 @@
         openConsentSettings();
       });
     }
-  }
-
-  if (forceRefreshIfNeeded()) {
-    return;
   }
 
   if (document.readyState === "loading") {

@@ -3,53 +3,12 @@
 <head>
 <meta name="robots" content="noindex, nofollow" />
 <meta name="bsv-env" content="test" />
+
 <script>
-/* Build cache gate: on BUILD change, drop SW/Cache API and hard-reload HTML (keeps login/settings). */
-(function () {
-  var BUILD = "20260926-cache1";
-  window.BSV_BUILD = BUILD;
-  var KEY = "bsv-build";
-  var FLAG = "bsv-cache-busting";
-  try {
-    var clean = new URL(location.href);
-    if (clean.searchParams.has("bsv_r") || clean.searchParams.has("_")) {
-      clean.searchParams.delete("bsv_r");
-      clean.searchParams.delete("_");
-      var qs = clean.searchParams.toString();
-      history.replaceState(null, "", clean.pathname + (qs ? "?" + qs : "") + clean.hash);
-    }
-    if (localStorage.getItem(KEY) === BUILD) return;
-    if (sessionStorage.getItem(FLAG) === BUILD) {
-      localStorage.setItem(KEY, BUILD);
-      sessionStorage.removeItem(FLAG);
-      return;
-    }
-    sessionStorage.setItem(FLAG, BUILD);
-    var pending = 1;
-    function done() {
-      if (--pending > 0) return;
-      var url = new URL(location.href);
-      url.searchParams.delete("_");
-      url.searchParams.set("bsv_r", BUILD);
-      var q = url.searchParams.toString();
-      location.replace(url.pathname + (q ? "?" + q : "") + url.hash);
-    }
-    if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
-      pending++;
-      navigator.serviceWorker.getRegistrations().then(function (regs) {
-        return Promise.all(regs.map(function (r) { return r.unregister(); }));
-      }).then(done, done);
-    }
-    if (window.caches && caches.keys) {
-      pending++;
-      caches.keys().then(function (keys) {
-        return Promise.all(keys.map(function (k) { return caches.delete(k); }));
-      }).then(done, done);
-    }
-    done();
-  } catch (e) {}
-})();
+/* Asset build id (no auto-reload). Bump via tools/bump-build.py */
+window.BSV_BUILD = "20260926-noreload";
 </script>
+
 
   <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -83,7 +42,7 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="style.css?v=20260926-cache1">
+<link rel="stylesheet" href="style.css?v=20260926-noreload">
 </head>
 <body data-bsv-page="legal">
 
@@ -154,6 +113,6 @@
 
 <div id="bsv-sponsor-banner-slot" class="bsv-sponsor-banner-slot"></div>
 <div id="bsv-site-footer"></div>
-<script src="site-chrome.js?v=20260926-cache1"></script>
+<script src="site-chrome.js?v=20260926-noreload"></script>
 </body>
 </html>
