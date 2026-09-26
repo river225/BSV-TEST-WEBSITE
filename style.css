@@ -16130,18 +16130,42 @@ body.live-trading-page .main-container {
   align-items: stretch;
   min-height: calc(100vh - 120px);
 }
+/*
+  Critical layout lock: the empty right spacer must KEEP its 240px flex footprint
+  (visibility:hidden, never display:none). Hiding it with display:none makes
+  .sections-sidebar (flex:1) balloon horizontally — the worst site layout bug.
+  Content then extends over that reserved gutter with a negative margin.
+*/
+body.live-trading-page .sections-sidebar {
+  flex: 1 1 0%;
+  min-width: 0;
+  max-width: none;
+}
 body.live-trading-page .live-trading-main {
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - 140px);
   flex: 3 1 0%;
+  min-width: 0;
+  max-width: none;
+  position: relative;
+  z-index: 1;
+  /* Paint across the reserved right gutter without changing flex ratios. */
+  width: calc(100% + 260px);
+  margin-right: -260px;
+  box-sizing: border-box;
 }
 body.live-trading-page .live-trading-layout-spacer {
-  display: none !important;
-}
-body.live-trading-page .live-trading-main {
-  flex: 1 1 auto;
-  max-width: none;
+  display: flex !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 240px !important;
+  max-width: 240px !important;
+  min-width: 240px !important;
+  flex: 0 0 240px !important;
+  overflow: hidden;
+  min-height: 1px;
 }
 .live-trading-section {
   flex: 1 1 auto;
@@ -16230,9 +16254,10 @@ body.live-trading-page .live-trading-main {
   gap: 16px;
   min-height: 0;
   height: 100%;
-  max-width: 1180px;
+  max-width: min(1180px, 100%);
   width: 100%;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 .lt-board__title {
   width: 100%;
@@ -17256,6 +17281,8 @@ body.lt-picker-open {
   }
   body.live-trading-page .live-trading-main {
     min-height: calc(100vh - 160px);
+    width: 100%;
+    margin-right: 0;
   }
   body.live-trading-page .live-trading-layout-spacer {
     display: none !important;
