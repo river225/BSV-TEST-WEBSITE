@@ -11,6 +11,20 @@
     }
     window.BSV_SITE_ROOT = R;
     window.bsvSitePath = function (p) { return R + String(p || "").replace(/^\//, ""); };
+    // Avoid Home flash when arriving from Live Trading (or any #sec= deep link).
+    try {
+      var hash = location.hash || "";
+      if (/^#sec=/i.test(hash)) {
+        var secName = decodeURIComponent(hash.slice(5));
+        if (secName && secName !== "Home") {
+          document.documentElement.classList.add("bsv-hash-section");
+          var bootStyle = document.createElement("style");
+          bootStyle.id = "bsv-hash-section-style";
+          bootStyle.textContent = "#home{display:none!important}";
+          document.head.appendChild(bootStyle);
+        }
+      }
+    } catch (hashErr) {}
     function fixAttr(sel, attr) {
       document.querySelectorAll(sel).forEach(function (el) {
         var v = el.getAttribute(attr);
@@ -463,7 +477,7 @@ We’ve launched a complete site redesign, and items will now display both their
 <script defer src="site-settings.js?v=20260925-responsive-pass"></script>
 <script defer src="section-config.js?v=20260926-live-trading"></script>
 <script defer src="quest-guide-i18n.js?v=20260713-cwv"></script>
-<script defer src="script.js?v=20260926-live-trading"></script> 
+<script defer src="script.js?v=20260926-lt-navfix"></script> 
 
 
 <div id="bsv-site-footer"></div>

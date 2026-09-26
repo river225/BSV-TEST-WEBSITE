@@ -151,6 +151,31 @@ var _sectionsDomReady = Object.create(null);
 var _pendingSectionName = null;
 var _activeSectionName = "Home";
 
+function clearHashSectionBootHide() {
+  document.documentElement.classList.remove("bsv-hash-section");
+  var bootStyle = document.getElementById("bsv-hash-section-style");
+  if (bootStyle) bootStyle.remove();
+}
+
+function resolveHashSectionRequest() {
+  if (!window.location.hash || !window.location.hash.startsWith("#sec=")) {
+    return null;
+  }
+  var requested = decodeURIComponent(window.location.hash.substring(5));
+  if (requested === "Uncommon") requested = "Common / Uncommon";
+  if (requested === "richest-players" || requested === "Richest Players") {
+    requested = "💰 Richest Players";
+  }
+  if (requested === "live-trading" || requested === "Live Trading") {
+    return { redirectLiveTrading: true };
+  }
+  if (requested === "Untradable Items") requested = ACCESSORIES_SECTION_NAME;
+  if (typeof SECTION_NAMES !== "undefined" && SECTION_NAMES.includes(requested)) {
+    return { section: requested };
+  }
+  return null;
+}
+
 function shouldShowGiveawayCarousel() {
   return false;
 }
@@ -4090,6 +4115,7 @@ function showSection(name) {
 
   _pendingSectionName = null;
   _activeSectionName = name;
+  clearHashSectionBootHide();
 
   const isHome = cfg.id === "home";
   document.body.classList.toggle("is-home", isHome);
@@ -4877,7 +4903,26 @@ document.addEventListener("DOMContentLoaded", async () => {
   initSearch();
   initTaxCalculator();
   initMobileTaxPanel();
-  showSection("Home");
+
+  // Do not force Home first — that flashes Home when arriving via #sec= from Live Trading.
+  var bootHash = resolveHashSectionRequest();
+  if (bootHash && bootHash.redirectLiveTrading) {
+    var liveBootHref =
+      typeof window.bsvSitePath === "function"
+        ? window.bsvSitePath("live-trading.html")
+        : "live-trading.html";
+    window.location.replace(liveBootHref);
+    return;
+  }
+  if (bootHash && bootHash.section && bootHash.section !== "Home") {
+    var homeBootEl = document.getElementById("home");
+    if (homeBootEl) homeBootEl.style.display = "none";
+    document.body.classList.remove("is-home");
+    showSection(bootHash.section);
+  } else {
+    clearHashSectionBootHide();
+    showSection("Home");
+  }
 
   const giveawayPromise = loadExternalGiveawayConfig();
   const contentPromise = loadSectionContentConfig();
@@ -4924,24 +4969,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   _sectionsDomReady["Home"] = true;
 
   let initialSection = "Home";
-  if (window.location.hash && window.location.hash.startsWith('#sec=')) {
-    let requested = decodeURIComponent(window.location.hash.substring(5));
-    if (requested === "Uncommon") requested = "Common / Uncommon";
-    if (requested === "richest-players" || requested === "Richest Players") {
-      requested = "💰 Richest Players";
-    }
-    if (requested === "live-trading" || requested === "Live Trading") {
-      var liveHref =
-        typeof window.bsvSitePath === "function"
-          ? window.bsvSitePath("live-trading.html")
-          : "live-trading.html";
-      window.location.replace(liveHref);
-      return;
-    }
-    if (requested === "Untradable Items") requested = ACCESSORIES_SECTION_NAME;
-    if (SECTION_NAMES.includes(requested)) {
-      initialSection = requested;
-    }
+  var hashRequest = resolveHashSectionRequest();
+  if (hashRequest && hashRequest.redirectLiveTrading) {
+    var liveHref =
+      typeof window.bsvSitePath === "function"
+        ? window.bsvSitePath("live-trading.html")
+        : "live-trading.html";
+    window.location.replace(liveHref);
+    return;
+  }
+  if (hashRequest && hashRequest.section) {
+    initialSection = hashRequest.section;
   }
 
   // Only paint the active section up front — rendering every rarity into the DOM
