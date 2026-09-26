@@ -46,13 +46,13 @@
 <meta name="robots" content="noindex, nofollow" />
 <meta name="bsv-env" content="test" />
 <script>
-/* One-time hard client reset: cookies, storage, SW, caches */
+/* Build cache gate: on BUILD change, drop SW/Cache API and hard-reload HTML (keeps login/settings). */
 (function () {
-  var BUILD = "20260915-tech-fix";
+  var BUILD = "20260926-cache1";
+  window.BSV_BUILD = BUILD;
   var KEY = "bsv-build";
-  var FLAG = "bsv-hard-resetting";
+  var FLAG = "bsv-cache-busting";
   try {
-    // Strip one-time cache-bust params before analytics can read them.
     var clean = new URL(location.href);
     if (clean.searchParams.has("bsv_r") || clean.searchParams.has("_")) {
       clean.searchParams.delete("bsv_r");
@@ -67,25 +67,12 @@
       return;
     }
     sessionStorage.setItem(FLAG, BUILD);
-    var cookies = document.cookie ? document.cookie.split(";") : [];
-    var host = location.hostname || "";
-    var domains = ["", host, "." + host];
-    for (var i = 0; i < cookies.length; i++) {
-      var name = (cookies[i].split("=")[0] || "").trim();
-      if (!name) continue;
-      for (var d = 0; d < domains.length; d++) {
-        var base = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;Max-Age=0";
-        document.cookie = domains[d] ? base + ";domain=" + domains[d] : base;
-      }
-    }
-    try { localStorage.clear(); } catch (e) {}
-    try { sessionStorage.clear(); sessionStorage.setItem(FLAG, BUILD); } catch (e) {}
     var pending = 1;
     function done() {
       if (--pending > 0) return;
       var url = new URL(location.href);
-      url.searchParams.delete("bsv_r");
-      url.searchParams.set("_", String(Date.now()));
+      url.searchParams.delete("_");
+      url.searchParams.set("bsv_r", BUILD);
       var q = url.searchParams.toString();
       location.replace(url.pathname + (q ? "?" + q : "") + url.hash);
     }
@@ -107,8 +94,10 @@
 </script>
 
     <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
     
-<script src="auth-oauth-bounce.js?v=20260614-auth-fix" defer></script>
+<script src="auth-oauth-bounce.js?v=20260926-cache1" defer></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>About Us - BlockSpin Values</title>
@@ -136,7 +125,7 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="style.css?v=20260926-discord-only">
+<link rel="stylesheet" href="style.css?v=20260926-cache1">
 </head>
 <body data-bsv-page="about">
 
@@ -208,7 +197,7 @@
 <div id="bsv-sponsor-banner-slot" class="bsv-sponsor-banner-slot"></div>
 <div id="bsv-site-footer"></div>
 
-<script src="site-chrome.js?v=20260926-site-root"></script>
+<script src="site-chrome.js?v=20260926-cache1"></script>
 <script>
 (function () {
   function esc(s) {

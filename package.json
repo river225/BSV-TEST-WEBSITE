@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "start": "python3 -m http.server 5500",
-    "dev": "python3 -m http.server 5500"
+    "dev": "python3 -m http.server 5500",
+    "bump-build": "python3 tools/bump-build.py"
   }
 }
