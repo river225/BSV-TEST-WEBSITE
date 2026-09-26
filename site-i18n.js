@@ -112,7 +112,7 @@
       "home.whatIsTitle": "What is BlockSpin Values?",
       "home.whatIsBody":
         "BlockSpin Values is the trusted value list for all items in the Roblox game BlockSpin. Our dedicated team of top traders keeps values updated daily to help you make fair trades and avoid scams. Whether you're looking for weapon values, checking crew logos, or calculating taxes, we've got everything you need to trade with confidence.",
-      "announce.1.date": "April 17, 2025",
+      "announce.1.date": "April 17, 2026",
       "announce.1.text":
         "Website Update is now live! The Tax Calculator is finally back and more advanced 🔥 It shows exactly how much to trade and in what order to avoid overpaying. New Recent Changes box lets you track all value list updates. (On mobile click blue arrow in a gun section to access tax calculator.)",
       "announce.2.date": "Dec 3, 2025",
@@ -443,7 +443,7 @@
       "home.whatIsTitle": "Qu'est-ce que BlockSpin Values ?",
       "home.whatIsBody":
         "BlockSpin Values est la liste de valeurs de confiance pour tous les objets du jeu Roblox BlockSpin. Notre équipe de traders expérimentés met à jour les valeurs chaque jour pour vous aider à faire des échanges équitables et éviter les arnaques. Que vous cherchiez des valeurs d'armes, des logos de crew ou des calculs de taxes, nous avons tout ce qu'il vous faut pour échanger en toute confiance.",
-      "announce.1.date": "17 avril 2025",
+      "announce.1.date": "17 avril 2026",
       "announce.1.text":
         "La mise à jour du site est en ligne ! Le calculateur de taxe est de retour, plus avancé 🔥 Il indique exactement combien échanger et dans quel ordre pour éviter de surpayer. La nouvelle section Changements récents vous permet de suivre toutes les mises à jour de la liste. (Sur mobile, cliquez sur la flèche bleue dans une section d'armes pour accéder au calculateur.)",
       "announce.2.date": "3 déc. 2025",
@@ -774,7 +774,7 @@
       "home.whatIsTitle": "¿Qué es BlockSpin Values?",
       "home.whatIsBody":
         "BlockSpin Values es la lista de valores confiable para todos los objetos del juego Roblox BlockSpin. Nuestro equipo de traders expertos actualiza los valores a diario para ayudarte a hacer intercambios justos y evitar estafas. Ya sea que busques valores de armas, logos de crew o cálculos de impuestos, tenemos todo lo que necesitas para intercambiar con confianza.",
-      "announce.1.date": "17 de abril de 2025",
+      "announce.1.date": "17 de abril de 2026",
       "announce.1.text":
         "¡La actualización del sitio ya está en vivo! La calculadora de impuestos ha vuelto y es más avanzada 🔥 Muestra exactamente cuánto intercambiar y en qué orden para no pagar de más. La nueva sección de Cambios recientes te permite seguir todas las actualizaciones. (En móvil, pulsa la flecha azul en una sección de armas para abrir la calculadora.)",
       "announce.2.date": "3 dic. 2025",
