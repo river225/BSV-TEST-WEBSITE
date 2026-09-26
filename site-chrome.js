@@ -694,7 +694,7 @@
     });
   }
 
-  var CHROME_ASSET_V = "20260926-profile-menu";
+  var CHROME_ASSET_V = "20260926-profile-ui2";
 
   function ensureHomeHeaderDeps() {
     ensureSettingsModal();
