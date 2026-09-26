@@ -15,6 +15,51 @@
     /quge5\.com|5gvci\.com|omg10\.com|n6wxm\.com|nap5k\.com|tzegilo\.com|monetag|11550419|11550420|11550421|11548891|268935/i;
   var MONETAG_TAG_IDS = ["bsv-ad-vignette", "bsv-ad-ipp", "bsv-ad-push"];
 
+  // GitHub project Pages live under /RepoName/ — root-absolute "/assets/..." would 404 at domain root.
+  function siteRoot() {
+    try {
+      if (typeof window.BSV_SITE_ROOT === "string" && window.BSV_SITE_ROOT) {
+        return window.BSV_SITE_ROOT;
+      }
+      var host = location.hostname || "";
+      if (/\.github\.io$/i.test(host)) {
+        var seg = (location.pathname || "/").split("/").filter(Boolean)[0];
+        if (seg) return "/" + seg + "/";
+      }
+    } catch (_) {}
+    return "/";
+  }
+
+  function sitePath(path) {
+    var p = String(path || "");
+    if (!p) return siteRoot();
+    if (/^(https?:|data:|mailto:|tel:|#)/i.test(p)) return p;
+    return siteRoot() + p.replace(/^\//, "");
+  }
+
+  try {
+    window.BSV_SITE_ROOT = siteRoot();
+    window.bsvSitePath = sitePath;
+  } catch (_) {}
+
+  function rewriteRootAbsoluteAssets(rootEl) {
+    var root = siteRoot();
+    if (root === "/") return;
+    var scope = rootEl || document;
+    var nodes = scope.querySelectorAll(
+      '[src^="/assets/"], [href^="/assets/"], [href^="/favicon"], [href^="/apple-touch"], [href^="/x-"], [href^="/z-"], [href^="/sponsors"]'
+    );
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      var attr = el.hasAttribute("src") ? "src" : "href";
+      var val = el.getAttribute(attr);
+      if (!val || val.charAt(0) !== "/" || val.indexOf(root) === 0) continue;
+      // Don't rewrite protocol-relative or already-prefixed paths.
+      if (val.indexOf("//") === 0) continue;
+      el.setAttribute(attr, root + val.slice(1));
+    }
+  }
+
   function isSponsorsPage() {
     try {
       if (/\/sponsors(\/|$)/i.test(location.pathname || "")) return true;
@@ -244,7 +289,6 @@
 
   function ensureAnalytics() {
     try {
-      if (isDevSite()) return;
       if (!hasMarketingConsent()) return;
       window.dataLayer = window.dataLayer || [];
       if (typeof window.gtag !== "function") {
@@ -339,7 +383,6 @@
 
   function initConsent() {
     purgeMonetagArtifacts();
-    if (isDevSite()) return;
     var choice = getConsent();
     if (choice === "accepted") {
       ensureAnalytics();
@@ -426,10 +469,10 @@
       '<aside class="bsv-sponsor-promo" aria-label="Sponsorship">' +
         '<div class="bsv-sponsor-promo__shell">' +
           '<div class="bsv-sponsor-promo__frame">' +
-            '<img class="bsv-sponsor-promo__logo" src="/assets/bsv-logo.png" width="72" height="72" alt="" decoding="async">' +
+            '<img class="bsv-sponsor-promo__logo" src="' + sitePath("assets/bsv-logo.png") + '" width="72" height="72" alt="" decoding="async">' +
             '<p class="bsv-sponsor-promo__title">Work with <span>us</span></p>' +
             '<p class="bsv-sponsor-promo__sub">Sponsor slots are open. Get your brand in front of 12,700+ active traders every month.</p>' +
-            '<a class="bsv-sponsor-promo__cta" href="/sponsors/">Work with us</a>' +
+            '<a class="bsv-sponsor-promo__cta" href="' + sitePath("sponsors/") + '">Work with us</a>' +
           "</div>" +
         "</div>" +
       "</aside>"
@@ -534,7 +577,7 @@
     var dev = isDevSite();
     var isHome = activePage === "home";
     var login = (dev || isHome) ? '<div class="nav-login" id="nav-login"></div>' : "";
-    var brandHref = isHome ? "#" : "/";
+    var brandHref = isHome ? "#" : sitePath("");
     var brandOnclick = isHome ? ' onclick="showSection(\'Home\'); return false;"' : "";
     var search = isHome ? headerSearch() : "";
     return (
@@ -543,12 +586,12 @@
           '<div class="nav-container-full">' +
             '<div class="nav-left">' +
               '<a href="' + brandHref + '" class="nav-brand"' + brandOnclick + ">" +
-                '<img src="/assets/bsv-logo.png" alt="BlockSpin Values Logo" class="nav-logo-img" width="60" height="60" decoding="async">' +
+                '<img src="' + sitePath("assets/bsv-logo.png") + '" alt="BlockSpin Values Logo" class="nav-logo-img" width="60" height="60" decoding="async">' +
                 '<span class="nav-title">Block<span class="brand-spin">Spin</span> Values</span>' +
               "</a>" +
-              navLink("/x-about.html", "About Us", activePage, "about") +
-              navLink("/sponsors/", "Sponsors", activePage, "sponsors") +
-              navLink("/x-faq.html", "FAQ", activePage, "faq") +
+              navLink(sitePath("x-about.html"), "About Us", activePage, "about") +
+              navLink(sitePath("sponsors/"), "Sponsors", activePage, "sponsors") +
+              navLink(sitePath("x-faq.html"), "FAQ", activePage, "faq") +
             "</div>" +
             search +
             '<div class="nav-right">' +
@@ -562,11 +605,11 @@
       "</header>" +
       '<div class="site-mobile-below-header">' +
         '<nav class="header-subnav" aria-label="Site pages">' +
-          navLink("/x-about.html", "About Us", activePage, "about") +
+          navLink(sitePath("x-about.html"), "About Us", activePage, "about") +
           '<span class="header-subnav__sep" aria-hidden="true">·</span>' +
-          navLink("/sponsors/", "Sponsors", activePage, "sponsors") +
+          navLink(sitePath("sponsors/"), "Sponsors", activePage, "sponsors") +
           '<span class="header-subnav__sep" aria-hidden="true">·</span>' +
-          navLink("/x-faq.html", "FAQ", activePage, "faq") +
+          navLink(sitePath("x-faq.html"), "FAQ", activePage, "faq") +
         "</nav>" +
         '<div class="nav-mobile-toolbar' + (isHome ? ' is-active' : '') + '" aria-label="Mobile shortcuts"></div>' +
       "</div>"
@@ -579,7 +622,7 @@
         '<div class="footer-side-nav__group" aria-label="Contact">' +
           '<p class="footer-side-nav__title">Contact</p>' +
           '<ul class="footer-side-nav__list">' +
-            '<li><a class="footer-side-nav__link" href="/z-contact.html">' +
+            '<li><a class="footer-side-nav__link" href="' + sitePath("z-contact.html") + '">' +
               '<svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/></svg>' +
               "<span>Contact</span></a></li>" +
             '<li><a class="footer-side-nav__link" href="https://discord.gg/blockspinvalues" target="_blank" rel="noopener noreferrer">' +
@@ -590,13 +633,13 @@
         '<div class="footer-side-nav__group" aria-label="Legal">' +
           '<p class="footer-side-nav__title">Legal</p>' +
           '<ul class="footer-side-nav__list">' +
-            '<li><a class="footer-side-nav__link" href="/z-terms.html">' +
+            '<li><a class="footer-side-nav__link" href="' + sitePath("z-terms.html") + '">' +
               '<svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>' +
               "<span>Terms of Service</span></a></li>" +
-            '<li><a class="footer-side-nav__link" href="/z-privacy.html">' +
+            '<li><a class="footer-side-nav__link" href="' + sitePath("z-privacy.html") + '">' +
               '<svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 6h2v2h-2V7zm0 4h2v6h-2v-6z"/></svg>' +
               "<span>Privacy Policy</span></a></li>" +
-            '<li><a class="footer-side-nav__link" href="/z-cookie.html">' +
+            '<li><a class="footer-side-nav__link" href="' + sitePath("z-cookie.html") + '">' +
               '<svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6zm5 4h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>' +
               "<span>Cookie Policy</span></a></li>" +
           "</ul>" +
@@ -675,6 +718,21 @@
     initMobileHeaderToolbar();
     initConsent();
     initFooterBoostersLazy();
+    rewriteRootAbsoluteAssets(document);
+  }
+
+  function ensureProjectPageFavicons() {
+    var root = siteRoot();
+    if (root === "/") return;
+    var have = document.querySelector('link[rel="icon"][href*="favicon"]');
+    if (have && String(have.getAttribute("href") || "").indexOf(root) === 0) return;
+    // Replace root-absolute icons that 404 on GitHub project Pages.
+    document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]').forEach(function (el) {
+      var href = el.getAttribute("href") || "";
+      if (href.charAt(0) === "/" && href.indexOf(root) !== 0) {
+        el.setAttribute("href", root + href.slice(1));
+      }
+    });
   }
 
   function shrinkDiscordAvatarUrl(url) {
@@ -794,6 +852,8 @@
   }
 
   function autoMount() {
+    ensureProjectPageFavicons();
+    rewriteRootAbsoluteAssets(document);
     var page = document.body.getAttribute("data-bsv-page") || "";
     if (document.getElementById("bsv-site-header") || document.getElementById("bsv-site-footer")) {
       mount(page);
