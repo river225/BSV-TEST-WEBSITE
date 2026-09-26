@@ -108,11 +108,54 @@
     });
   }
 
+  var RESUME_LOGIN_KEY = "bsv-live-trading-resume-login";
+
   function setModalOpen(open) {
     var modal = document.getElementById("live-trading-login-modal");
     if (!modal) return;
     modal.hidden = !open;
     document.body.classList.toggle("live-trading-login-open", open);
+  }
+
+  function markResumeLoginModal() {
+    try {
+      sessionStorage.setItem(RESUME_LOGIN_KEY, "1");
+    } catch (_) {}
+    try {
+      var url = new URL(window.location.href);
+      url.searchParams.set("lt_login", "1");
+      var qs = url.searchParams.toString();
+      history.replaceState(null, "", url.pathname + (qs ? "?" + qs : "") + url.hash);
+    } catch (_) {}
+  }
+
+  function shouldResumeLoginModal() {
+    try {
+      if (sessionStorage.getItem(RESUME_LOGIN_KEY) === "1") return true;
+    } catch (_) {}
+    try {
+      return new URLSearchParams(window.location.search || "").get("lt_login") === "1";
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function clearResumeLoginModal() {
+    try {
+      sessionStorage.removeItem(RESUME_LOGIN_KEY);
+    } catch (_) {}
+    try {
+      var url = new URL(window.location.href);
+      if (!url.searchParams.has("lt_login")) return;
+      url.searchParams.delete("lt_login");
+      var qs = url.searchParams.toString();
+      history.replaceState(null, "", url.pathname + (qs ? "?" + qs : "") + url.hash);
+    } catch (_) {}
+  }
+
+  function startDiscordLoginAndResume() {
+    markResumeLoginModal();
+    if (typeof window.startDiscordLogin === "function") window.startDiscordLogin();
   }
 
   function showRobloxFallback(show) {
@@ -166,14 +209,28 @@
     if (roblox) showRobloxFallback(false);
 
     if (ready) setModalOpen(false);
+    return {
+      ready: ready,
+      discord: discord,
+      user: discord,
+      roblox: roblox
+    };
   }
 
   function refreshSession() {
     if (typeof window.bsvGetAuthSession === "function") {
-      return window.bsvGetAuthSession().then(applySession);
+      return window.bsvGetAuthSession().then(function (session) {
+        return applySession(session || {});
+      });
     }
-    applySession({ ready: false, discord: null, roblox: null });
-    return Promise.resolve();
+    return Promise.resolve(applySession({ ready: false, discord: null, roblox: null }));
+  }
+
+  function resumeLoginModalIfNeeded(session) {
+    if (!shouldResumeLoginModal()) return;
+    clearResumeLoginModal();
+    if (session && session.ready) return;
+    setModalOpen(true);
   }
 
   function bindLoginUi() {
@@ -200,10 +257,19 @@
     });
 
     if (discordBtn) {
-      discordBtn.addEventListener("click", function () {
-        if (typeof window.startDiscordLogin === "function") window.startDiscordLogin();
-      });
+      discordBtn.addEventListener("click", startDiscordLoginAndResume);
     }
+
+    // Header Log In on this page should also return into the login steps modal.
+    document.addEventListener(
+      "click",
+      function (e) {
+        var btn = e.target && e.target.closest ? e.target.closest("#nav-login-btn.nav-login-btn--signin") : null;
+        if (!btn) return;
+        markResumeLoginModal();
+      },
+      true
+    );
 
     if (robloxBtn) {
       robloxBtn.addEventListener("click", function () {
@@ -265,7 +331,8 @@
     initMobileSectionsMenu();
     bindLoginUi();
     // Same first paint for every visitor; auth only toggles visibility after load.
-    refreshSession();
+    // After Discord OAuth, reopen the login steps modal so Step 2 is ready.
+    refreshSession().then(resumeLoginModalIfNeeded);
   }
 
   if (document.readyState === "loading") {
