@@ -776,25 +776,13 @@
   }
 
   function postSummaryHtml(post) {
-    var user = authorDisplayName(post.author) || "This trader";
-    var trade =
-      sideTradePhrase(post.giving, "nothing") +
-      " for " +
-      sideTradePhrase(post.wanting, "nothing");
-    var lines =
-      '<p class="lt-post__summary-text">' + escapeHtml(trade) + "</p>";
-    if (post.wanting && post.wanting.lookingForOffers) {
-      lines +=
-        '<p class="lt-post__summary-offer">' +
-        escapeHtml(user + " is looking for offers.") +
-        "</p>";
-    } else if (post.wanting && post.wanting.notLookingForOffers) {
-      lines +=
-        '<p class="lt-post__summary-offer">' +
-        escapeHtml(user + " is not looking for offers.") +
-        "</p>";
-    }
-    return lines;
+    return (
+      '<p class="lt-post__summary-text">' +
+      escapeHtml(sideTradePhrase(post.giving, "nothing")) +
+      ' <strong class="lt-post__summary-for">for</strong> ' +
+      escapeHtml(sideTradePhrase(post.wanting, "nothing")) +
+      "</p>"
+    );
   }
 
   function resolveItemDisplay(item) {
@@ -838,9 +826,6 @@
       '<span class="lt-icard__name">' +
       escapeHtml(d.name) +
       "</span>" +
-      '<span class="lt-icard__num">' +
-      escapeHtml(String(d.qty)) +
-      "</span>" +
       "</div>" +
       "</div>"
     );
@@ -854,10 +839,10 @@
       '<div class="lt-icard__art lt-icard__art--cash">' +
       '<span class="lt-icard__cash-sign">$</span>' +
       "</div>" +
-      '<div class="lt-icard__bar">' +
+      '<div class="lt-icard__bar lt-icard__bar--cash">' +
       '<span class="lt-icard__name">Cash</span>' +
-      '<span class="lt-icard__num">' +
-      escapeHtml(formatCash(cash).replace(/^\$/, "")) +
+      '<span class="lt-icard__cash-amt">' +
+      escapeHtml(formatCash(cash)) +
       "</span>" +
       "</div>" +
       "</div>"
@@ -949,20 +934,20 @@
       escapeHtml(timeAgo(post.createdAt)) +
       "</p>" +
       "</div></div>" +
-      (own
-        ? '<button type="button" class="lt-post__delete" data-delete="' +
-          escapeAttr(post.id) +
-          '">Delete</button>'
-        : "") +
+      (offerCorner || "") +
       "</header>" +
       '<div class="lt-post__trade">' +
-      '<div class="lt-post__side">' +
-      '<span class="lt-post__side-pill">Offering</span>' +
+      '<div class="lt-post__panel">' +
+      '<span class="lt-post__side-pill lt-post__side-pill--offer">Offering</span>' +
       '<div class="lt-rail">' +
       railHtml(post.giving) +
       "</div></div>" +
-      '<div class="lt-post__side">' +
-      '<span class="lt-post__side-pill">Requesting</span>' +
+      '<div class="lt-post__divider" aria-hidden="true">' +
+      '<span class="lt-post__divider-line"></span>' +
+      '<span class="lt-post__swap"><span class="lt-post__swap-h">↔</span></span>' +
+      "</div>" +
+      '<div class="lt-post__panel">' +
+      '<span class="lt-post__side-pill lt-post__side-pill--request">Requesting</span>' +
       '<div class="lt-rail">' +
       railHtml(post.wanting) +
       "</div></div>" +
@@ -971,7 +956,13 @@
       '<p class="lt-post__summary-label">Post Summary</p>' +
       postSummaryHtml(post) +
       "</div>" +
-      offerCorner +
+      (own
+        ? '<div class="lt-post__foot">' +
+          '<button type="button" class="lt-post__delete" data-delete="' +
+          escapeAttr(post.id) +
+          '">Delete</button>' +
+          "</div>"
+        : "") +
       "</article>"
     );
   }
