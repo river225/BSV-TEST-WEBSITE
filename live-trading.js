@@ -328,15 +328,123 @@
     }, 50);
   }
 
+  var DISCORD_INVITE_FALLBACK = "https://discord.gg/QbapryYUUx";
+  var guildMemberCache = {
+    checkedAt: 0,
+    inGuild: false,
+    inviteUrl: DISCORD_INVITE_FALLBACK
+  };
+  var GUILD_CACHE_MS = 30 * 1000;
+
   function isLoggedIn() {
     return !!(currentSession && currentSession.ready);
   }
 
-  /** Browse is public; create / interact need Discord login. */
+  function authApiUrl(path) {
+    var p = String(path || "").replace(/^\/+/, "");
+    if (typeof window.bsvBotApiUrl === "function") return window.bsvBotApiUrl(p);
+    var base =
+      window.BSV_BOT_PUBLIC_BASE || "https://bsv-bot-production.up.railway.app";
+    return String(base).replace(/\/+$/, "") + "/" + p;
+  }
+
+  function showJoinDiscordPrompt(inviteUrl, message) {
+    var modal = document.getElementById("lt-join-discord");
+    var link = document.getElementById("lt-join-discord-link");
+    var body = modal ? modal.querySelector(".lt-join__body") : null;
+    var url = inviteUrl || guildMemberCache.inviteUrl || DISCORD_INVITE_FALLBACK;
+    if (link) link.href = url;
+    if (body) {
+      body.textContent =
+        message ||
+        "You must be in the BlockSpin Values Discord server to create or interact with Live Trading posts. Join, then come back and try again.";
+    }
+    if (modal) {
+      modal.hidden = false;
+      return;
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+
+  function hideJoinDiscordPrompt() {
+    var modal = document.getElementById("lt-join-discord");
+    if (modal) modal.hidden = true;
+  }
+
+  function checkGuildMembership(force) {
+    var token =
+      typeof window.bsvGetAuthToken === "function" ? window.bsvGetAuthToken() : null;
+    if (!token) {
+      return Promise.resolve({
+        loggedIn: false,
+        inGuild: false,
+        inviteUrl: DISCORD_INVITE_FALLBACK
+      });
+    }
+    if (
+      !force &&
+      guildMemberCache.checkedAt &&
+      Date.now() - guildMemberCache.checkedAt < GUILD_CACHE_MS
+    ) {
+      return Promise.resolve({
+        loggedIn: true,
+        inGuild: guildMemberCache.inGuild,
+        inviteUrl: guildMemberCache.inviteUrl
+      });
+    }
+    return fetch(authApiUrl("api/auth/guild-member"), {
+      headers: { Authorization: "Bearer " + token }
+    })
+      .then(function (res) {
+        return res.json().catch(function () {
+          return null;
+        });
+      })
+      .then(function (data) {
+        data = data || {};
+        guildMemberCache = {
+          checkedAt: Date.now(),
+          inGuild: !!data.inGuild,
+          inviteUrl: data.inviteUrl || DISCORD_INVITE_FALLBACK
+        };
+        return {
+          loggedIn: !!data.loggedIn,
+          inGuild: !!data.inGuild,
+          inviteUrl: guildMemberCache.inviteUrl,
+          error: data.error || null
+        };
+      })
+      .catch(function () {
+        return {
+          loggedIn: true,
+          inGuild: false,
+          inviteUrl: DISCORD_INVITE_FALLBACK,
+          error: "check_failed"
+        };
+      });
+  }
+
+  /**
+   * Browse is public. Create / interact need Discord login AND server membership.
+   * Returns a Promise<boolean>.
+   */
   function requireLoginForAction() {
-    if (isLoggedIn()) return true;
-    openSharedLogin();
-    return false;
+    if (!isLoggedIn()) {
+      openSharedLogin();
+      return Promise.resolve(false);
+    }
+    return checkGuildMembership(false).then(function (data) {
+      if (data.inGuild) return true;
+      if (data.error === "check_failed" || data.error === "checker_unavailable") {
+        showJoinDiscordPrompt(
+          data.inviteUrl,
+          "Couldn't verify Discord membership right now. Make sure you've joined the server, then tap “I’ve joined — check again”."
+        );
+        return false;
+      }
+      showJoinDiscordPrompt(data.inviteUrl);
+      return false;
+    });
   }
 
   function applySession(session) {
@@ -348,6 +456,8 @@
       user: discord,
       roblox: null
     };
+    guildMemberCache.checkedAt = 0;
+    guildMemberCache.inGuild = false;
     var gate = document.getElementById("live-trading-gate");
     var workspace = document.getElementById("live-trading-workspace");
     // Board is always visible; gate stays unused (login modal handles prompts).
@@ -663,7 +773,13 @@
   }
 
   function submitPost() {
-    if (!requireLoginForAction()) return;
+    requireLoginForAction().then(function (ok) {
+      if (!ok) return;
+      submitPostAfterAuth();
+    });
+  }
+
+  function submitPostAfterAuth() {
     clearComposerError();
     draft.givingCash = parseCash(
       (document.getElementById("lt-giving-cash") || {}).value
@@ -729,13 +845,15 @@
   }
 
   function deletePost(id) {
-    if (!requireLoginForAction()) return;
-    writePosts(
-      readPosts().filter(function (p) {
-        return p.id !== id;
-      })
-    );
-    renderFeed();
+    requireLoginForAction().then(function (ok) {
+      if (!ok) return;
+      writePosts(
+        readPosts().filter(function (p) {
+          return p.id !== id;
+        })
+      );
+      renderFeed();
+    });
   }
 
   function sideItemNames(side) {
@@ -1040,9 +1158,27 @@
 
     if (openCreate) {
       openCreate.addEventListener("click", function () {
-        if (!requireLoginForAction()) return;
-        setComposerOpen(true);
-        loadCatalog();
+        requireLoginForAction().then(function (ok) {
+          if (!ok) return;
+          setComposerOpen(true);
+          loadCatalog();
+        });
+      });
+    }
+    var joinClose = document.getElementById("lt-join-discord-close");
+    var joinBackdrop = document.getElementById("lt-join-discord-backdrop");
+    var joinRecheck = document.getElementById("lt-join-discord-recheck");
+    if (joinClose) joinClose.addEventListener("click", hideJoinDiscordPrompt);
+    if (joinBackdrop) joinBackdrop.addEventListener("click", hideJoinDiscordPrompt);
+    if (joinRecheck) {
+      joinRecheck.addEventListener("click", function () {
+        checkGuildMembership(true).then(function (data) {
+          if (data.inGuild) {
+            hideJoinDiscordPrompt();
+            return;
+          }
+          showJoinDiscordPrompt(data.inviteUrl);
+        });
       });
     }
     if (closeCreate) {
