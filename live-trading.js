@@ -1836,9 +1836,11 @@
       feedWrap.style.removeProperty("min-height");
       return;
     }
+    // Stretch well past the sections column so the trade feed feels taller.
+    var EXTRA_BELOW_SECTIONS = 160;
     var navBottom = nav.getBoundingClientRect().bottom;
     var wrapTop = feedWrap.getBoundingClientRect().top;
-    var h = Math.round(navBottom - wrapTop);
+    var h = Math.round(navBottom - wrapTop + EXTRA_BELOW_SECTIONS);
     if (h < 220) h = 220;
     feedWrap.style.setProperty("height", h + "px", "important");
     feedWrap.style.setProperty("min-height", h + "px", "important");
