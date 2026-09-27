@@ -346,6 +346,306 @@
     );
   }
 
+  var VALUE_LIST_SECTIONS = [
+    "Common / Uncommon",
+    "Rare",
+    "Epic",
+    "Legendary",
+    "Omega",
+    "Misc",
+    "Vehicles"
+  ];
+  var VALUE_LIST_EXTRAS = [
+    "Live Trading",
+    "Money & Game Guide",
+    "Untradeable Items",
+    "💰 Richest Players",
+    "Crew Logos"
+  ];
+  var DISCORD_INVITE = "https://discord.gg/QbapryYUUx";
+
+  function goToSection(title) {
+    if (typeof global.showSection === "function" && document.getElementById("sections-nav")) {
+      global.showSection(title);
+      return;
+    }
+    var cfg =
+      typeof global.getSectionConfig === "function" ? global.getSectionConfig(title) : null;
+    if (cfg && cfg.pageHref) {
+      location.href = sitePath(cfg.pageHref);
+      return;
+    }
+    location.href = sitePath("") + "#sec=" + encodeURIComponent(title);
+  }
+
+  function navValueListMenu() {
+    var items = VALUE_LIST_SECTIONS.map(function (title) {
+      return (
+        '<button type="button" class="nav-icon-menu__item" data-section-go="' +
+        title.replace(/"/g, "&quot;") +
+        '">' +
+        title +
+        "</button>"
+      );
+    }).join("");
+    var extras = VALUE_LIST_EXTRAS.map(function (title) {
+      var label = title === "💰 Richest Players" ? "Richest Players" : title;
+      return (
+        '<button type="button" class="nav-icon-menu__item nav-icon-menu__item--sub" data-section-go="' +
+        title.replace(/"/g, "&quot;") +
+        '">' +
+        label +
+        "</button>"
+      );
+    }).join("");
+    return (
+      '<div class="nav-icon-menu" data-nav-menu="value-list">' +
+        '<button type="button" class="nav-icon-menu__btn" aria-expanded="false" aria-haspopup="true" aria-label="Value List">' +
+          '<span class="nav-icon-menu__icon" aria-hidden="true">' +
+            '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+              '<path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/>' +
+              '<path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/>' +
+            "</svg>" +
+          "</span>" +
+          '<span class="nav-icon-menu__label">Value List</span>' +
+        "</button>" +
+        '<div class="nav-icon-menu__panel" hidden>' +
+          items +
+          '<button type="button" class="nav-icon-menu__item nav-icon-menu__item--extras-toggle" aria-expanded="false">Extras</button>' +
+          '<div class="nav-icon-menu__extras" hidden>' + extras + "</div>" +
+        "</div>" +
+      "</div>"
+    );
+  }
+
+  function navGiveawaysMenu() {
+    return (
+      '<div class="nav-icon-menu" data-nav-menu="giveaways">' +
+        '<button type="button" class="nav-icon-menu__btn" aria-expanded="false" aria-haspopup="dialog" aria-label="Giveaways" data-open-giveaways="1">' +
+          '<span class="nav-icon-menu__icon" aria-hidden="true">' +
+            '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+              '<path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7z"/>' +
+            "</svg>" +
+          "</span>" +
+          '<span class="nav-icon-menu__label">Giveaways</span>' +
+        "</button>" +
+      "</div>"
+    );
+  }
+
+  function giveawaysModalHtml() {
+    return (
+      '<div class="bsv-giveaways-modal" id="bsv-giveaways-modal" hidden>' +
+        '<div class="bsv-giveaways-modal__backdrop" data-close-giveaways="1"></div>' +
+        '<div class="bsv-giveaways-modal__card" role="dialog" aria-modal="true" aria-labelledby="bsv-giveaways-title">' +
+          '<button type="button" class="bsv-giveaways-modal__close" data-close-giveaways="1" aria-label="Close">&times;</button>' +
+          '<span class="bsv-giveaways-modal__badge">Active Giveaways</span>' +
+          '<h2 class="bsv-giveaways-modal__title" id="bsv-giveaways-title">Win free BlockSpin items</h2>' +
+          '<p class="bsv-giveaways-modal__body">We\'ve given away <strong>tons of guns, vehicles, and Robux</strong> to the community. Join our Discord for active giveaways and enter the next drop.</p>' +
+          '<a class="bsv-giveaways-modal__cta" href="' +
+          DISCORD_INVITE +
+          '" target="_blank" rel="noopener noreferrer">Join Discord for Giveaways →</a>' +
+        "</div>" +
+      "</div>"
+    );
+  }
+
+  function valueListModalHtml() {
+    var main = VALUE_LIST_SECTIONS.map(function (title) {
+      return (
+        '<button type="button" class="bsv-value-list-modal__item" data-section-go="' +
+        title.replace(/"/g, "&quot;") +
+        '">' +
+        title +
+        "</button>"
+      );
+    }).join("");
+    var extras = VALUE_LIST_EXTRAS.map(function (title) {
+      var label = title === "💰 Richest Players" ? "Richest Players" : title;
+      return (
+        '<button type="button" class="bsv-value-list-modal__item" data-section-go="' +
+        title.replace(/"/g, "&quot;") +
+        '">' +
+        label +
+        "</button>"
+      );
+    }).join("");
+    return (
+      '<div class="bsv-value-list-modal" id="bsv-value-list-modal" hidden>' +
+        '<div class="bsv-value-list-modal__backdrop" data-close-value-list="1"></div>' +
+        '<div class="bsv-value-list-modal__card" role="dialog" aria-modal="true" aria-labelledby="bsv-value-list-title">' +
+          '<button type="button" class="bsv-value-list-modal__close" data-close-value-list="1" aria-label="Close">&times;</button>' +
+          '<h2 class="bsv-value-list-modal__title" id="bsv-value-list-title">Value List</h2>' +
+          '<div class="bsv-value-list-modal__list">' +
+            main +
+            '<p class="bsv-value-list-modal__group">Extras</p>' +
+            extras +
+          "</div>" +
+        "</div>" +
+      "</div>"
+    );
+  }
+
+  function initHeaderIconMenus() {
+    if (!document.getElementById("bsv-giveaways-modal")) {
+      var wrap = document.createElement("div");
+      wrap.innerHTML = giveawaysModalHtml();
+      document.body.appendChild(wrap.firstElementChild);
+    }
+    if (!document.getElementById("bsv-value-list-modal")) {
+      var vlWrap = document.createElement("div");
+      vlWrap.innerHTML = valueListModalHtml();
+      document.body.appendChild(vlWrap.firstElementChild);
+    }
+
+    function closeAllMenus() {
+      document.querySelectorAll(".nav-icon-menu.is-open").forEach(function (menu) {
+        menu.classList.remove("is-open");
+        var btn = menu.querySelector(".nav-icon-menu__btn");
+        var panel = menu.querySelector(".nav-icon-menu__panel");
+        if (btn) btn.setAttribute("aria-expanded", "false");
+        if (panel) panel.hidden = true;
+        var extras = menu.querySelector(".nav-icon-menu__extras");
+        var extrasBtn = menu.querySelector(".nav-icon-menu__item--extras-toggle");
+        if (extras) extras.hidden = true;
+        if (extrasBtn) extrasBtn.setAttribute("aria-expanded", "false");
+      });
+    }
+
+    function openGiveaways() {
+      closeAllMenus();
+      closeValueListModal();
+      var modal = document.getElementById("bsv-giveaways-modal");
+      if (modal) modal.hidden = false;
+    }
+
+    function closeGiveaways() {
+      var modal = document.getElementById("bsv-giveaways-modal");
+      if (modal) modal.hidden = true;
+    }
+
+    function openValueListModal() {
+      closeAllMenus();
+      closeGiveaways();
+      var modal = document.getElementById("bsv-value-list-modal");
+      if (modal) modal.hidden = false;
+    }
+
+    function closeValueListModal() {
+      var modal = document.getElementById("bsv-value-list-modal");
+      if (modal) modal.hidden = true;
+    }
+
+    global.bsvOpenValueListMenu = function () {
+      if (window.matchMedia("(max-width: 900px)").matches) {
+        openValueListModal();
+        return;
+      }
+      var menu = document.querySelector('.nav-icon-menu[data-nav-menu="value-list"]');
+      var btn = menu && menu.querySelector(".nav-icon-menu__btn");
+      if (btn) btn.click();
+    };
+
+    document.querySelectorAll(".nav-icon-menu").forEach(function (menu) {
+      if (menu._bsvBound) return;
+      menu._bsvBound = true;
+      var btn = menu.querySelector(".nav-icon-menu__btn");
+      var panel = menu.querySelector(".nav-icon-menu__panel");
+      if (!btn) return;
+
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (btn.getAttribute("data-open-giveaways")) {
+          openGiveaways();
+          return;
+        }
+        var open = menu.classList.contains("is-open");
+        closeAllMenus();
+        if (!open && panel) {
+          menu.classList.add("is-open");
+          btn.setAttribute("aria-expanded", "true");
+          panel.hidden = false;
+        }
+      });
+
+      menu.querySelectorAll("[data-section-go]").forEach(function (item) {
+        item.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var title = item.getAttribute("data-section-go");
+          closeAllMenus();
+          if (title) goToSection(title);
+        });
+      });
+
+      var extrasBtn = menu.querySelector(".nav-icon-menu__item--extras-toggle");
+      var extrasPanel = menu.querySelector(".nav-icon-menu__extras");
+      if (extrasBtn && extrasPanel) {
+        extrasBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var open = extrasBtn.getAttribute("aria-expanded") === "true";
+          extrasBtn.setAttribute("aria-expanded", open ? "false" : "true");
+          extrasPanel.hidden = open;
+        });
+      }
+    });
+
+    document.querySelectorAll("[data-open-giveaways]").forEach(function (el) {
+      if (el._bsvGwBound) return;
+      el._bsvGwBound = true;
+      if (el.closest(".nav-icon-menu")) return;
+      el.addEventListener("click", function (e) {
+        e.preventDefault();
+        openGiveaways();
+      });
+    });
+
+    document.querySelectorAll("[data-close-giveaways]").forEach(function (el) {
+      if (el._bsvGwCloseBound) return;
+      el._bsvGwCloseBound = true;
+      el.addEventListener("click", function () {
+        closeGiveaways();
+      });
+    });
+
+    document.querySelectorAll("[data-close-value-list]").forEach(function (el) {
+      if (el._bsvVlCloseBound) return;
+      el._bsvVlCloseBound = true;
+      el.addEventListener("click", function () {
+        closeValueListModal();
+      });
+    });
+
+    var vlModal = document.getElementById("bsv-value-list-modal");
+    if (vlModal && !vlModal._bsvBound) {
+      vlModal._bsvBound = true;
+      vlModal.querySelectorAll("[data-section-go]").forEach(function (item) {
+        item.addEventListener("click", function (e) {
+          e.preventDefault();
+          var title = item.getAttribute("data-section-go");
+          closeValueListModal();
+          if (title) goToSection(title);
+        });
+      });
+    }
+
+    if (!document._bsvNavMenusDocBound) {
+      document._bsvNavMenusDocBound = true;
+      document.addEventListener("click", function () {
+        closeAllMenus();
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          closeAllMenus();
+          closeGiveaways();
+          closeValueListModal();
+        }
+      });
+    }
+  }
+
   function ensureSponsorBannerStyles() {
     var old = document.getElementById("bsv-sponsor-banner-styles-v2");
     if (old) old.remove();
@@ -564,7 +864,9 @@
                 '<img src="' + sitePath("assets/bsv-logo.png") + '" alt="BlockSpin Values Logo" class="nav-logo-img" width="60" height="60" decoding="async">' +
                 '<span class="nav-title">Block<span class="brand-spin">Spin</span> Values</span>' +
               "</a>" +
+              navValueListMenu() +
               navLiveTradingLink(activePage) +
+              navGiveawaysMenu() +
             "</div>" +
             search +
             '<div class="nav-right">' +
@@ -579,7 +881,11 @@
       "</header>" +
       '<div class="site-mobile-below-header">' +
         '<nav class="header-subnav" aria-label="Site pages">' +
+          '<button type="button" class="header-subnav__btn" data-open-value-list="1">Value List</button>' +
+          '<span class="header-subnav__sep" aria-hidden="true">·</span>' +
           navLink(sitePath("live-trading.html"), "Live Trading", activePage, "live-trading") +
+          '<span class="header-subnav__sep" aria-hidden="true">·</span>' +
+          '<button type="button" class="header-subnav__btn" data-open-giveaways="1">Giveaways</button>' +
         "</nav>" +
         '<div class="nav-mobile-toolbar is-active" aria-label="Mobile shortcuts"></div>' +
       "</div>"
@@ -789,10 +1095,22 @@
     var boosters = document.getElementById("footer-boosters");
     if (boostersSlot && boosters) boostersSlot.appendChild(boosters);
     initMobileHeaderToolbar();
+    initHeaderIconMenus();
     ensureHomeHeaderDeps();
     initConsent();
     initFooterBoostersLazy();
     rewriteRootAbsoluteAssets(document);
+
+    document.querySelectorAll("[data-open-value-list]").forEach(function (el) {
+      if (el._bsvVlBound) return;
+      el._bsvVlBound = true;
+      el.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (typeof global.bsvOpenValueListMenu === "function") {
+          global.bsvOpenValueListMenu();
+        }
+      });
+    });
   }
 
   function ensureProjectPageFavicons() {

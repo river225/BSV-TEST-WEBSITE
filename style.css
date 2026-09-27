@@ -2432,6 +2432,9 @@ background-attachment: fixed;
 }#sections-nav button:nth-child(9).active {
   background: linear-gradient(135deg, #3f2f72 0%, #59429b 25%, #765bc2 50%, #9a7ae0 75%, #b39af0 100%);
   color: white;
+}#sections-nav button[data-section="Untradeable Items"].active {
+  background: linear-gradient(135deg, #3f2f72 0%, #59429b 25%, #765bc2 50%, #9a7ae0 75%, #b39af0 100%);
+  color: white;
 }#sections-nav button[data-section="Money & Game Guide"].active {
   background: linear-gradient(135deg, #064e3b 0%, #047857 22%, #059669 48%, #10b981 72%, #34d399 100%);
   color: white;
@@ -3341,18 +3344,55 @@ background-attachment: fixed;
   border: 3px solid #000;
   overflow: hidden;
   background:
-    radial-gradient(ellipse 90% 70% at 18% 12%, rgba(255, 255, 255, 0.22) 0%, transparent 48%),
-    radial-gradient(ellipse 70% 60% at 88% 88%, rgba(96, 165, 250, 0.35) 0%, transparent 55%),
-    linear-gradient(145deg, #1d4ed8 0%, #2563eb 28%, #5865f2 58%, #3b82f6 100%);
+    radial-gradient(ellipse 90% 70% at 18% 12%, rgba(255, 255, 255, 0.28) 0%, transparent 48%),
+    radial-gradient(ellipse 70% 60% at 88% 88%, rgba(96, 165, 250, 0.4) 0%, transparent 55%),
+    linear-gradient(145deg, #1e40af 0%, #2563eb 28%, #5865f2 58%, #3b82f6 100%);
   box-shadow:
     0 6px 0 #000,
-    0 0 28px rgba(37, 99, 235, 0.4);
+    0 0 36px rgba(88, 101, 242, 0.55),
+    0 0 60px rgba(37, 99, 235, 0.28);
+  animation: home-discord-banner-pulse 4s ease-in-out infinite;
+}@keyframes home-discord-banner-pulse {
+  0%, 100% {
+    box-shadow: 0 6px 0 #000, 0 0 36px rgba(88, 101, 242, 0.5), 0 0 56px rgba(37, 99, 235, 0.24);
+  }
+  50% {
+    box-shadow: 0 6px 0 #000, 0 0 48px rgba(129, 140, 248, 0.7), 0 0 72px rgba(59, 130, 246, 0.38);
+  }
 }.home-discord-promo--home::before,
 .home-discord-promo--home::after {
   display: none;
-}.home-discord-promo--home .home-discord-promo__home-glow,
-.home-discord-promo__home-shimmer,
-.home-discord-promo--home .home-discord-promo__shape {
+}.home-discord-promo--home .home-discord-promo__home-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.3) 0%, transparent 38%),
+    radial-gradient(circle at 88% 82%, rgba(147, 197, 253, 0.28) 0%, transparent 42%),
+    radial-gradient(circle at 72% 12%, rgba(196, 181, 253, 0.18) 0%, transparent 36%);
+  pointer-events: none;
+  z-index: 0;
+  animation: home-discord-home-pulse 3s ease-in-out infinite;
+}.home-discord-promo__home-shimmer {
+  position: absolute;
+  inset: -40% -60%;
+  background: linear-gradient(
+    105deg,
+    transparent 42%,
+    rgba(255, 255, 255, 0.16) 50%,
+    transparent 58%
+  );
+  pointer-events: none;
+  z-index: 0;
+  animation: home-discord-shimmer 4.5s ease-in-out infinite;
+}@keyframes home-discord-shimmer {
+  0%, 100% { transform: translateX(-30%) rotate(8deg); opacity: 0; }
+  45% { opacity: 1; }
+  55% { opacity: 1; }
+  100% { transform: translateX(30%) rotate(8deg); opacity: 0; }
+}@keyframes home-discord-home-pulse {
+  0%, 100% { opacity: 0.75; }
+  50% { opacity: 1; }
+}.home-discord-promo--home .home-discord-promo__shape {
   display: none;
 }.home-discord-promo--home .home-discord-promo__inner {
   position: relative;
@@ -3360,8 +3400,8 @@ background-attachment: fixed;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
-  padding: 22px 20px 18px;
+  gap: 12px;
+  padding: 16px 16px 14px;
   text-align: center;
 }.home-discord-promo__flash-badges {
   display: flex;
@@ -3393,6 +3433,10 @@ background-attachment: fixed;
   background: linear-gradient(180deg, #bae6fd 0%, #38bdf8 100%);
   color: #0c4a6e;
   animation-delay: 0.7s;
+}.home-discord-promo__flash-badge--values {
+  background: linear-gradient(180deg, #e9d5ff 0%, #a855f7 100%);
+  color: #3b0764;
+  animation-delay: 0.2s;
 }@keyframes home-discord-badge-pop {
   0%, 100% { transform: translateY(0) scale(1); }
   50% { transform: translateY(-2px) scale(1.03); }
@@ -3409,7 +3453,11 @@ background-attachment: fixed;
   border-radius: 12px;
   background: rgba(15, 23, 42, 0.45);
   border: 2px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 3px 0 #000;
+  box-shadow: 0 3px 0 #000, 0 0 18px rgba(255, 255, 255, 0.28);
+  animation: home-discord-logo-float 3.2s ease-in-out infinite;
+}@keyframes home-discord-logo-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
 }.home-discord-promo__flash-title {
   margin: 0;
   font-size: clamp(1.15rem, 2.8vw, 1.45rem);
@@ -3542,20 +3590,38 @@ background-attachment: fixed;
   border-radius: 20px;
   text-align: center;
   box-sizing: border-box;
-  background: linear-gradient(180deg, rgba(225, 29, 46, 0.18), transparent 55%), #090b11;
-  border: 1px solid rgba(225, 29, 46, 0.35);
+  background: linear-gradient(180deg, rgba(225, 29, 46, 0.28), transparent 55%), #12080a;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 28px rgba(225, 29, 46, 0.18);
+}.home-lt-bar__new {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #450a0a;
+  background: linear-gradient(180deg, #fde68a 0%, #f59e0b 100%);
+  border: 2px solid #000;
+  box-shadow: 0 2px 0 #000;
 }.home-lt-bar h3 {
   margin: 0 0 8px;
   font-family: "Paytone One", system-ui, sans-serif;
   font-size: clamp(1.6rem, 3.5vw, 2.3rem);
   color: #fff;
   line-height: 1.15;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
 }.home-lt-bar p {
   margin: 0 auto 14px;
-  max-width: 40ch;
-  color: rgba(244, 247, 251, 0.62);
-  font-size: 0.95rem;
-  line-height: 1.5;
+  max-width: 42ch;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.45;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
 }.home-lt-bar__actions {
   display: flex;
   flex-wrap: wrap;
@@ -6273,6 +6339,200 @@ background-attachment: fixed;
 }.nav-live-trading-link:hover .nav-live-trading-link__icon,
 .nav-live-trading-link.nav-link--active .nav-live-trading-link__icon {
   color: var(--bsv-accent);
+}.nav-icon-menu {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}.nav-icon-menu__btn {
+  appearance: none;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: 2px 6px 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  line-height: 1.05;
+}.nav-icon-menu__icon {
+  display: flex;
+  color: #fff;
+  filter: drop-shadow(1px 1px 0 #000);
+}.nav-icon-menu__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  text-shadow: 1px 1px 0 #000;
+}.nav-icon-menu__btn:hover,
+.nav-icon-menu.is-open .nav-icon-menu__btn {
+  color: var(--bsv-accent);
+}.nav-icon-menu__btn:hover .nav-icon-menu__icon,
+.nav-icon-menu.is-open .nav-icon-menu__icon {
+  color: var(--bsv-accent);
+}.nav-icon-menu__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1200;
+  min-width: 200px;
+  max-height: min(70vh, 420px);
+  overflow: auto;
+  padding: 8px;
+  border-radius: 12px;
+  border: 2px solid #000;
+  background: #121826;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}.nav-icon-menu__item {
+  appearance: none;
+  width: 100%;
+  text-align: left;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  font: 600 0.9rem/1.2 system-ui, sans-serif;
+  cursor: pointer;
+}.nav-icon-menu__item:hover,
+.nav-icon-menu__item--extras-toggle[aria-expanded="true"] {
+  background: rgba(88, 101, 242, 0.22);
+}.nav-icon-menu__item--extras-toggle {
+  margin-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0 0 8px 8px;
+  font-weight: 800;
+  color: #93c5fd;
+}.nav-icon-menu__extras {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 2px 0 0 8px;
+}.nav-icon-menu__item--sub {
+  font-size: 0.84rem;
+  color: rgba(255, 255, 255, 0.92);
+}.header-subnav__btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}.bsv-giveaways-modal,
+.bsv-value-list-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 12050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}.bsv-giveaways-modal[hidden],
+.bsv-value-list-modal[hidden] {
+  display: none !important;
+}.bsv-giveaways-modal__backdrop,
+.bsv-value-list-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.62);
+}.bsv-giveaways-modal__card,
+.bsv-value-list-modal__card {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 420px);
+  max-height: min(80vh, 560px);
+  overflow: auto;
+  padding: 28px 24px 24px;
+  border-radius: 18px;
+  border: 2px solid #000;
+  background: linear-gradient(165deg, #1a2234 0%, #0f141f 100%);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}.bsv-giveaways-modal__close,
+.bsv-value-list-modal__close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}.bsv-giveaways-modal__badge {
+  display: inline-flex;
+  margin-bottom: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #422006;
+  background: linear-gradient(180deg, #fde68a 0%, #f59e0b 100%);
+  border: 2px solid #000;
+}.bsv-giveaways-modal__title,
+.bsv-value-list-modal__title {
+  margin: 0 0 10px;
+  color: #fff;
+  font: 800 1.45rem/1.2 system-ui, sans-serif;
+}.bsv-giveaways-modal__body {
+  margin: 0 0 18px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.98rem;
+  line-height: 1.5;
+}.bsv-giveaways-modal__body strong {
+  color: #fde68a;
+}.bsv-giveaways-modal__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 2px solid #000;
+  background: linear-gradient(180deg, #7289da 0%, #5865f2 100%);
+  color: #fff;
+  font: 800 0.95rem/1 system-ui, sans-serif;
+  text-decoration: none;
+  box-shadow: 0 3px 0 #000;
+}.bsv-giveaways-modal__cta:hover {
+  filter: brightness(1.06);
+}.bsv-value-list-modal__list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}.bsv-value-list-modal__group {
+  margin: 10px 0 2px;
+  color: #93c5fd;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}.bsv-value-list-modal__item {
+  appearance: none;
+  width: 100%;
+  text-align: left;
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  font: 600 0.95rem/1.2 system-ui, sans-serif;
+  cursor: pointer;
+}.bsv-value-list-modal__item:hover {
+  background: rgba(88, 101, 242, 0.25);
+  border-color: rgba(147, 197, 253, 0.35);
 }.nav-right {
   display: flex;
   gap: 15px;
@@ -14016,7 +14276,8 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     transform: none;
   }
 
-  .nav-left a:not(.nav-brand) {
+  .nav-left a:not(.nav-brand),
+  .nav-left .nav-icon-menu {
     display: none !important;
   }
 

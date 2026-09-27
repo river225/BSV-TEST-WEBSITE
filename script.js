@@ -442,8 +442,16 @@ function buildHomeFlashPerkHtml(mod, icon, titleKey, tagKey) {
 function buildDiscordPromoBannerHtml(inCards) {
   if (inCards) return buildDiscordPromoCardSlotHtml("");
   return (
-    '<div class="home-discord-promo home-discord-promo--home" role="complementary" aria-label="Join BlockSpin Discord">' +
+    '<div class="home-discord-promo home-discord-promo--home home-discord-promo--home-flash" role="complementary" aria-label="Join BlockSpin Discord">' +
+      '<div class="home-discord-promo__home-glow" aria-hidden="true"></div>' +
+      '<div class="home-discord-promo__home-shimmer" aria-hidden="true"></div>' +
       '<div class="home-discord-promo__inner">' +
+        '<div class="home-discord-promo__flash-badges">' +
+          '<span class="home-discord-promo__flash-badge home-discord-promo__flash-badge--mm">' + escapeHtml(i18n("discord.home.badgeFreeMm")) + "</span>" +
+          '<span class="home-discord-promo__flash-badge home-discord-promo__flash-badge--values">' + escapeHtml(i18n("discord.home.badgeValueList")) + "</span>" +
+          '<span class="home-discord-promo__flash-badge home-discord-promo__flash-badge--gw">' + escapeHtml(i18n("discord.home.badgeGiveaways")) + "</span>" +
+          '<span class="home-discord-promo__flash-badge home-discord-promo__flash-badge--trade">' + escapeHtml(i18n("discord.home.badgeTrading")) + "</span>" +
+        "</div>" +
         '<div class="home-discord-promo__flash-hero">' +
           '<img src="https://i.ibb.co/Tq7DLCJt/dsfbvbvxcxbvn.png" alt="" width="52" height="52" class="home-discord-promo__logo home-discord-promo__flash-logo">' +
           '<p class="home-discord-promo__title home-discord-promo__flash-title">' + escapeHtml(i18n("discord.home.title")) + "</p>" +
@@ -452,6 +460,11 @@ function buildDiscordPromoBannerHtml(inCards) {
             '<span class="home-discord-promo__flash-stat-num"><span class="discord-member-count" data-home-stat="traders">0</span>+</span>' +
             '<span class="home-discord-promo__flash-stat-label">' + escapeHtml(i18n("discord.home.statLabel")) + "</span>" +
           "</p>" +
+        "</div>" +
+        '<div class="home-discord-promo__flash-perks">' +
+          buildHomeFlashPerkHtml("trading", "📊", "discord.card.tradingPerk", "discord.home.tradingTag1") +
+          buildHomeFlashPerkHtml("middleman", buildMiddlemanShieldIconHtml(22), "discord.card.middlemanTitle", "discord.card.middlemanStep1") +
+          buildHomeFlashPerkHtml("giveaways", "🎁", "discord.card.giveawaysTitle", "discord.card.giveawaysTag2") +
         "</div>" +
         '<div class="home-discord-promo__actions home-discord-promo__actions--home home-discord-promo__flash-actions">' +
           '<a href="' + BSV_DISCORD_INVITE_URL + '" target="_blank" rel="noopener noreferrer" class="home-discord-promo__btn home-discord-promo__btn--primary home-discord-promo__btn--flash-join">' +
@@ -493,8 +506,9 @@ function homeLiveTradingHref() {
 function buildHomeLiveTradingBarHtml() {
   return (
     '<aside class="home-lt-bar" aria-label="Live Trading">' +
-      "<h3>Live Trading is open</h3>" +
-      "<p>Drop your offers. Find what you need. Chat the trader.</p>" +
+      '<span class="home-lt-bar__new">NEW</span>' +
+      "<h3>BlockSpin Live Trading</h3>" +
+      "<p>Post offers, browse live deals, and message traders instantly.</p>" +
       '<div class="home-lt-bar__actions">' +
         '<a class="home-lt-bar__btn" href="' + homeLiveTradingHref() + '">Start Trading →</a>' +
       "</div>" +
