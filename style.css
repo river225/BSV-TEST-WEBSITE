@@ -2740,7 +2740,7 @@ background-attachment: fixed;
   z-index: 2;
   display: flex;
   align-items: flex-start;
-  gap: 40px;
+  gap: 32px;
   text-align: left;
   max-width: 100%;
 }.footer-side-nav__title {

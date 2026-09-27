@@ -564,9 +564,6 @@
                 '<img src="' + sitePath("assets/bsv-logo.png") + '" alt="BlockSpin Values Logo" class="nav-logo-img" width="60" height="60" decoding="async">' +
                 '<span class="nav-title">Block<span class="brand-spin">Spin</span> Values</span>' +
               "</a>" +
-              navLink(sitePath("x-about.html"), "About Us", activePage, "about") +
-              navLink(sitePath("sponsors/"), "Sponsors", activePage, "sponsors") +
-              navLink(sitePath("x-faq.html"), "FAQ", activePage, "faq") +
               navLiveTradingLink(activePage) +
             "</div>" +
             search +
@@ -582,12 +579,6 @@
       "</header>" +
       '<div class="site-mobile-below-header">' +
         '<nav class="header-subnav" aria-label="Site pages">' +
-          navLink(sitePath("x-about.html"), "About Us", activePage, "about") +
-          '<span class="header-subnav__sep" aria-hidden="true">·</span>' +
-          navLink(sitePath("sponsors/"), "Sponsors", activePage, "sponsors") +
-          '<span class="header-subnav__sep" aria-hidden="true">·</span>' +
-          navLink(sitePath("x-faq.html"), "FAQ", activePage, "faq") +
-          '<span class="header-subnav__sep" aria-hidden="true">·</span>' +
           navLink(sitePath("live-trading.html"), "Live Trading", activePage, "live-trading") +
         "</nav>" +
         '<div class="nav-mobile-toolbar is-active" aria-label="Mobile shortcuts"></div>' +
@@ -687,15 +678,18 @@
   function footerSideNavBlock() {
     return (
       '<div class="footer-side-nav">' +
-        '<div class="footer-side-nav__group" aria-label="Contact">' +
-          '<p class="footer-side-nav__title">Contact</p>' +
+        '<div class="footer-side-nav__group" aria-label="About">' +
+          '<p class="footer-side-nav__title">About</p>' +
           '<ul class="footer-side-nav__list">' +
-            '<li><a class="footer-side-nav__link" href="' + sitePath("z-contact.html") + '">' +
-              '<svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/></svg>' +
-              "<span>Contact</span></a></li>" +
-            '<li><a class="footer-side-nav__link" href="https://discord.gg/blockspinvalues" target="_blank" rel="noopener noreferrer">' +
-              '<svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.445.865-.608 1.25-1.845-.276-3.68-.276-5.487 0-.164-.393-.406-.874-.618-1.25a.077.077 0 0 0-.078-.037 19.736 19.736 0 0 0-4.885 1.515.07.07 0 0 0-.032.028C.533 9.046-.319 13.58.099 18.058a.082.082 0 0 0 .031.056c2.053 1.508 4.041 2.423 5.993 3.029a.078.078 0 0 0 .084-.028c.462-.63.873-1.295 1.226-1.994a.076.076 0 0 0-.042-.106c-.653-.248-1.274-.55-1.872-.892a.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.099.246.198.373.292a.077.077 0 0 1-.007.128 12.299 12.299 0 0 1-1.873.891.077.077 0 0 0-.041.107c.36.698.772 1.363 1.225 1.993a.076.076 0 0 0 .084.028c1.961-.607 3.95-1.522 6.002-3.029a.077.077 0 0 0 .031-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.029zM8.02 15.331c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.211 0 2.176 1.095 2.157 2.419 0 1.333-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.211 0 2.176 1.095 2.157 2.419 0 1.333-.946 2.419-2.157 2.419z"/></svg>' +
-              "<span>Discord</span></a></li>" +
+            '<li><a class="footer-side-nav__link" href="' + sitePath("x-about.html") + '">' +
+              '<svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>' +
+              "<span>About Us</span></a></li>" +
+            '<li><a class="footer-side-nav__link" href="' + sitePath("sponsors/") + '">' +
+              '<svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2 9.2 8.6 2 9.2l5.4 4.6L5.6 22 12 18.2 18.4 22l-1.8-8.2L22 9.2l-7.2-.6L12 2z"/></svg>' +
+              "<span>Sponsors</span></a></li>" +
+            '<li><a class="footer-side-nav__link" href="' + sitePath("x-faq.html") + '">' +
+              '<svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>' +
+              "<span>FAQ</span></a></li>" +
           "</ul>" +
         "</div>" +
         '<div class="footer-side-nav__group" aria-label="Legal">' +
@@ -710,6 +704,17 @@
             '<li><a class="footer-side-nav__link" href="' + sitePath("z-cookie.html") + '">' +
               '<svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6zm5 4h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>' +
               "<span>Cookie Policy</span></a></li>" +
+          "</ul>" +
+        "</div>" +
+        '<div class="footer-side-nav__group" aria-label="Contact">' +
+          '<p class="footer-side-nav__title">Contact</p>' +
+          '<ul class="footer-side-nav__list">' +
+            '<li><a class="footer-side-nav__link" href="' + sitePath("z-contact.html") + '">' +
+              '<svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/></svg>' +
+              "<span>Contact</span></a></li>" +
+            '<li><a class="footer-side-nav__link" href="https://discord.gg/blockspinvalues" target="_blank" rel="noopener noreferrer">' +
+              '<svg class="footer-side-nav__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.445.865-.608 1.25-1.845-.276-3.68-.276-5.487 0-.164-.393-.406-.874-.618-1.25a.077.077 0 0 0-.078-.037 19.736 19.736 0 0 0-4.885 1.515.07.07 0 0 0-.032.028C.533 9.046-.319 13.58.099 18.058a.082.082 0 0 0 .031.056c2.053 1.508 4.041 2.423 5.993 3.029a.078.078 0 0 0 .084-.028c.462-.63.873-1.295 1.226-1.994a.076.076 0 0 0-.042-.106c-.653-.248-1.274-.55-1.872-.892a.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.099.246.198.373.292a.077.077 0 0 1-.007.128 12.299 12.299 0 0 1-1.873.891.077.077 0 0 0-.041.107c.36.698.772 1.363 1.225 1.993a.076.076 0 0 0 .084.028c1.961-.607 3.95-1.522 6.002-3.029a.077.077 0 0 0 .031-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.029zM8.02 15.331c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.211 0 2.176 1.095 2.157 2.419 0 1.333-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.211 0 2.176 1.095 2.157 2.419 0 1.333-.946 2.419-2.157 2.419z"/></svg>' +
+              "<span>Discord</span></a></li>" +
           "</ul>" +
         "</div>" +
       "</div>"
