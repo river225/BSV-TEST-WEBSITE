@@ -17106,6 +17106,12 @@ body.live-trading-page .live-trading-workspace {
   filter: drop-shadow(0 0 4px rgba(167, 243, 208, 0.65));
 }
 .lt-post__staff-tag {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  gap: 0;
+  justify-content: center;
+  border-radius: 50%;
   border: 1px solid rgba(191, 219, 254, 0.85);
   background:
     linear-gradient(180deg, #60a5fa 0%, #2563eb 55%, #1e3a8a 100%);
@@ -17113,17 +17119,22 @@ body.live-trading-page .live-trading-workspace {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.28),
     0 0 0 1px rgba(30, 58, 138, 0.55),
-    0 4px 14px rgba(37, 99, 235, 0.35);
-  text-shadow: 0 1px 0 rgba(30, 58, 138, 0.45);
+    0 4px 12px rgba(37, 99, 235, 0.35);
+  text-shadow: none;
+  letter-spacing: 0;
 }
 .lt-post__staff-mark {
-  background: rgba(255, 255, 255, 0.18);
-  border: 1px solid rgba(239, 246, 255, 0.55);
-  color: #dbeafe;
+  display: none;
+}
+.lt-post__staff-text {
+  display: none;
 }
 .lt-post__staff-icon {
-  color: #dbeafe;
-  filter: drop-shadow(0 0 4px rgba(147, 197, 253, 0.7));
+  width: 13px;
+  height: 13px;
+  display: block;
+  color: #eff6ff;
+  filter: drop-shadow(0 0 3px rgba(191, 219, 254, 0.75));
 }
 .lt-post__time {
   margin: 2px 0 0;

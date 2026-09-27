@@ -403,13 +403,10 @@
 
   function communityStaffBadgeHtml() {
     return (
-      '<span class="lt-post__staff-tag" data-lt-tip="Community Staff — official BlockSpin Values server staff">' +
-      '<span class="lt-post__staff-mark" aria-hidden="true">' +
-      '<svg class="lt-post__staff-icon" viewBox="0 0 24 24" width="14" height="14">' +
+      '<span class="lt-post__staff-tag" data-lt-tip="Community Staff" aria-label="Community Staff" role="img">' +
+      '<svg class="lt-post__staff-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">' +
       '<path fill="currentColor" d="M12 2.2l7.2 3.1v6.2c0 4.7-3.1 8.9-7.2 10.1-4.1-1.2-7.2-5.4-7.2-10.1V5.3L12 2.2zm0 2.3L6.8 6.6v4.9c0 3.5 2.3 6.7 5.2 7.8 2.9-1.1 5.2-4.3 5.2-7.8V6.6L12 4.5z"/>' +
       "</svg>" +
-      "</span>" +
-      '<span class="lt-post__staff-text">Community Staff</span>' +
       "</span>"
     );
   }
