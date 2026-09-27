@@ -299,7 +299,7 @@
 
   function ownerBadgeHtml() {
     return (
-      '<span class="lt-post__owner-tag" title="Owner of BlockSpin Values">' +
+      '<span class="lt-post__owner-tag" data-lt-tip="Owner of BlockSpin Values">' +
       '<svg class="lt-post__owner-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">' +
       '<path fill="currentColor" d="M3.5 8.5l3.2 2.1L9.5 5l2.5 5.2L15.5 5l2.8 5.6 3.2-2.1-.9 9.1H4.4L3.5 8.5zM5 19.5h14V21H5v-1.5z"/>' +
       "</svg>" +
@@ -314,7 +314,7 @@
 
   function scammerBadgeHtml() {
     return (
-      '<span class="lt-post__scammer-tag" title="This user has previously been caught scamming. Trade with caution">' +
+      '<span class="lt-post__scammer-tag" data-lt-tip="This user has previously been caught scamming. Trade with caution">' +
       '<svg class="lt-post__scammer-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">' +
       '<path fill="currentColor" d="M12 2.2L1.2 21h21.6L12 2.2zm0 5.3l6.8 11.7H5.2L12 7.5zM11 11v4.5h2V11h-2zm0 6v2h2v-2h-2z"/>' +
       "</svg>" +
@@ -329,7 +329,7 @@
 
   function trustedTraderBadgeHtml() {
     return (
-      '<span class="lt-post__trusted-tag" title="This user has got 200+ vouches to prove their trust in trades, For big trades we recommend still using a Middleman">' +
+      '<span class="lt-post__trusted-tag" data-lt-tip="This user has got 200+ vouches to prove their trust in trades, For big trades we recommend still using a Middleman">' +
       '<svg class="lt-post__trusted-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">' +
       '<path fill="currentColor" d="M9.2 16.6L4.8 12.2l1.4-1.4 3 3 8.6-8.6 1.4 1.4-10 10z"/>' +
       "</svg>" +
@@ -730,7 +730,7 @@
       (hasDura ? " lt-slot--dura" : "") +
       '" data-id="' +
       escapeAttr(entry.id) +
-      '" title="' +
+      '" data-lt-tip="' +
       escapeAttr(
         entry.name +
           " · Qty " +
@@ -852,8 +852,10 @@
     var entry = list[i];
     var qty = Math.max(1, Math.min(MAX_DRAFT_QTY, Number(entry.qty) || 1));
     var label = formatDurability(entry);
-    slot.title =
-      entry.name + " · Qty " + qty + (label ? " · " + label : "");
+    slot.setAttribute(
+      "data-lt-tip",
+      entry.name + " · Qty " + qty + (label ? " · " + label : "")
+    );
   }
 
   function syncDraftDuraLabel(side, index) {
@@ -1479,7 +1481,7 @@
       escapeAttr(duraLabel) +
       '" data-repair="' +
       escapeAttr(repair == null ? "" : String(repair)) +
-      '" title="' +
+      '" data-lt-tip="' +
       escapeAttr(d.name + (duraLabel ? " · " + duraLabel : "")) +
       '">' +
       (d.qty > 1
@@ -1508,7 +1510,7 @@
 
   function cashCardHtml(cash) {
     return (
-      '<div class="lt-icard lt-icard--cash" title="' +
+      '<div class="lt-icard lt-icard--cash" data-lt-tip="' +
       escapeAttr(formatCash(cash)) +
       '">' +
       '<div class="lt-icard__art lt-icard__art--cash">' +
@@ -1639,7 +1641,7 @@
       "</div></div>" +
       '<div class="lt-post__divider" aria-hidden="true">' +
       '<span class="lt-post__divider-line"></span>' +
-      '<span class="lt-post__swap" title="Trade exchange">' +
+      '<span class="lt-post__swap" data-lt-tip="Trade exchange">' +
       '<svg class="lt-post__swap-arrow" viewBox="0 0 24 24" aria-hidden="true">' +
       '<path d="M5 12h12M13 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
       "</svg>" +
@@ -1692,7 +1694,7 @@
     }
     return (
       '<div class="lt-post__actions">' +
-      '<span class="lt-post__accept lt-post__accept--disabled" title="Discord profile unavailable">Accept offer</span>' +
+      '<span class="lt-post__accept lt-post__accept--disabled" data-lt-tip="Discord profile unavailable">Accept offer</span>' +
       "</div>"
     );
   }
