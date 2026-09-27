@@ -307,9 +307,12 @@
   function ownerBadgeHtml() {
     return (
       '<span class="lt-post__owner-tag" data-lt-tip="Owner of BlockSpin Values">' +
-      '<svg class="lt-post__owner-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">' +
-      '<path fill="currentColor" d="M3.5 8.5l3.2 2.1L9.5 5l2.5 5.2L15.5 5l2.8 5.6 3.2-2.1-.9 9.1H4.4L3.5 8.5zM5 19.5h14V21H5v-1.5z"/>' +
+      '<span class="lt-post__owner-glow" aria-hidden="true"></span>' +
+      '<span class="lt-post__owner-mark" aria-hidden="true">' +
+      '<svg class="lt-post__owner-icon" viewBox="0 0 24 24" width="16" height="16">' +
+      '<path fill="currentColor" d="M5 16.5l-1.8-9.2 4.1 3.1L12 4.2l4.7 6.2 4.1-3.1L19 16.5H5zm-.5 1.8h15v2.2h-15v-2.2z"/>' +
       "</svg>" +
+      "</span>" +
       '<span class="lt-post__owner-text">Owner</span>' +
       "</span>"
     );
