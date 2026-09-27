@@ -1334,28 +1334,21 @@
 
   function postActionsHtml(post) {
     if (isOwnPost(post)) return "";
-    var wanting = post.wanting || {};
     var profileUrl = authorDiscordProfileUrl(post.author);
-    var actions = [];
-
     if (profileUrl) {
-      actions.push(
+      return (
+        '<div class="lt-post__actions">' +
         '<a class="lt-post__accept" href="' +
-          escapeAttr(profileUrl) +
-          '" target="_blank" rel="noopener noreferrer">Accept offer</a>'
-      );
-    } else {
-      actions.push(
-        '<span class="lt-post__accept lt-post__accept--disabled" title="Discord profile unavailable">Accept offer</span>'
+        escapeAttr(profileUrl) +
+        '" target="_blank" rel="noopener noreferrer">Accept offer</a>' +
+        "</div>"
       );
     }
-    if (wanting.lookingForOffers) {
-      actions.push(
-        '<button type="button" class="lt-post__counter" disabled title="Coming soon">Counter-offer</button>'
-      );
-    }
-    if (!actions.length) return "";
-    return '<div class="lt-post__actions">' + actions.join("") + "</div>";
+    return (
+      '<div class="lt-post__actions">' +
+      '<span class="lt-post__accept lt-post__accept--disabled" title="Discord profile unavailable">Accept offer</span>' +
+      "</div>"
+    );
   }
 
   function postMetaHtml(post) {
