@@ -12,11 +12,15 @@
   var ROBLOX_TOKEN_KEY = "bsv-roblox-auth";
   var OAUTH_RETURN_KEY = "bsv-oauth-return-to";
   var RESUME_LOGIN_KEY = "bsv-resume-login-modal";
+  var LOGIN_PURPOSE_KEY = "bsv-login-purpose";
   var DEFAULT_AVATAR = "https://i.ibb.co/Tq7DLCJt/dsfbvbvxcxbvn.png";
+  var DISCORD_INVITE_FALLBACK = "https://discord.gg/QbapryYUUx";
   var logoutTestObserver = null;
   var cachedDiscordUser = null;
   var cachedRobloxLink = null;
   var logoutChoicesOpen = false;
+  var loginModalOpts = { requireGuild: false };
+  var guildCheckInFlight = null;
 
   function apiBase() {
     if (typeof window.bsvBotApiUrl === "function") return window.bsvBotApiUrl("");
@@ -190,6 +194,67 @@
     try {
       sessionStorage.removeItem(RESUME_LOGIN_KEY);
     } catch (_) {}
+  }
+
+  function setLoginPurpose(purpose) {
+    try {
+      if (purpose) sessionStorage.setItem(LOGIN_PURPOSE_KEY, String(purpose));
+      else sessionStorage.removeItem(LOGIN_PURPOSE_KEY);
+    } catch (_) {}
+  }
+
+  function getLoginPurpose() {
+    try {
+      return sessionStorage.getItem(LOGIN_PURPOSE_KEY) || "";
+    } catch (_) {
+      return "";
+    }
+  }
+
+  function loginRequiresGuild() {
+    return !!(loginModalOpts && loginModalOpts.requireGuild) || getLoginPurpose() === "live-trading";
+  }
+
+  function fetchGuildMembership() {
+    var token = getAuthToken();
+    if (!token) {
+      return Promise.resolve({
+        loggedIn: false,
+        inGuild: false,
+        inviteUrl: DISCORD_INVITE_FALLBACK
+      });
+    }
+    if (guildCheckInFlight) return guildCheckInFlight;
+    guildCheckInFlight = fetch(authUrl("api/auth/guild-member"), {
+      headers: { Authorization: "Bearer " + token }
+    })
+      .then(function (res) {
+        return res.json().catch(function () {
+          return null;
+        });
+      })
+      .then(function (data) {
+        data = data || {};
+        return {
+          loggedIn: !!data.loggedIn,
+          inGuild: !!data.inGuild,
+          inviteUrl: data.inviteUrl || DISCORD_INVITE_FALLBACK,
+          error: data.error || null
+        };
+      })
+      .catch(function () {
+        return {
+          loggedIn: true,
+          inGuild: false,
+          inviteUrl: DISCORD_INVITE_FALLBACK,
+          error: "check_failed"
+        };
+      })
+      .then(function (result) {
+        guildCheckInFlight = null;
+        return result;
+      });
+    return guildCheckInFlight;
   }
 
   function parseAuthHash() {
@@ -382,13 +447,13 @@
 
   function ensureLoginModal() {
     var existing = document.getElementById("bsv-login-modal");
-    if (existing && existing.getAttribute("data-bsv-login-v") === "4") return;
+    if (existing && existing.getAttribute("data-bsv-login-v") === "5") return;
     if (existing) existing.remove();
 
     var wrap = document.createElement("div");
     wrap.className = "bsv-login-modal";
     wrap.id = "bsv-login-modal";
-    wrap.setAttribute("data-bsv-login-v", "4");
+    wrap.setAttribute("data-bsv-login-v", "5");
     wrap.hidden = true;
     wrap.innerHTML =
       '<div class="bsv-login-modal__backdrop" id="bsv-login-backdrop"></div>' +
@@ -399,13 +464,30 @@
         '<h2 class="bsv-login-modal__title" id="bsv-login-title">' +
           escapeHtml(t("auth.login", "Log In")) +
         "</h2>" +
-        '<div class="bsv-login-steps bsv-login-steps--single">' +
+        '<div class="bsv-login-steps bsv-login-steps--single" id="bsv-login-steps">' +
           '<div class="bsv-login-step" id="bsv-login-step-discord" data-step="discord">' +
             '<div class="bsv-login-step__body">' +
+              '<p class="bsv-login-step__eyebrow" id="bsv-login-discord-eyebrow">Step 1</p>' +
               '<h3 class="bsv-login-step__title">' + escapeHtml(t("auth.discordTitle", "Log in with Discord")) + "</h3>" +
               '<p class="bsv-login-step__status" id="bsv-login-discord-status"></p>' +
               '<button type="button" class="bsv-login-step__btn bsv-login-step__btn--discord" id="bsv-login-discord-btn">' +
                 escapeHtml(t("auth.discordBtn", "Log in with Discord")) +
+              "</button>" +
+            "</div>" +
+          "</div>" +
+          '<div class="bsv-login-step" id="bsv-login-step-guild" data-step="guild" hidden>' +
+            '<div class="bsv-login-step__body">' +
+              '<p class="bsv-login-step__eyebrow">Step 2</p>' +
+              '<h3 class="bsv-login-step__title">Join our Discord</h3>' +
+              '<p class="bsv-login-step__copy" id="bsv-login-guild-copy">' +
+                "You must be in the BlockSpin Values Discord server to create or interact with Live Trading posts. Join, then check again." +
+              "</p>" +
+              '<p class="bsv-login-step__status" id="bsv-login-guild-status"></p>' +
+              '<a class="bsv-login-step__btn bsv-login-step__btn--discord" id="bsv-login-guild-join" href="' +
+                escapeAttr(DISCORD_INVITE_FALLBACK) +
+                '" target="_blank" rel="noopener noreferrer">Join Discord server</a>' +
+              '<button type="button" class="bsv-login-step__btn bsv-login-step__btn--secondary" id="bsv-login-guild-recheck">' +
+                "I’ve joined — check again" +
               "</button>" +
             "</div>" +
           "</div>" +
@@ -416,10 +498,16 @@
     var closeBtn = document.getElementById("bsv-login-close");
     var backdrop = document.getElementById("bsv-login-backdrop");
     var discordBtn = document.getElementById("bsv-login-discord-btn");
+    var recheckBtn = document.getElementById("bsv-login-guild-recheck");
 
     if (closeBtn) closeBtn.addEventListener("click", closeLoginModal);
     if (backdrop) backdrop.addEventListener("click", closeLoginModal);
     if (discordBtn) discordBtn.addEventListener("click", startDiscordLogin);
+    if (recheckBtn) {
+      recheckBtn.addEventListener("click", function () {
+        syncLoginModal(currentSession(), { forceGuildCheck: true });
+      });
+    }
 
     if (!window.__bsvLoginEscBound) {
       window.__bsvLoginEscBound = true;
@@ -429,17 +517,38 @@
     }
   }
 
-  function syncLoginModal(session) {
+  function syncLoginModal(session, syncOpts) {
     ensureLoginModal();
     session = session || currentSession();
+    syncOpts = syncOpts || {};
     var discord = session.discord || session.user || null;
+    var requireGuild = loginRequiresGuild();
+    var steps = document.getElementById("bsv-login-steps");
     var stepDiscord = document.getElementById("bsv-login-step-discord");
+    var stepGuild = document.getElementById("bsv-login-step-guild");
     var discordStatus = document.getElementById("bsv-login-discord-status");
     var discordBtn = document.getElementById("bsv-login-discord-btn");
+    var discordEyebrow = document.getElementById("bsv-login-discord-eyebrow");
+    var guildStatus = document.getElementById("bsv-login-guild-status");
+    var guildJoin = document.getElementById("bsv-login-guild-join");
     var title = document.getElementById("bsv-login-title");
+    var modal = document.getElementById("bsv-login-modal");
 
-    if (title) title.textContent = t("auth.login", "Log In");
-    if (stepDiscord) stepDiscord.classList.toggle("is-complete", !!discord);
+    if (title) {
+      title.textContent = requireGuild
+        ? t("auth.liveTradingLogin", "Log in to trade")
+        : t("auth.login", "Log In");
+    }
+    if (steps) {
+      steps.classList.toggle("bsv-login-steps--single", !requireGuild);
+      steps.classList.toggle("bsv-login-steps--dual", requireGuild);
+    }
+    if (discordEyebrow) discordEyebrow.hidden = !requireGuild;
+    if (stepGuild) stepGuild.hidden = !requireGuild;
+    if (stepDiscord) {
+      stepDiscord.classList.toggle("is-complete", !!discord);
+      stepDiscord.classList.remove("is-locked");
+    }
     if (discordStatus) {
       discordStatus.textContent = discord
         ? t("auth.discordDone", "Connected") +
@@ -451,18 +560,72 @@
       discordBtn.disabled = !!discord;
       discordBtn.textContent = t("auth.discordBtn", "Log in with Discord");
     }
-    if (session.ready) closeLoginModal();
+
+    if (!requireGuild) {
+      if (stepGuild) stepGuild.classList.remove("is-complete", "is-locked");
+      if (session.ready) closeLoginModal();
+      return;
+    }
+
+    if (!discord) {
+      if (stepGuild) {
+        stepGuild.classList.add("is-locked");
+        stepGuild.classList.remove("is-complete");
+      }
+      if (guildStatus) guildStatus.textContent = "";
+      return;
+    }
+
+    if (stepGuild) stepGuild.classList.remove("is-locked");
+    if (guildStatus) guildStatus.textContent = "Checking server membership…";
+
+    fetchGuildMembership().then(function (membership) {
+      if (guildJoin && membership.inviteUrl) guildJoin.href = membership.inviteUrl;
+      if (!loginRequiresGuild()) return;
+      if (!currentSession().ready) return;
+      if (membership.inGuild) {
+        if (stepGuild) stepGuild.classList.add("is-complete");
+        if (guildStatus) guildStatus.textContent = "You’re in the server — you’re all set.";
+        setLoginPurpose("");
+        // Small delay so users see the completed step after OAuth return.
+        if (syncOpts.forceGuildCheck || (modal && !modal.hidden)) {
+          setTimeout(closeLoginModal, syncOpts.forceGuildCheck ? 350 : 500);
+        } else {
+          closeLoginModal();
+        }
+        return;
+      }
+      if (stepGuild) stepGuild.classList.remove("is-complete");
+      if (guildStatus) {
+        guildStatus.textContent =
+          membership.error === "check_failed" || membership.error === "checker_unavailable"
+            ? "Couldn’t verify membership. Join the server, then check again."
+            : "Join the server to continue.";
+      }
+      // Keep / reopen the login modal on the join step (header login never sets this purpose).
+      if (modal) {
+        modal.hidden = false;
+        document.body.classList.add("bsv-login-open");
+      }
+    });
   }
 
-  function openLoginModal() {
+  function openLoginModal(opts) {
+    opts = opts || {};
+    loginModalOpts = {
+      requireGuild: !!(opts.requireGuild || opts.purpose === "live-trading")
+    };
+    if (loginModalOpts.requireGuild) setLoginPurpose("live-trading");
+    else if (!opts.resume) setLoginPurpose("");
+
     ensureLoginModal();
-    syncLoginModal(currentSession());
     var modal = document.getElementById("bsv-login-modal");
     if (!modal) return;
     // Keep the dialog centered in the viewport (never anchored under the header button).
     if (modal.parentNode !== document.body) document.body.appendChild(modal);
     modal.hidden = false;
     document.body.classList.add("bsv-login-open");
+    syncLoginModal(currentSession(), { forceGuildCheck: !!opts.forceGuildCheck });
   }
 
   function closeLoginModal() {
@@ -470,6 +633,8 @@
     if (modal) modal.hidden = true;
     document.body.classList.remove("bsv-login-open");
     clearResumeLoginModal();
+    setLoginPurpose("");
+    loginModalOpts = { requireGuild: false };
   }
 
   function robloxAvatar(roblox) {
@@ -545,7 +710,11 @@
         "</span>" +
         "</button>";
       var loginBtn = document.getElementById("nav-login-btn");
-      if (loginBtn) loginBtn.addEventListener("click", openLoginModal);
+      if (loginBtn) {
+        loginBtn.addEventListener("click", function () {
+          openLoginModal();
+        });
+      }
       if (typeof initMobileHeaderToolbar === "function") initMobileHeaderToolbar();
       return;
     }
@@ -662,7 +831,10 @@
       removeLogoutTestButton();
       if (shouldResumeLoginModal() && !session.ready) {
         clearResumeLoginModal();
-        openLoginModal();
+        openLoginModal(getLoginPurpose() === "live-trading" ? { requireGuild: true } : {});
+      } else if (session.ready && getLoginPurpose() === "live-trading") {
+        clearResumeLoginModal();
+        openLoginModal({ requireGuild: true });
       } else if (session.ready) {
         clearResumeLoginModal();
       }

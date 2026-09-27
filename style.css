@@ -6600,10 +6600,32 @@ background-attachment: fixed;
   align-items: center;
   width: 100%;
 }
+.bsv-login-steps--dual .bsv-login-modal__box,
+.bsv-login-modal__box {
+  width: min(100%, 420px);
+}
+.bsv-login-step__eyebrow {
+  margin: 0 0 6px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.bsv-login-step__eyebrow[hidden] {
+  display: none !important;
+}
 .bsv-login-step__title {
   margin: 0 0 8px;
   color: #fff;
   font-size: 1.05rem;
+  text-align: center;
+}
+.bsv-login-step__copy {
+  margin: 0 0 12px;
+  color: #c7cce0;
+  font-size: 0.92rem;
+  line-height: 1.4;
   text-align: center;
 }
 .bsv-login-step__status {
@@ -6622,6 +6644,15 @@ background-attachment: fixed;
   color: #fff;
   cursor: pointer;
   width: min(100%, 280px);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  margin: 0 0 8px;
+}
+.bsv-login-step__btn:last-child {
+  margin-bottom: 0;
 }
 .bsv-login-step__btn:disabled {
   opacity: 0.55;
@@ -6629,6 +6660,15 @@ background-attachment: fixed;
 }
 .bsv-login-step__btn--discord {
   background: linear-gradient(180deg, #6875f5 0%, #4752c4 100%);
+}
+.bsv-login-step__btn--secondary {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.9);
+}
+.bsv-login-step__btn--secondary:hover {
+  border-color: rgba(51, 204, 230, 0.45);
+  color: #fff;
 }
 .bsv-login-step__btn--roblox {
   background: linear-gradient(180deg, #f0436a 0%, #be123c 100%);

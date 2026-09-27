@@ -319,12 +319,13 @@
   }
 
   function openSharedLogin() {
+    var opts = { requireGuild: true, purpose: "live-trading" };
     if (typeof window.bsvOpenLoginModal === "function") {
-      window.bsvOpenLoginModal();
+      window.bsvOpenLoginModal(opts);
       return;
     }
     setTimeout(function () {
-      if (typeof window.bsvOpenLoginModal === "function") window.bsvOpenLoginModal();
+      if (typeof window.bsvOpenLoginModal === "function") window.bsvOpenLoginModal(opts);
     }, 50);
   }
 
@@ -435,14 +436,8 @@
     }
     return checkGuildMembership(false).then(function (data) {
       if (data.inGuild) return true;
-      if (data.error === "check_failed" || data.error === "checker_unavailable") {
-        showJoinDiscordPrompt(
-          data.inviteUrl,
-          "Couldn't verify Discord membership right now. Make sure you've joined the server, then tap “I’ve joined — check again”."
-        );
-        return false;
-      }
-      showJoinDiscordPrompt(data.inviteUrl);
+      // Already logged in but not in server — reopen the trading login modal on step 2.
+      openSharedLogin();
       return false;
     });
   }
