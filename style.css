@@ -16508,8 +16508,8 @@ body.live-trading-page .live-trading-workspace {
 }
 .lt-slot__img,
 .lt-slot__ph {
-  width: 86%;
-  max-width: 104px;
+  width: 52%;
+  max-width: 56px;
   aspect-ratio: 1;
   object-fit: contain;
   border-radius: 8px;

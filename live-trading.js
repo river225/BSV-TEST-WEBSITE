@@ -746,27 +746,9 @@
       (entry.image
         ? '<img class="lt-slot__img" src="' +
           escapeAttr(entry.image) +
-          '" alt="" width="96" height="96" loading="lazy" decoding="async">'
+          '" alt="" width="56" height="56" loading="lazy" decoding="async">'
         : '<span class="lt-slot__ph" aria-hidden="true"></span>') +
       '<div class="lt-slot__meta">' +
-      '<div class="lt-slot__qty-ctrl" role="group" aria-label="Quantity">' +
-      '<span class="lt-slot__qty-label">Quantity</span>' +
-      '<div class="lt-slot__qty-row">' +
-      '<button type="button" class="lt-slot__qty-btn" data-side="' +
-      sideAttr +
-      '" data-index="' +
-      idx +
-      '" data-delta="-1" aria-label="Decrease quantity">−</button>' +
-      '<span class="lt-slot__qty-val">' +
-      escapeHtml(String(qty)) +
-      "</span>" +
-      '<button type="button" class="lt-slot__qty-btn" data-side="' +
-      sideAttr +
-      '" data-index="' +
-      idx +
-      '" data-delta="1" aria-label="Increase quantity">+</button>' +
-      "</div>" +
-      "</div>" +
       (hasDura
         ? '<div class="lt-slot__dura" role="group" aria-label="Durability">' +
           '<span class="lt-slot__dura-label">Durability</span>' +
@@ -787,6 +769,24 @@
           "</div>" +
           "</div>"
         : "") +
+      '<div class="lt-slot__qty-ctrl" role="group" aria-label="Quantity">' +
+      '<span class="lt-slot__qty-label">Quantity</span>' +
+      '<div class="lt-slot__qty-row">' +
+      '<button type="button" class="lt-slot__qty-btn" data-side="' +
+      sideAttr +
+      '" data-index="' +
+      idx +
+      '" data-delta="-1" aria-label="Decrease quantity">−</button>' +
+      '<span class="lt-slot__qty-val">' +
+      escapeHtml(String(qty)) +
+      "</span>" +
+      '<button type="button" class="lt-slot__qty-btn" data-side="' +
+      sideAttr +
+      '" data-index="' +
+      idx +
+      '" data-delta="1" aria-label="Increase quantity">+</button>' +
+      "</div>" +
+      "</div>" +
       "</div>" +
       "</div>"
     );
