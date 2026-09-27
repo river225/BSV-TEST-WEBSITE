@@ -653,12 +653,18 @@
     if (!tags) return;
     if (!on) {
       tags.classList.remove("lt-side__tags--required", "is-flicker");
-      if (hint) hint.classList.remove("is-loud");
+      if (hint) {
+        hint.hidden = true;
+        hint.classList.remove("is-loud");
+      }
       return;
     }
     var already = tags.classList.contains("lt-side__tags--required");
     tags.classList.add("lt-side__tags--required");
-    if (hint) hint.classList.add("is-loud");
+    if (hint) {
+      hint.hidden = false;
+      hint.classList.add("is-loud");
+    }
     if (already) {
       tags.classList.remove("is-flicker");
       void tags.offsetWidth;
