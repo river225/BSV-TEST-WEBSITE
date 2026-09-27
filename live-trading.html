@@ -92,7 +92,7 @@ window.BSV_BUILD = "20260926-sessionfix";
 <script defer src="auth-oauth-bounce.js?v=20260926-sessionfix"></script>
 <title>Live Trading — BlockSpin Values (Dev)</title>
 <meta name="description" content="Live Trading — development build of BlockSpin Values." />
-<link rel="stylesheet" href="style.css?v=20260927-lt-swap" />
+<link rel="stylesheet" href="style.css?v=20260927-lt-polish" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Paytone+One&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
@@ -212,6 +212,7 @@ window.BSV_BUILD = "20260926-sessionfix";
                 <button type="button" class="lt-search__scope is-active" data-scope="all">All</button>
                 <button type="button" class="lt-search__scope" data-scope="offering">Offering</button>
                 <button type="button" class="lt-search__scope" data-scope="requesting">Requesting</button>
+                <button type="button" class="lt-search__scope" data-scope="mine">Your posts</button>
               </div>
             </section>
             <button type="button" class="lt-board__create-btn" id="lt-open-create">
@@ -265,6 +266,16 @@ window.BSV_BUILD = "20260926-sessionfix";
           </div>
         </div>
       </div>
+
+      <div class="lt-item-pop" id="lt-item-pop" hidden>
+        <div class="lt-item-pop__backdrop" id="lt-item-pop-backdrop"></div>
+        <div class="lt-item-pop__box" role="dialog" aria-modal="true" aria-labelledby="lt-item-pop-title">
+          <div class="lt-item-pop__art" id="lt-item-pop-art"></div>
+          <h2 class="lt-item-pop__title" id="lt-item-pop-title">Item</h2>
+          <p class="lt-item-pop__dura" id="lt-item-pop-dura" hidden></p>
+          <p class="lt-item-pop__repair" id="lt-item-pop-repair" hidden></p>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -280,6 +291,6 @@ window.BSV_BUILD = "20260926-sessionfix";
 <script defer src="site-i18n.js?v=20260926-sessionfix"></script>
 <script defer src="site-settings.js?v=20260926-sessionfix"></script>
 <script defer src="section-config.js?v=20260926-sessionfix"></script>
-<script defer src="live-trading.js?v=20260927-lt-swap"></script>
+<script defer src="live-trading.js?v=20260927-lt-polish"></script>
 </body>
 </html>

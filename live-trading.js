@@ -34,6 +34,8 @@
   };
   var pickerSide = "giving";
   var searchScope = "all";
+  var LT_OWNER_DISCORD_ID = "1163614455616245780";
+  var discordAppLaunchTimer = null;
   var searchQuery = "";
   var pickerRarity = "all";
   var currentSession = { ready: false, discord: null, roblox: null, user: null };
@@ -138,6 +140,9 @@
               maxDurability = parseInt(duraRaw.split("/")[1], 10) || 0;
               if (maxDurability < 1) maxDurability = 0;
             }
+            var internalRaw = String(row["Internal Value"] || "").trim().replace(/,/g, "");
+            var internalValue = parseFloat(internalRaw);
+            if (!Number.isFinite(internalValue) || internalValue < 0) internalValue = 0;
             return {
               id: meta.sheet + "::" + name.toLowerCase(),
               name: name,
@@ -146,7 +151,8 @@
               sheet: meta.sheet,
               color: meta.color,
               value: String(row["Average Value"] || row["Ranged Value"] || "").trim(),
-              maxDurability: maxDurability
+              maxDurability: maxDurability,
+              internalValue: internalValue
             };
           });
         });
@@ -275,6 +281,30 @@
       !!post.author.discordUsername &&
       a.discordUsername.toLowerCase() ===
         String(post.author.discordUsername).toLowerCase()
+    );
+  }
+
+  function isLiveTradingAdmin() {
+    return sessionDiscordId() === LT_OWNER_DISCORD_ID;
+  }
+
+  function canDeletePost(post) {
+    return isOwnPost(post) || isLiveTradingAdmin();
+  }
+
+  function isSiteOwnerAuthor(author) {
+    author = author || {};
+    return String(author.discordId || author.id || "").trim() === LT_OWNER_DISCORD_ID;
+  }
+
+  function ownerBadgeHtml() {
+    return (
+      '<span class="lt-post__owner-tag" title="Owner of BlockSpin Values">' +
+      '<svg class="lt-post__owner-icon" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">' +
+      '<path fill="currentColor" d="M5 16l-2-8 5 3 4-6 4 6 5-3-2 8H5zm0 2h14v2H5v-2z"/>' +
+      "</svg>" +
+      "<span>Owner of BlockSpin Values</span>" +
+      "</span>"
     );
   }
 
@@ -617,8 +647,24 @@
   function setTagRequiredHint(on) {
     var tags = document.getElementById("lt-want-tags");
     var hint = document.getElementById("lt-want-tags-hint");
-    if (tags) tags.classList.toggle("lt-side__tags--required", !!on);
-    if (hint) hint.classList.toggle("is-loud", !!on);
+    if (!tags) return;
+    if (!on) {
+      tags.classList.remove("lt-side__tags--required", "is-flicker");
+      if (hint) hint.classList.remove("is-loud");
+      return;
+    }
+    var already = tags.classList.contains("lt-side__tags--required");
+    tags.classList.add("lt-side__tags--required");
+    if (hint) hint.classList.add("is-loud");
+    if (already) {
+      tags.classList.remove("is-flicker");
+      void tags.offsetWidth;
+      tags.classList.add("is-flicker");
+      window.clearTimeout(tags._ltFlickerTimer);
+      tags._ltFlickerTimer = window.setTimeout(function () {
+        tags.classList.remove("is-flicker");
+      }, 420);
+    }
   }
 
   function itemHasDurability(entry) {
@@ -657,9 +703,6 @@
           escapeAttr(entry.image) +
           '" alt="" width="56" height="56" loading="lazy" decoding="async">'
         : '<span class="lt-slot__ph" aria-hidden="true"></span>') +
-      '<span class="lt-slot__name">' +
-      escapeHtml(entry.name) +
-      "</span>" +
       (hasDura
         ? '<div class="lt-slot__dura" role="group" aria-label="Durability">' +
           '<button type="button" class="lt-slot__dura-btn" data-side="' +
@@ -1101,7 +1144,7 @@
                 return;
               }
               if (err === "not_owner") {
-                window.alert("You can only delete your own posts.");
+                window.alert("You don’t have permission to delete that post.");
                 fetchPosts({ force: true });
                 return;
               }
@@ -1131,6 +1174,7 @@
   }
 
   function postMatchesFilters(post) {
+    if (searchScope === "mine" && !isOwnPost(post)) return false;
     var q = searchQuery.trim().toLowerCase();
     if (!q) return true;
     var offering = sideItemNames(post.giving);
@@ -1228,15 +1272,32 @@
       value: (cat && cat.value) || item.value || "",
       qty: Math.max(1, Number(item.qty) || 1),
       durability: durability,
-      maxDurability: maxDurability
+      maxDurability: maxDurability,
+      internalValue: Math.max(
+        0,
+        Number(item.internalValue) || Number(cat && cat.internalValue) || 0
+      )
     };
+  }
+
+  function repairPriceFor(item) {
+    var d = resolveItemDisplay(item);
+    if (!d.maxDurability || !d.internalValue) return null;
+    var cur =
+      d.durability == null ? d.maxDurability : Number(d.durability);
+    var missing = Math.max(0, d.maxDurability - cur);
+    if (missing <= 0) return 0;
+    return Math.round(
+      missing * (d.internalValue / d.maxDurability / 1.43)
+    );
   }
 
   function itemCardHtml(item) {
     var d = resolveItemDisplay(item);
     var duraLabel = formatDurability(d);
+    var repair = repairPriceFor(d);
     return (
-      '<div class="lt-icard' +
+      '<button type="button" class="lt-icard' +
       (duraLabel ? " lt-icard--dura" : "") +
       '" style="--lt-card:' +
       escapeAttr(d.color) +
@@ -1244,14 +1305,21 @@
       escapeAttr(d.color) +
       "99,transparent 70%),linear-gradient(180deg," +
       escapeAttr(d.color) +
-      "88,#000 78%)\" title=\"" +
+      '88,#000 100%)" data-lt-item="1" data-name="' +
+      escapeAttr(d.name) +
+      '" data-image="' +
+      escapeAttr(d.image) +
+      '" data-color="' +
+      escapeAttr(d.color) +
+      '" data-dura="' +
+      escapeAttr(duraLabel) +
+      '" data-repair="' +
+      escapeAttr(repair == null ? "" : String(repair)) +
+      '" title="' +
       escapeAttr(d.name + (duraLabel ? " · " + duraLabel : "")) +
       '">' +
       (d.qty > 1
         ? '<span class="lt-icard__qty">' + escapeHtml(String(d.qty) + "×") + "</span>"
-        : "") +
-      (duraLabel
-        ? '<span class="lt-icard__dura">' + escapeHtml(duraLabel) + "</span>"
         : "") +
       '<div class="lt-icard__art">' +
       (d.image
@@ -1263,11 +1331,14 @@
         : '<span class="lt-icard__ph" aria-hidden="true"></span>') +
       "</div>" +
       '<div class="lt-icard__bar">' +
+      (duraLabel
+        ? '<span class="lt-icard__dura">' + escapeHtml(duraLabel) + "</span>"
+        : "") +
       '<span class="lt-icard__name">' +
       escapeHtml(d.name) +
       "</span>" +
       "</div>" +
-      "</div>"
+      "</button>"
     );
   }
 
@@ -1289,7 +1360,7 @@
     );
   }
 
-  function offersBadgeCircleHtml(kind, extraClass) {
+  function offersBadgeCircleHtml(kind, extraClass, withTip) {
     var isLfo = kind === "lfo";
     var tip = isLfo ? TIP_LFO : TIP_NLFO;
     var label = isLfo ? "Accepting offers" : "Not accepting offers";
@@ -1297,13 +1368,16 @@
       '<span class="lt-offers-badge' +
       (isLfo ? "" : " lt-offers-badge--no") +
       (extraClass ? " " + extraClass : "") +
-      '" data-tip="' +
-      escapeAttr(tip) +
-      '" title="' +
-      escapeAttr(tip) +
-      '" aria-label="' +
-      escapeAttr(label) +
-      '">' +
+      '"' +
+      (withTip
+        ? ' data-lt-tip="' +
+          escapeAttr(tip) +
+          '" aria-label="' +
+          escapeAttr(label) +
+          '"'
+        : ' aria-hidden="true"') +
+      ">" +
+      '<span class="lt-offers-badge__hit" aria-hidden="true"></span>' +
       '<span class="lt-offers-badge__icon">' +
       (isLfo ? "✓" : "✕") +
       "</span>" +
@@ -1323,20 +1397,13 @@
     return (
       '<div class="lt-icard lt-icard--offers lt-icard--' +
       (isLfo ? "lfo" : "nlfo") +
-      '" tabindex="0" data-tip="' +
-      escapeAttr(tip) +
-      '" title="' +
+      '" tabindex="0" data-lt-tip="' +
       escapeAttr(tip) +
       '" aria-label="' +
       escapeAttr(label) +
       '">' +
-      '<div class="lt-icard__art lt-icard__art--offers" aria-hidden="true">' +
-      offersBadgeCircleHtml(kind) +
-      "</div>" +
-      '<div class="lt-icard__bar lt-icard__bar--offers">' +
-      '<span class="lt-icard__name">' +
-      escapeHtml(label) +
-      "</span>" +
+      '<div class="lt-icard__art lt-icard__art--offers">' +
+      offersBadgeCircleHtml(kind, "", false) +
       "</div>" +
       "</div>"
     );
@@ -1367,9 +1434,9 @@
     var wanting = post.wanting || {};
     var offerCorner = "";
     if (wanting.lookingForOffers) {
-      offerCorner = offersBadgeCircleHtml("lfo", "lt-offers-badge--corner");
+      offerCorner = offersBadgeCircleHtml("lfo", "lt-offers-badge--corner", true);
     } else if (wanting.notLookingForOffers) {
-      offerCorner = offersBadgeCircleHtml("nlfo", "lt-offers-badge--corner");
+      offerCorner = offersBadgeCircleHtml("nlfo", "lt-offers-badge--corner", true);
     }
     return (
       '<article class="lt-post' +
@@ -1390,6 +1457,7 @@
       (handle
         ? ' <span class="lt-post__handle">' + escapeHtml(handle) + "</span>"
         : "") +
+      (isSiteOwnerAuthor(author) ? " " + ownerBadgeHtml() : "") +
       "</p>" +
       '<p class="lt-post__time">' +
       escapeHtml(timeAgo(post.createdAt)) +
@@ -1406,17 +1474,9 @@
       '<div class="lt-post__divider" aria-hidden="true">' +
       '<span class="lt-post__divider-line"></span>' +
       '<span class="lt-post__swap" title="Trade exchange">' +
-      '<span class="lt-post__swap-glow"></span>' +
-      '<span class="lt-post__swap-row lt-post__swap-row--out">' +
-      '<svg class="lt-post__swap-arrow" viewBox="0 0 24 12" aria-hidden="true">' +
-      '<path d="M2 6h16M13 2l5 4-5 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<svg class="lt-post__swap-arrow" viewBox="0 0 24 24" aria-hidden="true">' +
+      '<path d="M5 12h12M13 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
       "</svg>" +
-      "</span>" +
-      '<span class="lt-post__swap-row lt-post__swap-row--in">' +
-      '<svg class="lt-post__swap-arrow" viewBox="0 0 24 12" aria-hidden="true">' +
-      '<path d="M22 6H6M11 2L6 6l5 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>' +
-      "</svg>" +
-      "</span>" +
       "</span>" +
       "</div>" +
       '<div class="lt-post__panel">' +
@@ -1431,15 +1491,36 @@
     );
   }
 
+  function openDiscordProfile(discordId) {
+    var id = String(discordId || "").trim();
+    if (!id) return;
+    var appUrl = "discord://-/users/" + encodeURIComponent(id);
+    var webUrl = "https://discord.com/users/" + encodeURIComponent(id);
+    var started = Date.now();
+    var fallback = window.setTimeout(function () {
+      if (document.hidden) return;
+      if (Date.now() - started < 2200) {
+        window.open(webUrl, "_blank", "noopener,noreferrer");
+      }
+    }, 900);
+    discordAppLaunchTimer = fallback;
+    try {
+      window.location.href = appUrl;
+    } catch (_) {
+      window.clearTimeout(fallback);
+      window.open(webUrl, "_blank", "noopener,noreferrer");
+    }
+  }
+
   function postActionsHtml(post) {
     if (isOwnPost(post)) return "";
-    var profileUrl = authorDiscordProfileUrl(post.author);
-    if (profileUrl) {
+    var id = String((post.author && (post.author.discordId || post.author.id)) || "").trim();
+    if (id && /^\d{5,32}$/.test(id)) {
       return (
         '<div class="lt-post__actions">' +
-        '<a class="lt-post__accept" href="' +
-        escapeAttr(profileUrl) +
-        '" target="_blank" rel="noopener noreferrer">Accept offer</a>' +
+        '<button type="button" class="lt-post__accept" data-accept-discord="' +
+        escapeAttr(id) +
+        '">Accept offer</button>' +
         "</div>"
       );
     }
@@ -1464,7 +1545,7 @@
   }
 
   function postFootHtml(post) {
-    if (!isOwnPost(post)) return "";
+    if (!canDeletePost(post)) return "";
     return (
       '<div class="lt-post__foot">' +
       '<button type="button" class="lt-post__delete" data-delete="' +
@@ -1472,6 +1553,51 @@
       '">Delete</button>' +
       "</div>"
     );
+  }
+
+  function openItemPop(data) {
+    var pop = document.getElementById("lt-item-pop");
+    var art = document.getElementById("lt-item-pop-art");
+    var title = document.getElementById("lt-item-pop-title");
+    var dura = document.getElementById("lt-item-pop-dura");
+    var repair = document.getElementById("lt-item-pop-repair");
+    if (!pop) return;
+    if (title) title.textContent = data.name || "Item";
+    if (art) {
+      art.innerHTML = data.image
+        ? '<img src="' +
+          escapeAttr(data.image) +
+          '" alt="" width="120" height="120" decoding="async">'
+        : '<span class="lt-item-pop__ph"></span>';
+      if (data.color) art.style.setProperty("--lt-card", data.color);
+    }
+    if (dura) {
+      if (data.dura) {
+        dura.hidden = false;
+        dura.textContent = "Durability " + data.dura;
+      } else {
+        dura.hidden = true;
+        dura.textContent = "";
+      }
+    }
+    if (repair) {
+      if (data.repair !== "" && data.repair != null) {
+        var n = Number(data.repair);
+        repair.hidden = false;
+        repair.textContent =
+          "Repair price: $" +
+          (Number.isFinite(n) ? n.toLocaleString() : String(data.repair));
+      } else {
+        repair.hidden = true;
+        repair.textContent = "";
+      }
+    }
+    pop.hidden = false;
+  }
+
+  function closeItemPop() {
+    var pop = document.getElementById("lt-item-pop");
+    if (pop) pop.hidden = true;
   }
 
   function renderFeed(opts) {
@@ -1535,6 +1661,14 @@
     var joinBackdrop = document.getElementById("lt-join-discord-backdrop");
     if (joinClose) joinClose.addEventListener("click", hideJoinDiscordPrompt);
     if (joinBackdrop) joinBackdrop.addEventListener("click", hideJoinDiscordPrompt);
+    var itemPopBackdrop = document.getElementById("lt-item-pop-backdrop");
+    if (itemPopBackdrop) itemPopBackdrop.addEventListener("click", closeItemPop);
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden && discordAppLaunchTimer) {
+        window.clearTimeout(discordAppLaunchTimer);
+        discordAppLaunchTimer = null;
+      }
+    });
     if (closeCreate) {
       closeCreate.addEventListener("click", function () {
         setComposerOpen(false);
@@ -1566,6 +1700,27 @@
           remove.getAttribute("data-side"),
           remove.getAttribute("data-index")
         );
+        return;
+      }
+      var acceptBtn = e.target.closest && e.target.closest("[data-accept-discord]");
+      if (acceptBtn) {
+        e.preventDefault();
+        requireLoginForAction().then(function (ok) {
+          if (!ok) return;
+          openDiscordProfile(acceptBtn.getAttribute("data-accept-discord"));
+        });
+        return;
+      }
+      var itemCard = e.target.closest && e.target.closest("[data-lt-item]");
+      if (itemCard) {
+        e.preventDefault();
+        openItemPop({
+          name: itemCard.getAttribute("data-name") || "Item",
+          image: itemCard.getAttribute("data-image") || "",
+          color: itemCard.getAttribute("data-color") || "",
+          dura: itemCard.getAttribute("data-dura") || "",
+          repair: itemCard.getAttribute("data-repair")
+        });
         return;
       }
       var del = e.target.closest && e.target.closest("[data-delete]");
