@@ -291,8 +291,54 @@
     return sessionDiscordId() === LT_OWNER_DISCORD_ID;
   }
 
+  var viewerFlags = { communityStaff: false, checkedAt: 0 };
+  var VIEWER_FLAGS_CACHE_MS = 30 * 1000;
+
+  function isCommunityStaffViewer() {
+    return !!viewerFlags.communityStaff;
+  }
+
+  function refreshViewerFlags(force) {
+    if (!isLoggedIn()) {
+      viewerFlags = { communityStaff: false, checkedAt: 0 };
+      return Promise.resolve(viewerFlags);
+    }
+    if (
+      !force &&
+      viewerFlags.checkedAt &&
+      Date.now() - viewerFlags.checkedAt < VIEWER_FLAGS_CACHE_MS
+    ) {
+      return Promise.resolve(viewerFlags);
+    }
+    return fetch(authApiUrl("api/live-trading/me"), {
+      headers: authHeaders()
+    })
+      .then(function (res) {
+        return res.json().catch(function () {
+          return null;
+        });
+      })
+      .then(function (data) {
+        data = data || {};
+        viewerFlags = {
+          communityStaff: !!data.communityStaff,
+          checkedAt: Date.now()
+        };
+        return viewerFlags;
+      })
+      .catch(function () {
+        viewerFlags = { communityStaff: false, checkedAt: Date.now() };
+        return viewerFlags;
+      });
+  }
+
   function canDeletePost(post) {
-    return isOwnPost(post) || isLiveTradingAdmin();
+    if (isOwnPost(post)) return true;
+    if (isLiveTradingAdmin()) return true;
+    if (isCommunityStaffViewer() && !isSiteOwnerAuthor(post && post.author)) {
+      return true;
+    }
+    return false;
   }
 
   function canEditPost(post) {
@@ -347,6 +393,23 @@
       "</svg>" +
       "</span>" +
       '<span class="lt-post__trusted-text">Trusted Trader</span>' +
+      "</span>"
+    );
+  }
+
+  function isCommunityStaffAuthor(author) {
+    return !!(author && author.communityStaff);
+  }
+
+  function communityStaffBadgeHtml() {
+    return (
+      '<span class="lt-post__staff-tag" data-lt-tip="Community Staff — official BlockSpin Values server staff">' +
+      '<span class="lt-post__staff-mark" aria-hidden="true">' +
+      '<svg class="lt-post__staff-icon" viewBox="0 0 24 24" width="14" height="14">' +
+      '<path fill="currentColor" d="M12 2.2l7.2 3.1v6.2c0 4.7-3.1 8.9-7.2 10.1-4.1-1.2-7.2-5.4-7.2-10.1V5.3L12 2.2zm0 2.3L6.8 6.6v4.9c0 3.5 2.3 6.7 5.2 7.8 2.9-1.1 5.2-4.3 5.2-7.8V6.6L12 4.5z"/>' +
+      "</svg>" +
+      "</span>" +
+      '<span class="lt-post__staff-text">Community Staff</span>' +
       "</span>"
     );
   }
@@ -623,6 +686,7 @@
     };
     guildMemberCache.checkedAt = 0;
     guildMemberCache.inGuild = false;
+    viewerFlags = { communityStaff: false, checkedAt: 0 };
     var gate = document.getElementById("live-trading-gate");
     var workspace = document.getElementById("live-trading-workspace");
     // Board is always visible; gate stays unused (login modal handles prompts).
@@ -631,6 +695,10 @@
     loadCatalog();
     // Session can arrive after the first posts paint — force a redraw so Delete / owner UI appear.
     lastRenderedPostIds = "";
+    refreshViewerFlags(true).then(function () {
+      lastRenderedPostIds = "";
+      if (postsCache.length) renderFeed({ force: true });
+    });
     if (postsCache.length) renderFeed({ force: true });
     fetchPosts({ force: true });
     startPostsPolling();
@@ -1479,8 +1547,12 @@
                 openSharedLogin();
                 return;
               }
-              if (err === "not_owner") {
-                window.alert("You don’t have permission to delete that post.");
+              if (err === "not_owner" || err === "owner_protected") {
+                window.alert(
+                  err === "owner_protected"
+                    ? "Community Staff can’t delete the site owner’s posts."
+                    : "You don’t have permission to delete that post."
+                );
                 fetchPosts({ force: true });
                 return;
               }
@@ -1844,6 +1916,7 @@
       (function () {
         var badges = [];
         if (isSiteOwnerAuthor(author)) badges.push(ownerBadgeHtml());
+        if (isCommunityStaffAuthor(author)) badges.push(communityStaffBadgeHtml());
         if (isTrustedTraderAuthor(author)) badges.push(trustedTraderBadgeHtml());
         if (isScammerAuthor(author)) badges.push(scammerBadgeHtml());
         if (!badges.length) return "";
@@ -2117,7 +2190,8 @@
         return (
           String(p.id) +
           (p.author && p.author.scammer ? ":s" : "") +
-          (p.author && p.author.trustedTrader ? ":t" : "")
+          (p.author && p.author.trustedTrader ? ":t" : "") +
+          (p.author && p.author.communityStaff ? ":c" : "")
         );
       })
       .join(",");
@@ -2126,6 +2200,7 @@
       sessionDiscordId() +
       "|" +
       (isLiveTradingAdmin() ? "a" : "") +
+      (isCommunityStaffViewer() ? "s" : "") +
       "|" +
       ids
     );

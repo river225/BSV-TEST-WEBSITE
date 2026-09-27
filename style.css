@@ -16955,7 +16955,8 @@ body.live-trading-page .live-trading-workspace {
 }
 .lt-post__owner-tag,
 .lt-post__scammer-tag,
-.lt-post__trusted-tag {
+.lt-post__trusted-tag,
+.lt-post__staff-tag {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -16976,7 +16977,8 @@ body.live-trading-page .live-trading-workspace {
 }
 .lt-post__owner-tag::before,
 .lt-post__scammer-tag::before,
-.lt-post__trusted-tag::before {
+.lt-post__trusted-tag::before,
+.lt-post__staff-tag::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -16991,13 +16993,15 @@ body.live-trading-page .live-trading-workspace {
 }
 .lt-post__owner-tag:hover,
 .lt-post__scammer-tag:hover,
-.lt-post__trusted-tag:hover {
+.lt-post__trusted-tag:hover,
+.lt-post__staff-tag:hover {
   transform: translateY(-1px);
   filter: brightness(1.06);
 }
 .lt-post__owner-tag:hover::before,
 .lt-post__scammer-tag:hover::before,
-.lt-post__trusted-tag:hover::before {
+.lt-post__trusted-tag:hover::before,
+.lt-post__staff-tag:hover::before {
   animation: lt-badge-sheen 0.7s ease;
 }
 @keyframes lt-badge-sheen {
@@ -17007,7 +17011,8 @@ body.live-trading-page .live-trading-workspace {
 }
 .lt-post__owner-mark,
 .lt-post__scammer-mark,
-.lt-post__trusted-mark {
+.lt-post__trusted-mark,
+.lt-post__staff-mark {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -17019,14 +17024,16 @@ body.live-trading-page .live-trading-workspace {
 }
 .lt-post__owner-icon,
 .lt-post__scammer-icon,
-.lt-post__trusted-icon {
+.lt-post__trusted-icon,
+.lt-post__staff-icon {
   width: 12px;
   height: 12px;
   display: block;
 }
 .lt-post__owner-text,
 .lt-post__scammer-text,
-.lt-post__trusted-text {
+.lt-post__trusted-text,
+.lt-post__staff-text {
   transform: translateY(0.5px);
   position: relative;
   z-index: 1;
@@ -17090,6 +17097,26 @@ body.live-trading-page .live-trading-workspace {
 .lt-post__trusted-icon {
   color: #ecfdf5;
   filter: drop-shadow(0 0 4px rgba(167, 243, 208, 0.65));
+}
+.lt-post__staff-tag {
+  border: 1px solid rgba(191, 219, 254, 0.85);
+  background:
+    linear-gradient(180deg, #60a5fa 0%, #2563eb 55%, #1e3a8a 100%);
+  color: #eff6ff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 0 0 1px rgba(30, 58, 138, 0.55),
+    0 4px 14px rgba(37, 99, 235, 0.35);
+  text-shadow: 0 1px 0 rgba(30, 58, 138, 0.45);
+}
+.lt-post__staff-mark {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(239, 246, 255, 0.55);
+  color: #dbeafe;
+}
+.lt-post__staff-icon {
+  color: #dbeafe;
+  filter: drop-shadow(0 0 4px rgba(147, 197, 253, 0.7));
 }
 .lt-post__time {
   margin: 2px 0 0;
@@ -17733,6 +17760,19 @@ body.live-trading-page .live-trading-workspace {
   height: min(74vw, 284px);
   cursor: default;
   opacity: 1;
+  /* Fully opaque so the live page never shows through the card face. */
+  background-color: #0a0f1a;
+  background-image:
+    radial-gradient(
+      120% 90% at 50% 20%,
+      color-mix(in srgb, var(--lt-card) 92%, #111827),
+      #111827 72%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--lt-card) 78%, #0b1220) 0%,
+      #000 100%
+    );
   box-shadow: 0 28px 70px rgba(0, 0, 0, 0.6);
 }
 .lt-icard--pop .lt-icard__art {
