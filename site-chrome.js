@@ -374,11 +374,12 @@
   }
 
   function ensureSectionLtPromoStyles() {
-    if (document.getElementById("bsv-section-lt-promo-styles")) return;
+    var oldStyles = document.getElementById("bsv-section-lt-promo-styles");
+    if (oldStyles) oldStyles.remove();
     var style = document.createElement("style");
     style.id = "bsv-section-lt-promo-styles";
     style.textContent =
-      ".bsv-section-lt-promo{flex:0 0 auto;width:100%;max-width:100%;margin:16px 0 20px;padding:32px 24px;border-radius:20px;text-align:center;box-sizing:border-box;" +
+      ".bsv-section-lt-promo{flex:0 0 auto;width:100%;max-width:100%;margin:-10px 0 16px;padding:28px 24px;border-radius:20px;text-align:center;box-sizing:border-box;" +
       "background:linear-gradient(180deg,rgba(225,29,46,.18),transparent 55%),#090b11;border:1px solid rgba(225,29,46,.35)}" +
       ".bsv-section-lt-promo[hidden],.bsv-section-lt-promo.is-hidden{display:none!important}" +
       ".bsv-section-lt-promo h3{margin:0 0 8px;font-family:'Paytone One',system-ui,sans-serif;font-size:clamp(1.8rem,4vw,2.6rem);color:#fff;line-height:1.15}" +
