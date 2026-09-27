@@ -35,6 +35,9 @@
   var pickerSide = "giving";
   var searchScope = "all";
   var LT_OWNER_DISCORD_ID = "1163614455616245780";
+  var LT_TRUSTED_TRADER_DISCORD_IDS = {
+    "1507012667297103912": true
+  };
   var discordAppLaunchTimer = null;
   var searchQuery = "";
   var pickerRarity = "all";
@@ -319,6 +322,23 @@
       '<path fill="currentColor" d="M12 2.2L1.2 21h21.6L12 2.2zm0 5.3l6.8 11.7H5.2L12 7.5zM11 11v4.5h2V11h-2zm0 6v2h2v-2h-2z"/>' +
       "</svg>" +
       '<span class="lt-post__scammer-text">Scammer</span>' +
+      "</span>"
+    );
+  }
+
+  function isTrustedTraderAuthor(author) {
+    author = author || {};
+    var id = String(author.discordId || author.id || "").trim();
+    return !!(id && LT_TRUSTED_TRADER_DISCORD_IDS[id]);
+  }
+
+  function trustedTraderBadgeHtml() {
+    return (
+      '<span class="lt-post__trusted-tag" title="This user has got 200+ vouches to prove their trust in trades, For big trades we recommend still using a Middleman">' +
+      '<svg class="lt-post__trusted-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">' +
+      '<path fill="currentColor" d="M9.2 16.6L4.8 12.2l1.4-1.4 3 3 8.6-8.6 1.4 1.4-10 10z"/>' +
+      "</svg>" +
+      '<span class="lt-post__trusted-text">Trusted Trader</span>' +
       "</span>"
     );
   }
@@ -1607,6 +1627,7 @@
         ? ' <span class="lt-post__handle">' + escapeHtml(handle) + "</span>"
         : "") +
       (isSiteOwnerAuthor(author) ? " " + ownerBadgeHtml() : "") +
+      (isTrustedTraderAuthor(author) ? " " + trustedTraderBadgeHtml() : "") +
       (isScammerAuthor(author) ? " " + scammerBadgeHtml() : "") +
       "</p>" +
       '<p class="lt-post__time">' +
