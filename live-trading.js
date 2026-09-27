@@ -795,6 +795,15 @@
     return cur + "/" + max;
   }
 
+  /** Summary text: only show dura when it's below full. */
+  function formatDurabilityForSummary(entry) {
+    if (!itemHasDurability(entry)) return "";
+    var max = Math.max(1, Number(entry.maxDurability) || 1);
+    var cur = Math.max(0, Math.min(max, Number(entry.durability) || max));
+    if (cur >= max) return "";
+    return cur + "/" + max;
+  }
+
   var MAX_DRAFT_QTY = 99;
 
   function itemSlotHtml(entry, side, index) {
@@ -1599,7 +1608,7 @@
   function itemPhrase(item) {
     var qty = Math.max(1, Number(item.qty) || 1);
     var name = String(item.name || "Item");
-    var dura = formatDurability(item);
+    var dura = formatDurabilityForSummary(item);
     if (dura) name += " (" + dura + ")";
     if (qty > 1) return qty + "× " + name;
     return name;
@@ -1630,7 +1639,7 @@
     for (i = 0; i < items.length; i++) {
       var it = items[i];
       var label = String((it && it.name) || "Item").trim() || "Item";
-      var dura = formatDurability(it);
+      var dura = formatDurabilityForSummary(it);
       if (dura) label += " (" + dura + ")";
       var qty = Math.max(1, Number(it && it.qty) || 1);
       parts.push(qty > 1 ? qty + "× " + label : label);
