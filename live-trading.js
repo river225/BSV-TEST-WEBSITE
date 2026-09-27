@@ -2007,8 +2007,8 @@
     return (
       'Accept offer / ' +
       '<span class="lt-post__accept-chat">' +
-      '<svg class="lt-post__accept-chat-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">' +
-      '<path fill="currentColor" d="M4.5 3.75h15A2.25 2.25 0 0121.75 6v9A2.25 2.25 0 0119.5 17.25H9.66l-3.72 3.1a.75.75 0 01-1.19-.6V17.25H4.5A2.25 2.25 0 012.25 15V6A2.25 2.25 0 014.5 3.75zm0 1.5c-.41 0-.75.34-.75.75v9c0 .41.34.75.75.75h1.7c.41 0 .75.34.75.75v1.72l2.42-2.02a.75.75 0 01.48-.18H19.5c.41 0 .75-.34.75-.75V6c0-.41-.34-.75-.75-.75H4.5z"/>' +
+      '<svg class="lt-post__accept-chat-icon" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">' +
+      '<path fill="currentColor" d="M12 3.2c-4.7 0-8.5 3.1-8.5 6.9 0 2.3 1.4 4.3 3.6 5.6-.15.7-.55 1.7-1.35 2.85-.2.28 0 .68.35.68 1.85-.15 3.2-.85 4.1-1.55.6.12 1.2.17 1.8.17 4.7 0 8.5-3.1 8.5-6.9S16.7 3.2 12 3.2z"/>' +
       "</svg>" +
       "<span>Chat</span>" +
       "</span>"

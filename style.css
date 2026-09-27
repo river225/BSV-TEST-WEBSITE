@@ -16909,7 +16909,7 @@ body.live-trading-page .live-trading-workspace {
 .lt-post__avatar {
   width: 40px;
   height: 40px;
-  border-radius: 12px;
+  border-radius: 50%;
   object-fit: cover;
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: #1e293b;
@@ -17121,12 +17121,13 @@ body.live-trading-page .live-trading-workspace {
   letter-spacing: 0;
   overflow: visible;
   color: transparent;
+  transform: translateY(-3px);
 }
 .lt-post__staff-tag::before {
   display: none;
 }
 .lt-post__staff-tag:hover {
-  transform: translateY(-1px);
+  transform: translateY(-4px);
   filter: brightness(1.1);
 }
 .lt-post__staff-mark,
@@ -17710,10 +17711,11 @@ body.live-trading-page .live-trading-workspace {
   gap: 5px;
 }
 .lt-post__accept-chat-icon {
-  width: 14px;
-  height: 14px;
+  width: 15px;
+  height: 15px;
   display: block;
   flex: 0 0 auto;
+  color: #fff;
 }
 .lt-post__accept:hover {
   border-color: rgba(52, 211, 153, 0.8);
