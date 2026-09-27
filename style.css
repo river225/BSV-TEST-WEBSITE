@@ -17118,14 +17118,14 @@ body.live-trading-page .live-trading-workspace {
   text-shadow: none;
   letter-spacing: 0;
   overflow: visible;
-  color: #3b82f6;
+  color: transparent;
 }
 .lt-post__staff-tag::before {
   display: none;
 }
 .lt-post__staff-tag:hover {
   transform: translateY(-1px);
-  filter: brightness(1.12);
+  filter: brightness(1.1);
 }
 .lt-post__staff-mark,
 .lt-post__staff-text {
@@ -17135,8 +17135,8 @@ body.live-trading-page .live-trading-workspace {
   width: 18px;
   height: 18px;
   display: block;
-  color: #3b82f6;
-  filter: drop-shadow(0 1px 2px rgba(30, 64, 175, 0.55));
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
 }
 .lt-post__time {
   margin: 2px 0 0;

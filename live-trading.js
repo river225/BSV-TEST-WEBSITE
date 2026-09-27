@@ -404,11 +404,7 @@
   function communityStaffBadgeHtml() {
     return (
       '<span class="lt-post__staff-tag" data-lt-tip="Community Staff" aria-label="Community Staff" role="img">' +
-      '<svg class="lt-post__staff-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">' +
-      '<path fill="currentColor" d="M12 1.6l8.2 3.4v7c0 5.35-3.55 10.15-8.2 11.4C7.35 22.15 3.8 17.35 3.8 12V5L12 1.6z"/>' +
-      '<path fill="rgba(255,255,255,0.22)" d="M12 3.55l6.05 2.5v5.95c0 3.95-2.55 7.55-6.05 8.55-3.5-1-6.05-4.6-6.05-8.55V6.05L12 3.55z"/>' +
-      '<path fill="currentColor" d="M12 6.2l3.9 1.55v3.55c0 2.35-1.5 4.5-3.9 5.2-2.4-.7-3.9-2.85-3.9-5.2V7.75L12 6.2zm0 1.85L9.55 9v2.3c0 1.35.85 2.55 2.45 3.1 1.6-.55 2.45-1.75 2.45-3.1V9L12 8.05z"/>' +
-      "</svg>" +
+      '<img class="lt-post__staff-icon" src="assets/community-staff-shield.png" alt="" width="18" height="18" decoding="async" />' +
       "</span>"
     );
   }
