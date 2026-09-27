@@ -3340,110 +3340,28 @@ background-attachment: fixed;
   border-radius: 14px;
   border: 3px solid #000;
   overflow: hidden;
-  filter: saturate(1.12);
   background:
-    radial-gradient(ellipse 100% 90% at 12% 20%, rgba(255, 255, 255, 0.35) 0%, transparent 46%),
-    radial-gradient(ellipse 80% 70% at 88% 75%, rgba(255, 220, 120, 0.35) 0%, transparent 55%),
-    linear-gradient(
-      128deg,
-      #450a0a 0%,
-      #7f1d1d 18%,
-      #b91c1c 36%,
-      #dc2626 52%,
-      #991b1b 72%,
-      #450a0a 100%
-    );
-  background-size: 100% 100%, 100% 100%, 300% 300%;
+    radial-gradient(ellipse 90% 70% at 18% 12%, rgba(255, 255, 255, 0.22) 0%, transparent 48%),
+    radial-gradient(ellipse 70% 60% at 88% 88%, rgba(96, 165, 250, 0.35) 0%, transparent 55%),
+    linear-gradient(145deg, #1d4ed8 0%, #2563eb 28%, #5865f2 58%, #3b82f6 100%);
   box-shadow:
     0 6px 0 #000,
-    0 0 32px rgba(220, 53, 69, 0.55),
-    0 0 52px rgba(185, 28, 28, 0.38),
-    inset 0 2px 0 rgba(255, 255, 255, 0.28);
-  animation:
-    giveaway-banner-shine 8.5s ease-in-out infinite,
-    anaconda-party-glow 4.5s ease-in-out infinite;
-}@keyframes home-discord-bg-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}.home-discord-promo--home::before {
-  content: "";
-  position: absolute;
-  inset: -70%;
-  background:
-    conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(255, 255, 255, 0.2) 55deg, transparent 110deg, rgba(255, 200, 200, 0.22) 180deg, transparent 235deg, rgba(255, 230, 150, 0.18) 290deg, transparent 360deg),
-    radial-gradient(circle at 18% 38%, rgba(255, 255, 255, 0.9) 0, rgba(255, 255, 255, 0.9) 1px, transparent 2px),
-    radial-gradient(circle at 72% 62%, rgba(255, 220, 220, 0.75) 0, rgba(255, 220, 220, 0.75) 1px, transparent 2px),
-    radial-gradient(circle at 55% 22%, rgba(255, 240, 160, 0.85) 0, rgba(255, 240, 160, 0.85) 1px, transparent 2px),
-    radial-gradient(circle at 40% 78%, rgba(255, 180, 180, 0.8) 0, rgba(255, 180, 180, 0.8) 1px, transparent 2px),
-    radial-gradient(circle at 82% 28%, rgba(255, 255, 255, 0.7) 0, rgba(255, 255, 255, 0.7) 1px, transparent 2px);
-  background-size: auto, 140px 140px, 180px 170px, 160px 160px, 190px 175px, 150px 150px;
-  animation: humvee-party-swirl 16s linear infinite, humvee-confetti-drift 9s ease-in-out infinite;
-  transform-origin: 50% 50%;
-  pointer-events: none;
-  z-index: 0;
-  border-radius: inherit;
-  opacity: 0.95;
-}.home-discord-promo--home::after {
-  content: "";
-  position: absolute;
-  top: -38%;
-  left: -48%;
-  width: 38%;
-  height: 175%;
-  pointer-events: none;
-  border-radius: 18px;
-  background: linear-gradient(
-    102deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.65) 42%,
-    rgba(255, 255, 220, 0.35) 58%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  transform: rotate(14deg);
-  animation: humvee-banner-sweep 3.8s ease-in-out infinite;
-  z-index: 1;
-}.home-discord-promo--home .home-discord-promo__home-glow {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.28) 0%, transparent 38%),
-    radial-gradient(circle at 88% 82%, rgba(253, 224, 71, 0.22) 0%, transparent 42%),
-    radial-gradient(circle at 72% 12%, rgba(255, 180, 180, 0.18) 0%, transparent 36%);
-  pointer-events: none;
-  z-index: 0;
-  animation: home-discord-home-pulse 3s ease-in-out infinite;
-}.home-discord-promo__home-shimmer {
-  position: absolute;
-  inset: -40% -60%;
-  background: linear-gradient(
-    105deg,
-    transparent 42%,
-    rgba(255, 255, 255, 0.14) 50%,
-    transparent 58%
-  );
-  pointer-events: none;
-  z-index: 0;
-  animation: home-discord-shimmer 4.5s ease-in-out infinite;
-}@keyframes home-discord-shimmer {
-  0%, 100% { transform: translateX(-30%) rotate(8deg); opacity: 0; }
-  45% { opacity: 1; }
-  55% { opacity: 1; }
-  100% { transform: translateX(30%) rotate(8deg); opacity: 0; }
-}@keyframes home-discord-home-pulse {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 1; }
-}.home-discord-promo--home .home-discord-promo__shape {
-  z-index: 0;
-  opacity: 0.55;
-  filter: blur(0.5px);
+    0 0 28px rgba(37, 99, 235, 0.4);
+}.home-discord-promo--home::before,
+.home-discord-promo--home::after {
+  display: none;
+}.home-discord-promo--home .home-discord-promo__home-glow,
+.home-discord-promo__home-shimmer,
+.home-discord-promo--home .home-discord-promo__shape {
+  display: none;
 }.home-discord-promo--home .home-discord-promo__inner {
   position: relative;
   z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 14px 14px 12px;
+  gap: 14px;
+  padding: 22px 20px 18px;
   text-align: center;
 }.home-discord-promo__flash-badges {
   display: flex;
@@ -3489,15 +3407,9 @@ background-attachment: fixed;
   height: 52px;
   padding: 8px;
   border-radius: 12px;
-  background: rgba(15, 23, 42, 0.5);
-  border: 2px solid rgba(255, 255, 255, 0.45);
-  box-shadow:
-    0 3px 0 #000,
-    0 0 18px rgba(255, 255, 255, 0.3);
-  animation: home-discord-logo-float 3.2s ease-in-out infinite;
-}@keyframes home-discord-logo-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  background: rgba(15, 23, 42, 0.45);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 3px 0 #000;
 }.home-discord-promo__flash-title {
   margin: 0;
   font-size: clamp(1.15rem, 2.8vw, 1.45rem);
@@ -3601,21 +3513,10 @@ background-attachment: fixed;
   padding: 10px 12px !important;
   font-size: clamp(0.9rem, 2.1vw, 1rem) !important;
   background: linear-gradient(180deg, #fff 0%, #e8ecff 100%) !important;
-  color: #5865f2 !important;
+  color: #1d4ed8 !important;
   border-color: #000 !important;
-  animation: home-discord-join-pulse 2s ease-in-out infinite;
-}@keyframes home-discord-join-pulse {
-  0%, 100% {
-    box-shadow: 0 4px 0 #000, 0 0 0 rgba(255, 255, 255, 0);
-    transform: translateY(0);
-  }
-  50% {
-    box-shadow: 0 4px 0 #000, 0 0 22px rgba(255, 255, 255, 0.7);
-    transform: translateY(-1px);
-  }
 }.home-discord-promo__btn--flash-join:hover {
   background: #fff !important;
-  animation: none;
 }.home-discord-promo--home .home-discord-promo__btn--secondary {
   background: rgba(15, 23, 42, 0.72);
   color: #fff;
@@ -3624,6 +3525,62 @@ background-attachment: fixed;
 }.home-discord-promo--home .home-discord-promo__btn--secondary:hover {
   background: rgba(15, 23, 42, 0.92);
   color: #fff;
+}.home-hero-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  width: 100%;
+  max-width: 860px;
+  margin: 8px auto 28px;
+  padding: 0 12px;
+  box-sizing: border-box;
+}.home-lt-bar {
+  width: 100%;
+  margin: 0;
+  padding: 24px 22px;
+  border-radius: 20px;
+  text-align: center;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, rgba(225, 29, 46, 0.18), transparent 55%), #090b11;
+  border: 1px solid rgba(225, 29, 46, 0.35);
+}.home-lt-bar h3 {
+  margin: 0 0 8px;
+  font-family: "Paytone One", system-ui, sans-serif;
+  font-size: clamp(1.6rem, 3.5vw, 2.3rem);
+  color: #fff;
+  line-height: 1.15;
+}.home-lt-bar p {
+  margin: 0 auto 14px;
+  max-width: 40ch;
+  color: rgba(244, 247, 251, 0.62);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}.home-lt-bar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin: 0;
+}.home-lt-bar__btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 20px;
+  border-radius: 12px;
+  font: 800 0.95rem/1.1 system-ui, sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid rgba(225, 29, 46, 0.75);
+  background: rgba(225, 29, 46, 0.12);
+  color: #fff;
+  transition: transform 0.15s ease, background 0.15s ease;
+}.home-lt-bar__btn:hover {
+  transform: translateY(-1px);
+  background: rgba(225, 29, 46, 0.22);
+  border-color: #ef4444;
 }.home-hero-row {
   position: relative;
   display: flex;
@@ -3632,18 +3589,18 @@ background-attachment: fixed;
   justify-content: center;
   gap: 16px;
   width: 100%;
-  margin: 0 0 28px;
-  padding: 0 12px;
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
   overflow: visible;
 }.home-hero-row__banner {
   flex: 0 1 620px;
   width: min(100%, 620px);
   max-width: 620px;
+  margin: 0;
   display: flex;
   justify-content: center;
   align-items: stretch;
-  order: 2;
 }.home-hero-row__banner .home-discord-promo-slot,
 .home-hero-row__banner .home-hero-banner-carousel {
   margin: 0;
@@ -4217,23 +4174,12 @@ background-attachment: fixed;
 }
 .home-hero-row__stats {
   position: relative;
-  top: auto;
-  left: auto;
+  flex: 0 0 180px;
   width: 180px;
   min-width: 160px;
   max-width: 200px;
-  flex: 0 0 auto;
-  order: 1;
   z-index: 1;
   align-self: stretch;
-}.home-hero-row__lt {
-  flex: 0 0 200px;
-  width: 200px;
-  min-width: 180px;
-  max-width: 220px;
-  order: 3;
-  align-self: stretch;
-  z-index: 1;
 }.home-lt-promo {
   position: relative;
   display: flex;
@@ -13757,17 +13703,8 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     grid-column: 1;
     order: -1;
   }
-  .home-hero-row {
-    flex-wrap: wrap;
-  }
-  .home-hero-row__lt {
-    flex: 1 1 100%;
-    width: min(100%, 620px);
-    max-width: 620px;
-    min-width: 0;
-  }
-  .home-lt-promo {
-    min-height: 120px;
+  .home-hero-row__stats {
+    display: none !important;
   }
 }
 
@@ -14855,11 +14792,19 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     margin-bottom: 12px;
   }
 
-  .home-hero-row {
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
+  .home-hero-stack {
     padding: 0;
+    margin-bottom: 20px;
+    gap: 12px;
+  }
+
+  .home-lt-bar {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+
+  .home-lt-bar h3 {
+    font-size: clamp(1.4rem, 6vw, 1.9rem);
   }
 
   .home-hero-row__stats {
@@ -14871,28 +14816,14 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     max-width: 620px;
   }
 
-  .home-hero-row__lt {
-    width: min(100%, 620px);
-    max-width: 620px;
-    min-width: 0;
-    flex: 0 0 auto;
-  }
-
-  .home-lt-promo {
-    min-height: 0;
-    padding: 16px 14px;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 8px 12px;
-  }
-
-  .home-lt-promo__text {
-    flex: 1 1 100%;
-  }
-
   .home-discord-promo--home {
     border-width: 2px;
     border-radius: 12px;
+  }
+
+  .home-discord-promo--home .home-discord-promo__inner {
+    padding: 18px 14px 16px;
+    gap: 12px;
   }
 
   .home-anaconda-banner {
