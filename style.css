@@ -16750,6 +16750,19 @@ body.live-trading-page .live-trading-workspace {
   text-align: center;
 }
 
+.lt-post--enter {
+  animation: lt-post-enter 0.45s ease-out;
+}
+@keyframes lt-post-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
 .lt-post {
   position: relative;
   padding: 16px 16px 14px;

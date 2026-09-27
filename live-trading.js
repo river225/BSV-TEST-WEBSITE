@@ -6,8 +6,11 @@
   var EMPTY_SLOT_COUNT = 8;
   var postsCache = [];
   var postsFetchInFlight = null;
+  var postsFetchGen = 0;
   var postsPollTimer = null;
-  var POSTS_POLL_MS = 12000;
+  var lastRenderedPostIds = "";
+  var POSTS_POLL_MS = 2000;
+  var POSTS_POLL_HIDDEN_MS = 15000;
   var TRADE_SHEETS = [
     { sheet: "Uncommon", rarity: "Common / Uncommon", color: "#4caf50" },
     { sheet: "Rare", rarity: "Rare", color: "#4a90e2" },
@@ -173,6 +176,7 @@
   function fetchPosts(opts) {
     opts = opts || {};
     if (postsFetchInFlight && !opts.force) return postsFetchInFlight;
+    var gen = ++postsFetchGen;
     postsFetchInFlight = fetch(authApiUrl("api/live-trading/posts"), {
       headers: { Accept: "application/json" },
       cache: "no-store"
@@ -183,6 +187,7 @@
         });
       })
       .then(function (data) {
+        if (gen !== postsFetchGen) return postsCache;
         if (data && Array.isArray(data.posts)) {
           postsCache = data.posts;
         } else if (!postsCache.length) {
@@ -192,22 +197,42 @@
         return postsCache;
       })
       .catch(function () {
+        if (gen !== postsFetchGen) return postsCache;
         if (!postsCache.length) postsCache = readLocalPostsFallback();
         renderFeed();
         return postsCache;
       })
       .then(function (list) {
-        postsFetchInFlight = null;
+        if (gen === postsFetchGen) postsFetchInFlight = null;
         return list;
       });
     return postsFetchInFlight;
   }
 
+  function currentPollMs() {
+    if (typeof document !== "undefined" && document.visibilityState === "hidden") {
+      return POSTS_POLL_HIDDEN_MS;
+    }
+    return POSTS_POLL_MS;
+  }
+
+  function schedulePostsPoll() {
+    if (postsPollTimer) clearTimeout(postsPollTimer);
+    postsPollTimer = setTimeout(function () {
+      fetchPosts({ force: true }).finally(function () {
+        schedulePostsPoll();
+      });
+    }, currentPollMs());
+  }
+
   function startPostsPolling() {
-    if (postsPollTimer) return;
-    postsPollTimer = setInterval(function () {
-      fetchPosts({ force: true });
-    }, POSTS_POLL_MS);
+    schedulePostsPoll();
+    if (window.__bsvLtPollVisBound) return;
+    window.__bsvLtPollVisBound = true;
+    document.addEventListener("visibilitychange", function () {
+      schedulePostsPoll();
+      if (document.visibilityState === "visible") fetchPosts({ force: true });
+    });
   }
 
   function authorFromSession() {
@@ -914,8 +939,12 @@
         }
         resetDraft();
         setComposerOpen(false);
-        renderFeed();
-        fetchPosts({ force: true });
+        renderFeed({ preferTop: true });
+        // Refresh from server shortly after so other clients stay in sync;
+        // generation guard prevents a slower in-flight fetch from wiping this post.
+        setTimeout(function () {
+          fetchPosts({ force: true });
+        }, 400);
       })
       .catch(function () {
         showComposerError("Couldn’t reach the server. Try again.");
@@ -1143,7 +1172,7 @@
     return parts.join("");
   }
 
-  function postCardHtml(post) {
+  function postCardHtml(post, isNew) {
     var author = post.author || {};
     var avatar = authorAvatar(author);
     var displayName = authorDisplayName(author);
@@ -1167,7 +1196,9 @@
         '">Not accepting offers</span>';
     }
     return (
-      '<article class="lt-post" data-id="' +
+      '<article class="lt-post' +
+      (isNew ? " lt-post--enter" : "") +
+      '" data-id="' +
       escapeAttr(post.id) +
       '" role="article">' +
       '<header class="lt-post__head">' +
@@ -1221,13 +1252,19 @@
     );
   }
 
-  function renderFeed() {
+  function renderFeed(opts) {
+    opts = opts || {};
     var feed = document.getElementById("lt-feed");
-    var empty = document.getElementById("lt-feed-empty");
     if (!feed) return;
     var posts = readPosts().filter(postMatchesFilters);
+    var ids = posts
+      .map(function (p) {
+        return p && p.id ? String(p.id) : "";
+      })
+      .join(",");
     feed.setAttribute("aria-busy", "false");
     if (!posts.length) {
+      lastRenderedPostIds = "";
       feed.innerHTML =
         '<p class="lt-feed__empty" id="lt-feed-empty">' +
         (readPosts().length
@@ -1236,7 +1273,20 @@
         "</p>";
       return;
     }
-    feed.innerHTML = posts.map(postCardHtml).join("");
+    if (ids === lastRenderedPostIds && feed.querySelector(".lt-post")) {
+      if (opts.preferTop) feed.scrollTop = 0;
+      return;
+    }
+    var prevIds = lastRenderedPostIds ? lastRenderedPostIds.split(",") : [];
+    var hadPosts = prevIds.length > 0 && prevIds[0] !== "";
+    lastRenderedPostIds = ids;
+    feed.innerHTML = posts
+      .map(function (post) {
+        var isNew = hadPosts && prevIds.indexOf(String(post.id)) === -1;
+        return postCardHtml(post, isNew);
+      })
+      .join("");
+    if (opts.preferTop) feed.scrollTop = 0;
   }
 
   function bindBoardUi() {
