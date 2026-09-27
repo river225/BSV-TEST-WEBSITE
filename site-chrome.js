@@ -373,44 +373,104 @@
     );
   }
 
-  // Pin the banner under the Home section only (not Rare / Legendary / etc.).
+  function ensureSectionLtPromoStyles() {
+    if (document.getElementById("bsv-section-lt-promo-styles")) return;
+    var style = document.createElement("style");
+    style.id = "bsv-section-lt-promo-styles";
+    style.textContent =
+      ".bsv-section-lt-promo{flex:0 0 auto;width:100%;max-width:100%;margin:16px 0 20px;padding:32px 24px;border-radius:20px;text-align:center;box-sizing:border-box;" +
+      "background:linear-gradient(180deg,rgba(225,29,46,.18),transparent 55%),#090b11;border:1px solid rgba(225,29,46,.35)}" +
+      ".bsv-section-lt-promo[hidden],.bsv-section-lt-promo.is-hidden{display:none!important}" +
+      ".bsv-section-lt-promo h3{margin:0 0 8px;font-family:'Paytone One',system-ui,sans-serif;font-size:clamp(1.8rem,4vw,2.6rem);color:#fff;line-height:1.15}" +
+      ".bsv-section-lt-promo p{margin:0 auto 16px;max-width:40ch;color:rgba(244,247,251,.62);font-size:.95rem;line-height:1.5}" +
+      ".bsv-section-lt-promo__actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:0}" +
+      ".bsv-section-lt-promo .hv2-btn,.bsv-section-lt-promo__btn{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 20px;border-radius:12px;font:800 .95rem/1.1 system-ui,sans-serif;text-decoration:none;cursor:pointer;border:1px solid rgba(225,29,46,.75);background:rgba(225,29,46,.12);color:#fff;transition:transform .15s ease,background .15s ease}" +
+      ".bsv-section-lt-promo .hv2-btn:hover,.bsv-section-lt-promo__btn:hover{transform:translateY(-1px);background:rgba(225,29,46,.22);border-color:#ef4444}";
+    document.head.appendChild(style);
+  }
+
+  function renderLiveTradingSectionPromo() {
+    return (
+      '<aside class="hv2-lt-c bsv-section-lt-promo" aria-label="Live Trading">' +
+        "<h3>Live Trading is open</h3>" +
+        "<p>Drop your offers. Find what you need. Chat the trader.</p>" +
+        '<div class="hv2-hero__actions bsv-section-lt-promo__actions">' +
+          '<a class="hv2-btn hv2-btn--primary bsv-section-lt-promo__btn" href="' +
+          sitePath("live-trading.html") +
+          '">Start Trading →</a>' +
+        "</div>" +
+      "</aside>"
+    );
+  }
+
+  function ensureLiveTradingSectionPromo() {
+    ensureSectionLtPromoStyles();
+    var existing = document.querySelector(".bsv-section-lt-promo");
+    if (existing) return existing;
+    var wrap = document.createElement("div");
+    wrap.innerHTML = renderLiveTradingSectionPromo();
+    var el = wrap.firstElementChild;
+    if (!el) return null;
+    var sections = document.querySelector(".main-container > #sections");
+    if (sections) {
+      sections.appendChild(el);
+      return el;
+    }
+    var slot = document.getElementById("bsv-sponsor-banner-slot");
+    if (slot) {
+      slot.appendChild(el);
+      return el;
+    }
+    return null;
+  }
+
+  function setPromoVisible(el, on) {
+    if (!el) return;
+    el.hidden = !on;
+    el.classList.toggle("is-hidden", !on);
+  }
+
+  // Home → sponsorship. Other value sections → Live Trading Alt C.
   function alignSponsorBannerToHomeContent() {
     var promo = document.querySelector(".bsv-sponsor-promo");
-    if (!promo) return;
-    promo.style.left = "";
-    promo.style.transform = "";
-
-    // body.is-home is toggled by showSection — do not use data-bsv-page (always "home").
+    var ltPromo = ensureLiveTradingSectionPromo();
     var onHome = document.body.classList.contains("is-home");
-
-    if (!onHome) {
-      promo.hidden = true;
-      promo.classList.add("is-hidden");
-      return;
-    }
-    promo.hidden = false;
-    promo.classList.remove("is-hidden");
-
     var sections = document.querySelector(".main-container > #sections");
     var home = document.getElementById("home");
-    if (sections && home) {
-      if (home.nextSibling !== promo) {
+
+    if (promo) {
+      promo.style.left = "";
+      promo.style.transform = "";
+    }
+
+    if (onHome) {
+      setPromoVisible(promo, true);
+      setPromoVisible(ltPromo, false);
+      if (promo && sections && home && home.nextSibling !== promo) {
         sections.insertBefore(promo, home.nextSibling);
+      } else if (promo && !sections) {
+        var slot = document.getElementById("bsv-sponsor-banner-slot");
+        if (slot && promo.parentElement !== slot) slot.appendChild(promo);
       }
       return;
     }
 
-    var slot = document.getElementById("bsv-sponsor-banner-slot");
-    if (slot && promo.parentElement !== slot) {
-      slot.appendChild(promo);
+    setPromoVisible(promo, false);
+    setPromoVisible(ltPromo, true);
+    if (ltPromo && sections && ltPromo.parentElement !== sections) {
+      sections.appendChild(ltPromo);
+    } else if (ltPromo && sections) {
+      sections.appendChild(ltPromo);
     }
   }
 
   function placeSponsorBanner(activePage) {
-    // Homepage only. Sponsors has its own hero CTA; other pages should stay clean.
+    // Values list page only. Sponsors page has its own hero CTA.
     var existing = document.querySelector(".bsv-sponsor-promo");
+    var existingLt = document.querySelector(".bsv-section-lt-promo");
     if (activePage !== "home") {
       if (existing) existing.remove();
+      if (existingLt) existingLt.remove();
       return;
     }
     ensureSponsorBannerStyles();
@@ -425,17 +485,15 @@
     var home = document.getElementById("home");
     if (sections && home) {
       sections.insertBefore(el, home.nextSibling);
-      return;
-    }
-    if (sections) {
+    } else if (sections) {
       sections.appendChild(el);
-      return;
+    } else {
+      var slot = document.getElementById("bsv-sponsor-banner-slot");
+      if (slot) slot.appendChild(el);
     }
 
-    var slot = document.getElementById("bsv-sponsor-banner-slot");
-    if (slot) {
-      slot.appendChild(el);
-    }
+    ensureLiveTradingSectionPromo();
+    alignSponsorBannerToHomeContent();
   }
 
   function headerSearch() {
