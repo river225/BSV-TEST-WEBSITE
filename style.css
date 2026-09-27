@@ -16942,19 +16942,22 @@ body.live-trading-page .live-trading-workspace {
   position: relative;
   z-index: 1;
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
+  gap: 0;
+  width: 36px;
+  height: 44px;
+  border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   background: #152030;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
   color: #e2e8f0;
 }
 .lt-post__swap-h {
-  font-size: 1.05rem;
-  font-weight: 800;
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 900;
   line-height: 1;
 }
 .lt-post__side-pill {
@@ -17759,9 +17762,6 @@ body.lt-picker-open {
       rgba(255, 255, 255, 0.18) 80%,
       transparent 100%
     );
-  }
-  .lt-post__swap-h {
-    transform: rotate(90deg);
   }
   .lt-toolbar {
     flex-direction: column-reverse;

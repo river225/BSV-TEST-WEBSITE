@@ -1405,7 +1405,10 @@
       "</div></div>" +
       '<div class="lt-post__divider" aria-hidden="true">' +
       '<span class="lt-post__divider-line"></span>' +
-      '<span class="lt-post__swap"><span class="lt-post__swap-h">↔</span></span>' +
+      '<span class="lt-post__swap">' +
+      '<span class="lt-post__swap-h">→</span>' +
+      '<span class="lt-post__swap-h">←</span>' +
+      "</span>" +
       "</div>" +
       '<div class="lt-post__panel">' +
       '<span class="lt-post__side-pill lt-post__side-pill--request">Requesting</span>' +
