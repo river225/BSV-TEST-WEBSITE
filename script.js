@@ -245,35 +245,12 @@ function buildHomeAnacondaBannerHtml() {
 }
 
 function buildHomeRobuxBannerHtml() {
-  var href = escapeAttr(BSV_DISCORD_INVITE_URL);
-  return (
-    '<article class="home-robux-banner home-robux-banner--birthday" role="complementary" aria-label="BlockSpin Values 1 Year Birthday — 10K Robux Giveaway">' +
-      '<div class="home-robux-banner__stars" aria-hidden="true"></div>' +
-      '<div class="home-robux-banner__nebula" aria-hidden="true"></div>' +
-      '<div class="home-robux-banner__confetti" aria-hidden="true">' +
-        "<span></span><span></span><span></span><span></span><span></span><span></span>" +
-      "</div>" +
-      '<div class="home-robux-banner__inner">' +
-        '<span class="home-robux-banner__urgency">Happy 1 Year</span>' +
-        '<div class="home-robux-banner__copy">' +
-          '<p class="home-robux-banner__eyebrow">BlockSpin Values Birthday</p>' +
-          '<p class="home-robux-banner__amount">10,000 Robux</p>' +
-          '<h3 class="home-robux-banner__title">Birthday Giveaway</h3>' +
-          '<p class="home-robux-banner__hook">Celebrating one year with the community — join Discord to enter!</p>' +
-        "</div>" +
-        '<a href="' + href + '" target="_blank" rel="noopener noreferrer" class="home-robux-banner__cta">Enter Now <span aria-hidden="true">→</span></a>' +
-      "</div>" +
-    "</article>"
-  );
+  // 10K Robux birthday banner retired.
+  return "";
 }
 
 function buildSectionRobuxSlotHtml(title) {
-  if (!ROBUX_GIVEAWAY_SECTION_TITLES.has(title)) return "";
-  return (
-    '<div class="section-robux-slot section-robux-slot--birthday" aria-label="Birthday giveaway">' +
-      buildHomeRobuxBannerHtml() +
-    "</div>"
-  );
+  return "";
 }
 
 function initHomeHeroBannerCarousel() {
@@ -528,21 +505,11 @@ function mountHomeDiscordPromo() {
   slot.outerHTML =
     '<div class="home-hero-row">' +
       '<div class="home-hero-row__banner">' +
-        '<div class="home-hero-banner-carousel" data-rotate="1" aria-live="polite">' +
-          '<div class="home-hero-banner-carousel__viewport">' +
-            '<div class="home-hero-banner-carousel__slide is-active" data-slide="discord" aria-hidden="false">' +
-              buildDiscordPromoBannerHtml(false) +
-            "</div>" +
-            '<div class="home-hero-banner-carousel__slide" data-slide="robux" aria-hidden="true">' +
-              buildHomeRobuxBannerHtml() +
-            "</div>" +
-          "</div>" +
-        "</div>" +
+        buildDiscordPromoBannerHtml(false) +
       "</div>" +
       '<div class="home-hero-row__stats" id="home-site-stats-slot"></div>' +
     "</div>";
   mountHomeSiteStats();
-  initHomeHeroBannerCarousel();
 }
 
 function mountHomeSiteStats() {
