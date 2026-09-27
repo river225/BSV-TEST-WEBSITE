@@ -1337,56 +1337,58 @@
       railHtml(post.wanting) +
       "</div></div>" +
       "</div>" +
-      '<div class="lt-post__summary">' +
-      '<p class="lt-post__summary-label">Post Summary</p>' +
-      postSummaryHtml(post) +
-      "</div>" +
+      postMetaHtml(post) +
       postFootHtml(post) +
       "</article>"
     );
   }
 
-  function postFootHtml(post) {
-    var own = isOwnPost(post);
+  function postActionsHtml(post) {
+    if (isOwnPost(post)) return "";
     var wanting = post.wanting || {};
     var profileUrl = authorDiscordProfileUrl(post.author);
     var actions = [];
 
-    if (!own) {
-      if (profileUrl) {
-        actions.push(
-          '<a class="lt-post__accept" href="' +
-            escapeAttr(profileUrl) +
-            '" target="_blank" rel="noopener noreferrer">Accept offer</a>'
-        );
-      } else {
-        actions.push(
-          '<span class="lt-post__accept lt-post__accept--disabled" title="Discord profile unavailable">Accept offer</span>'
-        );
-      }
-      if (wanting.lookingForOffers) {
-        actions.push(
-          '<button type="button" class="lt-post__counter" disabled title="Coming soon">Counter-offer</button>'
-        );
-      }
+    if (profileUrl) {
+      actions.push(
+        '<a class="lt-post__accept" href="' +
+          escapeAttr(profileUrl) +
+          '" target="_blank" rel="noopener noreferrer">Accept offer</a>'
+      );
+    } else {
+      actions.push(
+        '<span class="lt-post__accept lt-post__accept--disabled" title="Discord profile unavailable">Accept offer</span>'
+      );
     }
+    if (wanting.lookingForOffers) {
+      actions.push(
+        '<button type="button" class="lt-post__counter" disabled title="Coming soon">Counter-offer</button>'
+      );
+    }
+    if (!actions.length) return "";
+    return '<div class="lt-post__actions">' + actions.join("") + "</div>";
+  }
 
-    var deleteBtn = own
-      ? '<button type="button" class="lt-post__delete" data-delete="' +
-        escapeAttr(post.id) +
-        '">Delete</button>'
-      : "";
+  function postMetaHtml(post) {
+    var actions = postActionsHtml(post);
+    return (
+      '<div class="lt-post__meta">' +
+      '<div class="lt-post__summary">' +
+      '<p class="lt-post__summary-label">Post Summary</p>' +
+      postSummaryHtml(post) +
+      "</div>" +
+      (actions || "") +
+      "</div>"
+    );
+  }
 
-    if (!actions.length && !deleteBtn) return "";
-
+  function postFootHtml(post) {
+    if (!isOwnPost(post)) return "";
     return (
       '<div class="lt-post__foot">' +
-      (deleteBtn
-        ? '<div class="lt-post__foot-left">' + deleteBtn + "</div>"
-        : '<div class="lt-post__foot-left"></div>') +
-      (actions.length
-        ? '<div class="lt-post__actions">' + actions.join("") + "</div>"
-        : "") +
+      '<button type="button" class="lt-post__delete" data-delete="' +
+      escapeAttr(post.id) +
+      '">Delete</button>' +
       "</div>"
     );
   }
