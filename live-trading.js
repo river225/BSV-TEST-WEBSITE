@@ -586,6 +586,9 @@
     if (gate) gate.hidden = true;
     if (workspace) workspace.hidden = false;
     loadCatalog();
+    // Session can arrive after the first posts paint — force a redraw so Delete / owner UI appear.
+    lastRenderedPostIds = "";
+    if (postsCache.length) renderFeed({ force: true });
     fetchPosts({ force: true });
     startPostsPolling();
     syncLiveTradingBoardHeight();
@@ -1651,11 +1654,28 @@
     if (pop) pop.hidden = true;
   }
 
+  function feedRenderKey(posts) {
+    var ids = (posts || [])
+      .map(function (p) {
+        return p && p.id ? String(p.id) : "";
+      })
+      .join(",");
+    // Include viewer identity so Delete/owner UI re-render when login finishes after posts load.
+    return (
+      sessionDiscordId() +
+      "|" +
+      (isLiveTradingAdmin() ? "a" : "") +
+      "|" +
+      ids
+    );
+  }
+
   function renderFeed(opts) {
     opts = opts || {};
     var feed = document.getElementById("lt-feed");
     if (!feed) return;
     var posts = readPosts().filter(postMatchesFilters);
+    var key = feedRenderKey(posts);
     var ids = posts
       .map(function (p) {
         return p && p.id ? String(p.id) : "";
@@ -1672,13 +1692,14 @@
         "</p>";
       return;
     }
-    if (ids === lastRenderedPostIds && feed.querySelector(".lt-post")) {
+    if (!opts.force && key === lastRenderedPostIds && feed.querySelector(".lt-post")) {
       if (opts.preferTop) feed.scrollTop = 0;
       return;
     }
-    var prevIds = lastRenderedPostIds ? lastRenderedPostIds.split(",") : [];
+    var prevKey = lastRenderedPostIds || "";
+    var prevIds = prevKey.indexOf("|") !== -1 ? prevKey.split("|").pop().split(",") : [];
     var hadPosts = prevIds.length > 0 && prevIds[0] !== "";
-    lastRenderedPostIds = ids;
+    lastRenderedPostIds = key;
     feed.innerHTML = posts
       .map(function (post) {
         var isNew = hadPosts && prevIds.indexOf(String(post.id)) === -1;
