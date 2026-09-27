@@ -17531,24 +17531,24 @@ body.live-trading-page .live-trading-workspace {
 .lt-item-pop__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.72);
+  background: #000;
 }
 .lt-icard--pop {
   position: relative;
   z-index: 1;
   flex: 0 0 auto;
-  width: min(72vw, 280px);
-  height: min(92vw, 360px);
+  width: min(58vw, 220px);
+  height: min(74vw, 284px);
   cursor: default;
   box-shadow: 0 28px 70px rgba(0, 0, 0, 0.6);
 }
 .lt-icard--pop .lt-icard__art {
-  padding: 18px 12px 8px;
+  padding: 14px 10px 6px;
 }
 .lt-icard--pop .lt-icard__art img,
 .lt-icard--pop .lt-icard__ph {
-  max-height: 220px;
-  width: 86%;
+  max-height: 168px;
+  width: 84%;
 }
 .lt-icard--pop .lt-icard__bar {
   gap: 4px;
