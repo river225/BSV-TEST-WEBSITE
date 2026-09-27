@@ -447,13 +447,13 @@
 
   function ensureLoginModal() {
     var existing = document.getElementById("bsv-login-modal");
-    if (existing && existing.getAttribute("data-bsv-login-v") === "5") return;
+    if (existing && existing.getAttribute("data-bsv-login-v") === "6") return;
     if (existing) existing.remove();
 
     var wrap = document.createElement("div");
     wrap.className = "bsv-login-modal";
     wrap.id = "bsv-login-modal";
-    wrap.setAttribute("data-bsv-login-v", "5");
+    wrap.setAttribute("data-bsv-login-v", "6");
     wrap.hidden = true;
     wrap.innerHTML =
       '<div class="bsv-login-modal__backdrop" id="bsv-login-backdrop"></div>' +
@@ -479,16 +479,11 @@
             '<div class="bsv-login-step__body">' +
               '<p class="bsv-login-step__eyebrow">Step 2</p>' +
               '<h3 class="bsv-login-step__title">Join our Discord</h3>' +
-              '<p class="bsv-login-step__copy" id="bsv-login-guild-copy">' +
-                "You must be in the BlockSpin Values Discord server to create or interact with Live Trading posts. Join, then check again." +
-              "</p>" +
+              '<p class="bsv-login-step__copy" id="bsv-login-guild-copy">Required to create and interact with trades.</p>' +
               '<p class="bsv-login-step__status" id="bsv-login-guild-status"></p>' +
               '<a class="bsv-login-step__btn bsv-login-step__btn--discord" id="bsv-login-guild-join" href="' +
                 escapeAttr(DISCORD_INVITE_FALLBACK) +
                 '" target="_blank" rel="noopener noreferrer">Join Discord server</a>' +
-              '<button type="button" class="bsv-login-step__btn bsv-login-step__btn--secondary" id="bsv-login-guild-recheck">' +
-                "I’ve joined — check again" +
-              "</button>" +
             "</div>" +
           "</div>" +
         "</div>" +
@@ -498,21 +493,27 @@
     var closeBtn = document.getElementById("bsv-login-close");
     var backdrop = document.getElementById("bsv-login-backdrop");
     var discordBtn = document.getElementById("bsv-login-discord-btn");
-    var recheckBtn = document.getElementById("bsv-login-guild-recheck");
 
     if (closeBtn) closeBtn.addEventListener("click", closeLoginModal);
     if (backdrop) backdrop.addEventListener("click", closeLoginModal);
     if (discordBtn) discordBtn.addEventListener("click", startDiscordLogin);
-    if (recheckBtn) {
-      recheckBtn.addEventListener("click", function () {
-        syncLoginModal(currentSession(), { forceGuildCheck: true });
-      });
-    }
 
     if (!window.__bsvLoginEscBound) {
       window.__bsvLoginEscBound = true;
       document.addEventListener("keydown", function (e) {
         if (e.key === "Escape") closeLoginModal();
+      });
+      // After they join in Discord and return to this tab, re-check membership.
+      window.addEventListener("focus", function () {
+        var modal = document.getElementById("bsv-login-modal");
+        if (!modal || modal.hidden || !loginRequiresGuild() || !currentSession().ready) return;
+        syncLoginModal(currentSession(), { forceGuildCheck: true });
+      });
+      document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState !== "visible") return;
+        var modal = document.getElementById("bsv-login-modal");
+        if (!modal || modal.hidden || !loginRequiresGuild() || !currentSession().ready) return;
+        syncLoginModal(currentSession(), { forceGuildCheck: true });
       });
     }
   }
@@ -599,8 +600,8 @@
       if (guildStatus) {
         guildStatus.textContent =
           membership.error === "check_failed" || membership.error === "checker_unavailable"
-            ? "Couldn’t verify membership. Join the server, then check again."
-            : "Join the server to continue.";
+            ? "Couldn’t verify yet — join, then come back here."
+            : "";
       }
       // Keep / reopen the login modal on the join step (header login never sets this purpose).
       if (modal) {

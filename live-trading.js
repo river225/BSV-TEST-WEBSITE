@@ -356,9 +356,7 @@
     var url = inviteUrl || guildMemberCache.inviteUrl || DISCORD_INVITE_FALLBACK;
     if (link) link.href = url;
     if (body) {
-      body.textContent =
-        message ||
-        "You must be in the BlockSpin Values Discord server to create or interact with Live Trading posts. Join, then come back and try again.";
+      body.textContent = message || "Required to create and interact with trades.";
     }
     if (modal) {
       modal.hidden = false;
@@ -1162,20 +1160,8 @@
     }
     var joinClose = document.getElementById("lt-join-discord-close");
     var joinBackdrop = document.getElementById("lt-join-discord-backdrop");
-    var joinRecheck = document.getElementById("lt-join-discord-recheck");
     if (joinClose) joinClose.addEventListener("click", hideJoinDiscordPrompt);
     if (joinBackdrop) joinBackdrop.addEventListener("click", hideJoinDiscordPrompt);
-    if (joinRecheck) {
-      joinRecheck.addEventListener("click", function () {
-        checkGuildMembership(true).then(function (data) {
-          if (data.inGuild) {
-            hideJoinDiscordPrompt();
-            return;
-          }
-          showJoinDiscordPrompt(data.inviteUrl);
-        });
-      });
-    }
     if (closeCreate) {
       closeCreate.addEventListener("click", function () {
         setComposerOpen(false);
