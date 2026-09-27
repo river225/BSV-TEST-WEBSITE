@@ -325,6 +325,27 @@
     return '<a href="' + href + '"' + cls + ">" + label + "</a>";
   }
 
+  function navLiveTradingLink(activeKey) {
+    var cls =
+      "nav-live-trading-link" +
+      (activeKey === "live-trading" ? " nav-link--active" : "");
+    return (
+      '<a href="' +
+      sitePath("live-trading.html") +
+      '" class="' +
+      cls +
+      '" aria-label="Live Trading">' +
+      '<span class="nav-live-trading-link__icon" aria-hidden="true">' +
+      '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">' +
+      '<path d="M3 7h13"/><path d="M13 3l4 4-4 4"/>' +
+      '<path d="M21 17H8"/><path d="M11 13l-4 4 4 4"/>' +
+      "</svg>" +
+      "</span>" +
+      '<span class="nav-live-trading-link__label">Live Trading</span>' +
+      "</a>"
+    );
+  }
+
   function ensureSponsorBannerStyles() {
     var old = document.getElementById("bsv-sponsor-banner-styles-v2");
     if (old) old.remove();
@@ -546,6 +567,7 @@
               navLink(sitePath("x-about.html"), "About Us", activePage, "about") +
               navLink(sitePath("sponsors/"), "Sponsors", activePage, "sponsors") +
               navLink(sitePath("x-faq.html"), "FAQ", activePage, "faq") +
+              navLiveTradingLink(activePage) +
             "</div>" +
             search +
             '<div class="nav-right">' +
@@ -565,6 +587,8 @@
           navLink(sitePath("sponsors/"), "Sponsors", activePage, "sponsors") +
           '<span class="header-subnav__sep" aria-hidden="true">·</span>' +
           navLink(sitePath("x-faq.html"), "FAQ", activePage, "faq") +
+          '<span class="header-subnav__sep" aria-hidden="true">·</span>' +
+          navLink(sitePath("live-trading.html"), "Live Trading", activePage, "live-trading") +
         "</nav>" +
         '<div class="nav-mobile-toolbar is-active" aria-label="Mobile shortcuts"></div>' +
       "</div>"

@@ -499,15 +499,36 @@ function buildCardsHtmlWithDiscordPromo(items, cardBuilder, sectionTitle, minIte
   return parts.join("");
 }
 
+function homeLiveTradingHref() {
+  return typeof window.bsvSitePath === "function"
+    ? window.bsvSitePath("live-trading.html")
+    : "live-trading.html";
+}
+
+function buildHomeLiveTradingPromoHtml() {
+  return (
+    '<a class="home-lt-promo" href="' + homeLiveTradingHref() + '" aria-label="Live Trading">' +
+      '<span class="home-lt-promo__glow" aria-hidden="true"></span>' +
+      '<span class="home-lt-promo__kicker">Open now</span>' +
+      '<span class="home-lt-promo__title">Live Trading</span>' +
+      '<span class="home-lt-promo__text">Drop offers. Find what you need.</span>' +
+      '<span class="home-lt-promo__cta">Start Trading →</span>' +
+    "</a>"
+  );
+}
+
 function mountHomeDiscordPromo() {
   var slot = document.getElementById("home-discord-promo-slot");
   if (!slot) return;
   slot.outerHTML =
     '<div class="home-hero-row">' +
+      '<div class="home-hero-row__stats" id="home-site-stats-slot"></div>' +
       '<div class="home-hero-row__banner">' +
         buildDiscordPromoBannerHtml(false) +
       "</div>" +
-      '<div class="home-hero-row__stats" id="home-site-stats-slot"></div>' +
+      '<div class="home-hero-row__lt">' +
+        buildHomeLiveTradingPromoHtml() +
+      "</div>" +
     "</div>";
   mountHomeSiteStats();
 }
