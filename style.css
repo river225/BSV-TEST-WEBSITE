@@ -6390,6 +6390,9 @@ background-attachment: fixed;
   display: flex;
   flex-direction: column;
   gap: 4px;
+}.nav-icon-menu__panel[hidden],
+.nav-icon-menu__extras[hidden] {
+  display: none !important;
 }.nav-icon-menu__item {
   appearance: none;
   width: 100%;
