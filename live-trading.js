@@ -32,6 +32,7 @@
     lookingForOffers: false,
     notLookingForOffers: false
   };
+  var editingPostId = null;
   var pickerSide = "giving";
   var searchScope = "all";
   var LT_OWNER_DISCORD_ID = "1163614455616245780";
@@ -290,6 +291,10 @@
 
   function canDeletePost(post) {
     return isOwnPost(post) || isLiveTradingAdmin();
+  }
+
+  function canEditPost(post) {
+    return isOwnPost(post);
   }
 
   function isSiteOwnerAuthor(author) {
@@ -652,13 +657,25 @@
   }
 
   /* —— Composer / picker / feed —— */
+  function syncComposerModeUi() {
+    var title = document.querySelector(".lt-composer__title");
+    var submit = document.getElementById("lt-submit-post");
+    var editing = !!editingPostId;
+    if (title) title.textContent = editing ? "Edit trade post" : "New trade post";
+    if (submit) submit.textContent = editing ? "Save changes" : "Post trade";
+  }
+
   function setComposerOpen(open) {
     var composer = document.getElementById("lt-composer");
     if (!composer) return;
     composer.hidden = !open;
     if (open) {
+      syncComposerModeUi();
       renderDraftGrids();
       clearComposerError();
+    } else {
+      editingPostId = null;
+      syncComposerModeUi();
     }
     requestAnimationFrame(syncLiveTradingBoardHeight);
   }
@@ -1017,12 +1034,79 @@
       lookingForOffers: false,
       notLookingForOffers: false
     };
+    editingPostId = null;
     var gc = document.getElementById("lt-giving-cash");
     var wc = document.getElementById("lt-wanting-cash");
     if (gc) gc.value = "";
     if (wc) wc.value = "";
+    syncComposerModeUi();
     renderDraftGrids();
     clearComposerError();
+    setTagRequiredHint(false);
+  }
+
+  function cloneDraftItems(side) {
+    var items = side && Array.isArray(side.items) ? side.items : [];
+    return items.map(function (it) {
+      var entry = {
+        id: it.id,
+        name: it.name,
+        rarity: it.rarity,
+        color: it.color,
+        image: it.image || "",
+        qty: Math.max(1, Math.min(MAX_DRAFT_QTY, Number(it.qty) || 1))
+      };
+      if (itemHasDurability(it)) {
+        var max = Math.max(1, Number(it.maxDurability) || 1);
+        entry.maxDurability = max;
+        entry.durability = Math.max(
+          0,
+          Math.min(max, Number(it.durability) || max)
+        );
+      }
+      return entry;
+    });
+  }
+
+  function loadDraftFromPost(post) {
+    var giving = post && post.giving ? post.giving : {};
+    var wanting = post && post.wanting ? post.wanting : {};
+    draft = {
+      giving: cloneDraftItems(giving),
+      wanting: cloneDraftItems(wanting),
+      givingCash: Math.max(0, Math.floor(Number(giving.cash) || 0)),
+      wantingCash: Math.max(0, Math.floor(Number(wanting.cash) || 0)),
+      lookingForOffers: !!wanting.lookingForOffers,
+      notLookingForOffers: !!wanting.notLookingForOffers
+    };
+    var gc = document.getElementById("lt-giving-cash");
+    var wc = document.getElementById("lt-wanting-cash");
+    if (gc) gc.value = draft.givingCash ? String(draft.givingCash) : "";
+    if (wc) wc.value = draft.wantingCash ? String(draft.wantingCash) : "";
+    setTagRequiredHint(false);
+    clearComposerError();
+    renderDraftGrids();
+  }
+
+  function startEditPost(id) {
+    var postId = String(id || "").trim();
+    if (!postId) return;
+    var post = null;
+    for (var i = 0; i < postsCache.length; i++) {
+      if (postsCache[i] && String(postsCache[i].id) === postId) {
+        post = postsCache[i];
+        break;
+      }
+    }
+    if (!post || !canEditPost(post)) return;
+    editingPostId = post.id;
+    loadDraftFromPost(post);
+    setComposerOpen(true);
+    loadCatalog();
+    var composer = document.getElementById("lt-composer");
+    if (composer && typeof composer.scrollIntoView === "function") {
+      composer.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
 
   function openPicker(side) {
@@ -1203,8 +1287,14 @@
 
     var headers = authHeaders();
     headers["Content-Type"] = "application/json";
-    fetch(authApiUrl("api/live-trading/posts"), {
-      method: "POST",
+    var editingId = editingPostId ? String(editingPostId) : "";
+    var url = editingId
+      ? authApiUrl(
+          "api/live-trading/posts/" + encodeURIComponent(editingId)
+        )
+      : authApiUrl("api/live-trading/posts");
+    fetch(url, {
+      method: editingId ? "PATCH" : "POST",
       headers: headers,
       body: JSON.stringify(payload)
     })
@@ -1231,19 +1321,33 @@
             clearComposerError();
             return;
           }
-          showComposerError("Couldn’t post right now. Try again.");
+          if (err === "not_owner" || err === "not_found") {
+            showComposerError("Couldn’t save that post. Try again.");
+            return;
+          }
+          showComposerError(
+            editingId
+              ? "Couldn’t save changes right now. Try again."
+              : "Couldn’t post right now. Try again."
+          );
           return;
         }
         if (out.data && out.data.post) {
-          postsCache = [out.data.post].concat(
-            postsCache.filter(function (p) {
-              return p && p.id !== out.data.post.id;
-            })
-          );
+          if (editingId) {
+            postsCache = postsCache.map(function (p) {
+              return p && p.id === out.data.post.id ? out.data.post : p;
+            });
+          } else {
+            postsCache = [out.data.post].concat(
+              postsCache.filter(function (p) {
+                return p && p.id !== out.data.post.id;
+              })
+            );
+          }
         }
         resetDraft();
         setComposerOpen(false);
-        renderFeed({ preferTop: true });
+        renderFeed({ preferTop: !editingId, force: true });
         // Refresh from server shortly after so other clients stay in sync;
         // generation guard prevents a slower in-flight fetch from wiping this post.
         setTimeout(function () {
@@ -1713,12 +1817,21 @@
   }
 
   function postFootHtml(post) {
-    if (!canDeletePost(post)) return "";
+    var own = canEditPost(post);
+    var canDel = canDeletePost(post);
+    if (!own && !canDel) return "";
     return (
       '<div class="lt-post__foot">' +
-      '<button type="button" class="lt-post__delete" data-delete="' +
-      escapeAttr(post.id) +
-      '">Delete</button>' +
+      (own
+        ? '<button type="button" class="lt-post__edit" data-edit="' +
+          escapeAttr(post.id) +
+          '">Edit</button>'
+        : "") +
+      (canDel
+        ? '<button type="button" class="lt-post__delete" data-delete="' +
+          escapeAttr(post.id) +
+          '">Delete</button>'
+        : "") +
       "</div>"
     );
   }
@@ -1910,6 +2023,7 @@
       openCreate.addEventListener("click", function () {
         requireLoginForAction().then(function (ok) {
           if (!ok) return;
+          resetDraft();
           setComposerOpen(true);
           loadCatalog();
         });
@@ -1930,6 +2044,7 @@
     });
     if (closeCreate) {
       closeCreate.addEventListener("click", function () {
+        resetDraft();
         setComposerOpen(false);
       });
     }
@@ -1991,6 +2106,11 @@
           dura: itemCard.getAttribute("data-dura") || "",
           repair: itemCard.getAttribute("data-repair")
         });
+        return;
+      }
+      var edit = e.target.closest && e.target.closest("[data-edit]");
+      if (edit) {
+        startEditPost(edit.getAttribute("data-edit"));
         return;
       }
       var del = e.target.closest && e.target.closest("[data-delete]");

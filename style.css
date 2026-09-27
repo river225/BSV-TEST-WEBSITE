@@ -17015,6 +17015,19 @@ body.live-trading-page .live-trading-workspace {
   font-size: 0.75rem;
   font-weight: 650;
 }
+.lt-post__edit {
+  appearance: none;
+  border: 1px solid rgba(96, 165, 250, 0.45);
+  border-radius: 8px;
+  padding: 8px 14px;
+  background: rgba(30, 64, 175, 0.28);
+  color: #bfdbfe;
+  font: 700 0.78rem/1 system-ui, sans-serif;
+  cursor: pointer;
+}
+.lt-post__edit:hover {
+  filter: brightness(1.08);
+}
 .lt-post__delete {
   appearance: none;
   border: 1px solid rgba(248, 113, 113, 0.35);
@@ -17024,6 +17037,9 @@ body.live-trading-page .live-trading-workspace {
   color: #fecaca;
   font: 700 0.78rem/1 system-ui, sans-serif;
   cursor: pointer;
+}
+.lt-post__delete:hover {
+  filter: brightness(1.08);
 }
 .lt-post__trade {
   display: grid;
@@ -17524,6 +17540,8 @@ body.live-trading-page .live-trading-workspace {
 .lt-post__foot {
   display: flex;
   justify-content: flex-start;
+  align-items: center;
+  gap: 8px;
   margin-top: 10px;
   padding-top: 2px;
 }
