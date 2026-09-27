@@ -1688,7 +1688,9 @@
   function feedRenderKey(posts) {
     var ids = (posts || [])
       .map(function (p) {
-        return p && p.id ? String(p.id) : "";
+        if (!p || !p.id) return "";
+        // Include scammer flag so role grant/removal refreshes badges without a hard reload.
+        return String(p.id) + (p.author && p.author.scammer ? ":s" : "");
       })
       .join(",");
     // Include viewer identity so Delete/owner UI re-render when login finishes after posts load.
