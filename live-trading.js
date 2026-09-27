@@ -397,18 +397,6 @@
     );
   }
 
-  function isCommunityStaffAuthor(author) {
-    return !!(author && author.communityStaff);
-  }
-
-  function communityStaffBadgeHtml() {
-    return (
-      '<span class="lt-post__staff-tag" data-lt-tip="Community Staff" aria-label="Community Staff" role="img">' +
-      '<img class="lt-post__staff-icon" src="assets/community-staff-shield.png" alt="" width="22" height="22" decoding="async" />' +
-      "</span>"
-    );
-  }
-
   function authorDisplayName(author) {
     author = author || {};
     return (
@@ -2168,7 +2156,6 @@
   function authorBadgesHtml(author) {
     var badges = [];
     if (isSiteOwnerAuthor(author)) badges.push(ownerBadgeHtml());
-    if (isCommunityStaffAuthor(author)) badges.push(communityStaffBadgeHtml());
     if (isTrustedTraderAuthor(author)) badges.push(trustedTraderBadgeHtml());
     if (isScammerAuthor(author)) badges.push(scammerBadgeHtml());
     return badges.join("");
@@ -2255,8 +2242,7 @@
         return (
           String(p.id) +
           (p.author && p.author.scammer ? ":s" : "") +
-          (p.author && p.author.trustedTrader ? ":t" : "") +
-          (p.author && p.author.communityStaff ? ":c" : "")
+          (p.author && p.author.trustedTrader ? ":t" : "")
         );
       })
       .join(",");
