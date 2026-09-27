@@ -891,7 +891,7 @@
     }
     if (!draft.lookingForOffers && !draft.notLookingForOffers) {
       setTagRequiredHint(true);
-      showComposerError("Select a tag: Looking for offers or Not looking for offers.");
+      clearComposerError();
       return;
     }
     setTagRequiredHint(false);
@@ -954,9 +954,7 @@
           }
           if (err === "tag_required") {
             setTagRequiredHint(true);
-            showComposerError(
-              "Select a tag: Looking for offers or Not looking for offers."
-            );
+            clearComposerError();
             return;
           }
           showComposerError("Couldn’t post right now. Try again.");
