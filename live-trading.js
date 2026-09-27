@@ -404,7 +404,7 @@
   function communityStaffBadgeHtml() {
     return (
       '<span class="lt-post__staff-tag" data-lt-tip="Community Staff" aria-label="Community Staff" role="img">' +
-      '<img class="lt-post__staff-icon" src="assets/community-staff-shield.png" alt="" width="18" height="18" decoding="async" />' +
+      '<img class="lt-post__staff-icon" src="assets/community-staff-shield.png" alt="" width="22" height="22" decoding="async" />' +
       "</span>"
     );
   }

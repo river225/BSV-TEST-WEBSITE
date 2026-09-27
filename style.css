@@ -17134,8 +17134,8 @@ body.live-trading-page .live-trading-workspace {
   display: none;
 }
 .lt-post__staff-icon {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   display: block;
   object-fit: contain;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
