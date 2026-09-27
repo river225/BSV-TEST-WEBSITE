@@ -359,7 +359,7 @@
     "Live Trading",
     "Money & Game Guide",
     "Untradeable Items",
-    "💰 Richest Players",
+    "Richest Players",
     "Crew Logos"
   ];
   var DISCORD_INVITE = "https://discord.gg/QbapryYUUx";
@@ -389,12 +389,11 @@
       );
     }).join("");
     var extras = VALUE_LIST_EXTRAS.map(function (title) {
-      var label = title === "💰 Richest Players" ? "Richest Players" : title;
       return (
         '<button type="button" class="nav-icon-menu__item nav-icon-menu__item--sub" data-section-go="' +
         title.replace(/"/g, "&quot;") +
         '">' +
-        label +
+        title +
         "</button>"
       );
     }).join("");
@@ -461,12 +460,11 @@
       );
     }).join("");
     var extras = VALUE_LIST_EXTRAS.map(function (title) {
-      var label = title === "💰 Richest Players" ? "Richest Players" : title;
       return (
         '<button type="button" class="bsv-value-list-modal__item" data-section-go="' +
         title.replace(/"/g, "&quot;") +
         '">' +
-        label +
+        title +
         "</button>"
       );
     }).join("");

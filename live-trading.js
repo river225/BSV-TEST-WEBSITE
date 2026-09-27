@@ -518,9 +518,19 @@
       var btn = document.createElement("button");
       btn.type = "button";
       btn.dataset.section = cfg.title;
-      btn.textContent = i18nSection(cfg.title);
       if (cfg.id === "live-trading") {
         btn.classList.add("nav-live-trading", "active");
+        var ltLabel = document.createElement("span");
+        ltLabel.className = "nav-live-trading__label";
+        ltLabel.textContent = i18nSection(cfg.title);
+        var ltNew = document.createElement("span");
+        ltNew.className = "nav-live-trading__new";
+        ltNew.setAttribute("aria-hidden", "true");
+        ltNew.textContent = "NEW";
+        btn.appendChild(ltLabel);
+        btn.appendChild(ltNew);
+      } else {
+        btn.textContent = i18nSection(cfg.title);
       }
       btn.addEventListener("click", function () {
         closeSectionsMenu();

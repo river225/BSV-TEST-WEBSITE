@@ -3,7 +3,7 @@ const SECTION_NAMES = typeof getSectionTitles === "function" ? getSectionTitles(
 
 const GA_MEASUREMENT_ID = "G-0T25993BCC";
 const ACCESSORIES_SECTION_NAME = "Untradeable Items";
-const RICHEST_SECTION_NAME = "💰 Richest Players";
+const RICHEST_SECTION_NAME = "Richest Players";
 const MONEY_GAME_GUIDE_SECTION = "Money & Game Guide";
 const MONEY_GUIDE_SHEETS = {
   fishingItems: "Fishing Item",
@@ -163,8 +163,12 @@ function resolveHashSectionRequest() {
   }
   var requested = decodeURIComponent(window.location.hash.substring(5));
   if (requested === "Uncommon") requested = "Common / Uncommon";
-  if (requested === "richest-players" || requested === "Richest Players") {
-    requested = "💰 Richest Players";
+  if (
+    requested === "richest-players" ||
+    requested === "Richest Players" ||
+    requested === "💰 Richest Players"
+  ) {
+    requested = "Richest Players";
   }
   if (requested === "live-trading" || requested === "Live Trading") {
     return { redirectLiveTrading: true };
@@ -679,7 +683,7 @@ function countTrackedItemsFromResults(results) {
     var cfg = typeof getSectionConfig === "function" ? getSectionConfig(result.section) : null;
     if (cfg) {
       if (cfg.dataSource !== "sheet") return;
-    } else if (result.section === "Home" || result.section === "\uD83D\uDCB0 Richest Players") {
+    } else if (result.section === "Home" || result.section === "Richest Players" || result.section === "💰 Richest Players") {
       return;
     }
     if (result.section === ACCESSORIES_SECTION_NAME) {
@@ -729,7 +733,13 @@ function buildRobuxGiveawayBannerHtml(bannerId) {
 function normalizeSectionNameForAnalytics(sectionName) {
   var name = sectionName || "Home";
   if (name === "Untradable Items") return ACCESSORIES_SECTION_NAME;
-  if (name === "Richest Players" || name === "richest-players") return "💰 Richest Players";
+  if (
+    name === "Richest Players" ||
+    name === "richest-players" ||
+    name === "💰 Richest Players"
+  ) {
+    return "Richest Players";
+  }
   return name;
 }
 
@@ -3155,7 +3165,7 @@ function renderSection(title, items) {
     return;
   }
 
-  if (title === "💰 Richest Players") {
+  if (title === "Richest Players") {
     renderRichestPlayersSection(items);
   } else if (title === "Crew Logos") {
     renderCrewLogosSection(items);
@@ -3676,7 +3686,7 @@ function renderScammerSection(items) {
 
 
  function renderRichestPlayersSection(items) {
-  const sectionId = slugify("💰 Richest Players");
+  const sectionId = slugify("Richest Players");
   const html = `
     <section class="section richest-players-section" id="${sectionId}">
       <a href="#" class="richest-back-to-top" id="richest-back-to-top" hidden aria-label="${escapeAttr(i18n("richest.backToTop"))}">
@@ -3756,9 +3766,25 @@ function initSectionsNav() {
 
     const btn = document.createElement("button");
     btn.dataset.section = name;
-    btn.textContent = i18nSection(name);
     if (cfg && cfg.id === "live-trading") {
       btn.classList.add("nav-live-trading");
+      var ltLabel = document.createElement("span");
+      ltLabel.className = "nav-live-trading__label";
+      ltLabel.textContent = i18nSection(name);
+      var ltNew = document.createElement("span");
+      ltNew.className = "nav-live-trading__new";
+      ltNew.setAttribute("aria-hidden", "true");
+      ltNew.textContent = "NEW";
+      btn.appendChild(ltLabel);
+      btn.appendChild(ltNew);
+      if (
+        document.body.classList.contains("live-trading-page") ||
+        document.body.getAttribute("data-bsv-page") === "live-trading"
+      ) {
+        btn.classList.add("active");
+      }
+    } else {
+      btn.textContent = i18nSection(name);
     }
     btn.addEventListener("click", function () {
       if (cfg && cfg.pageHref) {
@@ -3918,10 +3944,10 @@ function setHeaderSearchVisible(visible) {
 }
 
 function shouldUseMobileSectionSearch(sectionName) {
-  if (sectionName === "💰 Richest Players") return false;
+  if (sectionName === "Richest Players") return false;
   const cfg = typeof getSectionConfig === "function" ? getSectionConfig(sectionName) : null;
   if (cfg) return cfg.mobileSearchInSection === true;
-  const hiddenSearchSections = ["Home", "Crew Logos", "Crate Game", "💰 Richest Players", ACCESSORIES_SECTION_NAME];
+  const hiddenSearchSections = ["Home", "Crew Logos", "Crate Game", "Richest Players", ACCESSORIES_SECTION_NAME];
   return !hiddenSearchSections.includes(sectionName);
 }
 
@@ -3933,7 +3959,7 @@ function isHeaderSearchVisibleForSection(sectionName) {
     }
     return cfg.search !== "hide";
   }
-  const hiddenSearchSections = ["Home", "Crew Logos", "Crate Game", "💰 Richest Players", ACCESSORIES_SECTION_NAME];
+  const hiddenSearchSections = ["Home", "Crew Logos", "Crate Game", "Richest Players", ACCESSORIES_SECTION_NAME];
   return !hiddenSearchSections.includes(sectionName);
 }
 

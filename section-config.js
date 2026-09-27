@@ -183,7 +183,7 @@
       moneyGuideFastNav: false,
     },
     {
-      title: "💰 Richest Players",
+      title: "Richest Players",
       id: "richest-players",
       navGroup: "extras",
       dataSource: "richest",
