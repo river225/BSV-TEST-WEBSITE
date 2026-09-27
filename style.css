@@ -16939,26 +16939,102 @@ body.live-trading-page .live-trading-workspace {
   );
 }
 .lt-post__swap {
+  --lt-swap: #7ee7ff;
   position: relative;
   z-index: 1;
   display: inline-flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0;
-  width: 36px;
-  height: 44px;
+  gap: 5px;
+  width: 40px;
+  height: 48px;
+  padding: 8px 6px;
+  box-sizing: border-box;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: #152030;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-  color: #e2e8f0;
+  border: 1px solid rgba(126, 231, 255, 0.35);
+  background:
+    radial-gradient(120% 100% at 50% 20%, rgba(126, 231, 255, 0.18), transparent 65%),
+    linear-gradient(180deg, #1a2c40 0%, #101925 100%);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.35) inset,
+    0 6px 16px rgba(0, 0, 0, 0.4),
+    0 0 18px rgba(51, 204, 230, 0.18);
+  color: var(--lt-swap);
+  overflow: hidden;
 }
-.lt-post__swap-h {
+.lt-post__swap-glow {
+  position: absolute;
+  inset: -30%;
+  background: radial-gradient(circle at 50% 50%, rgba(126, 231, 255, 0.22), transparent 58%);
+  animation: lt-swap-glow 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
+.lt-post__swap-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  line-height: 0;
+}
+.lt-post__swap-row--out {
+  justify-content: flex-start;
+  animation: lt-swap-out 1.8s ease-in-out infinite;
+}
+.lt-post__swap-row--in {
+  justify-content: flex-end;
+  animation: lt-swap-in 1.8s ease-in-out infinite;
+}
+.lt-post__swap-arrow {
+  width: 22px;
+  height: 10px;
   display: block;
-  font-size: 0.95rem;
-  font-weight: 900;
-  line-height: 1;
+  filter: drop-shadow(0 0 4px rgba(126, 231, 255, 0.55));
+}
+@keyframes lt-swap-out {
+  0%,
+  100% {
+    transform: translateX(-3px);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateX(3px);
+    opacity: 1;
+  }
+}
+@keyframes lt-swap-in {
+  0%,
+  100% {
+    transform: translateX(3px);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateX(-3px);
+    opacity: 1;
+  }
+}
+@keyframes lt-swap-glow {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lt-post__swap-glow,
+  .lt-post__swap-row--out,
+  .lt-post__swap-row--in {
+    animation: none;
+  }
+  .lt-post__swap-row--out,
+  .lt-post__swap-row--in {
+    opacity: 0.9;
+    transform: none;
+  }
 }
 .lt-post__side-pill {
   align-self: center;

@@ -1405,9 +1405,18 @@
       "</div></div>" +
       '<div class="lt-post__divider" aria-hidden="true">' +
       '<span class="lt-post__divider-line"></span>' +
-      '<span class="lt-post__swap">' +
-      '<span class="lt-post__swap-h">→</span>' +
-      '<span class="lt-post__swap-h">←</span>' +
+      '<span class="lt-post__swap" title="Trade exchange">' +
+      '<span class="lt-post__swap-glow"></span>' +
+      '<span class="lt-post__swap-row lt-post__swap-row--out">' +
+      '<svg class="lt-post__swap-arrow" viewBox="0 0 24 12" aria-hidden="true">' +
+      '<path d="M2 6h16M13 2l5 4-5 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>' +
+      "</svg>" +
+      "</span>" +
+      '<span class="lt-post__swap-row lt-post__swap-row--in">' +
+      '<svg class="lt-post__swap-arrow" viewBox="0 0 24 12" aria-hidden="true">' +
+      '<path d="M22 6H6M11 2L6 6l5 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>' +
+      "</svg>" +
+      "</span>" +
       "</span>" +
       "</div>" +
       '<div class="lt-post__panel">' +
