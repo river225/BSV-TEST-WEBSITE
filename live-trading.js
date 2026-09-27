@@ -4,6 +4,10 @@
   var SPREADSHEET_ID = "1vAm9x7c5JPxpHxDHVcDgQifXsAvW9iW2wPVuQLENiYs";
   var POSTS_KEY = "bsv-live-trades-v1";
   var EMPTY_SLOT_COUNT = 8;
+  var postsCache = [];
+  var postsFetchInFlight = null;
+  var postsPollTimer = null;
+  var POSTS_POLL_MS = 12000;
   var TRADE_SHEETS = [
     { sheet: "Uncommon", rarity: "Common / Uncommon", color: "#4caf50" },
     { sheet: "Rare", rarity: "Rare", color: "#4a90e2" },
@@ -144,7 +148,7 @@
     return catalogPromise;
   }
 
-  function readPosts() {
+  function readLocalPostsFallback() {
     try {
       var raw = localStorage.getItem(POSTS_KEY);
       var list = raw ? JSON.parse(raw) : [];
@@ -154,10 +158,56 @@
     }
   }
 
-  function writePosts(list) {
-    try {
-      localStorage.setItem(POSTS_KEY, JSON.stringify(list || []));
-    } catch (_) {}
+  function readPosts() {
+    return Array.isArray(postsCache) ? postsCache.slice() : [];
+  }
+
+  function authHeaders() {
+    var token =
+      typeof window.bsvGetAuthToken === "function" ? window.bsvGetAuthToken() : null;
+    var headers = { Accept: "application/json" };
+    if (token) headers.Authorization = "Bearer " + token;
+    return headers;
+  }
+
+  function fetchPosts(opts) {
+    opts = opts || {};
+    if (postsFetchInFlight && !opts.force) return postsFetchInFlight;
+    postsFetchInFlight = fetch(authApiUrl("api/live-trading/posts"), {
+      headers: { Accept: "application/json" },
+      cache: "no-store"
+    })
+      .then(function (res) {
+        return res.json().catch(function () {
+          return null;
+        });
+      })
+      .then(function (data) {
+        if (data && Array.isArray(data.posts)) {
+          postsCache = data.posts;
+        } else if (!postsCache.length) {
+          postsCache = readLocalPostsFallback();
+        }
+        renderFeed();
+        return postsCache;
+      })
+      .catch(function () {
+        if (!postsCache.length) postsCache = readLocalPostsFallback();
+        renderFeed();
+        return postsCache;
+      })
+      .then(function (list) {
+        postsFetchInFlight = null;
+        return list;
+      });
+    return postsFetchInFlight;
+  }
+
+  function startPostsPolling() {
+    if (postsPollTimer) return;
+    postsPollTimer = setInterval(function () {
+      fetchPosts({ force: true });
+    }, POSTS_POLL_MS);
   }
 
   function authorFromSession() {
@@ -457,7 +507,8 @@
     if (gate) gate.hidden = true;
     if (workspace) workspace.hidden = false;
     loadCatalog();
-    renderFeed();
+    fetchPosts({ force: true });
+    startPostsPolling();
     syncLiveTradingBoardHeight();
     return currentSession;
   }
@@ -795,10 +846,7 @@
       return;
     }
 
-    var post = {
-      id: uid(),
-      createdAt: Date.now(),
-      author: authorFromSession(),
+    var payload = {
       giving: {
         items: draft.giving.map(function (e) {
           return {
@@ -829,23 +877,76 @@
       }
     };
 
-    var posts = readPosts();
-    posts.unshift(post);
-    writePosts(posts);
-    resetDraft();
-    setComposerOpen(false);
-    renderFeed();
+    var headers = authHeaders();
+    headers["Content-Type"] = "application/json";
+    fetch(authApiUrl("api/live-trading/posts"), {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(payload)
+    })
+      .then(function (res) {
+        return res.json().catch(function () {
+          return null;
+        }).then(function (data) {
+          return { res: res, data: data };
+        });
+      })
+      .then(function (out) {
+        if (!out.res.ok) {
+          var err = (out.data && out.data.error) || "post_failed";
+          if (err === "guild_required") {
+            openSharedLogin();
+            return;
+          }
+          if (err === "user_limit_reached") {
+            showComposerError("You already have the maximum number of active posts.");
+            return;
+          }
+          showComposerError("Couldn’t post right now. Try again.");
+          return;
+        }
+        if (out.data && out.data.post) {
+          postsCache = [out.data.post].concat(
+            postsCache.filter(function (p) {
+              return p && p.id !== out.data.post.id;
+            })
+          );
+        }
+        resetDraft();
+        setComposerOpen(false);
+        renderFeed();
+        fetchPosts({ force: true });
+      })
+      .catch(function () {
+        showComposerError("Couldn’t reach the server. Try again.");
+      });
   }
 
   function deletePost(id) {
     requireLoginForAction().then(function (ok) {
       if (!ok) return;
-      writePosts(
-        readPosts().filter(function (p) {
-          return p.id !== id;
+      fetch(authApiUrl("api/live-trading/posts/" + encodeURIComponent(id)), {
+        method: "DELETE",
+        headers: authHeaders()
+      })
+        .then(function (res) {
+          if (!res.ok) {
+            return res.json().catch(function () {
+              return null;
+            }).then(function (data) {
+              if (data && data.error === "guild_required") openSharedLogin();
+              throw new Error("delete_failed");
+            });
+          }
+          postsCache = postsCache.filter(function (p) {
+            return p && p.id !== id;
+          });
+          renderFeed();
+          fetchPosts({ force: true });
         })
-      );
-      renderFeed();
+        .catch(function () {
+          fetchPosts({ force: true });
+        });
     });
   }
 
@@ -1228,8 +1329,8 @@
       });
     }
 
-    window.addEventListener("storage", function (e) {
-      if (e.key === POSTS_KEY) renderFeed();
+    window.addEventListener("focus", function () {
+      fetchPosts({ force: true });
     });
   }
 
@@ -1326,6 +1427,8 @@
         syncLiveTradingBoardHeight();
       });
     }
+    fetchPosts({ force: true });
+    startPostsPolling();
     refreshSession();
     requestAnimationFrame(syncLiveTradingBoardHeight);
   }
