@@ -1614,41 +1614,47 @@
 
   function openItemPop(data) {
     var pop = document.getElementById("lt-item-pop");
-    var art = document.getElementById("lt-item-pop-art");
-    var title = document.getElementById("lt-item-pop-title");
-    var dura = document.getElementById("lt-item-pop-dura");
-    var repair = document.getElementById("lt-item-pop-repair");
-    if (!pop) return;
-    if (title) title.textContent = data.name || "Item";
-    if (art) {
-      art.innerHTML = data.image
+    var card = document.getElementById("lt-item-pop-card");
+    if (!pop || !card) return;
+    var name = data.name || "Item";
+    var color = data.color || "#334155";
+    var duraLabel = data.dura || "";
+    var repairHtml = "";
+    if (data.repair !== "" && data.repair != null) {
+      var n = Number(data.repair);
+      repairHtml =
+        '<span class="lt-icard__repair">Repair $' +
+        escapeHtml(
+          Number.isFinite(n) ? n.toLocaleString() : String(data.repair)
+        ) +
+        "</span>";
+    }
+    card.style.setProperty("--lt-card", color);
+    card.style.background =
+      "radial-gradient(120% 90% at 50% 18%," +
+      color +
+      "99,transparent 70%),linear-gradient(180deg," +
+      color +
+      "88,#000 100%)";
+    card.innerHTML =
+      '<div class="lt-icard__art">' +
+      (data.image
         ? '<img src="' +
           escapeAttr(data.image) +
-          '" alt="" width="120" height="120" decoding="async">'
-        : '<span class="lt-item-pop__ph"></span>';
-      if (data.color) art.style.setProperty("--lt-card", data.color);
-    }
-    if (dura) {
-      if (data.dura) {
-        dura.hidden = false;
-        dura.textContent = "Durability " + data.dura;
-      } else {
-        dura.hidden = true;
-        dura.textContent = "";
-      }
-    }
-    if (repair) {
-      if (data.repair !== "" && data.repair != null) {
-        var n = Number(data.repair);
-        repair.hidden = false;
-        repair.textContent =
-          "Repair price: $" +
-          (Number.isFinite(n) ? n.toLocaleString() : String(data.repair));
-      } else {
-        repair.hidden = true;
-        repair.textContent = "";
-      }
-    }
+          '" alt="' +
+          escapeAttr(name) +
+          '" decoding="async">'
+        : '<span class="lt-icard__ph" aria-hidden="true"></span>') +
+      "</div>" +
+      '<div class="lt-icard__bar">' +
+      (duraLabel
+        ? '<span class="lt-icard__dura">' + escapeHtml(duraLabel) + "</span>"
+        : "") +
+      '<span class="lt-icard__name" id="lt-item-pop-title">' +
+      escapeHtml(name) +
+      "</span>" +
+      repairHtml +
+      "</div>";
     pop.hidden = false;
   }
 
