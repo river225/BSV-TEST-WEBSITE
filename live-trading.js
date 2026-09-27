@@ -300,10 +300,10 @@
   function ownerBadgeHtml() {
     return (
       '<span class="lt-post__owner-tag" title="Owner of BlockSpin Values">' +
-      '<svg class="lt-post__owner-icon" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">' +
-      '<path fill="currentColor" d="M5 16l-2-8 5 3 4-6 4 6 5-3-2 8H5zm0 2h14v2H5v-2z"/>' +
+      '<svg class="lt-post__owner-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">' +
+      '<path fill="currentColor" d="M3.5 8.5l3.2 2.1L9.5 5l2.5 5.2L15.5 5l2.8 5.6 3.2-2.1-.9 9.1H4.4L3.5 8.5zM5 19.5h14V21H5v-1.5z"/>' +
       "</svg>" +
-      "<span>Owner of BlockSpin Values</span>" +
+      '<span class="lt-post__owner-text">Owner</span>' +
       "</span>"
     );
   }
@@ -708,6 +708,8 @@
         : '<span class="lt-slot__ph" aria-hidden="true"></span>') +
       (hasDura
         ? '<div class="lt-slot__dura" role="group" aria-label="Durability">' +
+          '<span class="lt-slot__dura-label">Durability</span>' +
+          '<div class="lt-slot__dura-row">' +
           '<button type="button" class="lt-slot__dura-btn" data-side="' +
           side +
           '" data-index="' +
@@ -721,6 +723,7 @@
           '" data-index="' +
           escapeAttr(String(index)) +
           '" data-delta="1" aria-label="Raise durability">+</button>' +
+          "</div>" +
           "</div>"
         : "") +
       "</div>"
@@ -1709,6 +1712,66 @@
     if (opts.preferTop) feed.scrollTop = 0;
   }
 
+  function ensureFloatTip() {
+    var el = document.getElementById("lt-float-tip");
+    if (el) return el;
+    el = document.createElement("div");
+    el.id = "lt-float-tip";
+    el.className = "lt-float-tip";
+    el.hidden = true;
+    document.body.appendChild(el);
+    return el;
+  }
+
+  function hideFloatTip() {
+    var el = document.getElementById("lt-float-tip");
+    if (el) el.hidden = true;
+  }
+
+  function showFloatTip(anchor, text) {
+    text = String(text || "").trim();
+    if (!anchor || !text) {
+      hideFloatTip();
+      return;
+    }
+    var el = ensureFloatTip();
+    el.textContent = text;
+    el.hidden = false;
+    var r = anchor.getBoundingClientRect();
+    var tipW = el.offsetWidth || 200;
+    var tipH = el.offsetHeight || 40;
+    var left = r.left + r.width / 2 - tipW / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - tipW - 8));
+    var top = r.top - tipH - 10;
+    if (top < 8) top = r.bottom + 10;
+    el.style.left = Math.round(left) + "px";
+    el.style.top = Math.round(top) + "px";
+  }
+
+  function bindFloatTips() {
+    document.addEventListener(
+      "pointerover",
+      function (e) {
+        var tipHost = e.target.closest && e.target.closest("[data-lt-tip]");
+        if (!tipHost) return;
+        showFloatTip(tipHost, tipHost.getAttribute("data-lt-tip"));
+      },
+      true
+    );
+    document.addEventListener(
+      "pointerout",
+      function (e) {
+        var tipHost = e.target.closest && e.target.closest("[data-lt-tip]");
+        if (!tipHost) return;
+        var related = e.relatedTarget;
+        if (related && tipHost.contains(related)) return;
+        hideFloatTip();
+      },
+      true
+    );
+    document.addEventListener("scroll", hideFloatTip, true);
+  }
+
   function bindBoardUi() {
     var openCreate = document.getElementById("lt-open-create");
     var closeCreate = document.getElementById("lt-close-create");
@@ -1735,6 +1798,7 @@
     if (joinBackdrop) joinBackdrop.addEventListener("click", hideJoinDiscordPrompt);
     var itemPopBackdrop = document.getElementById("lt-item-pop-backdrop");
     if (itemPopBackdrop) itemPopBackdrop.addEventListener("click", closeItemPop);
+    bindFloatTips();
     document.addEventListener("visibilitychange", function () {
       if (document.hidden && discordAppLaunchTimer) {
         window.clearTimeout(discordAppLaunchTimer);
@@ -1858,7 +1922,7 @@
       return;
     }
     // Stretch well past the sections column so the trade feed feels taller.
-    var EXTRA_BELOW_SECTIONS = 160;
+    var EXTRA_BELOW_SECTIONS = 280;
     var navBottom = nav.getBoundingClientRect().bottom;
     var wrapTop = feedWrap.getBoundingClientRect().top;
     var h = Math.round(navBottom - wrapTop + EXTRA_BELOW_SECTIONS);
