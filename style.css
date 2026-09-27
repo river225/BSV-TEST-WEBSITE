@@ -17712,7 +17712,7 @@ body.live-trading-page .live-trading-workspace {
 .lt-item-pop__backdrop {
   position: absolute;
   inset: 0;
-  background: #000;
+  background: rgba(0, 0, 0, 0.42);
 }
 .lt-icard--pop {
   position: relative;
@@ -17721,6 +17721,7 @@ body.live-trading-page .live-trading-workspace {
   width: min(58vw, 220px);
   height: min(74vw, 284px);
   cursor: default;
+  opacity: 1;
   box-shadow: 0 28px 70px rgba(0, 0, 0, 0.6);
 }
 .lt-icard--pop .lt-icard__art {
