@@ -2604,13 +2604,16 @@
     }
 
     clearLiveTradingSidebarLocks(sidebar, sections);
-    sidebar.style.setProperty("flex", "1 1 0%", "important");
+    // Match home fit-content sidebar so Live Trading keeps the same narrow width.
+    sidebar.style.setProperty("flex", "0 0 auto", "important");
+    sidebar.style.setProperty("width", "max-content", "important");
+    sidebar.style.setProperty("max-width", "none", "important");
     sidebar.style.setProperty("min-width", "0", "important");
-    sections.style.setProperty("flex", "3 1 0%", "important");
+    sections.style.setProperty("flex", "1 1 0%", "important");
     sections.style.setProperty("min-width", "0", "important");
 
     void sidebar.offsetWidth;
-    var sideW = sidebar.getBoundingClientRect().width;
+    var sideW = Math.ceil(sidebar.getBoundingClientRect().width);
     var mainW = sections.getBoundingClientRect().width;
 
     sidebar.style.setProperty("flex", "0 0 " + sideW + "px", "important");

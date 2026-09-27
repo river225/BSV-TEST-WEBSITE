@@ -390,7 +390,7 @@
     }).join("");
     var extras = VALUE_LIST_EXTRAS.map(function (title) {
       return (
-        '<button type="button" class="nav-icon-menu__item nav-icon-menu__item--sub" data-section-go="' +
+        '<button type="button" class="nav-icon-menu__item" data-section-go="' +
         title.replace(/"/g, "&quot;") +
         '">' +
         title +
@@ -410,8 +410,8 @@
         "</button>" +
         '<div class="nav-icon-menu__panel" hidden>' +
           items +
-          '<button type="button" class="nav-icon-menu__item nav-icon-menu__item--extras-toggle" aria-expanded="false">Extras</button>' +
-          '<div class="nav-icon-menu__extras" hidden>' + extras + "</div>" +
+          '<p class="nav-icon-menu__group" aria-hidden="true">Extras</p>' +
+          extras +
         "</div>" +
       "</div>"
     );
@@ -503,10 +503,6 @@
         var panel = menu.querySelector(".nav-icon-menu__panel");
         if (btn) btn.setAttribute("aria-expanded", "false");
         if (panel) panel.hidden = true;
-        var extras = menu.querySelector(".nav-icon-menu__extras");
-        var extrasBtn = menu.querySelector(".nav-icon-menu__item--extras-toggle");
-        if (extras) extras.hidden = true;
-        if (extrasBtn) extrasBtn.setAttribute("aria-expanded", "false");
       });
     }
 
@@ -576,18 +572,16 @@
           if (title) goToSection(title);
         });
       });
+    });
 
-      var extrasBtn = menu.querySelector(".nav-icon-menu__item--extras-toggle");
-      var extrasPanel = menu.querySelector(".nav-icon-menu__extras");
-      if (extrasBtn && extrasPanel) {
-        extrasBtn.addEventListener("click", function (e) {
-          e.preventDefault();
-          e.stopPropagation();
-          var open = extrasBtn.getAttribute("aria-expanded") === "true";
-          extrasBtn.setAttribute("aria-expanded", open ? "false" : "true");
-          extrasPanel.hidden = open;
-        });
-      }
+    document.querySelectorAll(".nav-live-trading-link").forEach(function (link) {
+      if (link._bsvCloseMenusBound) return;
+      link._bsvCloseMenusBound = true;
+      link.addEventListener("click", function () {
+        closeAllMenus();
+        closeValueListModal();
+        closeGiveaways();
+      });
     });
 
     document.querySelectorAll("[data-open-giveaways]").forEach(function (el) {

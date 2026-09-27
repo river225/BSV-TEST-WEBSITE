@@ -632,6 +632,14 @@ function animateHomeStatValue(key, targetValue, durationMs) {
   var els = document.querySelectorAll('[data-home-stat="' + key + '"]');
   if (!els.length) return;
 
+  if (key === "traders") {
+    document.querySelectorAll(".home-discord-promo__flash-stat-num").forEach(function (wrap) {
+      wrap.classList.remove("is-grown");
+      void wrap.offsetWidth;
+      wrap.classList.add("is-counting");
+    });
+  }
+
   var start = performance.now();
   function frame(now) {
     var progress = Math.min(1, (now - start) / durationMs);
@@ -647,6 +655,12 @@ function animateHomeStatValue(key, targetValue, durationMs) {
       els.forEach(function (el) {
         el.textContent = targetValue.toLocaleString();
       });
+      if (key === "traders") {
+        document.querySelectorAll(".home-discord-promo__flash-stat-num").forEach(function (wrap) {
+          wrap.classList.remove("is-counting");
+          wrap.classList.add("is-grown");
+        });
+      }
     }
   }
   homeStatAnimFrames[key] = requestAnimationFrame(frame);
