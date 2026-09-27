@@ -702,51 +702,77 @@
     return cur + "/" + max;
   }
 
+  var MAX_DRAFT_QTY = 99;
+
   function itemSlotHtml(entry, side, index) {
-    var qty = Math.max(1, Number(entry.qty) || 1);
+    var qty = Math.max(1, Math.min(MAX_DRAFT_QTY, Number(entry.qty) || 1));
     var hasDura = itemHasDurability(entry);
     var duraLabel = formatDurability(entry);
+    var idx = escapeAttr(String(index));
+    var sideAttr = escapeAttr(side);
     return (
-      '<div class="lt-slot lt-slot--item' +
+      '<div class="lt-slot lt-slot--item lt-slot--qty' +
       (hasDura ? " lt-slot--dura" : "") +
       '" data-id="' +
       escapeAttr(entry.id) +
       '" title="' +
-      escapeAttr(entry.name + (duraLabel ? " · " + duraLabel : "")) +
+      escapeAttr(
+        entry.name +
+          " · Qty " +
+          qty +
+          (duraLabel ? " · " + duraLabel : "")
+      ) +
       '">' +
-      (qty > 1
-        ? '<span class="lt-slot__qty">' + escapeHtml(String(qty) + "×") + "</span>"
-        : "") +
       '<button type="button" class="lt-slot__remove" data-side="' +
-      side +
+      sideAttr +
       '" data-index="' +
-      escapeAttr(String(index)) +
-      '" aria-label="Remove one">&times;</button>' +
+      idx +
+      '" aria-label="Remove item">&times;</button>' +
       (entry.image
         ? '<img class="lt-slot__img" src="' +
           escapeAttr(entry.image) +
           '" alt="" width="96" height="96" loading="lazy" decoding="async">'
         : '<span class="lt-slot__ph" aria-hidden="true"></span>') +
+      '<div class="lt-slot__meta">' +
+      '<div class="lt-slot__qty-ctrl" role="group" aria-label="Quantity">' +
+      '<span class="lt-slot__qty-label">Quantity</span>' +
+      '<div class="lt-slot__qty-row">' +
+      '<button type="button" class="lt-slot__qty-btn" data-side="' +
+      sideAttr +
+      '" data-index="' +
+      idx +
+      '" data-delta="-1" aria-label="Decrease quantity">−</button>' +
+      '<span class="lt-slot__qty-val">' +
+      escapeHtml(String(qty)) +
+      "</span>" +
+      '<button type="button" class="lt-slot__qty-btn" data-side="' +
+      sideAttr +
+      '" data-index="' +
+      idx +
+      '" data-delta="1" aria-label="Increase quantity">+</button>' +
+      "</div>" +
+      "</div>" +
       (hasDura
         ? '<div class="lt-slot__dura" role="group" aria-label="Durability">' +
           '<span class="lt-slot__dura-label">Durability</span>' +
           '<div class="lt-slot__dura-row">' +
           '<button type="button" class="lt-slot__dura-btn" data-side="' +
-          side +
+          sideAttr +
           '" data-index="' +
-          escapeAttr(String(index)) +
+          idx +
           '" data-delta="-1" aria-label="Lower durability">−</button>' +
           '<span class="lt-slot__dura-val">' +
           escapeHtml(duraLabel) +
           "</span>" +
           '<button type="button" class="lt-slot__dura-btn" data-side="' +
-          side +
+          sideAttr +
           '" data-index="' +
-          escapeAttr(String(index)) +
+          idx +
           '" data-delta="1" aria-label="Raise durability">+</button>' +
           "</div>" +
           "</div>"
         : "") +
+      "</div>" +
       "</div>"
     );
   }
@@ -789,32 +815,69 @@
     var list = draft[side] || [];
     var i = Number(index);
     if (!Number.isFinite(i) || i < 0 || i >= list.length) return;
-    var qty = Math.max(1, Number(list[i].qty) || 1);
-    if (qty > 1) {
-      list[i].qty = qty - 1;
-    } else {
-      list.splice(i, 1);
-    }
+    list.splice(i, 1);
     draft[side] = list;
     renderDraftGrids();
+  }
+
+  function draftSlotEl(side, index) {
+    var grid = document.getElementById(
+      side === "giving" ? "lt-giving-grid" : "lt-wanting-grid"
+    );
+    if (!grid) return null;
+    return grid.querySelectorAll(".lt-slot--item")[index] || null;
+  }
+
+  function syncDraftSlotTitle(side, index) {
+    var list = draft[side] || [];
+    var i = Number(index);
+    if (!Number.isFinite(i) || i < 0 || i >= list.length) return;
+    var slot = draftSlotEl(side, i);
+    if (!slot) return;
+    var entry = list[i];
+    var qty = Math.max(1, Math.min(MAX_DRAFT_QTY, Number(entry.qty) || 1));
+    var label = formatDurability(entry);
+    slot.title =
+      entry.name + " · Qty " + qty + (label ? " · " + label : "");
   }
 
   function syncDraftDuraLabel(side, index) {
     var list = draft[side] || [];
     var i = Number(index);
     if (!Number.isFinite(i) || i < 0 || i >= list.length) return;
-    var grid = document.getElementById(
-      side === "giving" ? "lt-giving-grid" : "lt-wanting-grid"
-    );
-    if (!grid) return;
-    var slots = grid.querySelectorAll(".lt-slot--item");
-    var slot = slots[i];
+    var slot = draftSlotEl(side, i);
     if (!slot) return;
-    var entry = list[i];
-    var label = formatDurability(entry);
+    var label = formatDurability(list[i]);
     var val = slot.querySelector(".lt-slot__dura-val");
     if (val) val.textContent = label;
-    slot.title = entry.name + (label ? " · " + label : "");
+    syncDraftSlotTitle(side, i);
+  }
+
+  function syncDraftQtyLabel(side, index) {
+    var list = draft[side] || [];
+    var i = Number(index);
+    if (!Number.isFinite(i) || i < 0 || i >= list.length) return;
+    var slot = draftSlotEl(side, i);
+    if (!slot) return;
+    var qty = Math.max(1, Math.min(MAX_DRAFT_QTY, Number(list[i].qty) || 1));
+    var val = slot.querySelector(".lt-slot__qty-val");
+    if (val) val.textContent = String(qty);
+    syncDraftSlotTitle(side, i);
+  }
+
+  function adjustDraftQty(side, index, delta, soft) {
+    var list = draft[side] || [];
+    var i = Number(index);
+    if (!Number.isFinite(i) || i < 0 || i >= list.length) return false;
+    var entry = list[i];
+    var cur = Math.max(1, Math.min(MAX_DRAFT_QTY, Number(entry.qty) || 1));
+    var next = Math.max(1, Math.min(MAX_DRAFT_QTY, cur + (Number(delta) || 0)));
+    if (next === cur) return false;
+    entry.qty = next;
+    draft[side] = list;
+    if (soft) syncDraftQtyLabel(side, i);
+    else renderDraftGrids();
+    return true;
   }
 
   function adjustDraftDurability(side, index, delta, soft) {
@@ -834,31 +897,36 @@
     return true;
   }
 
-  var duraHoldTimer = null;
-  var duraHoldInterval = null;
+  var slotHoldTimer = null;
+  var slotHoldInterval = null;
 
-  function stopDuraHold() {
-    if (duraHoldTimer) {
-      window.clearTimeout(duraHoldTimer);
-      duraHoldTimer = null;
+  function stopSlotHold() {
+    if (slotHoldTimer) {
+      window.clearTimeout(slotHoldTimer);
+      slotHoldTimer = null;
     }
-    if (duraHoldInterval) {
-      window.clearInterval(duraHoldInterval);
-      duraHoldInterval = null;
+    if (slotHoldInterval) {
+      window.clearInterval(slotHoldInterval);
+      slotHoldInterval = null;
     }
   }
 
-  function startDuraHold(btn) {
-    stopDuraHold();
+  function startSlotHold(btn) {
+    stopSlotHold();
     if (!btn) return;
     var side = btn.getAttribute("data-side");
     var index = btn.getAttribute("data-index");
     var delta = btn.getAttribute("data-delta");
-    adjustDraftDurability(side, index, delta, true);
-    duraHoldTimer = window.setTimeout(function () {
-      duraHoldInterval = window.setInterval(function () {
-        var ok = adjustDraftDurability(side, index, delta, true);
-        if (!ok) stopDuraHold();
+    var isQty = btn.classList.contains("lt-slot__qty-btn");
+    var tick = function () {
+      return isQty
+        ? adjustDraftQty(side, index, delta, true)
+        : adjustDraftDurability(side, index, delta, true);
+    };
+    tick();
+    slotHoldTimer = window.setTimeout(function () {
+      slotHoldInterval = window.setInterval(function () {
+        if (!tick()) stopSlotHold();
       }, 55);
     }, 220);
   }
@@ -880,7 +948,10 @@
       }
     }
     if (existing) {
-      existing.qty = Math.max(1, Number(existing.qty) || 1) + 1;
+      existing.qty = Math.min(
+        MAX_DRAFT_QTY,
+        Math.max(1, Number(existing.qty) || 1) + 1
+      );
     } else {
       var entry = {
         id: item.id,
@@ -1845,19 +1916,25 @@
     if (nlfo) nlfo.addEventListener("click", toggleNlfo);
 
     document.addEventListener("pointerdown", function (e) {
-      var duraBtn = e.target.closest && e.target.closest(".lt-slot__dura-btn");
-      if (!duraBtn) return;
+      var holdBtn =
+        e.target.closest &&
+        e.target.closest(".lt-slot__dura-btn, .lt-slot__qty-btn");
+      if (!holdBtn) return;
       e.preventDefault();
-      startDuraHold(duraBtn);
+      startSlotHold(holdBtn);
     });
-    document.addEventListener("pointerup", stopDuraHold);
-    document.addEventListener("pointercancel", stopDuraHold);
+    document.addEventListener("pointerup", stopSlotHold);
+    document.addEventListener("pointercancel", stopSlotHold);
     document.addEventListener("pointerleave", function (e) {
-      if (e.target && e.target.closest && e.target.closest(".lt-slot__dura-btn")) {
-        stopDuraHold();
+      if (
+        e.target &&
+        e.target.closest &&
+        e.target.closest(".lt-slot__dura-btn, .lt-slot__qty-btn")
+      ) {
+        stopSlotHold();
       }
     });
-    window.addEventListener("blur", stopDuraHold);
+    window.addEventListener("blur", stopSlotHold);
 
     document.addEventListener("click", function (e) {
       var addBtn = e.target.closest && e.target.closest(".lt-slot--add");
