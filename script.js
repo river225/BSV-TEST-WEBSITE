@@ -551,9 +551,38 @@ function buildHomeSiteStatsHtml(extraClass) {
 }
 
 var homeStatAnimFrames = {};
+var homeStatValueCache = { traders: null, online: null, items: null };
+
+function syncDiscordMemberCountElements(value) {
+  if (typeof value !== "number" || isNaN(value)) return;
+  var text = value.toLocaleString();
+  document.querySelectorAll(".discord-member-count").forEach(function (el) {
+    el.textContent = text;
+  });
+}
+
+function applyCachedHomeStatValues(root) {
+  var scope = root && root.querySelectorAll ? root : document;
+  Object.keys(homeStatValueCache).forEach(function (key) {
+    var value = homeStatValueCache[key];
+    if (typeof value !== "number" || isNaN(value)) return;
+    var text = value.toLocaleString();
+    scope.querySelectorAll('[data-home-stat="' + key + '"]').forEach(function (el) {
+      el.textContent = text;
+    });
+  });
+  if (typeof homeStatValueCache.traders === "number") {
+    var tradersText = homeStatValueCache.traders.toLocaleString();
+    scope.querySelectorAll(".discord-member-count").forEach(function (el) {
+      el.textContent = tradersText;
+    });
+  }
+}
 
 function setHomeStatValue(key, value, animate) {
   if (typeof value !== "number" || isNaN(value)) return;
+  homeStatValueCache[key] = value;
+  if (key === "traders") syncDiscordMemberCountElements(value);
   if (animate) {
     animateHomeStatValue(key, value);
     return;
@@ -3151,6 +3180,9 @@ function renderSection(title, items) {
 
   _sectionsDomReady[title] = true;
 
+  // Section Discord cards mount after the invite count fetch — fill cached totals.
+  applyCachedHomeStatValues(document);
+
   if (typeof window.bsvRefreshSavedCardButtons === "function") {
     window.bsvRefreshSavedCardButtons();
   }
@@ -3201,6 +3233,7 @@ function fetchDiscordMemberCount() {
       var online = data.approximate_presence_count;
       if (typeof n === "number" && !isNaN(n)) {
         setHomeStatValue("traders", n, true);
+        syncDiscordMemberCountElements(n);
       }
       if (typeof online === "number" && !isNaN(online)) {
         setHomeStatValue("online", online, true);
