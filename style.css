@@ -17130,7 +17130,7 @@ body.live-trading-page .live-trading-workspace {
   justify-content: center;
   gap: 3px;
   padding: 8px 8px 9px;
-  margin-top: -2px;
+  background: #000;
 }
 .lt-icard__bar--cash .lt-icard__name {
   color: rgba(255, 255, 255, 0.72);
@@ -17246,10 +17246,10 @@ body.live-trading-page .live-trading-workspace {
   font-size: 0.68rem;
 }
 .lt-icard__bar--offers {
-  background: linear-gradient(180deg, rgba(8, 20, 32, 0.2), rgba(0, 0, 0, 0.55));
+  background: #000;
 }
 .lt-icard--nlfo .lt-icard__bar--offers {
-  background: linear-gradient(180deg, rgba(40, 10, 12, 0.2), rgba(0, 0, 0, 0.55));
+  background: #000;
 }
 .lt-icard__bar--offers .lt-icard__name {
   color: #e0f2fe;
