@@ -1173,7 +1173,7 @@
     }
     var title = document.getElementById("lt-picker-title");
     if (title) {
-      title.textContent = side === "giving" ? "Add to I Have" : "Add to I Want";
+      title.textContent = side === "giving" ? "Add to I have" : "Add to I want";
     }
     loadCatalog().then(function () {
       renderPickerRarities();
@@ -1297,7 +1297,7 @@
     );
 
     if (!draft.giving.length && !draft.givingCash) {
-      showComposerError("Add at least one item or cash on I Have.");
+      showComposerError("Add at least one item or cash on I have.");
       return;
     }
     if (!draft.lookingForOffers && !draft.notLookingForOffers) {
