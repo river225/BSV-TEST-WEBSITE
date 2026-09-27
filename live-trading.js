@@ -725,7 +725,7 @@
       (entry.image
         ? '<img class="lt-slot__img" src="' +
           escapeAttr(entry.image) +
-          '" alt="" width="56" height="56" loading="lazy" decoding="async">'
+          '" alt="" width="96" height="96" loading="lazy" decoding="async">'
         : '<span class="lt-slot__ph" aria-hidden="true"></span>') +
       (hasDura
         ? '<div class="lt-slot__dura" role="group" aria-label="Durability">' +

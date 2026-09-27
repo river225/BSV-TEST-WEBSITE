@@ -16466,8 +16466,8 @@ body.live-trading-page .live-trading-workspace {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 8px 6px;
+  gap: 2px;
+  padding: 6px 4px;
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -16505,8 +16505,8 @@ body.live-trading-page .live-trading-workspace {
 }
 .lt-slot__img,
 .lt-slot__ph {
-  width: 58%;
-  max-width: 64px;
+  width: 86%;
+  max-width: 104px;
   aspect-ratio: 1;
   object-fit: contain;
   border-radius: 8px;
@@ -17806,7 +17806,7 @@ body.live-trading-page .live-trading-workspace {
   padding: 16px;
   border-radius: 16px;
   border: 3px solid #000;
-  background: #141d28;
+  background: var(--bsv-surface-card, #141d28);
   box-shadow: 0 24px 50px rgba(0, 0, 0, 0.5);
   box-sizing: border-box;
   overflow: hidden;
@@ -18016,5 +18016,131 @@ body.lt-picker-open {
   .lt-side__grid {
     max-height: 240px;
   }
+}
+
+/* Live Trading — colorized / dark mode surfaces */
+html[data-bsv-bg="colorized"] .lt-composer,
+html[data-bsv-bg="colorized"] .lt-search,
+html[data-bsv-bg="colorized"] .lt-feed-wrap,
+html[data-bsv-bg="dark"] .lt-composer,
+html[data-bsv-bg="dark"] .lt-search,
+html[data-bsv-bg="dark"] .lt-feed-wrap {
+  background: hsl(var(--bsv-hue) var(--bsv-s-panel) 8% / 0.72) !important;
+  border-color: color-mix(in srgb, var(--bsv-accent) 28%, transparent) !important;
+}
+html[data-bsv-bg="colorized"] .lt-search__input,
+html[data-bsv-bg="colorized"] .lt-cash input,
+html[data-bsv-bg="colorized"] .lt-picker__search,
+html[data-bsv-bg="dark"] .lt-search__input,
+html[data-bsv-bg="dark"] .lt-cash input,
+html[data-bsv-bg="dark"] .lt-picker__search {
+  background: hsl(var(--bsv-hue) var(--bsv-s-deep) 10% / 0.85) !important;
+  border-color: color-mix(in srgb, var(--bsv-accent) 30%, transparent) !important;
+  color: #fff !important;
+}
+html[data-bsv-bg="colorized"] .lt-slot--item,
+html[data-bsv-bg="dark"] .lt-slot--item {
+  background: var(--bsv-surface-raised) !important;
+  border-color: color-mix(in srgb, var(--bsv-muted) 35%, transparent) !important;
+}
+html[data-bsv-bg="colorized"] .lt-slot--empty,
+html[data-bsv-bg="dark"] .lt-slot--empty {
+  background: hsl(var(--bsv-hue) var(--bsv-s-raised) 12% / 0.35) !important;
+  border-color: color-mix(in srgb, var(--bsv-muted) 25%, transparent) !important;
+}
+html[data-bsv-bg="colorized"] .lt-slot--add,
+html[data-bsv-bg="dark"] .lt-slot--add {
+  background: color-mix(in srgb, var(--bsv-accent) 16%, transparent) !important;
+  border-color: color-mix(in srgb, var(--bsv-accent) 45%, transparent) !important;
+  color: var(--bsv-accent) !important;
+}
+html[data-bsv-bg="colorized"] .lt-side__pill,
+html[data-bsv-bg="dark"] .lt-side__pill {
+  background: color-mix(in srgb, var(--bsv-accent) 18%, var(--bsv-surface-raised)) !important;
+  border-color: color-mix(in srgb, var(--bsv-accent) 45%, transparent) !important;
+  color: var(--bsv-accent) !important;
+}
+html[data-bsv-bg="colorized"] .lt-tag,
+html[data-bsv-bg="dark"] .lt-tag {
+  background: hsl(var(--bsv-hue) var(--bsv-s-raised) 14% / 0.55) !important;
+  border-color: color-mix(in srgb, var(--bsv-muted) 40%, transparent) !important;
+}
+html[data-bsv-bg="colorized"] .lt-post,
+html[data-bsv-bg="dark"] .lt-post {
+  background: linear-gradient(
+    180deg,
+    var(--bsv-surface-raised) 0%,
+    var(--bsv-surface-panel) 100%
+  ) !important;
+}
+html[data-bsv-bg="colorized"] .lt-post__panel,
+html[data-bsv-bg="dark"] .lt-post__panel {
+  background: linear-gradient(
+    180deg,
+    hsl(var(--bsv-hue) var(--bsv-s-raised) 12% / 0.92) 0%,
+    hsl(var(--bsv-hue) var(--bsv-s-panel) 7% / 0.96) 100%
+  ) !important;
+  border-color: color-mix(in srgb, var(--bsv-accent) 22%, transparent) !important;
+}
+html[data-bsv-bg="colorized"] .lt-post__swap,
+html[data-bsv-bg="dark"] .lt-post__swap {
+  background: color-mix(in srgb, var(--bsv-accent) 22%, var(--bsv-surface-raised)) !important;
+  border-color: color-mix(in srgb, var(--bsv-accent) 65%, #fff) !important;
+  color: #e0f7ff !important;
+}
+html[data-bsv-bg="colorized"] .lt-post__avatar,
+html[data-bsv-bg="dark"] .lt-post__avatar {
+  background: var(--bsv-surface-hover) !important;
+}
+html[data-bsv-bg="colorized"] .lt-post__summary,
+html[data-bsv-bg="dark"] .lt-post__summary {
+  background: hsl(var(--bsv-hue) var(--bsv-s-deep) 8% / 0.55) !important;
+  border-color: color-mix(in srgb, var(--bsv-accent) 22%, transparent) !important;
+}
+html[data-bsv-bg="colorized"] .lt-post__summary-label,
+html[data-bsv-bg="dark"] .lt-post__summary-label {
+  color: var(--bsv-accent) !important;
+}
+html[data-bsv-bg="colorized"] .lt-picker__box,
+html[data-bsv-bg="colorized"] .lt-join__box,
+html[data-bsv-bg="colorized"] .lt-confirm__box,
+html[data-bsv-bg="colorized"] .live-trading-gate__card,
+html[data-bsv-bg="dark"] .lt-picker__box,
+html[data-bsv-bg="dark"] .lt-join__box,
+html[data-bsv-bg="dark"] .lt-confirm__box,
+html[data-bsv-bg="dark"] .live-trading-gate__card {
+  background-color: var(--bsv-surface-card) !important;
+}
+html[data-bsv-bg="colorized"] .lt-picker__item,
+html[data-bsv-bg="dark"] .lt-picker__item {
+  background: var(--bsv-surface-raised) !important;
+  border-color: color-mix(in srgb, var(--bsv-muted) 35%, transparent) !important;
+}
+html[data-bsv-bg="colorized"] .lt-picker__item:hover,
+html[data-bsv-bg="dark"] .lt-picker__item:hover {
+  background: color-mix(in srgb, var(--bsv-accent) 16%, var(--bsv-surface-raised)) !important;
+  border-color: color-mix(in srgb, var(--bsv-accent) 50%, transparent) !important;
+}
+html[data-bsv-bg="colorized"] .lt-float-tip,
+html[data-bsv-bg="dark"] .lt-float-tip {
+  background: var(--bsv-surface-card) !important;
+  border-color: color-mix(in srgb, var(--bsv-accent) 35%, transparent) !important;
+}
+html[data-bsv-bg="colorized"] .lt-icard__bar,
+html[data-bsv-bg="colorized"] .lt-icard::after,
+html[data-bsv-bg="dark"] .lt-icard__bar,
+html[data-bsv-bg="dark"] .lt-icard::after {
+  background: var(--bsv-bg-deep) !important;
+}
+html[data-bsv-bg="colorized"] .lt-composer__close,
+html[data-bsv-bg="colorized"] .lt-picker__close,
+html[data-bsv-bg="dark"] .lt-composer__close,
+html[data-bsv-bg="dark"] .lt-picker__close {
+  background: hsl(var(--bsv-hue) var(--bsv-s-raised) 16% / 0.65) !important;
+}
+html[data-bsv-bg="colorized"] .lt-slot__dura,
+html[data-bsv-bg="dark"] .lt-slot__dura {
+  background: hsl(var(--bsv-hue) var(--bsv-s-deep) 6% / 0.88) !important;
+  border-color: color-mix(in srgb, var(--bsv-accent) 22%, transparent) !important;
 }
 
