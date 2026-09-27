@@ -16917,6 +16917,17 @@ body.live-trading-page .live-trading-workspace {
 .lt-post__avatar--ph {
   display: inline-block;
 }
+.lt-post__avatar--click,
+.lt-post__name-main--click {
+  cursor: pointer;
+}
+.lt-post__avatar--click:hover {
+  filter: brightness(1.08);
+}
+.lt-post__name-main--click:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 .lt-post__name {
   margin: 0;
   color: #fff;
@@ -17762,6 +17773,110 @@ body.live-trading-page .live-trading-workspace {
 .lt-icard--pop .lt-icard__repair {
   font-size: 0.95rem;
   margin-top: 2px;
+}
+
+.lt-profile[hidden] {
+  display: none !important;
+}
+.lt-profile {
+  position: fixed;
+  inset: 0;
+  z-index: 12600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.lt-profile__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+.lt-profile__box {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 360px);
+  padding: 24px 20px 18px;
+  border-radius: 16px;
+  border: 3px solid #000;
+  background: var(--bsv-surface-card, #141d28);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+}
+.lt-profile__close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.lt-profile__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.lt-profile__avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  background: #1e293b;
+}
+.lt-profile__avatar--ph {
+  display: inline-block;
+}
+.lt-profile__name {
+  margin: 0;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 850;
+  line-height: 1.2;
+  word-break: break-word;
+}
+.lt-profile__handle {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.88rem;
+  font-weight: 650;
+}
+.lt-profile__meta {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.lt-profile__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.lt-profile__row dt {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+.lt-profile__row dd {
+  margin: 0;
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 750;
+  text-align: right;
+  word-break: break-all;
 }
 
 .lt-join[hidden] {

@@ -1792,14 +1792,50 @@
       '" role="article">' +
       '<header class="lt-post__head">' +
       '<div class="lt-post__author">' +
-      (avatar
-        ? '<img class="lt-post__avatar" src="' +
-          escapeAttr(avatar) +
-          '" alt="" width="40" height="40" loading="lazy" decoding="async">'
-        : '<span class="lt-post__avatar lt-post__avatar--ph"></span>') +
+      (function () {
+        var discordId = String(author.discordId || author.id || "").trim();
+        var profileAttrs =
+          discordId && /^\d{5,32}$/.test(discordId)
+            ? ' data-lt-profile="' +
+              escapeAttr(discordId) +
+              '" tabindex="0" role="button" aria-label="View trader profile"'
+            : "";
+        if (avatar) {
+          return (
+            '<img class="lt-post__avatar' +
+            (profileAttrs ? " lt-post__avatar--click" : "") +
+            '" src="' +
+            escapeAttr(avatar) +
+            '" alt="" width="40" height="40" loading="lazy" decoding="async"' +
+            profileAttrs +
+            ">"
+          );
+        }
+        return (
+          '<span class="lt-post__avatar lt-post__avatar--ph' +
+          (profileAttrs ? " lt-post__avatar--click" : "") +
+          '"' +
+          profileAttrs +
+          "></span>"
+        );
+      })() +
       '<div class="lt-post__who">' +
       '<p class="lt-post__name">' +
-      '<span class="lt-post__name-main">' +
+      '<span class="lt-post__name-main' +
+      (String(author.discordId || author.id || "").trim()
+        ? " lt-post__name-main--click"
+        : "") +
+      '"' +
+      (function () {
+        var discordId = String(author.discordId || author.id || "").trim();
+        if (!discordId || !/^\d{5,32}$/.test(discordId)) return "";
+        return (
+          ' data-lt-profile="' +
+          escapeAttr(discordId) +
+          '" tabindex="0" role="button" aria-label="View trader profile"'
+        );
+      })() +
+      ">" +
       escapeHtml(displayName) +
       (handle
         ? ' <span class="lt-post__handle">' + escapeHtml(handle) + "</span>"
@@ -1972,6 +2008,107 @@
     if (pop) pop.hidden = true;
   }
 
+  function discordCreatedAtFromId(id) {
+    var s = String(id || "").trim();
+    if (!/^\d{5,32}$/.test(s)) return null;
+    try {
+      var ms;
+      if (typeof BigInt === "function") {
+        ms = Number((BigInt(s) >> 22n) + 1420070400000n);
+      } else {
+        ms = Math.floor(Number(s) / 4194304) + 1420070400000;
+      }
+      if (!Number.isFinite(ms)) return null;
+      var d = new Date(ms);
+      return isNaN(d.getTime()) ? null : d;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function countPostsByDiscordId(discordId) {
+    var id = String(discordId || "").trim();
+    if (!id) return 0;
+    var n = 0;
+    for (var i = 0; i < postsCache.length; i++) {
+      var a = postsCache[i] && postsCache[i].author;
+      if (!a) continue;
+      if (String(a.discordId || a.id || "").trim() === id) n += 1;
+    }
+    return n;
+  }
+
+  function findAuthorByDiscordId(discordId) {
+    var id = String(discordId || "").trim();
+    if (!id) return null;
+    for (var i = 0; i < postsCache.length; i++) {
+      var a = postsCache[i] && postsCache[i].author;
+      if (!a) continue;
+      if (String(a.discordId || a.id || "").trim() === id) return a;
+    }
+    return null;
+  }
+
+  function openAuthorProfile(discordId) {
+    var id = String(discordId || "").trim();
+    if (!id || !/^\d{5,32}$/.test(id)) return;
+    var author = findAuthorByDiscordId(id) || {};
+    var avatar = authorAvatar(author);
+    var name = authorDisplayName(author);
+    var handle = authorHandle(author);
+    var created = discordCreatedAtFromId(id);
+    var posts = countPostsByDiscordId(id);
+
+    var pop = document.getElementById("lt-profile");
+    var avatarEl = document.getElementById("lt-profile-avatar");
+    var avatarPh = document.getElementById("lt-profile-avatar-ph");
+    var nameEl = document.getElementById("lt-profile-name");
+    var handleEl = document.getElementById("lt-profile-handle");
+    var idEl = document.getElementById("lt-profile-id");
+    var createdEl = document.getElementById("lt-profile-created");
+    var postsEl = document.getElementById("lt-profile-posts");
+    if (!pop) return;
+
+    if (avatarEl && avatarPh) {
+      if (avatar) {
+        avatarEl.src = avatar;
+        avatarEl.hidden = false;
+        avatarPh.hidden = true;
+      } else {
+        avatarEl.removeAttribute("src");
+        avatarEl.hidden = true;
+        avatarPh.hidden = false;
+      }
+    }
+    if (nameEl) nameEl.textContent = name;
+    if (handleEl) {
+      if (handle) {
+        handleEl.textContent = handle;
+        handleEl.hidden = false;
+      } else {
+        handleEl.textContent = "";
+        handleEl.hidden = true;
+      }
+    }
+    if (idEl) idEl.textContent = id;
+    if (createdEl) {
+      createdEl.textContent = created
+        ? created.toLocaleDateString(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "numeric"
+          })
+        : "—";
+    }
+    if (postsEl) postsEl.textContent = String(posts);
+    pop.hidden = false;
+  }
+
+  function closeAuthorProfile() {
+    var pop = document.getElementById("lt-profile");
+    if (pop) pop.hidden = true;
+  }
+
   function feedRenderKey(posts) {
     var ids = (posts || [])
       .map(function (p) {
@@ -2126,6 +2263,10 @@
     if (joinBackdrop) joinBackdrop.addEventListener("click", hideJoinDiscordPrompt);
     var itemPopBackdrop = document.getElementById("lt-item-pop-backdrop");
     if (itemPopBackdrop) itemPopBackdrop.addEventListener("click", closeItemPop);
+    var profileClose = document.getElementById("lt-profile-close");
+    var profileBackdrop = document.getElementById("lt-profile-backdrop");
+    if (profileClose) profileClose.addEventListener("click", closeAuthorProfile);
+    if (profileBackdrop) profileBackdrop.addEventListener("click", closeAuthorProfile);
     bindFloatTips();
     document.addEventListener("visibilitychange", function () {
       if (document.hidden && discordAppLaunchTimer) {

@@ -92,7 +92,7 @@ window.BSV_BUILD = "20260926-sessionfix";
 <script defer src="auth-oauth-bounce.js?v=20260926-sessionfix"></script>
 <title>Live Trading — BlockSpin Values (Dev)</title>
 <meta name="description" content="Live Trading — development build of BlockSpin Values." />
-<link rel="stylesheet" href="style.css?v=20260927-lt-pop3" />
+<link rel="stylesheet" href="style.css?v=20260927-lt-profile" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Paytone+One&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
@@ -283,6 +283,33 @@ window.BSV_BUILD = "20260926-sessionfix";
           aria-label="Item details"
         ></div>
       </div>
+
+      <div class="lt-profile" id="lt-profile" hidden>
+        <div class="lt-profile__backdrop" id="lt-profile-backdrop"></div>
+        <div class="lt-profile__box" role="dialog" aria-modal="true" aria-labelledby="lt-profile-name">
+          <button type="button" class="lt-profile__close" id="lt-profile-close" aria-label="Close">&times;</button>
+          <div class="lt-profile__head">
+            <img class="lt-profile__avatar" id="lt-profile-avatar" alt="" width="72" height="72" hidden />
+            <span class="lt-profile__avatar lt-profile__avatar--ph" id="lt-profile-avatar-ph" hidden></span>
+            <h2 class="lt-profile__name" id="lt-profile-name">Trader</h2>
+            <p class="lt-profile__handle" id="lt-profile-handle" hidden></p>
+          </div>
+          <dl class="lt-profile__meta">
+            <div class="lt-profile__row">
+              <dt>Discord ID</dt>
+              <dd id="lt-profile-id">—</dd>
+            </div>
+            <div class="lt-profile__row">
+              <dt>Account created</dt>
+              <dd id="lt-profile-created">—</dd>
+            </div>
+            <div class="lt-profile__row">
+              <dt>Total posts</dt>
+              <dd id="lt-profile-posts">0</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -298,6 +325,6 @@ window.BSV_BUILD = "20260926-sessionfix";
 <script defer src="site-i18n.js?v=20260926-sessionfix"></script>
 <script defer src="site-settings.js?v=20260926-sessionfix"></script>
 <script defer src="section-config.js?v=20260926-sessionfix"></script>
-<script defer src="live-trading.js?v=20260927-lt-cooldown"></script>
+<script defer src="live-trading.js?v=20260927-lt-profile"></script>
 </body>
 </html>
