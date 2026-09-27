@@ -1370,6 +1370,18 @@
             showComposerError("You already have the maximum number of active posts.");
             return;
           }
+          if (err === "rate_limited") {
+            var waitMs = Number(out.data && out.data.retryAfterMs) || 0;
+            var mins = Math.max(1, Math.ceil(waitMs / 60000));
+            showComposerError(
+              mins === 1
+                ? "You can only create a new post every 5 minutes. Try again in about 1 minute."
+                : "You can only create a new post every 5 minutes. Try again in about " +
+                    mins +
+                    " minutes."
+            );
+            return;
+          }
           if (err === "tag_required") {
             setTagRequiredHint(true);
             clearComposerError();
@@ -2250,7 +2262,7 @@
       return;
     }
     // Stretch well past the sections column so the trade feed feels taller.
-    var EXTRA_BELOW_SECTIONS = 280;
+    var EXTRA_BELOW_SECTIONS = 480;
     var navBottom = nav.getBoundingClientRect().bottom;
     var wrapTop = feedWrap.getBoundingClientRect().top;
     var h = Math.round(navBottom - wrapTop + EXTRA_BELOW_SECTIONS);

@@ -18138,7 +18138,7 @@ body.lt-picker-open {
     align-self: stretch;
   }
   .lt-feed {
-    max-height: min(58vh, 640px);
+    max-height: min(72vh, 780px);
   }
   .lt-side__grid {
     max-height: 240px;
