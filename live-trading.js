@@ -307,9 +307,8 @@
   function ownerBadgeHtml() {
     return (
       '<span class="lt-post__owner-tag" data-lt-tip="Owner of BlockSpin Values">' +
-      '<span class="lt-post__owner-glow" aria-hidden="true"></span>' +
       '<span class="lt-post__owner-mark" aria-hidden="true">' +
-      '<svg class="lt-post__owner-icon" viewBox="0 0 24 24" width="16" height="16">' +
+      '<svg class="lt-post__owner-icon" viewBox="0 0 24 24" width="14" height="14">' +
       '<path fill="currentColor" d="M5 16.5l-1.8-9.2 4.1 3.1L12 4.2l4.7 6.2 4.1-3.1L19 16.5H5zm-.5 1.8h15v2.2h-15v-2.2z"/>' +
       "</svg>" +
       "</span>" +
@@ -1788,13 +1787,22 @@
         : '<span class="lt-post__avatar lt-post__avatar--ph"></span>') +
       '<div class="lt-post__who">' +
       '<p class="lt-post__name">' +
+      '<span class="lt-post__name-main">' +
       escapeHtml(displayName) +
       (handle
         ? ' <span class="lt-post__handle">' + escapeHtml(handle) + "</span>"
         : "") +
-      (isSiteOwnerAuthor(author) ? " " + ownerBadgeHtml() : "") +
-      (isTrustedTraderAuthor(author) ? " " + trustedTraderBadgeHtml() : "") +
-      (isScammerAuthor(author) ? " " + scammerBadgeHtml() : "") +
+      "</span>" +
+      (function () {
+        var badges = [];
+        if (isSiteOwnerAuthor(author)) badges.push(ownerBadgeHtml());
+        if (isTrustedTraderAuthor(author)) badges.push(trustedTraderBadgeHtml());
+        if (isScammerAuthor(author)) badges.push(scammerBadgeHtml());
+        if (!badges.length) return "";
+        return (
+          '<span class="lt-post__badges">' + badges.join("") + "</span>"
+        );
+      })() +
       "</p>" +
       '<p class="lt-post__time">' +
       escapeHtml(timeAgo(post.createdAt)) +
