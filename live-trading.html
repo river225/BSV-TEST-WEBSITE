@@ -92,7 +92,7 @@ window.BSV_BUILD = "20260926-sessionfix";
 <script defer src="auth-oauth-bounce.js?v=20260926-sessionfix"></script>
 <title>Live Trading — BlockSpin Values (Dev)</title>
 <meta name="description" content="Live Trading — development build of BlockSpin Values." />
-<link rel="stylesheet" href="style.css?v=20260927-lt-live" />
+<link rel="stylesheet" href="style.css?v=20260927-lt-del" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Paytone+One&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
@@ -252,6 +252,18 @@ window.BSV_BUILD = "20260926-sessionfix";
           </div>
         </div>
       </div>
+
+      <div class="lt-confirm" id="lt-delete-confirm" hidden>
+        <div class="lt-confirm__backdrop" id="lt-delete-confirm-backdrop"></div>
+        <div class="lt-confirm__box" role="dialog" aria-modal="true" aria-labelledby="lt-delete-confirm-title">
+          <h2 class="lt-confirm__title" id="lt-delete-confirm-title">Delete this post?</h2>
+          <p class="lt-confirm__body">This can’t be undone.</p>
+          <div class="lt-confirm__actions">
+            <button type="button" class="lt-confirm__btn lt-confirm__btn--danger" id="lt-delete-confirm-yes">Delete</button>
+            <button type="button" class="lt-confirm__btn lt-confirm__btn--ghost" id="lt-delete-confirm-no">Cancel</button>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -267,6 +279,6 @@ window.BSV_BUILD = "20260926-sessionfix";
 <script defer src="site-i18n.js?v=20260926-sessionfix"></script>
 <script defer src="site-settings.js?v=20260926-sessionfix"></script>
 <script defer src="section-config.js?v=20260926-sessionfix"></script>
-<script defer src="live-trading.js?v=20260927-lt-live"></script>
+<script defer src="live-trading.js?v=20260927-lt-del"></script>
 </body>
 </html>

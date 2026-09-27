@@ -247,12 +247,18 @@
     };
   }
 
+  function sessionDiscordId() {
+    var discord = currentSession.discord || currentSession.user || null;
+    if (!discord) return "";
+    return String(discord.id || discord.userId || discord.discordId || "").trim();
+  }
+
   function isOwnPost(post) {
-    var a = authorFromSession();
     if (!post || !post.author) return false;
-    if (a.discordId && post.author.discordId) {
-      return String(a.discordId) === String(post.author.discordId);
-    }
+    var myId = sessionDiscordId();
+    var postId = String(post.author.discordId || post.author.id || "").trim();
+    if (myId && postId && myId === postId) return true;
+    var a = authorFromSession();
     return (
       !!a.discordUsername &&
       !!post.author.discordUsername &&
@@ -951,31 +957,81 @@
       });
   }
 
+  function showDeleteConfirm(id) {
+    return new Promise(function (resolve) {
+      var modal = document.getElementById("lt-delete-confirm");
+      var okBtn = document.getElementById("lt-delete-confirm-yes");
+      var cancelBtn = document.getElementById("lt-delete-confirm-no");
+      var backdrop = document.getElementById("lt-delete-confirm-backdrop");
+      if (!modal || !okBtn || !cancelBtn) {
+        resolve(window.confirm("Delete this trade post?"));
+        return;
+      }
+      function finish(ok) {
+        modal.hidden = true;
+        okBtn.removeEventListener("click", onOk);
+        cancelBtn.removeEventListener("click", onCancel);
+        if (backdrop) backdrop.removeEventListener("click", onCancel);
+        resolve(ok);
+      }
+      function onOk() {
+        finish(true);
+      }
+      function onCancel() {
+        finish(false);
+      }
+      modal.hidden = false;
+      modal.setAttribute("data-post-id", String(id || ""));
+      okBtn.addEventListener("click", onOk);
+      cancelBtn.addEventListener("click", onCancel);
+      if (backdrop) backdrop.addEventListener("click", onCancel);
+    });
+  }
+
   function deletePost(id) {
     requireLoginForAction().then(function (ok) {
       if (!ok) return;
-      fetch(authApiUrl("api/live-trading/posts/" + encodeURIComponent(id)), {
-        method: "DELETE",
-        headers: authHeaders()
-      })
-        .then(function (res) {
-          if (!res.ok) {
+      return showDeleteConfirm(id).then(function (confirmed) {
+        if (!confirmed) return;
+        return fetch(authApiUrl("api/live-trading/posts/" + encodeURIComponent(id)), {
+          method: "DELETE",
+          headers: authHeaders()
+        })
+          .then(function (res) {
             return res.json().catch(function () {
               return null;
             }).then(function (data) {
-              if (data && data.error === "guild_required") openSharedLogin();
-              throw new Error("delete_failed");
+              return { res: res, data: data };
             });
-          }
-          postsCache = postsCache.filter(function (p) {
-            return p && p.id !== id;
+          })
+          .then(function (out) {
+            if (!out.res.ok) {
+              var err = (out.data && out.data.error) || "delete_failed";
+              if (err === "guild_required" || err === "login_required") {
+                openSharedLogin();
+                return;
+              }
+              if (err === "not_owner") {
+                window.alert("You can only delete your own posts.");
+                fetchPosts({ force: true });
+                return;
+              }
+              window.alert("Couldn’t delete that post. Try again.");
+              fetchPosts({ force: true });
+              return;
+            }
+            postsCache = postsCache.filter(function (p) {
+              return p && p.id !== id;
+            });
+            lastRenderedPostIds = "";
+            renderFeed();
+            fetchPosts({ force: true });
+          })
+          .catch(function () {
+            window.alert("Couldn’t delete that post. Try again.");
+            fetchPosts({ force: true });
           });
-          renderFeed();
-          fetchPosts({ force: true });
-        })
-        .catch(function () {
-          fetchPosts({ force: true });
-        });
+      });
     });
   }
 
