@@ -18120,6 +18120,31 @@ html[data-bsv-bg="colorized"] .lt-tag,
 html[data-bsv-bg="dark"] .lt-tag {
   background: hsl(var(--bsv-hue) var(--bsv-s-raised) 14% / 0.55) !important;
   border-color: color-mix(in srgb, var(--bsv-muted) 40%, transparent) !important;
+  color: rgba(255, 255, 255, 0.72) !important;
+  box-shadow: none !important;
+}
+html[data-bsv-bg="colorized"] .lt-tag.is-on,
+html[data-bsv-bg="dark"] .lt-tag.is-on {
+  background: color-mix(in srgb, var(--bsv-accent) 34%, var(--bsv-surface-raised)) !important;
+  border-color: color-mix(in srgb, var(--bsv-accent) 85%, #fff) !important;
+  color: #fff !important;
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--bsv-accent) 45%, transparent),
+    0 0 14px color-mix(in srgb, var(--bsv-accent) 35%, transparent) !important;
+}
+html[data-bsv-bg="colorized"] .lt-tag[data-tag="nlfo"].is-on,
+html[data-bsv-bg="dark"] .lt-tag[data-tag="nlfo"].is-on {
+  background: linear-gradient(180deg, rgba(248, 113, 113, 0.45), rgba(127, 29, 29, 0.72)) !important;
+  border-color: rgba(252, 165, 165, 0.95) !important;
+  color: #fff !important;
+  box-shadow:
+    0 0 0 2px rgba(248, 113, 113, 0.45),
+    0 0 14px rgba(239, 68, 68, 0.35) !important;
+}
+html[data-bsv-bg="colorized"] .lt-tag:hover:not(.is-on),
+html[data-bsv-bg="dark"] .lt-tag:hover:not(.is-on) {
+  border-color: color-mix(in srgb, var(--bsv-accent) 50%, transparent) !important;
+  color: #fff !important;
 }
 html[data-bsv-bg="colorized"] .lt-post,
 html[data-bsv-bg="dark"] .lt-post {
