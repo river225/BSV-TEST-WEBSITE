@@ -1110,27 +1110,16 @@
     return joinPhrases(parts) || emptyLabel || "nothing";
   }
 
-  function truncateSummaryName(name, maxLen) {
-    var s = String(name || "").trim();
-    var n = maxLen || 22;
-    if (s.length <= n) return s;
-    return s.slice(0, Math.max(1, n - 1)) + "…";
-  }
-
   function sideTradePhraseCompact(side, emptyLabel) {
     side = side || {};
     var items = Array.isArray(side.items) ? side.items : [];
     var parts = [];
     var i;
-    var limit = 2;
-    for (i = 0; i < items.length && i < limit; i++) {
+    for (i = 0; i < items.length; i++) {
       var it = items[i];
-      var label = truncateSummaryName(it && it.name ? it.name : "Item", 20);
+      var label = String((it && it.name) || "Item").trim() || "Item";
       var qty = Math.max(1, Number(it && it.qty) || 1);
       parts.push(qty > 1 ? qty + "× " + label : label);
-    }
-    if (items.length > limit) {
-      parts.push("+" + (items.length - limit) + " more");
     }
     if (side.cash) parts.push(formatCash(side.cash));
     return parts.length ? parts.join(", ") : emptyLabel || "nothing";

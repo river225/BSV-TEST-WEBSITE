@@ -17204,8 +17204,9 @@ body.live-trading-page .live-trading-workspace {
   margin-top: 14px;
 }
 .lt-post__summary {
-  flex: 1 1 180px;
-  max-width: 280px;
+  flex: 1 1 220px;
+  max-width: 420px;
+  min-width: 0;
   padding: 8px 10px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -17235,7 +17236,7 @@ body.live-trading-page .live-trading-workspace {
 .lt-post__summary-k {
   display: inline-block;
   min-width: 4.6em;
-  color: rgba(255, 255, 255, 0.45);
+  color: #fff;
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.02em;
