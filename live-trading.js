@@ -1489,18 +1489,26 @@
     });
   }
 
-  function sideItemNames(side) {
-    return ((side && side.items) || []).map(function (i) {
+  function sideSearchTerms(side) {
+    var terms = ((side && side.items) || []).map(function (i) {
       return String(i.name || "");
     });
+    var cash = side && side.cash ? Number(side.cash) : 0;
+    if (cash > 0) {
+      terms.push("cash");
+      terms.push("$");
+      terms.push(String(Math.floor(cash)));
+      terms.push(formatCash(cash));
+    }
+    return terms;
   }
 
   function postMatchesFilters(post) {
     if (searchScope === "mine" && !isOwnPost(post)) return false;
     var q = searchQuery.trim().toLowerCase();
     if (!q) return true;
-    var offering = sideItemNames(post.giving);
-    var requesting = sideItemNames(post.wanting);
+    var offering = sideSearchTerms(post.giving);
+    var requesting = sideSearchTerms(post.wanting);
     var hay =
       searchScope === "offering"
         ? offering
@@ -1508,7 +1516,9 @@
           ? requesting
           : offering.concat(requesting);
     return hay.some(function (name) {
-      return name.toLowerCase().indexOf(q) !== -1;
+      return String(name || "")
+        .toLowerCase()
+        .indexOf(q) !== -1;
     });
   }
 
