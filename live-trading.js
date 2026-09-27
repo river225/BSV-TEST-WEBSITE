@@ -128,6 +128,16 @@
         return fetchSheet(meta.sheet).then(function (rows) {
           return rows.map(function (row) {
             var name = String(row.Name || "").trim();
+            var duraRaw = String(row.Durability || "").trim();
+            var inv = String(row["Durability Invisible"] || "")
+              .trim()
+              .toLowerCase();
+            var duraInvisible = /^(yes|true|1|ticked|checked|on|y)$/i.test(inv);
+            var maxDurability = 0;
+            if (!duraInvisible && duraRaw.indexOf("/") !== -1) {
+              maxDurability = parseInt(duraRaw.split("/")[1], 10) || 0;
+              if (maxDurability < 1) maxDurability = 0;
+            }
             return {
               id: meta.sheet + "::" + name.toLowerCase(),
               name: name,
@@ -135,7 +145,8 @@
               rarity: meta.rarity,
               sheet: meta.sheet,
               color: meta.color,
-              value: String(row["Average Value"] || row["Ranged Value"] || "").trim()
+              value: String(row["Average Value"] || row["Ranged Value"] || "").trim(),
+              maxDurability: maxDurability
             };
           });
         });
@@ -610,21 +621,36 @@
     if (hint) hint.classList.toggle("is-loud", !!on);
   }
 
-  function itemSlotHtml(entry, side) {
+  function itemHasDurability(entry) {
+    return Math.max(0, Number(entry && entry.maxDurability) || 0) > 0;
+  }
+
+  function formatDurability(entry) {
+    if (!itemHasDurability(entry)) return "";
+    var max = Math.max(1, Number(entry.maxDurability) || 1);
+    var cur = Math.max(0, Math.min(max, Number(entry.durability) || max));
+    return cur + "/" + max;
+  }
+
+  function itemSlotHtml(entry, side, index) {
     var qty = Math.max(1, Number(entry.qty) || 1);
+    var hasDura = itemHasDurability(entry);
+    var duraLabel = formatDurability(entry);
     return (
-      '<div class="lt-slot lt-slot--item" data-id="' +
+      '<div class="lt-slot lt-slot--item' +
+      (hasDura ? " lt-slot--dura" : "") +
+      '" data-id="' +
       escapeAttr(entry.id) +
       '" title="' +
-      escapeAttr(entry.name) +
+      escapeAttr(entry.name + (duraLabel ? " · " + duraLabel : "")) +
       '">' +
       (qty > 1
         ? '<span class="lt-slot__qty">' + escapeHtml(String(qty) + "×") + "</span>"
         : "") +
       '<button type="button" class="lt-slot__remove" data-side="' +
       side +
-      '" data-id="' +
-      escapeAttr(entry.id) +
+      '" data-index="' +
+      escapeAttr(String(index)) +
       '" aria-label="Remove one">&times;</button>' +
       (entry.image
         ? '<img class="lt-slot__img" src="' +
@@ -634,6 +660,23 @@
       '<span class="lt-slot__name">' +
       escapeHtml(entry.name) +
       "</span>" +
+      (hasDura
+        ? '<div class="lt-slot__dura" role="group" aria-label="Durability">' +
+          '<button type="button" class="lt-slot__dura-btn" data-side="' +
+          side +
+          '" data-index="' +
+          escapeAttr(String(index)) +
+          '" data-delta="-1" aria-label="Lower durability">−</button>' +
+          '<span class="lt-slot__dura-val">' +
+          escapeHtml(duraLabel) +
+          "</span>" +
+          '<button type="button" class="lt-slot__dura-btn" data-side="' +
+          side +
+          '" data-index="' +
+          escapeAttr(String(index)) +
+          '" data-delta="1" aria-label="Raise durability">+</button>' +
+          "</div>"
+        : "") +
       "</div>"
     );
   }
@@ -653,8 +696,8 @@
         '<span class="lt-slot__add-label">Add Item</span>' +
         "</button>"
     );
-    list.forEach(function (entry) {
-      html.push(itemSlotHtml(entry, side));
+    list.forEach(function (entry, index) {
+      html.push(itemSlotHtml(entry, side, index));
     });
     var empties = Math.max(0, EMPTY_SLOT_COUNT - list.length);
     for (var i = 0; i < empties; i++) {
@@ -672,27 +715,45 @@
     if (nlfoBtn) nlfoBtn.classList.toggle("is-on", !!draft.notLookingForOffers);
   }
 
-  function removeDraftItem(side, id) {
+  function removeDraftItem(side, index) {
     var list = draft[side] || [];
-    for (var i = 0; i < list.length; i++) {
-      if (list[i].id !== id) continue;
-      var qty = Math.max(1, Number(list[i].qty) || 1);
-      if (qty > 1) {
-        list[i].qty = qty - 1;
-      } else {
-        list.splice(i, 1);
-      }
-      break;
+    var i = Number(index);
+    if (!Number.isFinite(i) || i < 0 || i >= list.length) return;
+    var qty = Math.max(1, Number(list[i].qty) || 1);
+    if (qty > 1) {
+      list[i].qty = qty - 1;
+    } else {
+      list.splice(i, 1);
     }
+    draft[side] = list;
+    renderDraftGrids();
+  }
+
+  function adjustDraftDurability(side, index, delta) {
+    var list = draft[side] || [];
+    var i = Number(index);
+    if (!Number.isFinite(i) || i < 0 || i >= list.length) return;
+    var entry = list[i];
+    if (!itemHasDurability(entry)) return;
+    var max = Math.max(1, Number(entry.maxDurability) || 1);
+    var cur = Math.max(0, Math.min(max, Number(entry.durability) || max));
+    entry.durability = Math.max(0, Math.min(max, cur + (Number(delta) || 0)));
     draft[side] = list;
     renderDraftGrids();
   }
 
   function addDraftItem(side, item) {
     var list = draft[side] || [];
+    var maxDura = Math.max(0, Number(item.maxDurability) || 0);
+    var defaultDura = maxDura > 0 ? maxDura : null;
     var existing = null;
     for (var i = 0; i < list.length; i++) {
-      if (list[i].id === item.id) {
+      if (list[i].id !== item.id) continue;
+      var sameDura =
+        maxDura <= 0
+          ? !itemHasDurability(list[i])
+          : Number(list[i].durability) === defaultDura;
+      if (sameDura) {
         existing = list[i];
         break;
       }
@@ -700,14 +761,19 @@
     if (existing) {
       existing.qty = Math.max(1, Number(existing.qty) || 1) + 1;
     } else {
-      list.push({
+      var entry = {
         id: item.id,
         name: item.name,
         rarity: item.rarity,
         color: item.color,
         image: item.image || "",
         qty: 1
-      });
+      };
+      if (maxDura > 0) {
+        entry.maxDurability = maxDura;
+        entry.durability = defaultDura;
+      }
+      list.push(entry);
     }
     draft[side] = list;
     renderDraftGrids();
@@ -896,31 +962,30 @@
     }
     setTagRequiredHint(false);
 
+    function mapDraftItem(e) {
+      var out = {
+        id: e.id,
+        name: e.name,
+        rarity: e.rarity,
+        color: e.color,
+        image: e.image || "",
+        qty: Math.max(1, Number(e.qty) || 1)
+      };
+      if (itemHasDurability(e)) {
+        var max = Math.max(1, Number(e.maxDurability) || 1);
+        out.maxDurability = max;
+        out.durability = Math.max(0, Math.min(max, Number(e.durability) || max));
+      }
+      return out;
+    }
+
     var payload = {
       giving: {
-        items: draft.giving.map(function (e) {
-          return {
-            id: e.id,
-            name: e.name,
-            rarity: e.rarity,
-            color: e.color,
-            image: e.image || "",
-            qty: Math.max(1, Number(e.qty) || 1)
-          };
-        }),
+        items: draft.giving.map(mapDraftItem),
         cash: draft.givingCash
       },
       wanting: {
-        items: draft.wanting.map(function (e) {
-          return {
-            id: e.id,
-            name: e.name,
-            rarity: e.rarity,
-            color: e.color,
-            image: e.image || "",
-            qty: Math.max(1, Number(e.qty) || 1)
-          };
-        }),
+        items: draft.wanting.map(mapDraftItem),
         cash: draft.wantingCash,
         lookingForOffers: !!draft.lookingForOffers,
         notLookingForOffers: !!draft.notLookingForOffers
@@ -1089,6 +1154,8 @@
   function itemPhrase(item) {
     var qty = Math.max(1, Number(item.qty) || 1);
     var name = String(item.name || "Item");
+    var dura = formatDurability(item);
+    if (dura) name += " (" + dura + ")";
     if (qty > 1) return qty + "× " + name;
     return name;
   }
@@ -1118,6 +1185,8 @@
     for (i = 0; i < items.length; i++) {
       var it = items[i];
       var label = String((it && it.name) || "Item").trim() || "Item";
+      var dura = formatDurability(it);
+      if (dura) label += " (" + dura + ")";
       var qty = Math.max(1, Number(it && it.qty) || 1);
       parts.push(qty > 1 ? qty + "× " + label : label);
     }
@@ -1140,6 +1209,16 @@
 
   function resolveItemDisplay(item) {
     var cat = findCatalogItem(item.id);
+    var maxFromItem = Math.max(0, Number(item.maxDurability) || 0);
+    var maxFromCat = Math.max(0, Number(cat && cat.maxDurability) || 0);
+    var maxDurability = maxFromItem || maxFromCat;
+    var durability = null;
+    if (maxDurability > 0) {
+      durability = Math.max(
+        0,
+        Math.min(maxDurability, Number(item.durability) || maxDurability)
+      );
+    }
     return {
       id: item.id,
       name: item.name || (cat && cat.name) || "Item",
@@ -1147,24 +1226,32 @@
       color: item.color || (cat && cat.color) || "#334155",
       rarity: item.rarity || (cat && cat.rarity) || "",
       value: (cat && cat.value) || item.value || "",
-      qty: Math.max(1, Number(item.qty) || 1)
+      qty: Math.max(1, Number(item.qty) || 1),
+      durability: durability,
+      maxDurability: maxDurability
     };
   }
 
   function itemCardHtml(item) {
     var d = resolveItemDisplay(item);
+    var duraLabel = formatDurability(d);
     return (
-      '<div class="lt-icard" style="--lt-card:' +
+      '<div class="lt-icard' +
+      (duraLabel ? " lt-icard--dura" : "") +
+      '" style="--lt-card:' +
       escapeAttr(d.color) +
       ";background:radial-gradient(120% 90% at 50% 18%," +
       escapeAttr(d.color) +
       "99,transparent 70%),linear-gradient(180deg," +
       escapeAttr(d.color) +
-      "88,#070b12 78%)\" title=\"" +
-      escapeAttr(d.name) +
+      "88,#000 78%)\" title=\"" +
+      escapeAttr(d.name + (duraLabel ? " · " + duraLabel : "")) +
       '">' +
       (d.qty > 1
         ? '<span class="lt-icard__qty">' + escapeHtml(String(d.qty) + "×") + "</span>"
+        : "") +
+      (duraLabel
+        ? '<span class="lt-icard__dura">' + escapeHtml(duraLabel) + "</span>"
         : "") +
       '<div class="lt-icard__art">' +
       (d.image
@@ -1451,11 +1538,21 @@
         openPicker(addBtn.getAttribute("data-add") || "giving");
         return;
       }
+      var duraBtn = e.target.closest && e.target.closest(".lt-slot__dura-btn");
+      if (duraBtn) {
+        e.preventDefault();
+        adjustDraftDurability(
+          duraBtn.getAttribute("data-side"),
+          duraBtn.getAttribute("data-index"),
+          duraBtn.getAttribute("data-delta")
+        );
+        return;
+      }
       var remove = e.target.closest && e.target.closest(".lt-slot__remove");
       if (remove) {
         removeDraftItem(
           remove.getAttribute("data-side"),
-          remove.getAttribute("data-id")
+          remove.getAttribute("data-index")
         );
         return;
       }
