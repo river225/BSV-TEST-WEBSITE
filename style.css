@@ -16687,14 +16687,13 @@ body.live-trading-page .sections-sidebar {
   width: max-content !important;
   min-width: 0 !important;
   max-width: none;
-  overflow: visible;
-  overflow: hidden !important;
+  overflow: visible !important;
 }
 body.live-trading-page .live-trading-main {
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - 140px);
-  flex: 3 1 0% !important;
+  flex: 1 1 0% !important;
   min-width: 0 !important;
   max-width: none;
   width: auto !important;
