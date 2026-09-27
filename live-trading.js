@@ -35,9 +35,6 @@
   var pickerSide = "giving";
   var searchScope = "all";
   var LT_OWNER_DISCORD_ID = "1163614455616245780";
-  var LT_TRUSTED_TRADER_DISCORD_IDS = {
-    "1507012667297103912": true
-  };
   var discordAppLaunchTimer = null;
   var searchQuery = "";
   var pickerRarity = "all";
@@ -327,9 +324,7 @@
   }
 
   function isTrustedTraderAuthor(author) {
-    author = author || {};
-    var id = String(author.discordId || author.id || "").trim();
-    return !!(id && LT_TRUSTED_TRADER_DISCORD_IDS[id]);
+    return !!(author && author.trustedTrader);
   }
 
   function trustedTraderBadgeHtml() {
@@ -1781,8 +1776,12 @@
     var ids = (posts || [])
       .map(function (p) {
         if (!p || !p.id) return "";
-        // Include scammer flag so role grant/removal refreshes badges without a hard reload.
-        return String(p.id) + (p.author && p.author.scammer ? ":s" : "");
+        // Include role badges so grant/removal refreshes without a hard reload.
+        return (
+          String(p.id) +
+          (p.author && p.author.scammer ? ":s" : "") +
+          (p.author && p.author.trustedTrader ? ":t" : "")
+        );
       })
       .join(",");
     // Include viewer identity so Delete/owner UI re-render when login finishes after posts load.
