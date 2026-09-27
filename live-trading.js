@@ -1215,10 +1215,37 @@
     );
   }
 
-  function offersBadgeCardHtml(kind) {
+  function offersBadgeCircleHtml(kind, extraClass) {
     var isLfo = kind === "lfo";
     var tip = isLfo ? TIP_LFO : TIP_NLFO;
     var label = isLfo ? "Accepting offers" : "Not accepting offers";
+    return (
+      '<span class="lt-offers-badge' +
+      (isLfo ? "" : " lt-offers-badge--no") +
+      (extraClass ? " " + extraClass : "") +
+      '" data-tip="' +
+      escapeAttr(tip) +
+      '" title="' +
+      escapeAttr(tip) +
+      '" aria-label="' +
+      escapeAttr(label) +
+      '">' +
+      '<span class="lt-offers-badge__icon">' +
+      (isLfo ? "✓" : "✕") +
+      "</span>" +
+      '<span class="lt-offers-badge__text">' +
+      (isLfo
+        ? '<span class="lt-offers-badge__line">Accepting</span><span class="lt-offers-badge__line lt-offers-badge__line--em">offers</span>'
+        : '<span class="lt-offers-badge__line">Not accepting</span><span class="lt-offers-badge__line lt-offers-badge__line--em">offers</span>') +
+      "</span>" +
+      "</span>"
+    );
+  }
+
+  function offersBadgeCardHtml(kind) {
+    var isLfo = kind === "lfo";
+    var label = isLfo ? "Accepting offers" : "Not accepting offers";
+    var tip = isLfo ? TIP_LFO : TIP_NLFO;
     return (
       '<div class="lt-icard lt-icard--offers lt-icard--' +
       (isLfo ? "lfo" : "nlfo") +
@@ -1230,18 +1257,7 @@
       escapeAttr(label) +
       '">' +
       '<div class="lt-icard__art lt-icard__art--offers" aria-hidden="true">' +
-      '<div class="lt-offers-badge' +
-      (isLfo ? "" : " lt-offers-badge--no") +
-      '">' +
-      '<span class="lt-offers-badge__icon">' +
-      (isLfo ? "✓" : "✕") +
-      "</span>" +
-      '<span class="lt-offers-badge__text">' +
-      (isLfo
-        ? '<span class="lt-offers-badge__line">Accepting</span><span class="lt-offers-badge__line lt-offers-badge__line--em">offers</span>'
-        : '<span class="lt-offers-badge__line">Not accepting</span><span class="lt-offers-badge__line lt-offers-badge__line--em">offers</span>') +
-      "</span>" +
-      "</div>" +
+      offersBadgeCircleHtml(kind) +
       "</div>" +
       '<div class="lt-icard__bar lt-icard__bar--offers">' +
       '<span class="lt-icard__name">' +
@@ -1277,19 +1293,9 @@
     var wanting = post.wanting || {};
     var offerCorner = "";
     if (wanting.lookingForOffers) {
-      offerCorner =
-        '<span class="lt-post__offer-corner lt-post__offer-corner--lfo" data-tip="' +
-        escapeAttr(TIP_LFO) +
-        '" title="' +
-        escapeAttr(TIP_LFO) +
-        '">Accepting offers</span>';
+      offerCorner = offersBadgeCircleHtml("lfo", "lt-offers-badge--corner");
     } else if (wanting.notLookingForOffers) {
-      offerCorner =
-        '<span class="lt-post__offer-corner lt-post__offer-corner--nlfo" data-tip="' +
-        escapeAttr(TIP_NLFO) +
-        '" title="' +
-        escapeAttr(TIP_NLFO) +
-        '">Not accepting offers</span>';
+      offerCorner = offersBadgeCircleHtml("nlfo", "lt-offers-badge--corner");
     }
     return (
       '<article class="lt-post' +
@@ -1377,10 +1383,12 @@
 
     return (
       '<div class="lt-post__foot">' +
+      (deleteBtn
+        ? '<div class="lt-post__foot-left">' + deleteBtn + "</div>"
+        : '<div class="lt-post__foot-left"></div>') +
       (actions.length
         ? '<div class="lt-post__actions">' + actions.join("") + "</div>"
-        : '<div class="lt-post__actions"></div>') +
-      deleteBtn +
+        : "") +
       "</div>"
     );
   }

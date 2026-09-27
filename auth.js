@@ -198,14 +198,23 @@
 
   function setLoginPurpose(purpose) {
     try {
-      if (purpose) sessionStorage.setItem(LOGIN_PURPOSE_KEY, String(purpose));
-      else sessionStorage.removeItem(LOGIN_PURPOSE_KEY);
+      if (purpose) {
+        sessionStorage.setItem(LOGIN_PURPOSE_KEY, String(purpose));
+        localStorage.setItem(LOGIN_PURPOSE_KEY, String(purpose));
+      } else {
+        sessionStorage.removeItem(LOGIN_PURPOSE_KEY);
+        localStorage.removeItem(LOGIN_PURPOSE_KEY);
+      }
     } catch (_) {}
   }
 
   function getLoginPurpose() {
     try {
-      return sessionStorage.getItem(LOGIN_PURPOSE_KEY) || "";
+      return (
+        sessionStorage.getItem(LOGIN_PURPOSE_KEY) ||
+        localStorage.getItem(LOGIN_PURPOSE_KEY) ||
+        ""
+      );
     } catch (_) {
       return "";
     }
@@ -213,6 +222,25 @@
 
   function loginRequiresGuild() {
     return !!(loginModalOpts && loginModalOpts.requireGuild) || getLoginPurpose() === "live-trading";
+  }
+
+  /** Restore live-trading login purpose from ?bsv_lt_login=1 after Discord OAuth. */
+  function consumeLiveTradingLoginFlag() {
+    try {
+      var u = new URL(window.location.href);
+      if (u.searchParams.get("bsv_lt_login") !== "1") return false;
+      setLoginPurpose("live-trading");
+      markResumeLoginModal();
+      u.searchParams.delete("bsv_lt_login");
+      history.replaceState(
+        null,
+        "",
+        u.pathname + (u.search || "") + (u.hash || "")
+      );
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   function fetchGuildMembership() {
@@ -309,8 +337,16 @@
 
   function startDiscordLogin() {
     markResumeLoginModal();
+    if (loginRequiresGuild()) setLoginPurpose("live-trading");
     saveOAuthReturnTo();
     var returnTo = window.location.href.split("#")[0];
+    if (loginRequiresGuild()) {
+      try {
+        var u = new URL(returnTo);
+        u.searchParams.set("bsv_lt_login", "1");
+        returnTo = u.toString();
+      } catch (_) {}
+    }
     window.location.href = authUrl("api/auth/discord?return_to=" + encodeURIComponent(returnTo));
   }
 
@@ -564,7 +600,8 @@
 
     if (!requireGuild) {
       if (stepGuild) stepGuild.classList.remove("is-complete", "is-locked");
-      if (session.ready) closeLoginModal();
+      // Only auto-close if the modal is already open — never wipe resume flags on page load.
+      if (session.ready && modal && !modal.hidden) closeLoginModal();
       return;
     }
 
@@ -825,27 +862,33 @@
     removeLogoutTestButton();
     watchForLogoutTestButton();
     ensureLoginModal();
+    consumeLiveTradingLoginFlag();
     var justLoggedIn = parseAuthHash();
     clearRobloxLink();
     getAuthSession().then(function (session) {
+      var needsGuildSteps = getLoginPurpose() === "live-trading";
+
       renderNavLogin(session);
       removeLogoutTestButton();
-      if (shouldResumeLoginModal() && !session.ready) {
+
+      if (session.ready && needsGuildSteps) {
+        // After Discord (step 1), reopen the steps popup on join-server (step 2).
         clearResumeLoginModal();
-        openLoginModal(getLoginPurpose() === "live-trading" ? { requireGuild: true } : {});
-      } else if (session.ready && getLoginPurpose() === "live-trading") {
+        openLoginModal({ requireGuild: true, forceGuildCheck: true });
+      } else if (shouldResumeLoginModal() && !session.ready) {
         clearResumeLoginModal();
-        openLoginModal({ requireGuild: true });
+        openLoginModal(needsGuildSteps ? { requireGuild: true } : {});
       } else if (session.ready) {
         clearResumeLoginModal();
       }
-      if (justLoggedIn) {
+
+      if (justLoggedIn && !needsGuildSteps) {
         var welcomeName =
           (session.user && (session.user.displayName || session.user.username)) ||
           "back";
         showWelcomeBanner(welcomeName);
-        setTimeout(removeLogoutTestButton, 0);
       }
+      if (justLoggedIn) setTimeout(removeLogoutTestButton, 0);
     });
     document.addEventListener("click", function (e) {
       if (!e.target.closest(".nav-login-user")) closeLoginMenu();
