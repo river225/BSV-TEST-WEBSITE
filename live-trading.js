@@ -336,7 +336,7 @@
 
   function trustedTraderBadgeHtml() {
     return (
-      '<span class="lt-post__trusted-tag" data-lt-tip="This user has got 200+ vouches to prove their trust in trades, For big trades we recommend still using a Middleman">' +
+      '<span class="lt-post__trusted-tag" data-lt-tip="This user has 200+ vouches proving they’re trusted in trades. For bigger trades, we still recommend using a Middleman to keep things safe.">' +
       '<svg class="lt-post__trusted-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">' +
       '<path fill="currentColor" d="M9.2 16.6L4.8 12.2l1.4-1.4 3 3 8.6-8.6 1.4 1.4-10 10z"/>' +
       "</svg>" +
