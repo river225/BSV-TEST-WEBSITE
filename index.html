@@ -134,7 +134,6 @@ window.BSV_BUILD = "20260926-sessionfix";
 <!-- Google Analytics loads only after cookie consent (see site-chrome.js) -->
 <link rel="preload" href="style.css?v=20260926-sessionfix" as="style" />
 <link rel="stylesheet" href="style.css?v=20260926-sessionfix" />
-<link rel="stylesheet" href="home-redesign.css?v=20260927-home-v2b" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Paytone+One&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
@@ -299,207 +298,93 @@ window.BSV_BUILD = "20260926-sessionfix";
 
     <main id="sections" class="sections">
      <section id="home" style="display: block;">
-
-  <div class="home-page-v2">
+  
+  <div class="home-page-clean">
+    
     <div class="home-content-main">
+    
+    <div class="welcome-header">
+      <h1>
+        <span class="welcome-title-line">Block<span class="brand-spin">Spin</span></span>
+        <span class="welcome-title-line">Values</span>
+      </h1>
+      <p class="subtitle welcome-subtitle-with-icon" data-i18n="home.tagline">The Most Trusted BlockSpin Value List</p>
+      <p class="founder-credit"><span data-i18n="home.founderPrefix">Founded and maintained by</span> <a href="#" onclick="openRiverLinks(event)" style="color: #33cce6; text-decoration: underline;">river</a></p>
+    </div>
 
-      <!-- Primary hero (reference-inspired) -->
-      <section class="hv2-hero" aria-label="BlockSpin Values">
-        <div class="hv2-hero__copy">
-          <h1 class="hv2-hero__title">
-            Block<span class="hv2-brand-spin">Spin</span> Values
-          </h1>
-          <p class="hv2-hero__lead">
-            The trusted hub for BlockSpin trading. Live values, Live Trading posts, tax tools, and a community built to keep deals fair.
-          </p>
-          <div class="hv2-pill">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.4l2.4 4.86 5.36.78-3.88 3.78.92 5.34L12 14.9l-4.8 2.52.92-5.34L4.24 8.04l5.36-.78L12 2.4z"/></svg>
-            The Most Trusted BlockSpin Value List
-          </div>
-          <div class="hv2-hero__actions">
-            <a class="hv2-btn hv2-btn--primary" href="live-trading.html">
-              Start Trading
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M5 12h12M13 6l6 6-6 6"/></svg>
-            </a>
-            <a class="hv2-btn hv2-btn--ghost" href="https://discord.gg/QbapryYUUx" target="_blank" rel="noopener noreferrer">Join Discord</a>
-          </div>
-          <p class="hv2-hero__credit">
-            <span data-i18n="home.founderPrefix">Founded and maintained by</span>
-            <a href="#" onclick="openRiverLinks(event)">river</a>
-          </p>
-        </div>
-        <div class="hv2-hero__visual">
-          <div class="hv2-hero__frame">
-            <div class="hv2-hero__frame-inner">
-              <img src="assets/bsv-logo.png" alt="BlockSpin Values" width="140" height="140" decoding="async" />
-              <p class="hv2-hero__frame-kicker">Live Trading</p>
-              <p class="hv2-hero__frame-title">Post offers. Find deals. Trade safer.</p>
-            </div>
-          </div>
-          <div class="hv2-float-card hv2-float-card--top">
-            <span class="hv2-float-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 18V6h2v12H4zm4-5h12v2H8v-2zm0-5h8v2H8V8z"/></svg>
-            </span>
-            <span class="hv2-float-card__text">
-              <strong>Value List</strong>
-              <span>Updated daily by traders</span>
-            </span>
-          </div>
-          <div class="hv2-float-card hv2-float-card--bottom">
-            <span class="hv2-float-card__icon hv2-float-card__icon--cyan" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M5 12h12M13 6l6 6-6 6"/></svg>
-            </span>
-            <span class="hv2-float-card__text">
-              <strong>Live Trading</strong>
-              <span>Post your offers now</span>
-            </span>
-          </div>
-        </div>
-      </section>
+    <div id="home-discord-promo-slot" class="home-hero-mount"></div>
 
-      <!-- Existing promo mounts (Discord / Robux carousel, humvee, etc.) -->
-      <div id="home-discord-promo-slot" class="home-hero-mount"></div>
-      <div class="home-humvee-banner-wrap"></div>
+    <div class="home-humvee-banner-wrap"></div>
 
-      <!-- Live Trading promotion -->
-      <section class="hv2-lt" aria-label="Live Trading">
-        <div>
-          <p class="hv2-lt__eyebrow">New · Live Trading</p>
-          <h2 class="hv2-lt__title">Trade in real time with the community</h2>
-          <p class="hv2-lt__body">
-            Browse live offers, post what you have and want, and chat traders on Discord — all from the BlockSpin Values site.
-          </p>
-        </div>
-        <div class="hv2-lt__actions">
-          <a class="hv2-btn hv2-btn--primary" href="live-trading.html">Open Live Trading</a>
-          <a class="hv2-btn hv2-btn--ghost" href="https://discord.gg/QbapryYUUx" target="_blank" rel="noopener noreferrer">Discord</a>
-        </div>
-      </section>
+    <div class="home-divider"></div>
 
-      <div class="home-two-columns">
-        <div class="home-column home-column--announcements home-panel is-open" data-home-panel>
-          <div class="home-panel__header">
-            <div class="home-announcements-box__title-row">
-              <img class="home-announcements-box__icon" src="https://i.ibb.co/20SshwSg/dfsawefsvdbsadfsv.png" alt="" width="32" height="32" loading="lazy">
-              <h2 data-i18n="home.announcements">Announcements</h2>
-            </div>
-            <button type="button" class="home-panel__toggle" aria-expanded="true" data-i18n-aria="home.panelToggle" aria-label="Show or hide section">
-              <svg class="home-panel__toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg>
-            </button>
+    
+<div class="home-two-columns">
+      
+      <div class="home-column home-column--announcements home-panel is-open" data-home-panel>
+        <div class="home-panel__header">
+          <div class="home-announcements-box__title-row">
+            <img class="home-announcements-box__icon" src="https://i.ibb.co/20SshwSg/dfsawefsvdbsadfsv.png" alt="" width="32" height="32" loading="lazy">
+            <h2 data-i18n="home.announcements">Announcements</h2>
           </div>
-          <div class="home-panel__body">
-            <div class="announcement-list">
-              <div class="announcement-item-clean">
-                <p class="announcement-date" data-i18n="announce.1.date">April 17, 2026</p>
-                <p class="announcement-text" data-i18n="announce.1.text">Website Update is now live! The Tax Calculator is finally back and more advanced 🔥 It shows exactly how much to trade and in what order to avoid overpaying. New Recent Changes box lets you track all value list updates. (On mobile click blue arrow in a gun section to access tax calculator.)</p>
-              </div>
-              <div class="announcement-item-clean">
-                <p class="announcement-date" data-i18n="announce.2.date">Dec 3, 2025</p>
-                <p class="announcement-text" data-i18n="announce.2.text">BlockSpin recently changed how many is dropped in-game, thus we have removed the tax calculator as its not accurate anymore. we will adapt to new changes shortly.</p>
-              </div>
-              <div class="announcement-item-clean">
-                <p class="announcement-date" data-i18n="announce.3.date">Dec 2, 2025</p>
-                <p class="announcement-text" data-i18n="announce.3.text">Our richest player sections search bar now works for mobile, check out your rank!</p>
-              </div>
-              <div class="announcement-item-clean">
-                <p class="announcement-date" data-i18n="announce.4.date">Nov 29, 2025</p>
-                <p class="announcement-text" data-i18n="announce.4.text">Our latest website update is now live!
+          <button type="button" class="home-panel__toggle" aria-expanded="true" data-i18n-aria="home.panelToggle" aria-label="Show or hide section">
+            <svg class="home-panel__toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg>
+          </button>
+        </div>
+        <div class="home-panel__body">
+        <div class="announcement-list">
+
+             <div class="announcement-item-clean">
+  <p class="announcement-date" data-i18n="announce.1.date">April 17, 2026</p>
+  <p class="announcement-text" data-i18n="announce.1.text">Website Update is now live! The Tax Calculator is finally back and more advanced 🔥 It shows exactly how much to trade and in what order to avoid overpaying. New Recent Changes box lets you track all value list updates. (On mobile click blue arrow in a gun section to access tax calculator.)</p>
+</div>
+
+          <div class="announcement-item-clean">
+  <p class="announcement-date" data-i18n="announce.2.date">Dec 3, 2025</p>
+  <p class="announcement-text" data-i18n="announce.2.text">BlockSpin recently changed how many is dropped in-game, thus we have removed the tax calculator as its not accurate anymore. we will adapt to new changes shortly.</p>
+</div>
+
+          <div class="announcement-item-clean">
+  <p class="announcement-date" data-i18n="announce.3.date">Dec 2, 2025</p>
+  <p class="announcement-text" data-i18n="announce.3.text">Our richest player sections search bar now works for mobile, check out your rank!</p>
+</div>
+          <div class="announcement-item-clean">
+            <p class="announcement-date" data-i18n="announce.4.date">Nov 29, 2025</p>
+            <p class="announcement-text" data-i18n="announce.4.text">Our latest website update is now live!
 We’ve launched a complete site redesign, and items will now display both their repair prices and pawn values across all durability levels. This update is designed to give you clearer, more detailed information and an overall better user experience.</p>
-              </div>
-            </div>
           </div>
         </div>
-
-        <div class="home-column home-column--value-changes home-panel is-open" data-home-panel>
-          <div class="home-panel__header">
-            <h2 class="value-changes-heading" data-i18n="home.recentChanges">Recent Value Changes</h2>
-            <button type="button" class="home-panel__toggle" aria-expanded="true" data-i18n-aria="home.panelToggle" aria-label="Show or hide section">
-              <svg class="home-panel__toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg>
-            </button>
-          </div>
-          <div class="home-panel__body">
-            <div class="value-changes-list" id="home-main-value-changes-list">
-              <div class="value-changes-loading" data-i18n="loading.changes">Loading value changes...</div>
-            </div>
-          </div>
         </div>
       </div>
 
-      <div class="what-is-section">
-        <h2 data-i18n="home.whatIsTitle">What is BlockSpin Values?</h2>
-        <p data-i18n="home.whatIsBody">BlockSpin Values is the trusted value list for all items in the Roblox game BlockSpin. Our dedicated team of top traders keeps values updated daily to help you make fair trades and avoid scams. Whether you're looking for weapon values, checking crew logos, or calculating taxes, we've got everything you need to trade with confidence.</p>
+      <div class="home-column home-column--value-changes home-panel is-open" data-home-panel>
+        <div class="home-panel__header">
+          <h2 class="value-changes-heading" data-i18n="home.recentChanges">Recent Value Changes</h2>
+          <button type="button" class="home-panel__toggle" aria-expanded="true" data-i18n-aria="home.panelToggle" aria-label="Show or hide section">
+            <svg class="home-panel__toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg>
+          </button>
+        </div>
+        <div class="home-panel__body">
+        <div class="value-changes-list" id="home-main-value-changes-list">
+          <div class="value-changes-loading" data-i18n="loading.changes">Loading value changes...</div>
+        </div>
+        </div>
       </div>
-
-      <!-- Alternate section versions for you to pick from -->
-      <aside class="hv2-lab" aria-label="Home section options">
-        <div class="hv2-lab__head">
-          <h2>Home section options (test only)</h2>
-          <p>Extra layouts you can compare — tell me which ones to keep or kill.</p>
-        </div>
-
-        <div class="hv2-lab__block">
-          <p class="hv2-lab__label">Hero · Alt B · Centered</p>
-          <div class="hv2-hero-b">
-            <h2>Block<span>Spin</span> Values</h2>
-            <p>Values, tax tools, and Live Trading in one place — built for BlockSpin traders.</p>
-            <div class="hv2-hero__actions">
-              <a class="hv2-btn hv2-btn--primary" href="live-trading.html">Start Trading →</a>
-              <a class="hv2-btn hv2-btn--ghost" href="https://discord.gg/QbapryYUUx" target="_blank" rel="noopener noreferrer">Discord</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="hv2-lab__block">
-          <p class="hv2-lab__label">Hero · Alt C · Compact bar</p>
-          <div class="hv2-hero-c">
-            <div>
-              <h2>Trade smarter on BlockSpin</h2>
-              <p>Official values + Live Trading board + free middleman community.</p>
-            </div>
-            <a class="hv2-btn hv2-btn--primary" href="live-trading.html">Open Live Trading</a>
-          </div>
-        </div>
-
-        <div class="hv2-lab__block">
-          <p class="hv2-lab__label">Live Trading · Alt B · Split tiles</p>
-          <div class="hv2-lt-b">
-            <article class="hv2-lt-b__tile hv2-lt-b__tile--live">
-              <h3>Live Trading board</h3>
-              <p>Post I Have / I Want offers and browse deals as they go live.</p>
-              <a class="hv2-btn hv2-btn--primary" href="live-trading.html">Go to board</a>
-            </article>
-            <article class="hv2-lt-b__tile hv2-lt-b__tile--discord">
-              <h3>Finish deals on Discord</h3>
-              <p>Accept offer opens chat so you can close trades with the poster.</p>
-              <a class="hv2-btn hv2-btn--ghost" href="https://discord.gg/QbapryYUUx" target="_blank" rel="noopener noreferrer">Join server</a>
-            </article>
-          </div>
-        </div>
-
-        <div class="hv2-lab__block">
-          <p class="hv2-lab__label">Features strip · Alt</p>
-          <div class="hv2-features">
-            <article>
-              <span class="hv2-features__mark" aria-hidden="true"></span>
-              <h3>Daily values</h3>
-              <p>Weapon, crate, and crew values kept current by top traders.</p>
-            </article>
-            <article>
-              <span class="hv2-features__mark" aria-hidden="true"></span>
-              <h3>Tax calculator</h3>
-              <p>Know exact drop amounts so you don’t overpay in-game tax.</p>
-            </article>
-            <article>
-              <span class="hv2-features__mark" aria-hidden="true"></span>
-              <h3>Live Trading</h3>
-              <p>Community offers on-site with Discord chat to close the deal.</p>
-            </article>
-          </div>
-        </div>
-      </aside>
 
     </div>
+
+    <div class="home-divider"></div>
+
+    
+<div class="what-is-section">
+      <h2 data-i18n="home.whatIsTitle">What is BlockSpin Values?</h2>
+      <p data-i18n="home.whatIsBody">BlockSpin Values is the trusted value list for all items in the Roblox game BlockSpin. Our dedicated team of top traders keeps values updated daily to help you make fair trades and avoid scams. Whether you're looking for weapon values, checking crew logos, or calculating taxes, we've got everything you need to trade with confidence.</p>
+    </div>
+
   </div>
+
+
+</div>
 
 </section>
     </main> 
