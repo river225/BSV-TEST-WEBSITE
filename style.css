@@ -16612,6 +16612,14 @@ body.live-trading-page .live-trading-workspace {
   margin: 0;
 }
 
+.lt-side__tags-note {
+  width: 100%;
+  margin: 0 0 8px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.78rem;
+  font-weight: 650;
+  line-height: 1.35;
+}
 .lt-side__tags {
   width: 100%;
   display: flex;
@@ -17050,11 +17058,11 @@ body.live-trading-page .live-trading-workspace {
   padding: 0;
   scroll-snap-align: start;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid #000;
   background:
     radial-gradient(120% 90% at 50% 20%, color-mix(in srgb, var(--lt-card) 55%, transparent), transparent 70%),
     linear-gradient(180deg, color-mix(in srgb, var(--lt-card) 42%, #0b1220) 0%, #000 100%);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 8px 16px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.28);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -17062,6 +17070,7 @@ body.live-trading-page .live-trading-workspace {
   color: inherit;
   font: inherit;
   text-align: left;
+  isolation: isolate;
 }
 .lt-icard[data-lt-item] {
   cursor: pointer;
@@ -17069,12 +17078,12 @@ body.live-trading-page .live-trading-workspace {
 .lt-icard::after {
   content: "";
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 12px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  height: 18px;
   background: #000;
-  border-radius: 0 0 13px 13px;
+  border-radius: 0 0 14px 14px;
   z-index: 1;
   pointer-events: none;
 }
@@ -17127,9 +17136,10 @@ body.live-trading-page .live-trading-workspace {
   justify-content: center;
   gap: 2px;
   margin: 0;
-  padding: 7px 8px 10px;
+  padding: 7px 8px 11px;
   border-radius: 0 0 13px 13px;
   background: #000;
+  box-shadow: 0 2px 0 #000;
 }
 .lt-icard__dura {
   color: #fff;

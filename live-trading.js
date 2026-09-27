@@ -772,17 +772,68 @@
     renderDraftGrids();
   }
 
-  function adjustDraftDurability(side, index, delta) {
+  function syncDraftDuraLabel(side, index) {
     var list = draft[side] || [];
     var i = Number(index);
     if (!Number.isFinite(i) || i < 0 || i >= list.length) return;
+    var grid = document.getElementById(
+      side === "giving" ? "lt-giving-grid" : "lt-wanting-grid"
+    );
+    if (!grid) return;
+    var slots = grid.querySelectorAll(".lt-slot--item");
+    var slot = slots[i];
+    if (!slot) return;
     var entry = list[i];
-    if (!itemHasDurability(entry)) return;
+    var label = formatDurability(entry);
+    var val = slot.querySelector(".lt-slot__dura-val");
+    if (val) val.textContent = label;
+    slot.title = entry.name + (label ? " · " + label : "");
+  }
+
+  function adjustDraftDurability(side, index, delta, soft) {
+    var list = draft[side] || [];
+    var i = Number(index);
+    if (!Number.isFinite(i) || i < 0 || i >= list.length) return false;
+    var entry = list[i];
+    if (!itemHasDurability(entry)) return false;
     var max = Math.max(1, Number(entry.maxDurability) || 1);
     var cur = Math.max(0, Math.min(max, Number(entry.durability) || max));
-    entry.durability = Math.max(0, Math.min(max, cur + (Number(delta) || 0)));
+    var next = Math.max(0, Math.min(max, cur + (Number(delta) || 0)));
+    if (next === cur) return false;
+    entry.durability = next;
     draft[side] = list;
-    renderDraftGrids();
+    if (soft) syncDraftDuraLabel(side, i);
+    else renderDraftGrids();
+    return true;
+  }
+
+  var duraHoldTimer = null;
+  var duraHoldInterval = null;
+
+  function stopDuraHold() {
+    if (duraHoldTimer) {
+      window.clearTimeout(duraHoldTimer);
+      duraHoldTimer = null;
+    }
+    if (duraHoldInterval) {
+      window.clearInterval(duraHoldInterval);
+      duraHoldInterval = null;
+    }
+  }
+
+  function startDuraHold(btn) {
+    stopDuraHold();
+    if (!btn) return;
+    var side = btn.getAttribute("data-side");
+    var index = btn.getAttribute("data-index");
+    var delta = btn.getAttribute("data-delta");
+    adjustDraftDurability(side, index, delta, true);
+    duraHoldTimer = window.setTimeout(function () {
+      duraHoldInterval = window.setInterval(function () {
+        var ok = adjustDraftDurability(side, index, delta, true);
+        if (!ok) stopDuraHold();
+      }, 55);
+    }, 220);
   }
 
   function addDraftItem(side, item) {
@@ -1235,7 +1286,7 @@
       parts.push(qty > 1 ? qty + "× " + label : label);
     }
     if (side.cash) parts.push(formatCash(side.cash));
-    return parts.length ? parts.join(", ") : emptyLabel || "nothing";
+    return joinPhrases(parts) || emptyLabel || "nothing";
   }
 
   function postSummaryHtml(post) {
@@ -1244,7 +1295,7 @@
       '<p class="lt-post__summary-line"><span class="lt-post__summary-k">Offering</span> ' +
       escapeHtml(sideTradePhraseCompact(post.giving, "nothing")) +
       "</p>" +
-      '<p class="lt-post__summary-line"><span class="lt-post__summary-k">Wanting</span> ' +
+      '<p class="lt-post__summary-line"><span class="lt-post__summary-k">Requesting</span> ' +
       escapeHtml(sideTradePhraseCompact(post.wanting, "nothing")) +
       "</p>" +
       "</div>"
@@ -1678,20 +1729,25 @@
     if (lfo) lfo.addEventListener("click", toggleLfo);
     if (nlfo) nlfo.addEventListener("click", toggleNlfo);
 
+    document.addEventListener("pointerdown", function (e) {
+      var duraBtn = e.target.closest && e.target.closest(".lt-slot__dura-btn");
+      if (!duraBtn) return;
+      e.preventDefault();
+      startDuraHold(duraBtn);
+    });
+    document.addEventListener("pointerup", stopDuraHold);
+    document.addEventListener("pointercancel", stopDuraHold);
+    document.addEventListener("pointerleave", function (e) {
+      if (e.target && e.target.closest && e.target.closest(".lt-slot__dura-btn")) {
+        stopDuraHold();
+      }
+    });
+    window.addEventListener("blur", stopDuraHold);
+
     document.addEventListener("click", function (e) {
       var addBtn = e.target.closest && e.target.closest(".lt-slot--add");
       if (addBtn) {
         openPicker(addBtn.getAttribute("data-add") || "giving");
-        return;
-      }
-      var duraBtn = e.target.closest && e.target.closest(".lt-slot__dura-btn");
-      if (duraBtn) {
-        e.preventDefault();
-        adjustDraftDurability(
-          duraBtn.getAttribute("data-side"),
-          duraBtn.getAttribute("data-index"),
-          duraBtn.getAttribute("data-delta")
-        );
         return;
       }
       var remove = e.target.closest && e.target.closest(".lt-slot__remove");
