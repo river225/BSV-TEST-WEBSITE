@@ -284,6 +284,13 @@
     return u ? "@" + u : "";
   }
 
+  function authorDiscordProfileUrl(author) {
+    author = author || {};
+    var id = String(author.discordId || author.id || "").trim();
+    if (!id || !/^\d{5,32}$/.test(id)) return "";
+    return "https://discord.com/users/" + encodeURIComponent(id);
+  }
+
   function authorAvatar(author) {
     author = author || {};
     if (author.discordAvatar) return author.discordAvatar;
@@ -596,6 +603,13 @@
     err.textContent = msg;
   }
 
+  function setTagRequiredHint(on) {
+    var tags = document.getElementById("lt-want-tags");
+    var hint = document.getElementById("lt-want-tags-hint");
+    if (tags) tags.classList.toggle("lt-side__tags--required", !!on);
+    if (hint) hint.classList.toggle("is-loud", !!on);
+  }
+
   function itemSlotHtml(entry, side) {
     var qty = Math.max(1, Number(entry.qty) || 1);
     return (
@@ -702,12 +716,20 @@
   function toggleLfo() {
     draft.lookingForOffers = !draft.lookingForOffers;
     if (draft.lookingForOffers) draft.notLookingForOffers = false;
+    if (draft.lookingForOffers || draft.notLookingForOffers) {
+      setTagRequiredHint(false);
+      clearComposerError();
+    }
     renderDraftGrids();
   }
 
   function toggleNlfo() {
     draft.notLookingForOffers = !draft.notLookingForOffers;
     if (draft.notLookingForOffers) draft.lookingForOffers = false;
+    if (draft.lookingForOffers || draft.notLookingForOffers) {
+      setTagRequiredHint(false);
+      clearComposerError();
+    }
     renderDraftGrids();
   }
 
@@ -867,15 +889,12 @@
       showComposerError("Add at least one item or cash on I Have.");
       return;
     }
-    if (
-      !draft.lookingForOffers &&
-      !draft.notLookingForOffers &&
-      !draft.wanting.length &&
-      !draft.wantingCash
-    ) {
-      showComposerError("Add items or cash on I Want, or pick a tag.");
+    if (!draft.lookingForOffers && !draft.notLookingForOffers) {
+      setTagRequiredHint(true);
+      showComposerError("Select a tag: Looking for offers or Not looking for offers.");
       return;
     }
+    setTagRequiredHint(false);
 
     var payload = {
       giving: {
@@ -931,6 +950,13 @@
           }
           if (err === "user_limit_reached") {
             showComposerError("You already have the maximum number of active posts.");
+            return;
+          }
+          if (err === "tag_required") {
+            setTagRequiredHint(true);
+            showComposerError(
+              "Select a tag: Looking for offers or Not looking for offers."
+            );
             return;
           }
           showComposerError("Couldn’t post right now. Try again.");
@@ -1086,28 +1112,42 @@
     return joinPhrases(parts) || emptyLabel || "nothing";
   }
 
-  function postSummaryHtml(post) {
-    var wanting = post.wanting || {};
-    var name = authorDisplayName(post.author);
-    var offerLine = "";
-    if (wanting.lookingForOffers) {
-      offerLine =
-        '<p class="lt-post__summary-offer lt-post__summary-offer--lfo">' +
-        escapeHtml(name) +
-        " is accepting offers</p>";
-    } else if (wanting.notLookingForOffers) {
-      offerLine =
-        '<p class="lt-post__summary-offer lt-post__summary-offer--nlfo">' +
-        escapeHtml(name) +
-        " is not accepting offers</p>";
+  function truncateSummaryName(name, maxLen) {
+    var s = String(name || "").trim();
+    var n = maxLen || 22;
+    if (s.length <= n) return s;
+    return s.slice(0, Math.max(1, n - 1)) + "…";
+  }
+
+  function sideTradePhraseCompact(side, emptyLabel) {
+    side = side || {};
+    var items = Array.isArray(side.items) ? side.items : [];
+    var parts = [];
+    var i;
+    var limit = 2;
+    for (i = 0; i < items.length && i < limit; i++) {
+      var it = items[i];
+      var label = truncateSummaryName(it && it.name ? it.name : "Item", 20);
+      var qty = Math.max(1, Number(it && it.qty) || 1);
+      parts.push(qty > 1 ? qty + "× " + label : label);
     }
+    if (items.length > limit) {
+      parts.push("+" + (items.length - limit) + " more");
+    }
+    if (side.cash) parts.push(formatCash(side.cash));
+    return parts.length ? parts.join(", ") : emptyLabel || "nothing";
+  }
+
+  function postSummaryHtml(post) {
     return (
-      '<p class="lt-post__summary-text">' +
-      escapeHtml(sideTradePhrase(post.giving, "nothing")) +
-      ' <strong class="lt-post__summary-for">for</strong> ' +
-      escapeHtml(sideTradePhrase(post.wanting, "nothing")) +
+      '<div class="lt-post__summary-text">' +
+      '<p class="lt-post__summary-line"><span class="lt-post__summary-k">Offering</span> ' +
+      escapeHtml(sideTradePhraseCompact(post.giving, "nothing")) +
       "</p>" +
-      offerLine
+      '<p class="lt-post__summary-line"><span class="lt-post__summary-k">Wanting</span> ' +
+      escapeHtml(sideTradePhraseCompact(post.wanting, "nothing")) +
+      "</p>" +
+      "</div>"
     );
   }
 
@@ -1297,14 +1337,51 @@
       '<p class="lt-post__summary-label">Post Summary</p>' +
       postSummaryHtml(post) +
       "</div>" +
-      (own
-        ? '<div class="lt-post__foot">' +
-          '<button type="button" class="lt-post__delete" data-delete="' +
-          escapeAttr(post.id) +
-          '">Delete</button>' +
-          "</div>"
-        : "") +
+      postFootHtml(post) +
       "</article>"
+    );
+  }
+
+  function postFootHtml(post) {
+    var own = isOwnPost(post);
+    var wanting = post.wanting || {};
+    var profileUrl = authorDiscordProfileUrl(post.author);
+    var actions = [];
+
+    if (!own) {
+      if (profileUrl) {
+        actions.push(
+          '<a class="lt-post__accept" href="' +
+            escapeAttr(profileUrl) +
+            '" target="_blank" rel="noopener noreferrer">Accept offer</a>'
+        );
+      } else {
+        actions.push(
+          '<span class="lt-post__accept lt-post__accept--disabled" title="Discord profile unavailable">Accept offer</span>'
+        );
+      }
+      if (wanting.lookingForOffers) {
+        actions.push(
+          '<button type="button" class="lt-post__counter" disabled title="Coming soon">Counter-offer</button>'
+        );
+      }
+    }
+
+    var deleteBtn = own
+      ? '<button type="button" class="lt-post__delete" data-delete="' +
+        escapeAttr(post.id) +
+        '">Delete</button>'
+      : "";
+
+    if (!actions.length && !deleteBtn) return "";
+
+    return (
+      '<div class="lt-post__foot">' +
+      (actions.length
+        ? '<div class="lt-post__actions">' + actions.join("") + "</div>"
+        : '<div class="lt-post__actions"></div>') +
+      deleteBtn +
+      "</div>"
     );
   }
 
