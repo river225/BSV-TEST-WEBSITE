@@ -17106,35 +17106,37 @@ body.live-trading-page .live-trading-workspace {
   filter: drop-shadow(0 0 4px rgba(167, 243, 208, 0.65));
 }
 .lt-post__staff-tag {
-  width: 22px;
-  height: 22px;
+  width: auto;
+  height: auto;
   padding: 0;
   gap: 0;
   justify-content: center;
-  border-radius: 50%;
-  border: 1px solid rgba(191, 219, 254, 0.85);
-  background:
-    linear-gradient(180deg, #60a5fa 0%, #2563eb 55%, #1e3a8a 100%);
-  color: #eff6ff;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    0 0 0 1px rgba(30, 58, 138, 0.55),
-    0 4px 12px rgba(37, 99, 235, 0.35);
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
   text-shadow: none;
   letter-spacing: 0;
+  overflow: visible;
+  color: #3b82f6;
 }
-.lt-post__staff-mark {
+.lt-post__staff-tag::before {
   display: none;
 }
+.lt-post__staff-tag:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.12);
+}
+.lt-post__staff-mark,
 .lt-post__staff-text {
   display: none;
 }
 .lt-post__staff-icon {
-  width: 13px;
-  height: 13px;
+  width: 18px;
+  height: 18px;
   display: block;
-  color: #eff6ff;
-  filter: drop-shadow(0 0 3px rgba(191, 219, 254, 0.75));
+  color: #3b82f6;
+  filter: drop-shadow(0 1px 2px rgba(30, 64, 175, 0.55));
 }
 .lt-post__time {
   margin: 2px 0 0;
