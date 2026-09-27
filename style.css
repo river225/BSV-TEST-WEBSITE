@@ -16942,8 +16942,15 @@ body.live-trading-page .live-trading-workspace {
 .lt-post__name-main {
   min-width: 0;
 }
+.lt-post__who {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  gap: 4px;
+}
 .lt-post__badges {
-  display: inline-flex;
+  display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 6px;
@@ -17874,6 +17881,10 @@ body.live-trading-page .live-trading-workspace {
 .lt-profile__avatar--ph {
   display: inline-block;
 }
+.lt-profile__avatar[hidden],
+.lt-profile__avatar--ph[hidden] {
+  display: none !important;
+}
 .lt-profile__name {
   margin: 0;
   color: #fff;
@@ -17887,6 +17898,23 @@ body.live-trading-page .live-trading-workspace {
   color: rgba(255, 255, 255, 0.55);
   font-size: 0.88rem;
   font-weight: 650;
+}
+.lt-profile__badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+.lt-profile__badges[hidden] {
+  display: none !important;
+}
+.lt-profile__badges .lt-post__owner-tag,
+.lt-profile__badges .lt-post__staff-tag,
+.lt-profile__badges .lt-post__trusted-tag,
+.lt-profile__badges .lt-post__scammer-tag {
+  margin: 0;
 }
 .lt-profile__meta {
   margin: 0;

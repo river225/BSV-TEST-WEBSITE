@@ -1913,18 +1913,12 @@
         ? ' <span class="lt-post__handle">' + escapeHtml(handle) + "</span>"
         : "") +
       "</span>" +
-      (function () {
-        var badges = [];
-        if (isSiteOwnerAuthor(author)) badges.push(ownerBadgeHtml());
-        if (isCommunityStaffAuthor(author)) badges.push(communityStaffBadgeHtml());
-        if (isTrustedTraderAuthor(author)) badges.push(trustedTraderBadgeHtml());
-        if (isScammerAuthor(author)) badges.push(scammerBadgeHtml());
-        if (!badges.length) return "";
-        return (
-          '<span class="lt-post__badges">' + badges.join("") + "</span>"
-        );
-      })() +
       "</p>" +
+      (function () {
+        var badgesHtml = authorBadgesHtml(author);
+        if (!badgesHtml) return "";
+        return '<div class="lt-post__badges">' + badgesHtml + "</div>";
+      })() +
       '<p class="lt-post__time">' +
       escapeHtml(timeAgo(post.createdAt)) +
       "</p>" +
@@ -2122,6 +2116,15 @@
     return null;
   }
 
+  function authorBadgesHtml(author) {
+    var badges = [];
+    if (isSiteOwnerAuthor(author)) badges.push(ownerBadgeHtml());
+    if (isCommunityStaffAuthor(author)) badges.push(communityStaffBadgeHtml());
+    if (isTrustedTraderAuthor(author)) badges.push(trustedTraderBadgeHtml());
+    if (isScammerAuthor(author)) badges.push(scammerBadgeHtml());
+    return badges.join("");
+  }
+
   function openAuthorProfile(discordId) {
     var id = String(discordId || "").trim();
     if (!id || !/^\d{5,32}$/.test(id)) return;
@@ -2131,12 +2134,14 @@
     var handle = authorHandle(author);
     var created = discordCreatedAtFromId(id);
     var posts = countPostsByDiscordId(id);
+    var badgesHtml = authorBadgesHtml(author);
 
     var pop = document.getElementById("lt-profile");
     var avatarEl = document.getElementById("lt-profile-avatar");
     var avatarPh = document.getElementById("lt-profile-avatar-ph");
     var nameEl = document.getElementById("lt-profile-name");
     var handleEl = document.getElementById("lt-profile-handle");
+    var badgesEl = document.getElementById("lt-profile-badges");
     var idEl = document.getElementById("lt-profile-id");
     var createdEl = document.getElementById("lt-profile-created");
     var postsEl = document.getElementById("lt-profile-posts");
@@ -2145,10 +2150,12 @@
     if (avatarEl && avatarPh) {
       if (avatar) {
         avatarEl.src = avatar;
+        avatarEl.alt = name || "Avatar";
         avatarEl.hidden = false;
         avatarPh.hidden = true;
       } else {
         avatarEl.removeAttribute("src");
+        avatarEl.alt = "";
         avatarEl.hidden = true;
         avatarPh.hidden = false;
       }
@@ -2161,6 +2168,15 @@
       } else {
         handleEl.textContent = "";
         handleEl.hidden = true;
+      }
+    }
+    if (badgesEl) {
+      if (badgesHtml) {
+        badgesEl.innerHTML = badgesHtml;
+        badgesEl.hidden = false;
+      } else {
+        badgesEl.innerHTML = "";
+        badgesEl.hidden = true;
       }
     }
     if (idEl) idEl.textContent = id;
