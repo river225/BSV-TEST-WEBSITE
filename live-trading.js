@@ -322,9 +322,11 @@
   function scammerBadgeHtml() {
     return (
       '<span class="lt-post__scammer-tag" data-lt-tip="This user has previously been caught scamming. Trade with caution">' +
-      '<svg class="lt-post__scammer-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">' +
-      '<path fill="currentColor" d="M12 2.2L1.2 21h21.6L12 2.2zm0 5.3l6.8 11.7H5.2L12 7.5zM11 11v4.5h2V11h-2zm0 6v2h2v-2h-2z"/>' +
+      '<span class="lt-post__scammer-mark" aria-hidden="true">' +
+      '<svg class="lt-post__scammer-icon" viewBox="0 0 24 24" width="14" height="14">' +
+      '<path fill="currentColor" d="M12 2.4L1.6 20.6c-.25.44.07 1 .58 1h19.64c.51 0 .83-.56.58-1L12 2.4zm0 5.4c.55 0 1 .4 1 .95v5.7c0 .55-.45 1-1 1s-1-.45-1-1v-5.7c0-.55.45-.95 1-.95zm0 10.7a1.15 1.15 0 100-2.3 1.15 1.15 0 000 2.3z"/>' +
       "</svg>" +
+      "</span>" +
       '<span class="lt-post__scammer-text">Scammer</span>' +
       "</span>"
     );
@@ -337,9 +339,11 @@
   function trustedTraderBadgeHtml() {
     return (
       '<span class="lt-post__trusted-tag" data-lt-tip="This user has 200+ vouches proving they’re trusted in trades. For bigger trades, we still recommend using a Middleman to keep things safe.">' +
-      '<svg class="lt-post__trusted-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">' +
-      '<path fill="currentColor" d="M9.2 16.6L4.8 12.2l1.4-1.4 3 3 8.6-8.6 1.4 1.4-10 10z"/>' +
+      '<span class="lt-post__trusted-mark" aria-hidden="true">' +
+      '<svg class="lt-post__trusted-icon" viewBox="0 0 24 24" width="14" height="14">' +
+      '<path fill="currentColor" d="M12 2.2l7.2 3.1v6.2c0 4.7-3.1 8.9-7.2 10.1-4.1-1.2-7.2-5.4-7.2-10.1V5.3L12 2.2zm0 2.3L6.8 6.6v4.9c0 3.5 2.3 6.7 5.2 7.8 2.9-1.1 5.2-4.3 5.2-7.8V6.6L12 4.5zm-.1 10.9l-3.3-3.3 1.3-1.3 2 2 4.1-4.1 1.3 1.3-5.4 5.4z"/>' +
       "</svg>" +
+      "</span>" +
       '<span class="lt-post__trusted-text">Trusted Trader</span>' +
       "</span>"
     );
