@@ -211,12 +211,14 @@
         } else if (!postsCache.length) {
           postsCache = readLocalPostsFallback();
         }
+        syncPastePreviousButton();
         renderFeed();
         return postsCache;
       })
       .catch(function () {
         if (gen !== postsFetchGen) return postsCache;
         if (!postsCache.length) postsCache = readLocalPostsFallback();
+        syncPastePreviousButton();
         renderFeed();
         return postsCache;
       })
@@ -671,11 +673,13 @@
     composer.hidden = !open;
     if (open) {
       syncComposerModeUi();
+      syncPastePreviousButton();
       renderDraftGrids();
       clearComposerError();
     } else {
       editingPostId = null;
       syncComposerModeUi();
+      syncPastePreviousButton();
     }
     requestAnimationFrame(syncLiveTradingBoardHeight);
   }
@@ -1086,6 +1090,50 @@
     setTagRequiredHint(false);
     clearComposerError();
     renderDraftGrids();
+  }
+
+  function findLatestOwnPost() {
+    if (!sessionDiscordId()) return null;
+    var latest = null;
+    var latestAt = -1;
+    var fallback = null;
+    var fallbackAt = -1;
+    for (var i = 0; i < postsCache.length; i++) {
+      var post = postsCache[i];
+      if (!post || !isOwnPost(post)) continue;
+      var at = Number(post.createdAt) || 0;
+      // Prefer a different post when editing; fall back to the edited one.
+      if (editingPostId && String(post.id) === String(editingPostId)) {
+        if (at >= fallbackAt) {
+          fallbackAt = at;
+          fallback = post;
+        }
+        continue;
+      }
+      if (at >= latestAt) {
+        latestAt = at;
+        latest = post;
+      }
+    }
+    return latest || fallback;
+  }
+
+  function syncPastePreviousButton() {
+    var btn = document.getElementById("lt-paste-previous");
+    if (!btn) return;
+    var hasPrev = !!findLatestOwnPost();
+    btn.hidden = !hasPrev;
+  }
+
+  function pastePreviousPost() {
+    var post = findLatestOwnPost();
+    if (!post) {
+      showComposerError("No previous post to paste.");
+      syncPastePreviousButton();
+      return;
+    }
+    loadDraftFromPost(post);
+    clearComposerError();
   }
 
   function startEditPost(id) {
@@ -2012,6 +2060,7 @@
     var openCreate = document.getElementById("lt-open-create");
     var closeCreate = document.getElementById("lt-close-create");
     var submit = document.getElementById("lt-submit-post");
+    var pastePrev = document.getElementById("lt-paste-previous");
     var lfo = document.getElementById("lt-add-lfo");
     var nlfo = document.getElementById("lt-add-nlfo");
     var search = document.getElementById("lt-search");
@@ -2027,6 +2076,11 @@
           setComposerOpen(true);
           loadCatalog();
         });
+      });
+    }
+    if (pastePrev) {
+      pastePrev.addEventListener("click", function () {
+        pastePreviousPost();
       });
     }
     var joinClose = document.getElementById("lt-join-discord-close");
