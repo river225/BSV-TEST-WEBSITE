@@ -17145,7 +17145,7 @@ body.live-trading-page .live-trading-workspace {
   content: "";
   position: absolute;
   right: 2px;
-  bottom: 2px;
+  bottom: 10px;
   left: auto;
   top: auto;
   width: 72px;
@@ -17567,7 +17567,7 @@ body.live-trading-page .live-trading-workspace {
 }
 .lt-icard--pop .lt-icard__art::after {
   right: 4px;
-  bottom: 4px;
+  bottom: 14px;
   width: 100px;
   height: 35px;
 }
