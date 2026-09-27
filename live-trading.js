@@ -2306,6 +2306,12 @@
     window.addEventListener("blur", stopSlotHold);
 
     document.addEventListener("click", function (e) {
+      var profileBtn = e.target.closest && e.target.closest("[data-lt-profile]");
+      if (profileBtn) {
+        e.preventDefault();
+        openAuthorProfile(profileBtn.getAttribute("data-lt-profile"));
+        return;
+      }
       var addBtn = e.target.closest && e.target.closest(".lt-slot--add");
       if (addBtn) {
         openPicker(addBtn.getAttribute("data-add") || "giving");
