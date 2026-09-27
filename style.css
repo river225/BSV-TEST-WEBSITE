@@ -17690,6 +17690,8 @@ body.live-trading-page .live-trading-workspace {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: 0 4px;
   width: 100%;
   box-sizing: border-box;
   padding: 12px 16px;
@@ -17701,6 +17703,17 @@ body.live-trading-page .live-trading-workspace {
   text-decoration: none;
   cursor: pointer;
   text-align: center;
+}
+.lt-post__accept-chat {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.lt-post__accept-chat-icon {
+  width: 14px;
+  height: 14px;
+  display: block;
+  flex: 0 0 auto;
 }
 .lt-post__accept:hover {
   border-color: rgba(52, 211, 153, 0.8);

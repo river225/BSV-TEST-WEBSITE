@@ -1946,25 +1946,73 @@
     );
   }
 
-  function openDiscordProfile(discordId) {
+  function discordUserWebUrl(discordId) {
     var id = String(discordId || "").trim();
-    if (!id) return;
+    if (!id || !/^\d{5,32}$/.test(id)) return "";
+    return "https://discord.com/users/" + encodeURIComponent(id);
+  }
+
+  function tryOpenDiscordAppProfile(discordId) {
+    var id = String(discordId || "").trim();
+    if (!id || !/^\d{5,32}$/.test(id)) return;
     var appUrl = "discord://-/users/" + encodeURIComponent(id);
-    var webUrl = "https://discord.com/users/" + encodeURIComponent(id);
-    var started = Date.now();
-    var fallback = window.setTimeout(function () {
-      if (document.hidden) return;
-      if (Date.now() - started < 2200) {
-        window.open(webUrl, "_blank", "noopener,noreferrer");
-      }
-    }, 900);
-    discordAppLaunchTimer = fallback;
     try {
-      window.location.href = appUrl;
+      var iframe = document.createElement("iframe");
+      iframe.setAttribute("aria-hidden", "true");
+      iframe.tabIndex = -1;
+      iframe.style.cssText =
+        "position:absolute;width:0;height:0;border:0;overflow:hidden;visibility:hidden";
+      iframe.src = appUrl;
+      document.body.appendChild(iframe);
+      window.setTimeout(function () {
+        if (iframe && iframe.parentNode) iframe.parentNode.removeChild(iframe);
+      }, 2000);
     } catch (_) {
-      window.clearTimeout(fallback);
-      window.open(webUrl, "_blank", "noopener,noreferrer");
+      /* ignore — web profile link is the reliable path */
     }
+  }
+
+  /**
+   * Open a trader's Discord profile without popup-blocker nonsense.
+   * Prefer a real <a target=_blank> navigation; never window.open after timeouts.
+   */
+  function openDiscordProfile(discordId, opts) {
+    opts = opts || {};
+    var id = String(discordId || "").trim();
+    var webUrl = discordUserWebUrl(id);
+    if (!webUrl) return;
+    tryOpenDiscordAppProfile(id);
+    if (opts.skipWeb) return;
+    // Same-gesture navigation via a temporary anchor (not delayed window.open).
+    var a = document.createElement("a");
+    a.href = webUrl;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  function canAcceptOfferSync() {
+    return (
+      isLoggedIn() &&
+      !!guildMemberCache.inGuild &&
+      !!guildMemberCache.checkedAt &&
+      Date.now() - guildMemberCache.checkedAt < GUILD_CACHE_MS
+    );
+  }
+
+  function acceptOfferLabelHtml() {
+    return (
+      'Accept offer / ' +
+      '<span class="lt-post__accept-chat">' +
+      '<svg class="lt-post__accept-chat-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">' +
+      '<path fill="currentColor" d="M4.5 3.75h15A2.25 2.25 0 0121.75 6v9A2.25 2.25 0 0119.5 17.25H9.66l-3.72 3.1a.75.75 0 01-1.19-.6V17.25H4.5A2.25 2.25 0 012.25 15V6A2.25 2.25 0 014.5 3.75zm0 1.5c-.41 0-.75.34-.75.75v9c0 .41.34.75.75.75h1.7c.41 0 .75.34.75.75v1.72l2.42-2.02a.75.75 0 01.48-.18H19.5c.41 0 .75-.34.75-.75V6c0-.41-.34-.75-.75-.75H4.5z"/>' +
+      "</svg>" +
+      "<span>Chat</span>" +
+      "</span>"
+    );
   }
 
   function postActionsHtml(post) {
@@ -1973,15 +2021,21 @@
     if (id && /^\d{5,32}$/.test(id)) {
       return (
         '<div class="lt-post__actions">' +
-        '<button type="button" class="lt-post__accept" data-accept-discord="' +
+        '<a class="lt-post__accept" href="' +
+        escapeAttr(discordUserWebUrl(id)) +
+        '" target="_blank" rel="noopener noreferrer" data-accept-discord="' +
         escapeAttr(id) +
-        '">Accept offer</button>' +
+        '">' +
+        acceptOfferLabelHtml() +
+        "</a>" +
         "</div>"
       );
     }
     return (
       '<div class="lt-post__actions">' +
-      '<span class="lt-post__accept lt-post__accept--disabled" data-lt-tip="Discord profile unavailable">Accept offer</span>' +
+      '<span class="lt-post__accept lt-post__accept--disabled" data-lt-tip="Discord profile unavailable">' +
+      acceptOfferLabelHtml() +
+      "</span>" +
       "</div>"
     );
   }
@@ -2413,10 +2467,19 @@
       }
       var acceptBtn = e.target.closest && e.target.closest("[data-accept-discord]");
       if (acceptBtn) {
+        var acceptId = acceptBtn.getAttribute("data-accept-discord");
+        // Already verified this session — let the real <a> open Discord (no popup).
+        if (canAcceptOfferSync()) {
+          tryOpenDiscordAppProfile(acceptId);
+          // Do not preventDefault: native target=_blank is never "blocked".
+          return;
+        }
         e.preventDefault();
         requireLoginForAction().then(function (ok) {
           if (!ok) return;
-          openDiscordProfile(acceptBtn.getAttribute("data-accept-discord"));
+          // After login, open via a fresh clickable path; user may need one more click
+          // if the browser still blocks — but prefer immediate open when allowed.
+          openDiscordProfile(acceptId);
         });
         return;
       }
