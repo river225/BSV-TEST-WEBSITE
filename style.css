@@ -16902,7 +16902,7 @@ body.live-trading-page .live-trading-workspace {
 }
 .lt-post__author {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   min-width: 0;
 }
@@ -16913,6 +16913,8 @@ body.live-trading-page .live-trading-workspace {
   object-fit: cover;
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: #1e293b;
+  flex: 0 0 auto;
+  margin-top: 1px;
 }
 .lt-post__avatar--ph {
   display: inline-block;
