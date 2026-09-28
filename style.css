@@ -4387,91 +4387,6 @@ background-attachment: fixed;
   width: min(100%, 720px);
   margin: 0 auto;
 }
-.home-quick-jumps {
-  width: 100%;
-  max-width: 1080px;
-  margin: 0 auto 28px;
-  padding: 14px 16px 16px;
-  border-radius: 14px;
-  border: 3px solid #000;
-  background: linear-gradient(160deg, var(--bsv-surface-raised) 0%, var(--bsv-surface-panel) 100%);
-  box-shadow: 0 5px 0 #000;
-  box-sizing: border-box;
-}
-.home-quick-jumps__label {
-  display: block;
-  margin: 0 0 10px;
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--bsv-accent);
-  text-shadow: 1px 1px 0 #000;
-  text-align: center;
-}
-.home-quick-jumps__row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-}
-.home-quick-jumps__btn {
-  appearance: none;
-  -webkit-appearance: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-height: 40px;
-  padding: 8px 14px;
-  border-radius: 10px;
-  border: 2px solid #000;
-  background: var(--bsv-surface-card);
-  color: #f8fafc;
-  font: inherit;
-  font-size: 0.9rem;
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: 0 3px 0 #000;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-  white-space: nowrap;
-}
-.home-quick-jumps__btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 0 #000;
-  background: var(--bsv-surface-hover);
-}
-.home-quick-jumps__btn--legendary {
-  background: linear-gradient(135deg, #a66a0a 0%, #f39c12 55%, #ffc870 100%);
-  color: #fff;
-}
-.home-quick-jumps__btn--omega {
-  background: linear-gradient(135deg, #8b251f 0%, #e74c3c 55%, #ff8080 100%);
-  color: #fff;
-}
-.home-quick-jumps__btn--richest {
-  background: linear-gradient(135deg, #9b7e0a 0%, #f5c312 55%, #ffed70 100%);
-  color: #1a1400;
-}
-.home-quick-jumps__btn--guide {
-  background: linear-gradient(135deg, #064e3b 0%, #10b981 55%, #34d399 100%);
-  color: #fff;
-}
-.home-quick-jumps__btn--lt {
-  background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 55%, #f87171 100%);
-  color: #fff;
-}
-.home-quick-jumps__btn--crew {
-  background: linear-gradient(135deg, #1a5560 0%, #3a9fb0 55%, #6dd5f0 100%);
-  color: #fff;
-}
-.home-quick-jumps__btn--legendary:hover,
-.home-quick-jumps__btn--omega:hover,
-.home-quick-jumps__btn--richest:hover,
-.home-quick-jumps__btn--guide:hover,
-.home-quick-jumps__btn--lt:hover,
-.home-quick-jumps__btn--crew:hover {
-  filter: brightness(1.06);
 }.home-site-stats--beside,
 .home-site-stats--sidebar {
   flex-direction: column;
@@ -15226,17 +15141,6 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   .home-hero-row__banner {
     width: 100%;
     max-width: 720px;
-  }
-
-  .home-quick-jumps {
-    margin-bottom: 20px;
-    padding: 12px;
-  }
-
-  .home-quick-jumps__btn {
-    min-height: 38px;
-    font-size: 0.84rem;
-    padding: 7px 12px;
   }
 
   .home-discord-promo--home {
