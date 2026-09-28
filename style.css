@@ -6007,8 +6007,8 @@ background-attachment: fixed;
   flex-direction: column;
   gap: 16px;
   width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
 }.info-footer-section {
   margin: 50px auto 0;
   padding: 35px 20px;
@@ -10904,9 +10904,6 @@ html[data-sidenav-style="minimal"] .sections-nav button.active {
   transform: none;
 }html[data-sidenav-style="minimal"] #sections-nav button.active::before,
 html[data-sidenav-style="minimal"] .sections-nav button.active::before {
-  display: none;
-}html[data-sidenav-style="minimal"] #sections-nav button:nth-child(12).active::after,
-html[data-sidenav-style="minimal"] .sections-nav button:nth-child(12).active::after {
   display: none;
 }html[data-sidenav-style="compact"] #sections-nav button,
 html[data-sidenav-style="compact"] .sections-nav button {
