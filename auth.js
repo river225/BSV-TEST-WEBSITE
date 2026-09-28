@@ -758,29 +758,23 @@
     }
 
     var discordName = discord ? discord.displayName || discord.username || "Discord" : "";
-    var discordHandle = discord && discord.username ? "@" + discord.username : "";
     var chipName = discordName || t("auth.accountChip", "Account");
     var chipAvatar = discord && discord.avatarUrl ? discord.avatarUrl : DEFAULT_AVATAR;
     var accountMenuLabel = t("auth.accountMenu", "Profile menu");
     var discordStatusHtml = statusRowHtml(
       chipAvatar,
-      t("auth.statusConnected", "Logged in") +
-        (discordName ? " · " + discordName : "") +
-        (discordHandle ? " " + discordHandle : "")
+      t("auth.statusConnected", "Logged in") + (discordName ? " · " + discordName : "")
     );
 
     slot.innerHTML =
       '<div class="nav-login-user">' +
         '<button type="button" class="nav-login-btn nav-login-btn--signedin" id="nav-login-btn" title="' +
-          escapeAttr(chipName + (discordHandle ? " " + discordHandle : "")) +
+          escapeAttr(chipName) +
           '" aria-label="' +
           escapeAttr(accountMenuLabel) +
           '" aria-expanded="false" aria-haspopup="true">' +
           '<span class="nav-login-btn__name">' +
           escapeHtml(chipName) +
-          (discordHandle
-            ? '<span class="nav-login-btn__handle">' + escapeHtml(discordHandle) + "</span>"
-            : "") +
           "</span>" +
           '<span class="nav-login-btn__avatar-wrap">' +
             '<img src="' +
