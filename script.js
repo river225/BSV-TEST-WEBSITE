@@ -520,10 +520,72 @@ function buildHomeLiveTradingBarHtml() {
   );
 }
 
+function buildHomeQuickJumpsHtml() {
+  var jumps = [
+    { name: "Legendary", tone: "legendary" },
+    { name: "Omega", tone: "omega" },
+    { name: "Richest Players", tone: "richest" },
+    { name: "Money & Game Guide", tone: "guide" },
+    { name: "Live Trading", tone: "lt" },
+    { name: "Crew Logos", tone: "crew" }
+  ];
+  var buttons = jumps
+    .map(function (jump) {
+      return (
+        '<button type="button" class="home-quick-jumps__btn home-quick-jumps__btn--' +
+        jump.tone +
+        '" data-home-jump="' +
+        escapeAttr(jump.name) +
+        '">' +
+        escapeHtml(i18nSection(jump.name)) +
+        "</button>"
+      );
+    })
+    .join("");
+  return (
+    '<nav class="home-quick-jumps" aria-label="' +
+    escapeHtml(i18n("home.exploreAria")) +
+    '">' +
+      '<span class="home-quick-jumps__label">' +
+      escapeHtml(i18n("home.explore")) +
+      "</span>" +
+      '<div class="home-quick-jumps__row">' +
+      buttons +
+      "</div>" +
+    "</nav>"
+  );
+}
+
+function bindHomeQuickJumps(root) {
+  var scope = root && root.querySelectorAll ? root : document;
+  scope.querySelectorAll("[data-home-jump]").forEach(function (btn) {
+    if (btn._homeJumpBound) return;
+    btn._homeJumpBound = true;
+    btn.addEventListener("click", function () {
+      var name = btn.getAttribute("data-home-jump");
+      if (!name) return;
+      var cfg =
+        typeof window.getSectionConfig === "function"
+          ? window.getSectionConfig(name)
+          : null;
+      if (cfg && cfg.pageHref) {
+        var href =
+          typeof window.bsvSitePath === "function"
+            ? window.bsvSitePath(cfg.pageHref)
+            : cfg.pageHref;
+        window.location.href = href;
+        return;
+      }
+      if (typeof showSection === "function") showSection(name);
+    });
+  });
+}
+
 function mountHomeDiscordPromo() {
   var slot = document.getElementById("home-discord-promo-slot");
   if (!slot) return;
-  slot.outerHTML =
+  var wrap = document.createElement("div");
+  wrap.innerHTML =
     '<div class="home-hero-stack">' +
       buildHomeLiveTradingBarHtml() +
       '<div class="home-hero-row">' +
@@ -532,8 +594,13 @@ function mountHomeDiscordPromo() {
         "</div>" +
         '<div class="home-hero-row__stats" id="home-site-stats-slot"></div>' +
       "</div>" +
-    "</div>";
+    "</div>" +
+    buildHomeQuickJumpsHtml();
+  var parent = slot.parentNode;
+  while (wrap.firstChild) parent.insertBefore(wrap.firstChild, slot);
+  parent.removeChild(slot);
   mountHomeSiteStats();
+  bindHomeQuickJumps(parent);
 }
 
 function mountHomeSiteStats() {
