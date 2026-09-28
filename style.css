@@ -2465,24 +2465,9 @@ background-attachment: fixed;
 }#sections-nav button[data-section="Richest Players"].active {
   background: linear-gradient(135deg, #9b7e0a 0%, #d6a910 25%, #f5c312 50%, #ffdb4d 75%, #ffed70 100%);
   color: white;
-  position: relative;
-  overflow: hidden;
-}#sections-nav button[data-section="Richest Players"].active::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 30%;
-  height: 200%;
-  background: rgba(255, 255, 255, 0.2);
-  transform: rotate(25deg);
-  animation: lightSweep 2.5s infinite;
 }#sections-nav button[data-section="Crew Logos"].active {
   background: linear-gradient(135deg, #1a5560 0%, #2d7a8a 25%, #3a9fb0 50%, #5bc5de 75%, #6dd5f0 100%);
   color: white;
-}@keyframes lightSweep {
-  0% { left: -50%; }
-  100% { left: 150%; }
 }#sections-nav button:hover:not(.active) {
   background: #4a4a4a;
   border-color: #000000;
@@ -5764,8 +5749,8 @@ background-attachment: fixed;
   flex-direction: column;
   gap: 16px;
   width: 100%;
-  max-width: 900px;
-  margin: 0px 0 auto;
+  max-width: none;
+  margin: 0;
 }.richest-card {
   display: flex;
   align-items: center;
@@ -16704,24 +16689,16 @@ body.live-trading-page .live-trading-main {
 }
 body.live-trading-page .live-trading-layout-spacer,
 body.live-trading-page #tax-sidebar-column.live-trading-layout-spacer {
-  /* Same footprint as .tax-sidebar-column on Home */
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: stretch !important;
-  gap: 14px !important;
-  width: 240px !important;
-  max-width: 240px !important;
-  flex: 0 0 auto !important;
-  flex-shrink: 0 !important;
+  /* No empty right column — content uses the room from the narrower side nav */
+  display: none !important;
+  width: 0 !important;
+  max-width: 0 !important;
+  flex: 0 0 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
   visibility: hidden !important;
-  opacity: 0 !important;
   pointer-events: none !important;
-  overflow: hidden !important;
-  position: sticky !important;
-  top: 118px !important;
-  align-self: flex-start !important;
-  height: fit-content !important;
-  min-height: 1px !important;
 }
 .live-trading-section {
   flex: 1 1 auto;
@@ -16737,8 +16714,7 @@ body.live-trading-page #tax-sidebar-column.live-trading-layout-spacer {
   z-index: 1;
 }
 body.live-trading-page .live-trading-workspace {
-  /* Paint over spacer + gap without changing flex column widths. */
-  width: calc(100% + 260px);
+  width: 100%;
   max-width: none;
   box-sizing: border-box;
 }

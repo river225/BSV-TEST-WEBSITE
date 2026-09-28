@@ -2593,44 +2593,33 @@
       return;
     }
 
-    // Measure with Home-identical flex and NO wide workspace, then pin those widths.
-    var prevWsWidth = "";
-    var prevWsMax = "";
     if (workspace) {
-      prevWsWidth = workspace.style.getPropertyValue("width");
-      prevWsMax = workspace.style.getPropertyValue("max-width");
       workspace.style.setProperty("width", "100%", "important");
-      workspace.style.setProperty("max-width", "100%", "important");
+      workspace.style.setProperty("max-width", "none", "important");
     }
 
     clearLiveTradingSidebarLocks(sidebar, sections);
-    // Match home fit-content sidebar so Live Trading keeps the same narrow width.
+    // Narrow fit-content nav; main column takes all remaining room (no right spacer).
     sidebar.style.setProperty("flex", "0 0 auto", "important");
     sidebar.style.setProperty("width", "max-content", "important");
     sidebar.style.setProperty("max-width", "none", "important");
     sidebar.style.setProperty("min-width", "0", "important");
     sections.style.setProperty("flex", "1 1 0%", "important");
+    sections.style.setProperty("width", "auto", "important");
+    sections.style.setProperty("max-width", "none", "important");
     sections.style.setProperty("min-width", "0", "important");
 
     void sidebar.offsetWidth;
     var sideW = Math.ceil(sidebar.getBoundingClientRect().width);
-    var mainW = sections.getBoundingClientRect().width;
 
     sidebar.style.setProperty("flex", "0 0 " + sideW + "px", "important");
     sidebar.style.setProperty("width", sideW + "px", "important");
     sidebar.style.setProperty("max-width", sideW + "px", "important");
     sidebar.style.setProperty("min-width", sideW + "px", "important");
 
-    sections.style.setProperty("flex", "0 0 " + mainW + "px", "important");
-    sections.style.setProperty("width", mainW + "px", "important");
-    sections.style.setProperty("max-width", mainW + "px", "important");
-    sections.style.setProperty("min-width", "0px", "important");
-
     if (workspace) {
-      if (prevWsWidth) workspace.style.setProperty("width", prevWsWidth, "important");
-      else workspace.style.removeProperty("width");
-      if (prevWsMax) workspace.style.setProperty("max-width", prevWsMax, "important");
-      else workspace.style.removeProperty("max-width");
+      workspace.style.setProperty("width", "100%", "important");
+      workspace.style.setProperty("max-width", "none", "important");
     }
     syncLiveTradingBoardHeight();
   }
