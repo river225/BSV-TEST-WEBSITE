@@ -695,8 +695,7 @@
       ".bsv-section-lt-promo{flex:0 0 auto;width:100%;max-width:100%;margin:-10px 0 16px;padding:28px 24px;border-radius:20px;text-align:center;box-sizing:border-box;" +
       "background:linear-gradient(180deg,rgba(225,29,46,.18),transparent 55%),#090b11;border:1px solid rgba(225,29,46,.35)}" +
       ".bsv-section-lt-promo[hidden],.bsv-section-lt-promo.is-hidden{display:none!important}" +
-      ".bsv-section-lt-promo h3{margin:0 0 8px;font-family:'Paytone One',system-ui,sans-serif;font-size:clamp(1.8rem,4vw,2.6rem);color:#fff;line-height:1.15}" +
-      ".bsv-section-lt-promo p{margin:0 auto 16px;max-width:40ch;color:rgba(244,247,251,.62);font-size:.95rem;line-height:1.5}" +
+      ".bsv-section-lt-promo h3{margin:0 0 16px;font-family:'Paytone One',system-ui,sans-serif;font-size:clamp(1.8rem,4vw,2.6rem);color:#fff;line-height:1.15}" +
       ".bsv-section-lt-promo__actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:0}" +
       ".bsv-section-lt-promo .hv2-btn,.bsv-section-lt-promo__btn{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 20px;border-radius:12px;font:800 .95rem/1.1 system-ui,sans-serif;text-decoration:none;cursor:pointer;border:1px solid rgba(225,29,46,.75);background:rgba(225,29,46,.12);color:#fff;transition:transform .15s ease,background .15s ease}" +
       ".bsv-section-lt-promo .hv2-btn:hover,.bsv-section-lt-promo__btn:hover{transform:translateY(-1px);background:rgba(225,29,46,.22);border-color:#ef4444}";
@@ -707,7 +706,6 @@
     return (
       '<aside class="hv2-lt-c bsv-section-lt-promo" aria-label="Live Trading">' +
         "<h3>Live Trading is open</h3>" +
-        "<p>Drop your offers. Find what you need. Chat the trader.</p>" +
         '<div class="hv2-hero__actions bsv-section-lt-promo__actions">' +
           '<a class="hv2-btn hv2-btn--primary bsv-section-lt-promo__btn" href="' +
           sitePath("live-trading.html") +
