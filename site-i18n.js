@@ -280,7 +280,8 @@
       "tax.drop40kTimes": "Drop $60,000 {count} times",
       "tax.drop40kTimesOnce": "Drop $60,000 once",
       "tax.thenDrop": "Then drop {amount}.",
-      "tax.howLabel": "For {want} after tax, drop {withdraw}. Steps:",
+      "tax.stepsTitle": "Steps",
+      "tax.howLabel": "For {want} after tax, you lose {lost} once dropped",
       "promo.middleman":
         "Tired of getting scammed during trades?<br>Our Middleman service can help you never get scammed again!<br>Join our discord server and get a Middleman today!<br><span class=\"discord-mm-promo-cta\">Click here to join our Discord</span>",
       "giveaway.modalTitle": "Giveaway Active!",
@@ -619,7 +620,8 @@
       "tax.drop40kTimes": "Lâcher 60 000 $ {count} fois",
       "tax.drop40kTimesOnce": "Lâcher 60 000 $ une fois",
       "tax.thenDrop": "Puis lâcher {amount}.",
-      "tax.howLabel": "Pour {want} après taxe, lâcher {withdraw}. Étapes :",
+      "tax.stepsTitle": "Étapes",
+      "tax.howLabel": "Pour {want} après taxe, vous perdez {lost} une fois lâché",
       "promo.middleman":
         "Marre de vous faire arnaquer lors des échanges ?<br>Notre service Middleman peut vous aider à ne plus jamais vous faire arnaquer !<br>Rejoignez notre serveur Discord et obtenez un Middleman dès aujourd'hui !<br><span class=\"discord-mm-promo-cta\">Cliquez ici pour rejoindre notre Discord</span>",
       "giveaway.modalTitle": "Giveaway actif !",
@@ -958,7 +960,8 @@
       "tax.drop40kTimes": "Soltar $60,000 {count} veces",
       "tax.drop40kTimesOnce": "Soltar $60,000 una vez",
       "tax.thenDrop": "Luego soltar {amount}.",
-      "tax.howLabel": "Para {want} después de impuestos, soltar {withdraw}. Pasos:",
+      "tax.stepsTitle": "Pasos",
+      "tax.howLabel": "Para {want} después de impuestos, pierdes {lost} una vez soltado",
       "promo.middleman":
         "¿Cansado de estafas en los intercambios?<br>¡Nuestro servicio Middleman puede ayudarte a no volver a ser estafado!<br>¡Únete a nuestro servidor de Discord y consigue un Middleman hoy!<br><span class=\"discord-mm-promo-cta\">Haz clic aquí para unirte a nuestro Discord</span>",
       "giveaway.modalTitle": "¡Sorteo activo!",

@@ -4935,10 +4935,28 @@ function formatDollar(amount) {
 }
 
 function buildTaxBreakdownHtml(want, breakdown) {
-  return '<span class="tax-how-label">' +
-    escapeHtml(i18n("tax.howLabel", { want: formatDollar(want), withdraw: formatDollar(breakdown.totalWithdraw) })) +
-    '</span><br>' +
-    breakdown.lines.map(function(line) { return escapeHtml(line) + '<br>'; }).join('');
+  var lost = Math.max(0, (breakdown.totalWithdraw || 0) - (want || 0));
+  var stepsHtml = breakdown.lines
+    .map(function (line) {
+      return '<p class="tax-steps-line">' + escapeHtml(line) + "</p>";
+    })
+    .join("");
+  return (
+    '<span class="tax-how-label">' +
+      escapeHtml(
+        i18n("tax.howLabel", {
+          want: formatDollar(want),
+          lost: formatDollar(lost)
+        })
+      ) +
+    "</span>" +
+    '<p class="tax-steps-heading">' +
+      escapeHtml(i18n("tax.stepsTitle")) +
+    "</p>" +
+    '<div class="tax-steps-list">' +
+      stepsHtml +
+    "</div>"
+  );
 }
 
 function bindTaxCalcWidget(root) {
@@ -4954,8 +4972,6 @@ function bindTaxCalcWidget(root) {
     var want = parseInt(raw, 10) || 0;
     var b = getTaxBreakdown(want);
     amountEl.textContent = b.totalWithdraw.toLocaleString();
-    var afterLabel = root.querySelector("[data-tax-after-label]");
-    if (afterLabel) afterLabel.hidden = b.totalWithdraw <= 0;
     if (!breakdownEl) return;
     if (b.totalWithdraw <= 0) {
       breakdownEl.innerHTML = "";
@@ -4999,7 +5015,7 @@ function initTaxCalculator() {
     const raw = taxInput.value.replace(/[^\d]/g, '');
     const want = parseInt(raw, 10) || 0;
     const b = getTaxBreakdown(want);
-    taxAmount.innerHTML = b.totalWithdraw.toLocaleString() + ' <span class="tax-after-label">' + escapeHtml(i18n("tax.afterLabel")) + '</span>';
+    taxAmount.textContent = b.totalWithdraw.toLocaleString();
     if (taxBreakdown) {
       if (b.totalWithdraw <= 0) {
         taxBreakdown.innerHTML = '';
@@ -5027,7 +5043,23 @@ function initTaxCalculator() {
     document.execCommand('insertText', false, cleaned);
   });
 
+  initTaxRemindersCollapse();
   update();
+}
+
+function initTaxRemindersCollapse() {
+  var toggle = document.getElementById("tax-reminders-toggle");
+  var body = document.getElementById("tax-reminders-body");
+  var wrap = toggle && toggle.closest(".tax-reminders");
+  if (!toggle || !body || !wrap || toggle.dataset.bound === "1") return;
+  toggle.dataset.bound = "1";
+  toggle.addEventListener("click", function () {
+    var open = toggle.getAttribute("aria-expanded") === "true";
+    var next = !open;
+    toggle.setAttribute("aria-expanded", next ? "true" : "false");
+    body.hidden = !next;
+    wrap.classList.toggle("is-open", next);
+  });
 }
 
 var MOBILE_TAX_MQ = "(max-width: 1024px)";
