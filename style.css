@@ -3643,7 +3643,127 @@ background-attachment: fixed;
   height: 48px;
   background: rgba(125, 211, 252, 0.35);
   flex-shrink: 0;
-}.home-lt-bar {
+}
+.home-changes-strip {
+  width: 100%;
+  max-width: 720px;
+  margin: 4px auto 8px;
+  padding: 4px 12px 8px;
+  box-sizing: border-box;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  text-align: center;
+}
+.home-changes-strip__heading {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7dd3fc;
+}
+.home-changes-strip__viewport {
+  --home-change-row: 58px;
+  height: calc(var(--home-change-row) * 3);
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(125, 211, 252, 0.45) transparent;
+  mask-image: linear-gradient(180deg, #000 0%, #000 78%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 78%, transparent 100%);
+}
+.home-changes-strip__viewport::-webkit-scrollbar {
+  width: 4px;
+}
+.home-changes-strip__viewport::-webkit-scrollbar-thumb {
+  background: rgba(125, 211, 252, 0.4);
+  border-radius: 999px;
+}
+.home-changes-strip__list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+}
+.home-changes-strip__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: var(--home-change-row);
+  height: var(--home-change-row);
+  padding: 8px 6px;
+  box-sizing: border-box;
+  scroll-snap-align: start;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.16);
+  text-align: left;
+}
+.home-changes-strip__item:last-child {
+  border-bottom: 0;
+}
+.home-changes-strip__dot {
+  flex: 0 0 8px;
+  width: 8px;
+  height: 8px;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: rgba(148, 163, 184, 0.85);
+  box-shadow: 0 0 0 2px rgba(125, 211, 252, 0.15);
+}
+.home-changes-strip__item--green .home-changes-strip__dot { background: #a2e82d; }
+.home-changes-strip__item--orange .home-changes-strip__dot { background: #f59e0b; }
+.home-changes-strip__item--red .home-changes-strip__dot { background: #f87171; }
+.home-changes-strip__item--blue .home-changes-strip__dot { background: #38bdf8; }
+.home-changes-strip__body {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.home-changes-strip__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 2px;
+}
+.home-changes-strip__title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.home-changes-strip__date {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #7dd3fc;
+  opacity: 0.9;
+}
+.home-changes-strip__text {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgba(226, 232, 240, 0.88);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.home-changes-strip .value-changes-loading {
+  margin: 0;
+  padding: 18px 8px;
+  font-size: 0.85rem;
+  color: rgba(226, 232, 240, 0.75);
+}
+.home-lt-bar {
   position: relative;
   width: 100%;
   max-width: 720px;
@@ -7297,6 +7417,14 @@ body.bsv-login-open {
   margin-top: 32px;
   width: 100%;
   --home-panel-height: 520px;
+}
+.home-two-columns--announcements-only {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+}
+.home-two-columns--announcements-only .home-column--announcements {
+  width: 100%;
+  max-width: 640px;
 }.home-column {
   min-width: 0;
   display: flex;
@@ -15419,6 +15547,10 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     --home-panel-height: auto;
   }
 
+  .home-two-columns--announcements-only .home-column--announcements {
+    max-width: 100%;
+  }
+
   .home-column {
     min-height: 0;
     height: auto;
@@ -15430,6 +15562,22 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     border-width: 2px;
     border-radius: 12px;
     box-shadow: 0 4px 0 #000, 0 6px 14px rgba(0, 0, 0, 0.32);
+  }
+
+  .home-changes-strip {
+    padding: 2px 4px 6px;
+  }
+
+  .home-changes-strip__viewport {
+    --home-change-row: 54px;
+  }
+
+  .home-changes-strip__title {
+    font-size: 0.86rem;
+  }
+
+  .home-changes-strip__text {
+    font-size: 0.74rem;
   }
 
   .home-announcements-box__title-row {

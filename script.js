@@ -524,6 +524,12 @@ function mountHomeDiscordPromo() {
       "</div>" +
       buildHomeLiveTradingBarHtml() +
       '<div id="home-site-stats-slot"></div>' +
+      '<aside class="home-changes-strip" aria-label="' + escapeHtml(i18n("home.recentChanges")) + '">' +
+        '<p class="home-changes-strip__heading">' + escapeHtml(i18n("home.recentChanges")) + "</p>" +
+        '<div class="home-changes-strip__viewport" id="home-main-value-changes-list">' +
+          '<div class="value-changes-loading" data-i18n="loading.changes">' + escapeHtml(i18n("loading.changes")) + "</div>" +
+        "</div>" +
+      "</aside>" +
     "</div>";
   mountHomeSiteStats();
 }
@@ -5261,6 +5267,22 @@ function buildValueChangeItemHtml(r, useTimeline) {
   var dateEsc = date.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   var textEsc = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/\n/g, "<br>");
 
+  if (useTimeline === "strip") {
+    var stripMod = colorKey ? " home-changes-strip__item--" + colorKey : "";
+    return (
+      '<div class="home-changes-strip__item' + stripMod + '" role="listitem">' +
+        '<span class="home-changes-strip__dot" aria-hidden="true"></span>' +
+        '<div class="home-changes-strip__body">' +
+          '<div class="home-changes-strip__top">' +
+            (titleEsc ? '<span class="home-changes-strip__title">' + titleEsc + "</span>" : "") +
+            (dateEsc ? '<span class="home-changes-strip__date">' + dateEsc + "</span>" : "") +
+          "</div>" +
+          (textEsc ? '<p class="home-changes-strip__text">' + textEsc + "</p>" : "") +
+        "</div>" +
+      "</div>"
+    );
+  }
+
   if (useTimeline) {
     return (
       '<div class="value-change-item value-change-item--timeline' + colorClass + '">' +
@@ -5309,13 +5331,11 @@ async function loadValueChanges() {
       return;
     }
     var classicHtml = filtered.map(function (r) { return buildValueChangeItemHtml(r, false); }).join("");
-    var timelineHtml = filtered.map(function (r) { return buildValueChangeItemHtml(r, true); }).join("");
     setSidebarValueChangesHtml(classicHtml);
     if (homeMainListEl) {
+      var stripHtml = filtered.map(function (r) { return buildValueChangeItemHtml(r, "strip"); }).join("");
       homeMainListEl.innerHTML =
-        '<div class="value-changes-list__track">' +
-          '<div class="value-changes-list__items">' + timelineHtml + "</div>" +
-        "</div>";
+        '<div class="home-changes-strip__list" role="list">' + stripHtml + "</div>";
     }
   } catch (err) {
     console.error('Error loading value changes:', err);
