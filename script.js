@@ -615,13 +615,15 @@ function animateHomeStatValue(key, targetValue, durationMs) {
   // Cache is already set — if the DOM isn't mounted yet, apply later via applyCachedHomeStatValues.
   if (!els.length) return;
 
-  if (key === "traders") {
-    document.querySelectorAll(".home-discord-promo__flash-stat-num").forEach(function (wrap) {
-      wrap.classList.remove("is-grown");
-      void wrap.offsetWidth;
-      wrap.classList.add("is-counting");
-    });
-  }
+  var animWraps =
+    key === "traders"
+      ? document.querySelectorAll(".home-discord-promo__flash-stat-num")
+      : els;
+  animWraps.forEach(function (wrap) {
+    wrap.classList.remove("is-grown");
+    void wrap.offsetWidth;
+    wrap.classList.add("is-counting");
+  });
 
   var start = performance.now();
   function frame(now) {
@@ -638,12 +640,10 @@ function animateHomeStatValue(key, targetValue, durationMs) {
       els.forEach(function (el) {
         el.textContent = targetValue.toLocaleString();
       });
-      if (key === "traders") {
-        document.querySelectorAll(".home-discord-promo__flash-stat-num").forEach(function (wrap) {
-          wrap.classList.remove("is-counting");
-          wrap.classList.add("is-grown");
-        });
-      }
+      animWraps.forEach(function (wrap) {
+        wrap.classList.remove("is-counting");
+        wrap.classList.add("is-grown");
+      });
     }
   }
   homeStatAnimFrames[key] = requestAnimationFrame(frame);
