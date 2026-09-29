@@ -517,8 +517,8 @@ function mountHomeDiscordPromo() {
   if (!slot) return;
   slot.outerHTML =
     '<div class="home-hero-stack">' +
-      buildHomeLiveTradingBarHtml() +
       '<div id="home-site-stats-slot"></div>' +
+      buildHomeLiveTradingBarHtml() +
       '<div class="home-hero-row">' +
         '<div class="home-hero-row__banner">' +
           buildDiscordPromoBannerHtml(false) +
@@ -550,7 +550,7 @@ function buildHomeSiteStatsHtml(extraClass) {
       '<span class="home-stats-strip__rule" aria-hidden="true"></span>' +
       '<div class="home-stats-strip__item">' +
         '<span class="home-stats-strip__value" data-home-stat="changes">0</span>' +
-        '<span class="home-stats-strip__label">' + escapeHtml(i18n("home.stats.totalChanges")) + "</span>" +
+        '<span class="home-stats-strip__label">' + escapeHtml(i18n("home.stats.cellEdits")) + "</span>" +
       "</div>" +
     "</aside>"
   );
@@ -649,17 +649,45 @@ function animateHomeStatValue(key, targetValue, durationMs) {
   homeStatAnimFrames[key] = requestAnimationFrame(frame);
 }
 
+function isWebsiteConfigMetaRow(name) {
+  var key = String(name || "").trim().toLowerCase();
+  return (
+    key === "anaconda gw" ||
+    key === "firework gw" ||
+    key === "cell edits" ||
+    key === "total cell edits" ||
+    key === "spreadsheet edits"
+  );
+}
+
 function filterValueChangeRows(rows) {
   if (!rows || !rows.length) return [];
   return rows.filter(function (r) {
     var name = (r.Title || r.Name || "").toString().trim();
-    if (name === "Anaconda GW" || name === "Firework GW") return false;
+    if (isWebsiteConfigMetaRow(name)) return false;
     var t = (r.Title || r.Date || r.Text || "").toString().trim();
     return t.length > 0;
   });
 }
 
-/** Count individual spreadsheet changes (adds, removes, value/demand edits, etc.). */
+/** Measured from Sheets Version history (cell-level edits); override via Website Configs Title "Cell Edits". */
+var HOME_STATS_CELL_EDITS_FALLBACK = 239;
+
+function resolveCellEditsCount(rows) {
+  var list = rows || [];
+  for (var i = 0; i < list.length; i++) {
+    var name = String((list[i] && (list[i].Title || list[i].Name)) || "")
+      .trim()
+      .toLowerCase();
+    if (name !== "cell edits" && name !== "total cell edits" && name !== "spreadsheet edits") continue;
+    var raw = String((list[i] && (list[i].Text || list[i].Date)) || "").replace(/,/g, "").trim();
+    var n = parseInt(raw, 10);
+    if (!isNaN(n) && n > 0) return n;
+  }
+  return HOME_STATS_CELL_EDITS_FALLBACK;
+}
+
+/** Count individual spreadsheet changelog rows (adds, removes, value/demand edits, etc.). */
 function countValueChangesFromRows(rows) {
   var filtered = filterValueChangeRows(rows);
   var verbRe =
@@ -5264,8 +5292,7 @@ async function loadValueChanges() {
   }
   try {
     var rows = await fetchSheet("Website Configs");
-    var changeCount = countValueChangesFromRows(rows || []);
-    setHomeStatValue("changes", changeCount, true);
+    setHomeStatValue("changes", resolveCellEditsCount(rows || []), true);
     applyCachedHomeStatValues(document);
     if (!listEl && !homeMainListEl) return;
     if (!rows || rows.length === 0) {
