@@ -3471,7 +3471,90 @@ function renderVehiclesSectionWithBanner(items) {
   document.getElementById("sections").insertAdjacentHTML("beforeend", html);
 }
 
+var sitePresenceVisitorId = "";
+var sitePresenceTimer = 0;
+var discordOnlineCache = null;
+var siteOnlineCache = null;
+
+function getSitePresenceVisitorId() {
+  if (sitePresenceVisitorId) return sitePresenceVisitorId;
+  try {
+    var stored = localStorage.getItem("bsv_presence_id");
+    if (stored && /^[a-zA-Z0-9_-]{8,80}$/.test(stored)) {
+      sitePresenceVisitorId = stored;
+      return sitePresenceVisitorId;
+    }
+  } catch (e) {}
+  sitePresenceVisitorId =
+    "v_" +
+    Math.random().toString(36).slice(2, 10) +
+    Date.now().toString(36) +
+    Math.random().toString(36).slice(2, 8);
+  try {
+    localStorage.setItem("bsv_presence_id", sitePresenceVisitorId);
+  } catch (e2) {}
+  return sitePresenceVisitorId;
+}
+
+function publishCombinedOnlineCount(animate) {
+  var discord = typeof discordOnlineCache === "number" ? discordOnlineCache : 0;
+  var site = typeof siteOnlineCache === "number" ? siteOnlineCache : 0;
+  var total = discord + site;
+  if (!(total > 0) && discordOnlineCache == null && siteOnlineCache == null) return;
+  setHomeStatValue("online", total, Boolean(animate));
+  document.querySelectorAll(".discord-online-count").forEach(function (el) {
+    el.textContent = total.toLocaleString();
+  });
+}
+
+function sendSitePresenceHeartbeat() {
+  var url = BSV_BOT_PUBLIC_BASE + "/api/presence/heartbeat";
+  return fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id: getSitePresenceVisitorId() }),
+    keepalive: true,
+    cache: "no-store"
+  })
+    .then(function (res) {
+      if (!res.ok) throw new Error("presence " + res.status);
+      return res.json();
+    })
+    .then(function (data) {
+      if (data && data.id) {
+        sitePresenceVisitorId = String(data.id);
+        try {
+          localStorage.setItem("bsv_presence_id", sitePresenceVisitorId);
+        } catch (e) {}
+      }
+      if (data && typeof data.online === "number" && !isNaN(data.online)) {
+        var first = siteOnlineCache == null;
+        siteOnlineCache = data.online;
+        publishCombinedOnlineCount(first);
+      }
+      return data;
+    })
+    .catch(function () {
+      return null;
+    });
+}
+
+function startSitePresenceTracking() {
+  if (sitePresenceTimer) return;
+  sendSitePresenceHeartbeat();
+  sitePresenceTimer = setInterval(sendSitePresenceHeartbeat, 25000);
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) sendSitePresenceHeartbeat();
+  });
+}
+
+// Shared chrome can also start presence; keep a single timer via sitePresenceTimer.
+try {
+  window.bsvStartSitePresence = startSitePresenceTracking;
+} catch (e) {}
+
 function fetchDiscordMemberCount() {
+  startSitePresenceTracking();
   fetch("https://discord.com/api/v10/invites/QbapryYUUx?with_counts=true")
     .then(function (res) {
       if (!res.ok) throw new Error("invite " + res.status);
@@ -3485,10 +3568,9 @@ function fetchDiscordMemberCount() {
         syncDiscordMemberCountElements(n);
       }
       if (typeof online === "number" && !isNaN(online)) {
-        setHomeStatValue("online", online, true);
-        document.querySelectorAll(".discord-online-count").forEach(function (el) {
-          el.textContent = online.toLocaleString();
-        });
+        var firstDiscord = discordOnlineCache == null;
+        discordOnlineCache = online;
+        publishCombinedOnlineCount(firstDiscord);
       }
       applyCachedHomeStatValues(document);
     })

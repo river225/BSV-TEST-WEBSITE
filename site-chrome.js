@@ -1254,10 +1254,88 @@
     }
   }
 
+  // Anonymous site presence so "Members online" can include people on the website.
+  // Prefer script.js helper when available (home also combines Discord counts).
+  var presenceTimer = 0;
+  function botPublicBase() {
+    try {
+      if (typeof window.BSV_BOT_PUBLIC_BASE === "string" && window.BSV_BOT_PUBLIC_BASE) {
+        return String(window.BSV_BOT_PUBLIC_BASE).replace(/\/+$/, "");
+      }
+    } catch (_) {}
+    return "https://bsv-bot-production.up.railway.app";
+  }
+  function presenceVisitorId() {
+    var id = "";
+    try {
+      id = localStorage.getItem("bsv_presence_id") || "";
+    } catch (_) {}
+    if (id && /^[a-zA-Z0-9_-]{8,80}$/.test(id)) return id;
+    id =
+      "v_" +
+      Math.random().toString(36).slice(2, 10) +
+      Date.now().toString(36) +
+      Math.random().toString(36).slice(2, 8);
+    try {
+      localStorage.setItem("bsv_presence_id", id);
+    } catch (_) {}
+    return id;
+  }
+  function sendPresenceHeartbeat() {
+    if (typeof window.bsvStartSitePresence === "function") {
+      window.bsvStartSitePresence();
+      return;
+    }
+    fetch(botPublicBase() + "/api/presence/heartbeat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: presenceVisitorId() }),
+      keepalive: true,
+      cache: "no-store"
+    })
+      .then(function (res) {
+        return res.ok ? res.json() : null;
+      })
+      .then(function (data) {
+        if (data && data.id) {
+          try {
+            localStorage.setItem("bsv_presence_id", String(data.id));
+          } catch (_) {}
+        }
+      })
+      .catch(function () {});
+  }
+  function startPresenceFromChrome() {
+    if (presenceTimer) return;
+    var tries = 0;
+    function attempt() {
+      // Prefer script.js on home (also merges Discord + site into Members online).
+      if (typeof window.bsvStartSitePresence === "function") {
+        window.bsvStartSitePresence();
+        return;
+      }
+      tries += 1;
+      if (tries < 25) {
+        setTimeout(attempt, 80);
+        return;
+      }
+      // Pages without script.js still count toward website presence.
+      if (presenceTimer) return;
+      sendPresenceHeartbeat();
+      presenceTimer = setInterval(sendPresenceHeartbeat, 25000);
+      document.addEventListener("visibilitychange", function () {
+        if (!document.hidden) sendPresenceHeartbeat();
+      });
+    }
+    attempt();
+  }
+
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", autoMount);
+    document.addEventListener("DOMContentLoaded", startPresenceFromChrome);
   } else {
     autoMount();
+    startPresenceFromChrome();
   }
 
   window.addEventListener("resize", function () {
