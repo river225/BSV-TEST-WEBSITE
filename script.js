@@ -517,13 +517,13 @@ function mountHomeDiscordPromo() {
   if (!slot) return;
   slot.outerHTML =
     '<div class="home-hero-stack">' +
-      '<div id="home-site-stats-slot"></div>' +
-      buildHomeLiveTradingBarHtml() +
       '<div class="home-hero-row">' +
         '<div class="home-hero-row__banner">' +
           buildDiscordPromoBannerHtml(false) +
         "</div>" +
       "</div>" +
+      buildHomeLiveTradingBarHtml() +
+      '<div id="home-site-stats-slot"></div>' +
     "</div>";
   mountHomeSiteStats();
 }

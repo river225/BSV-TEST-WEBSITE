@@ -3595,26 +3595,28 @@ background-attachment: fixed;
   justify-content: center;
   gap: 0;
   width: 100%;
-  margin: 0;
-  padding: 4px 4px 2px;
+  max-width: 720px;
+  margin: 10px auto 4px;
+  padding: 22px 12px 18px;
   background: none;
   border: 0;
   box-shadow: none;
+  box-sizing: border-box;
 }
 .home-stats-strip__item {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 8px;
   margin: 0;
-  padding: 0 22px;
+  padding: 6px 28px;
   text-align: center;
   white-space: nowrap;
 }
 .home-stats-strip__value {
   display: inline-block;
-  font-size: clamp(1.85rem, 3.8vw, 2.35rem);
+  font-size: clamp(2.4rem, 5.2vw, 3.25rem);
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.03em;
@@ -3628,7 +3630,7 @@ background-attachment: fixed;
   animation: home-discord-stat-pop 0.45s ease-out both;
 }
 .home-stats-strip__label {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -3638,7 +3640,7 @@ background-attachment: fixed;
   display: inline-block;
   align-self: center;
   width: 1px;
-  height: 34px;
+  height: 48px;
   background: rgba(125, 211, 252, 0.35);
   flex-shrink: 0;
 }.home-lt-bar {
@@ -15185,20 +15187,26 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     font-size: clamp(1.4rem, 6vw, 1.9rem);
   }
 
+  .home-stats-strip {
+    margin-top: 8px;
+    padding: 18px 8px 14px;
+  }
+
   .home-stats-strip__item {
-    padding: 0 12px;
+    padding: 4px 14px;
+    gap: 6px;
   }
 
   .home-stats-strip__value {
-    font-size: 1.4rem;
+    font-size: clamp(1.85rem, 8vw, 2.4rem);
   }
 
   .home-stats-strip__label {
-    font-size: 0.66rem;
+    font-size: 0.7rem;
   }
 
   .home-stats-strip__rule {
-    height: 28px;
+    height: 40px;
   }
 
   .home-hero-row__banner {
