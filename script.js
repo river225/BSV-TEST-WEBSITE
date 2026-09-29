@@ -446,33 +446,27 @@ function buildHomeFlashPerkHtml(mod, icon, titleKey, tagKey) {
 function buildDiscordPromoBannerHtml(inCards) {
   if (inCards) return buildDiscordPromoCardSlotHtml("");
   return (
-    '<div class="home-discord-promo home-discord-promo--home home-discord-promo--home-v2" role="complementary" aria-label="Join BlockSpin Discord">' +
-      '<div class="home-discord-promo__inner home-discord-promo__inner--v2">' +
-        '<div class="home-discord-promo__v2-main">' +
-          '<img src="https://i.ibb.co/Tq7DLCJt/dsfbvbvxcxbvn.png" alt="" width="56" height="56" class="home-discord-promo__logo home-discord-promo__v2-logo">' +
-          '<div class="home-discord-promo__v2-copy">' +
-            '<p class="home-discord-promo__title home-discord-promo__v2-title">' + escapeHtml(i18n("discord.home.title")) + "</p>" +
-            '<p class="home-discord-promo__hook home-discord-promo__v2-hook">' + escapeHtml(i18n("discord.home.hook")) + "</p>" +
-            '<p class="home-discord-promo__v2-meta">' +
-              escapeHtml(i18n("discord.home.badgeFreeMm")) +
-              " · " +
-              escapeHtml(i18n("discord.home.badgeTrading")) +
-              " · " +
-              escapeHtml(i18n("discord.home.badgeGiveaways")) +
-            "</p>" +
-          "</div>" +
-        "</div>" +
-        '<div class="home-discord-promo__v2-side">' +
-          '<p class="home-discord-promo__v2-count">' +
+    '<div class="home-discord-promo home-discord-promo--home home-discord-promo--home-flash" role="complementary" aria-label="Join BlockSpin Discord">' +
+      '<div class="home-discord-promo__inner">' +
+        '<div class="home-discord-promo__flash-hero">' +
+          '<img src="https://i.ibb.co/Tq7DLCJt/dsfbvbvxcxbvn.png" alt="" width="52" height="52" class="home-discord-promo__logo home-discord-promo__flash-logo">' +
+          '<p class="home-discord-promo__title home-discord-promo__flash-title">' + escapeHtml(i18n("discord.home.title")) + "</p>" +
+          '<p class="home-discord-promo__hook home-discord-promo__flash-hook">' + escapeHtml(i18n("discord.home.hook")) + "</p>" +
+          '<p class="home-discord-promo__flash-stat">' +
             '<span class="home-discord-promo__flash-stat-num"><span class="discord-member-count" data-home-stat="traders">0</span>+</span>' +
-            '<span class="home-discord-promo__v2-count-label">' + escapeHtml(i18n("discord.home.statLabel")) + "</span>" +
+            '<span class="home-discord-promo__flash-stat-label">' + escapeHtml(i18n("discord.home.statLabel")) + "</span>" +
           "</p>" +
-          '<div class="home-discord-promo__actions home-discord-promo__actions--home home-discord-promo__v2-actions">' +
-            '<a href="' + BSV_DISCORD_INVITE_URL + '" target="_blank" rel="noopener noreferrer" class="home-discord-promo__btn home-discord-promo__btn--primary home-discord-promo__btn--flash-join">' +
-              escapeHtml(i18n("discord.card.joinNow")) + ' <span aria-hidden="true">→</span>' +
-            "</a>" +
-            '<a href="blockspin-discord-server.html" class="home-discord-promo__btn home-discord-promo__btn--secondary">' + escapeHtml(i18n("discord.card.learnMore")) + "</a>" +
-          "</div>" +
+        "</div>" +
+        '<div class="home-discord-promo__flash-perks">' +
+          buildHomeFlashPerkHtml("values", "📋", "discord.home.badgeValueList", "discord.home.tradingTag1") +
+          buildHomeFlashPerkHtml("middleman", buildMiddlemanShieldIconHtml(22), "discord.card.middlemanTitle", "discord.card.middlemanStep1") +
+          buildHomeFlashPerkHtml("giveaways", "🎁", "discord.card.giveawaysTitle", "discord.card.giveawaysTag2") +
+        "</div>" +
+        '<div class="home-discord-promo__actions home-discord-promo__actions--home home-discord-promo__flash-actions">' +
+          '<a href="' + BSV_DISCORD_INVITE_URL + '" target="_blank" rel="noopener noreferrer" class="home-discord-promo__btn home-discord-promo__btn--primary home-discord-promo__btn--flash-join">' +
+            escapeHtml(i18n("discord.card.joinNow")) + ' <span aria-hidden="true">→</span>' +
+          "</a>" +
+          '<a href="blockspin-discord-server.html" class="home-discord-promo__btn home-discord-promo__btn--secondary">' + escapeHtml(i18n("discord.card.learnMore")) + "</a>" +
         "</div>" +
       "</div>" +
     "</div>"
@@ -544,20 +538,20 @@ function buildHomeSiteStatsHtml(extraClass) {
   var statsClass = "home-stats-strip" + (extraClass && extraClass !== "home-stats-strip" ? " " + extraClass : "");
   return (
     '<aside class="' + statsClass + '" id="home-site-stats-slot" aria-label="' + escapeHtml(i18n("home.stats.aria")) + '">' +
-      '<p class="home-stats-strip__item">' +
-        '<span class="home-stats-strip__value" data-home-stat="items">0</span> ' +
+      '<div class="home-stats-strip__item">' +
+        '<span class="home-stats-strip__value" data-home-stat="items">0</span>' +
         '<span class="home-stats-strip__label">' + escapeHtml(i18n("home.stats.itemsTracked")) + "</span>" +
-      "</p>" +
+      "</div>" +
       '<span class="home-stats-strip__rule" aria-hidden="true"></span>' +
-      '<p class="home-stats-strip__item">' +
-        '<span class="home-stats-strip__value" data-home-stat="online">0</span> ' +
+      '<div class="home-stats-strip__item">' +
+        '<span class="home-stats-strip__value" data-home-stat="online">0</span>' +
         '<span class="home-stats-strip__label">' + escapeHtml(i18n("home.stats.onlineMembers")) + "</span>" +
-      "</p>" +
+      "</div>" +
       '<span class="home-stats-strip__rule" aria-hidden="true"></span>' +
-      '<p class="home-stats-strip__item">' +
-        '<span class="home-stats-strip__value" data-home-stat="changes">0</span> ' +
+      '<div class="home-stats-strip__item">' +
+        '<span class="home-stats-strip__value" data-home-stat="changes">0</span>' +
         '<span class="home-stats-strip__label">' + escapeHtml(i18n("home.stats.totalChanges")) + "</span>" +
-      "</p>" +
+      "</div>" +
     "</aside>"
   );
 }
@@ -663,6 +657,36 @@ function filterValueChangeRows(rows) {
     var t = (r.Title || r.Date || r.Text || "").toString().trim();
     return t.length > 0;
   });
+}
+
+/** Count individual spreadsheet changes (adds, removes, value/demand edits, etc.). */
+function countValueChangesFromRows(rows) {
+  var filtered = filterValueChangeRows(rows);
+  var verbRe =
+    /\b(added|removed|deleted|increased|decreased|changed|updated|lowered|raised|nerfed|buffed|reverted|moved|renamed|adjusted)\b/gi;
+  var total = 0;
+  filtered.forEach(function (row) {
+    var text = String((row && row.Text) || "").trim();
+    if (!text) {
+      total += 1;
+      return;
+    }
+    var chunks = text
+      .replace(/\r/g, "")
+      .split(/\n+|•|●|▪|;/g)
+      .map(function (chunk) {
+        return chunk.trim();
+      })
+      .filter(Boolean);
+    if (!chunks.length) chunks = [text];
+    var rowCount = 0;
+    chunks.forEach(function (chunk) {
+      var hits = chunk.match(verbRe);
+      rowCount += hits && hits.length ? hits.length : 1;
+    });
+    total += Math.max(1, rowCount);
+  });
+  return total;
 }
 
 function countNamedSheetItems(items) {
@@ -5235,21 +5259,22 @@ function buildValueChangeItemHtml(r, useTimeline) {
 async function loadValueChanges() {
   var listEl = document.getElementById('value-changes-list');
   var homeMainListEl = document.getElementById('home-main-value-changes-list');
-  if (!listEl && !homeMainListEl) return;
   function setSidebarValueChangesHtml(html) {
     if (listEl) listEl.innerHTML = html;
   }
   try {
     var rows = await fetchSheet("Website Configs");
+    var changeCount = countValueChangesFromRows(rows || []);
+    setHomeStatValue("changes", changeCount, true);
+    applyCachedHomeStatValues(document);
+    if (!listEl && !homeMainListEl) return;
     if (!rows || rows.length === 0) {
       var emptyHtml = '<div class="value-changes-loading">' + escapeHtml(i18n("changes.none")) + '</div>';
       setSidebarValueChangesHtml(emptyHtml);
       if (homeMainListEl) homeMainListEl.innerHTML = emptyHtml;
-      setHomeStatValue("changes", 0, true);
       return;
     }
     var filtered = filterValueChangeRows(rows);
-    setHomeStatValue("changes", filtered.length, true);
     if (filtered.length === 0) {
       var noneHtml = '<div class="value-changes-loading">' + escapeHtml(i18n("changes.none")) + '</div>';
       setSidebarValueChangesHtml(noneHtml);
