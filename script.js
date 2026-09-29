@@ -649,6 +649,10 @@ function markHomeStatGrown(key) {
   wraps.forEach(function (wrap) {
     wrap.classList.remove("is-counting");
     wrap.classList.add("is-grown");
+    if (key === "traders") {
+      var pill = wrap.closest(".home-discord-promo__flash-stat");
+      if (pill) pill.classList.add("is-grown");
+    }
   });
 }
 
@@ -692,6 +696,10 @@ function animateHomeStatValue(key, targetValue, durationMs) {
       : els;
   animWraps.forEach(function (wrap) {
     wrap.classList.remove("is-grown");
+    if (key === "traders") {
+      var pill = wrap.closest(".home-discord-promo__flash-stat");
+      if (pill) pill.classList.remove("is-grown");
+    }
     void wrap.offsetWidth;
     wrap.classList.add("is-counting");
   });
@@ -711,10 +719,7 @@ function animateHomeStatValue(key, targetValue, durationMs) {
       els.forEach(function (el) {
         el.textContent = targetValue.toLocaleString();
       });
-      animWraps.forEach(function (wrap) {
-        wrap.classList.remove("is-counting");
-        wrap.classList.add("is-grown");
-      });
+      markHomeStatGrown(key);
     }
   }
   homeStatAnimFrames[key] = requestAnimationFrame(frame);

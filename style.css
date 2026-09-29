@@ -3486,14 +3486,15 @@ background-attachment: fixed;
 }.home-discord-promo__flash-stat-num.is-grown {
   animation: home-discord-stat-pop 0.45s ease-out both;
 }.home-discord-promo__flash-stat-num.is-grown,
-.home-discord-promo__flash-stat-num.is-grown .discord-member-count {
+.home-discord-promo__flash-stat-num.is-grown .discord-member-count,
+.home-discord-promo__flash-stat.is-grown .home-discord-promo__flash-stat-label {
   background-image: linear-gradient(
     165deg,
-    #f0d78a 0%,
-    #c9a227 32%,
-    #8f6d12 58%,
-    #b8922a 82%,
-    #e0c56a 100%
+    #fff0b0 0%,
+    #f0d060 28%,
+    #d4a824 55%,
+    #e8c44a 78%,
+    #ffe08a 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
@@ -3505,6 +3506,13 @@ background-attachment: fixed;
     drop-shadow(1.25px 0 0 #000)
     drop-shadow(0 -1.25px 0 #000)
     drop-shadow(0 1.25px 0 #000);
+}
+.home-discord-promo__flash-stat.is-grown .home-discord-promo__flash-stat-label {
+  filter:
+    drop-shadow(-1px 0 0 #000)
+    drop-shadow(1px 0 0 #000)
+    drop-shadow(0 -1px 0 #000)
+    drop-shadow(0 1px 0 #000);
 }@keyframes home-discord-stat-count {
   0% { transform: scale(0.72); opacity: 0.55; }
   100% { transform: scale(1); opacity: 1; }
@@ -3744,11 +3752,11 @@ background-attachment: fixed;
 .home-stats-strip__value.is-grown {
   background-image: linear-gradient(
     165deg,
-    #f0d78a 0%,
-    #c9a227 32%,
-    #8f6d12 58%,
-    #b8922a 82%,
-    #e0c56a 100%
+    #fff0b0 0%,
+    #f0d060 28%,
+    #d4a824 55%,
+    #e8c44a 78%,
+    #ffe08a 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
