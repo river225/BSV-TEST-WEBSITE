@@ -3678,8 +3678,8 @@ background-attachment: fixed;
   max-width: 480px;
   justify-self: end;
   align-self: stretch;
-  /* Drop past Discord logo so Items tracked lines up with "Join Our Discord Server" */
-  padding-top: 58px;
+  /* Drop past Discord logo / traders pill so Items tracked sits a bit lower */
+  padding-top: 74px;
   /* Match Discord promo inner bottom padding so Recent Changes lines up with Join/Learn */
   padding-bottom: 18px;
   box-sizing: border-box;
