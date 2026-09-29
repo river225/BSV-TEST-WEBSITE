@@ -446,35 +446,33 @@ function buildHomeFlashPerkHtml(mod, icon, titleKey, tagKey) {
 function buildDiscordPromoBannerHtml(inCards) {
   if (inCards) return buildDiscordPromoCardSlotHtml("");
   return (
-    '<div class="home-discord-promo home-discord-promo--home home-discord-promo--home-flash" role="complementary" aria-label="Join BlockSpin Discord">' +
-      '<div class="home-discord-promo__home-glow" aria-hidden="true"></div>' +
-      '<div class="home-discord-promo__home-shimmer" aria-hidden="true"></div>' +
-      '<div class="home-discord-promo__inner">' +
-        '<div class="home-discord-promo__flash-badges">' +
-          '<span class="home-discord-promo__flash-badge home-discord-promo__flash-badge--mm">' + escapeHtml(i18n("discord.home.badgeFreeMm")) + "</span>" +
-          '<span class="home-discord-promo__flash-badge home-discord-promo__flash-badge--values">' + escapeHtml(i18n("discord.home.badgeValueList")) + "</span>" +
-          '<span class="home-discord-promo__flash-badge home-discord-promo__flash-badge--gw">' + escapeHtml(i18n("discord.home.badgeGiveaways")) + "</span>" +
-          '<span class="home-discord-promo__flash-badge home-discord-promo__flash-badge--trade">' + escapeHtml(i18n("discord.home.badgeTrading")) + "</span>" +
+    '<div class="home-discord-promo home-discord-promo--home home-discord-promo--home-v2" role="complementary" aria-label="Join BlockSpin Discord">' +
+      '<div class="home-discord-promo__inner home-discord-promo__inner--v2">' +
+        '<div class="home-discord-promo__v2-main">' +
+          '<img src="https://i.ibb.co/Tq7DLCJt/dsfbvbvxcxbvn.png" alt="" width="56" height="56" class="home-discord-promo__logo home-discord-promo__v2-logo">' +
+          '<div class="home-discord-promo__v2-copy">' +
+            '<p class="home-discord-promo__title home-discord-promo__v2-title">' + escapeHtml(i18n("discord.home.title")) + "</p>" +
+            '<p class="home-discord-promo__hook home-discord-promo__v2-hook">' + escapeHtml(i18n("discord.home.hook")) + "</p>" +
+            '<p class="home-discord-promo__v2-meta">' +
+              escapeHtml(i18n("discord.home.badgeFreeMm")) +
+              " · " +
+              escapeHtml(i18n("discord.home.badgeTrading")) +
+              " · " +
+              escapeHtml(i18n("discord.home.badgeGiveaways")) +
+            "</p>" +
+          "</div>" +
         "</div>" +
-        '<div class="home-discord-promo__flash-hero">' +
-          '<img src="https://i.ibb.co/Tq7DLCJt/dsfbvbvxcxbvn.png" alt="" width="52" height="52" class="home-discord-promo__logo home-discord-promo__flash-logo">' +
-          '<p class="home-discord-promo__title home-discord-promo__flash-title">' + escapeHtml(i18n("discord.home.title")) + "</p>" +
-          '<p class="home-discord-promo__hook home-discord-promo__flash-hook">' + escapeHtml(i18n("discord.home.hook")) + "</p>" +
-          '<p class="home-discord-promo__flash-stat">' +
+        '<div class="home-discord-promo__v2-side">' +
+          '<p class="home-discord-promo__v2-count">' +
             '<span class="home-discord-promo__flash-stat-num"><span class="discord-member-count" data-home-stat="traders">0</span>+</span>' +
-            '<span class="home-discord-promo__flash-stat-label">' + escapeHtml(i18n("discord.home.statLabel")) + "</span>" +
+            '<span class="home-discord-promo__v2-count-label">' + escapeHtml(i18n("discord.home.statLabel")) + "</span>" +
           "</p>" +
-        "</div>" +
-        '<div class="home-discord-promo__flash-perks">' +
-          buildHomeFlashPerkHtml("trading", "📊", "discord.card.tradingPerk", "discord.home.tradingTag1") +
-          buildHomeFlashPerkHtml("middleman", buildMiddlemanShieldIconHtml(22), "discord.card.middlemanTitle", "discord.card.middlemanStep1") +
-          buildHomeFlashPerkHtml("giveaways", "🎁", "discord.card.giveawaysTitle", "discord.card.giveawaysTag2") +
-        "</div>" +
-        '<div class="home-discord-promo__actions home-discord-promo__actions--home home-discord-promo__flash-actions">' +
-          '<a href="' + BSV_DISCORD_INVITE_URL + '" target="_blank" rel="noopener noreferrer" class="home-discord-promo__btn home-discord-promo__btn--primary home-discord-promo__btn--flash-join">' +
-            escapeHtml(i18n("discord.card.joinNow")) + ' <span aria-hidden="true">→</span>' +
-          "</a>" +
-          '<a href="blockspin-discord-server.html" class="home-discord-promo__btn home-discord-promo__btn--secondary">' + escapeHtml(i18n("discord.card.learnMore")) + "</a>" +
+          '<div class="home-discord-promo__actions home-discord-promo__actions--home home-discord-promo__v2-actions">' +
+            '<a href="' + BSV_DISCORD_INVITE_URL + '" target="_blank" rel="noopener noreferrer" class="home-discord-promo__btn home-discord-promo__btn--primary home-discord-promo__btn--flash-join">' +
+              escapeHtml(i18n("discord.card.joinNow")) + ' <span aria-hidden="true">→</span>' +
+            "</a>" +
+            '<a href="blockspin-discord-server.html" class="home-discord-promo__btn home-discord-promo__btn--secondary">' + escapeHtml(i18n("discord.card.learnMore")) + "</a>" +
+          "</div>" +
         "</div>" +
       "</div>" +
     "</div>"
@@ -526,11 +524,11 @@ function mountHomeDiscordPromo() {
   slot.outerHTML =
     '<div class="home-hero-stack">' +
       buildHomeLiveTradingBarHtml() +
+      '<div id="home-site-stats-slot"></div>' +
       '<div class="home-hero-row">' +
         '<div class="home-hero-row__banner">' +
           buildDiscordPromoBannerHtml(false) +
         "</div>" +
-        '<div class="home-hero-row__stats" id="home-site-stats-slot"></div>' +
       "</div>" +
     "</div>";
   mountHomeSiteStats();
@@ -538,45 +536,34 @@ function mountHomeDiscordPromo() {
 
 function mountHomeSiteStats() {
   var slot = document.getElementById("home-site-stats-slot");
-  if (slot) slot.innerHTML = buildHomeSiteStatsHtml("home-site-stats--beside");
-  applyCachedHomeStatValues(slot || document);
+  if (slot) slot.outerHTML = buildHomeSiteStatsHtml("home-stats-strip");
+  applyCachedHomeStatValues(document);
 }
 
-var HOME_SITE_STATS_ICONS = {
-  items:
-    '<svg class="home-site-stats__icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-      '<path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/>' +
-    '</svg>',
-  online:
-    '<svg class="home-site-stats__icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">' +
-      '<rect x="2" y="14" width="3" height="6" rx="0.75"/><rect x="7" y="10" width="3" height="10" rx="0.75"/><rect x="12" y="6" width="3" height="14" rx="0.75"/><rect x="17" y="2" width="3" height="18" rx="0.75"/>' +
-    '</svg>'
-};
-
 function buildHomeSiteStatsHtml(extraClass) {
-  var statsClass = "home-site-stats" + (extraClass ? " " + extraClass : "");
+  var statsClass = "home-stats-strip" + (extraClass && extraClass !== "home-stats-strip" ? " " + extraClass : "");
   return (
-    '<aside class="' + statsClass + '" aria-label="' + escapeHtml(i18n("home.stats.aria")) + '">' +
-      '<div class="home-site-stats__item">' +
-        '<span class="home-site-stats__value" data-home-stat="items">0</span>' +
-        '<span class="home-site-stats__label">' +
-          '<span class="home-site-stats__icon">' + HOME_SITE_STATS_ICONS.items + '</span>' +
-          escapeHtml(i18n("home.stats.itemsTracked")) +
-        '</span>' +
-      '</div>' +
-      '<div class="home-site-stats__item">' +
-        '<span class="home-site-stats__value" data-home-stat="online">0</span>' +
-        '<span class="home-site-stats__label">' +
-          '<span class="home-site-stats__icon">' + HOME_SITE_STATS_ICONS.online + '</span>' +
-          escapeHtml(i18n("home.stats.onlineMembers")) +
-        '</span>' +
-      '</div>' +
-    '</aside>'
+    '<aside class="' + statsClass + '" id="home-site-stats-slot" aria-label="' + escapeHtml(i18n("home.stats.aria")) + '">' +
+      '<p class="home-stats-strip__item">' +
+        '<span class="home-stats-strip__value" data-home-stat="items">0</span> ' +
+        '<span class="home-stats-strip__label">' + escapeHtml(i18n("home.stats.itemsTracked")) + "</span>" +
+      "</p>" +
+      '<span class="home-stats-strip__rule" aria-hidden="true"></span>' +
+      '<p class="home-stats-strip__item">' +
+        '<span class="home-stats-strip__value" data-home-stat="online">0</span> ' +
+        '<span class="home-stats-strip__label">' + escapeHtml(i18n("home.stats.onlineMembers")) + "</span>" +
+      "</p>" +
+      '<span class="home-stats-strip__rule" aria-hidden="true"></span>' +
+      '<p class="home-stats-strip__item">' +
+        '<span class="home-stats-strip__value" data-home-stat="changes">0</span> ' +
+        '<span class="home-stats-strip__label">' + escapeHtml(i18n("home.stats.totalChanges")) + "</span>" +
+      "</p>" +
+    "</aside>"
   );
 }
 
 var homeStatAnimFrames = {};
-var homeStatValueCache = { traders: null, online: null, items: null };
+var homeStatValueCache = { traders: null, online: null, items: null, changes: null };
 
 function syncDiscordMemberCountElements(value) {
   if (typeof value !== "number" || isNaN(value)) return;
@@ -5258,9 +5245,11 @@ async function loadValueChanges() {
       var emptyHtml = '<div class="value-changes-loading">' + escapeHtml(i18n("changes.none")) + '</div>';
       setSidebarValueChangesHtml(emptyHtml);
       if (homeMainListEl) homeMainListEl.innerHTML = emptyHtml;
+      setHomeStatValue("changes", 0, true);
       return;
     }
     var filtered = filterValueChangeRows(rows);
+    setHomeStatValue("changes", filtered.length, true);
     if (filtered.length === 0) {
       var noneHtml = '<div class="value-changes-loading">' + escapeHtml(i18n("changes.none")) + '</div>';
       setSidebarValueChangesHtml(noneHtml);
