@@ -3699,6 +3699,178 @@ background-attachment: fixed;
   padding: 0;
   margin: 0 0 10px;
 }
+.home-changes-changelog-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  margin: 8px 0 0 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: rgba(125, 211, 252, 0.88);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  line-height: 1.2;
+}
+.home-changes-changelog-link:hover {
+  color: #fff;
+}
+.home-changes-changelog-link__icon {
+  flex: 0 0 auto;
+  opacity: 0.9;
+}
+.home-changelog-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+.home-changelog-modal.is-open {
+  display: flex;
+}
+.home-changelog-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 8, 20, 0.72);
+  backdrop-filter: blur(4px);
+}
+.home-changelog-modal__panel {
+  position: relative;
+  z-index: 1;
+  width: min(720px, 100%);
+  max-height: min(82vh, 860px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  border: 1px solid rgba(125, 211, 252, 0.28);
+  background: linear-gradient(180deg, rgba(18, 28, 48, 0.98), rgba(10, 16, 28, 0.98));
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+.home-changelog-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.18);
+  flex: 0 0 auto;
+}
+.home-changelog-modal__title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+.home-changelog-modal__close {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.home-changelog-modal__close:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+.home-changelog-modal__body {
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 12px 14px 18px;
+  flex: 1 1 auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(125, 211, 252, 0.45) transparent;
+}
+.home-changelog-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.home-changelog-feed__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(8, 14, 28, 0.55);
+  border: 1px solid rgba(125, 211, 252, 0.14);
+}
+.home-changelog-feed__item--green { border-color: rgba(162, 232, 45, 0.35); }
+.home-changelog-feed__item--orange { border-color: rgba(245, 158, 11, 0.35); }
+.home-changelog-feed__item--red { border-color: rgba(248, 113, 113, 0.35); }
+.home-changelog-feed__item--blue { border-color: rgba(56, 189, 248, 0.35); }
+.home-changelog-feed__media {
+  flex: 0 0 72px;
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 14, 28, 0.65);
+  border: 1px solid rgba(125, 211, 252, 0.16);
+}
+.home-changelog-feed__media.is-empty {
+  background:
+    linear-gradient(145deg, rgba(125, 211, 252, 0.12), transparent 60%),
+    rgba(8, 14, 28, 0.65);
+}
+.home-changelog-feed__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.home-changelog-feed__body {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.home-changelog-feed__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 4px;
+}
+.home-changelog-feed__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+}
+.home-changelog-feed__date {
+  flex: 0 0 auto;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #7dd3fc;
+}
+.home-changelog-feed__text {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgba(226, 232, 240, 0.9);
+}
+body.home-changelog-open {
+  overflow: hidden;
+}
 .home-hero-top__stats .home-changes-strip__item {
   --home-change-card: 152px;
 }

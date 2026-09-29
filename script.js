@@ -519,8 +519,77 @@ function buildHomeChangesStripHtml(listId) {
       '<div class="home-changes-strip__viewport" id="' + listId + '">' +
         '<div class="value-changes-loading" data-i18n="loading.changes">' + escapeHtml(i18n("loading.changes")) + "</div>" +
       "</div>" +
+      '<button type="button" class="home-changes-changelog-link" id="home-changelog-open" data-changelog-open>' +
+        '<span>' + escapeHtml(i18n("home.readFullChangelog")) + "</span>" +
+        '<svg class="home-changes-changelog-link__icon" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true" focusable="false">' +
+          '<path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M9 5h10M9 12h10M9 19h10M5 5h.01M5 12h.01M5 19h.01"/>' +
+        "</svg>" +
+      "</button>" +
     "</aside>"
   );
+}
+
+var homeValueChangesCache = [];
+
+function buildChangelogFeedItemHtml(r) {
+  return buildValueChangeItemHtml(r, "feed");
+}
+
+function ensureChangelogModal() {
+  var existing = document.getElementById("home-changelog-modal");
+  if (existing) return existing;
+
+  var modal = document.createElement("div");
+  modal.id = "home-changelog-modal";
+  modal.className = "home-changelog-modal";
+  modal.hidden = true;
+  modal.setAttribute("role", "dialog");
+  modal.setAttribute("aria-modal", "true");
+  modal.setAttribute("aria-labelledby", "home-changelog-title");
+  modal.innerHTML =
+    '<div class="home-changelog-modal__backdrop" data-changelog-close tabindex="-1"></div>' +
+    '<div class="home-changelog-modal__panel">' +
+      '<div class="home-changelog-modal__header">' +
+        '<h2 class="home-changelog-modal__title" id="home-changelog-title">' + escapeHtml(i18n("home.fullChangelogTitle")) + "</h2>" +
+        '<button type="button" class="home-changelog-modal__close" data-changelog-close aria-label="' + escapeAttr(i18n("home.changelogClose")) + '">&times;</button>' +
+      "</div>" +
+      '<div class="home-changelog-modal__body" id="home-changelog-list">' +
+        '<div class="value-changes-loading">' + escapeHtml(i18n("loading.changes")) + "</div>" +
+      "</div>" +
+    "</div>";
+  document.body.appendChild(modal);
+  return modal;
+}
+
+function renderChangelogModalList() {
+  var list = document.getElementById("home-changelog-list");
+  if (!list) return;
+  if (!homeValueChangesCache.length) {
+    list.innerHTML = '<div class="value-changes-loading">' + escapeHtml(i18n("changes.none")) + "</div>";
+    return;
+  }
+  list.innerHTML =
+    '<div class="home-changelog-feed" role="list">' +
+      homeValueChangesCache.map(buildChangelogFeedItemHtml).join("") +
+    "</div>";
+}
+
+function openChangelogModal() {
+  var modal = ensureChangelogModal();
+  renderChangelogModalList();
+  modal.hidden = false;
+  modal.classList.add("is-open");
+  document.body.classList.add("home-changelog-open");
+  var closeBtn = modal.querySelector(".home-changelog-modal__close");
+  if (closeBtn) closeBtn.focus();
+}
+
+function closeChangelogModal() {
+  var modal = document.getElementById("home-changelog-modal");
+  if (!modal) return;
+  modal.classList.remove("is-open");
+  modal.hidden = true;
+  document.body.classList.remove("home-changelog-open");
 }
 
 function mountHomeDiscordPromo() {
@@ -5404,6 +5473,27 @@ function buildValueChangeItemHtml(r, useTimeline) {
     );
   }
 
+  if (useTimeline === "feed") {
+    var feedMod = colorKey ? " home-changelog-feed__item--" + colorKey : "";
+    var feedMedia = imageAttr
+      ? '<div class="home-changelog-feed__media">' +
+          '<img src="' + imageAttr + '" alt="" width="72" height="72" loading="lazy" decoding="async" onerror="this.parentElement.classList.add(\'is-empty\');this.remove();">' +
+        "</div>"
+      : '<div class="home-changelog-feed__media is-empty" aria-hidden="true"></div>';
+    return (
+      '<article class="home-changelog-feed__item' + feedMod + '" role="listitem">' +
+        feedMedia +
+        '<div class="home-changelog-feed__body">' +
+          '<div class="home-changelog-feed__top">' +
+            (titleEsc ? '<h3 class="home-changelog-feed__title">' + titleEsc + "</h3>" : "") +
+            (dateEsc ? '<span class="home-changelog-feed__date">' + dateEsc + "</span>" : "") +
+          "</div>" +
+          (textEsc ? '<p class="home-changelog-feed__text">' + textEsc + "</p>" : "") +
+        "</div>" +
+      "</article>"
+    );
+  }
+
   var classicMedia = imageAttr
     ? '<div class="value-change-thumb"><img src="' + imageAttr + '" alt="" width="48" height="48" loading="lazy" decoding="async" onerror="this.parentElement.style.display=\'none\'"></div>'
     : '<div class="value-change-icon' + colorClass + '"></div>';
@@ -5620,18 +5710,22 @@ async function loadValueChanges() {
     applyCachedHomeStatValues(document);
     if (!listEl && !homeMainListEl) return;
     if (!rows || rows.length === 0) {
+      homeValueChangesCache = [];
       var emptyHtml = '<div class="value-changes-loading">' + escapeHtml(i18n("changes.none")) + '</div>';
       setSidebarValueChangesHtml(emptyHtml);
       if (homeMainListEl) homeMainListEl.innerHTML = emptyHtml;
       stopHomeChangesStripAutoScroll();
+      renderChangelogModalList();
       return;
     }
     var filtered = filterValueChangeRows(rows);
+    homeValueChangesCache = filtered.slice();
     if (filtered.length === 0) {
       var noneHtml = '<div class="value-changes-loading">' + escapeHtml(i18n("changes.none")) + '</div>';
       setSidebarValueChangesHtml(noneHtml);
       if (homeMainListEl) homeMainListEl.innerHTML = noneHtml;
       stopHomeChangesStripAutoScroll();
+      renderChangelogModalList();
       return;
     }
     var classicHtml = filtered.map(function (r) { return buildValueChangeItemHtml(r, false); }).join("");
@@ -5647,14 +5741,35 @@ async function loadValueChanges() {
         });
       });
     }
+    renderChangelogModalList();
   } catch (err) {
     console.error('Error loading value changes:', err);
+    homeValueChangesCache = [];
     var failHtml = '<div class="value-changes-loading">' + escapeHtml(i18n("changes.failed")) + '</div>';
     setSidebarValueChangesHtml(failHtml);
     if (homeMainListEl) homeMainListEl.innerHTML = failHtml;
     stopHomeChangesStripAutoScroll();
+    renderChangelogModalList();
   }
 }
+
+document.addEventListener("click", function (e) {
+  if (e.target.closest("[data-changelog-open]")) {
+    e.preventDefault();
+    openChangelogModal();
+    return;
+  }
+  if (e.target.closest("[data-changelog-close]")) {
+    e.preventDefault();
+    closeChangelogModal();
+  }
+});
+
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape" && document.body.classList.contains("home-changelog-open")) {
+    closeChangelogModal();
+  }
+});
 
 
 /* ========== PINK WEBSITE THEME - theme switcher (remove with theme section in style.css) ========== */
