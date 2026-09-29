@@ -518,11 +518,9 @@ function mountHomeDiscordPromo() {
   slot.outerHTML =
     '<div class="home-hero-stack">' +
       '<div id="home-site-stats-slot"></div>' +
-      '<div class="home-hero-row home-hero-row--promo-pair">' +
-        '<div class="home-hero-row__banner home-hero-row__banner--lt">' +
-          buildHomeLiveTradingBarHtml() +
-        "</div>" +
-        '<div class="home-hero-row__banner home-hero-row__banner--discord">' +
+      buildHomeLiveTradingBarHtml() +
+      '<div class="home-hero-row">' +
+        '<div class="home-hero-row__banner">' +
           buildDiscordPromoBannerHtml(false) +
         "</div>" +
       "</div>" +

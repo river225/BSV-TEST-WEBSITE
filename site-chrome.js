@@ -692,7 +692,7 @@
     var style = document.createElement("style");
     style.id = "bsv-section-lt-promo-styles";
     style.textContent =
-      ".bsv-section-lt-promo{flex:0 0 auto;width:100%;max-width:min(1080px,100%);margin:0 auto 20px;box-sizing:border-box}" +
+      ".bsv-section-lt-promo{flex:0 0 auto;width:100%;max-width:min(720px,100%);margin:0 auto 20px;box-sizing:border-box}" +
       ".bsv-section-lt-promo[hidden],.bsv-section-lt-promo.is-hidden{display:none!important}";
     document.head.appendChild(style);
   }
