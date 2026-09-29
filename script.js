@@ -5382,38 +5382,71 @@ var homeChangesAutoScrollState = null;
 function stopHomeChangesStripAutoScroll() {
   if (!homeChangesAutoScrollState) return;
   if (homeChangesAutoScrollState.raf) cancelAnimationFrame(homeChangesAutoScrollState.raf);
+  if (homeChangesAutoScrollState.retryTimer) clearTimeout(homeChangesAutoScrollState.retryTimer);
   var vp = homeChangesAutoScrollState.viewport;
   if (vp && homeChangesAutoScrollState.onInteract) {
     ["wheel", "pointerdown", "touchstart", "keydown"].forEach(function (type) {
       vp.removeEventListener(type, homeChangesAutoScrollState.onInteract);
     });
   }
+  if (vp) vp.classList.remove("is-auto-scrolling");
   homeChangesAutoScrollState = null;
 }
 
-function initHomeChangesStripAutoScroll(viewport) {
-  stopHomeChangesStripAutoScroll();
-  if (!viewport) return;
-  var list = viewport.querySelector(".home-changes-strip__list");
-  if (!list || list.children.length < 2) return;
-  if (viewport.scrollWidth <= viewport.clientWidth + 8) return;
+function initHomeChangesStripAutoScroll(viewport, attempt) {
+  attempt = attempt || 0;
+  if (!viewport || !viewport.isConnected) return;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-  // Duplicate items so the strip can loop seamlessly while scrolling right.
-  var clone = list.cloneNode(true);
-  clone.removeAttribute("role");
-  clone.setAttribute("aria-hidden", "true");
-  while (clone.firstChild) list.appendChild(clone.firstChild);
+  var list = viewport.querySelector(".home-changes-strip__list");
+  if (!list || list.children.length < 2) {
+    if (attempt < 12) {
+      homeChangesAutoScrollState = {
+        viewport: viewport,
+        retryTimer: setTimeout(function () {
+          initHomeChangesStripAutoScroll(viewport, attempt + 1);
+        }, 200)
+      };
+    }
+    return;
+  }
+
+  // Ensure a duplicated sequence exists for a seamless rightward loop.
+  if (list.dataset.autoDup !== "1") {
+    var originalCount = list.children.length;
+    var clone = list.cloneNode(true);
+    while (clone.firstChild) list.appendChild(clone.firstChild);
+    list.dataset.autoDup = "1";
+    list.dataset.autoDupCount = String(originalCount);
+  }
+
+  // Wait until layout has real overflow (fonts / flex can be late).
+  if (viewport.scrollWidth <= viewport.clientWidth + 8) {
+    if (attempt < 12) {
+      homeChangesAutoScrollState = {
+        viewport: viewport,
+        retryTimer: setTimeout(function () {
+          initHomeChangesStripAutoScroll(viewport, attempt + 1);
+        }, 200)
+      };
+    }
+    return;
+  }
+
+  stopHomeChangesStripAutoScroll();
 
   viewport.classList.add("is-auto-scrolling");
-  viewport.scrollLeft = 0;
+  try {
+    viewport.scrollLeft = 0;
+  } catch (e) {}
 
   var pauseUntil = 0;
   var lastTs = 0;
-  var speed = 32; // px / second
+  var speed = 56; // px / second — readable but clearly moving
+  var scrollingProgrammatically = false;
 
   function onInteract() {
-    pauseUntil = performance.now() + 1600;
+    pauseUntil = performance.now() + 1800;
   }
 
   ["wheel", "pointerdown", "touchstart", "keydown"].forEach(function (type) {
@@ -5425,7 +5458,7 @@ function initHomeChangesStripAutoScroll(viewport) {
     if (!state || state.viewport !== viewport) return;
     state.raf = requestAnimationFrame(tick);
 
-    if (document.hidden) {
+    if (document.hidden || !viewport.isConnected) {
       lastTs = ts;
       return;
     }
@@ -5439,23 +5472,31 @@ function initHomeChangesStripAutoScroll(viewport) {
     }
 
     if (!lastTs) lastTs = ts;
-    var dt = Math.min(40, ts - lastTs);
+    var dt = Math.min(48, ts - lastTs);
     lastTs = ts;
 
     var loopAt = list.scrollWidth / 2;
-    if (loopAt <= viewport.clientWidth) return;
+    if (!(loopAt > viewport.clientWidth)) return;
 
-    viewport.scrollLeft += (speed * dt) / 1000;
-    if (viewport.scrollLeft >= loopAt) {
-      viewport.scrollLeft -= loopAt;
-    }
+    scrollingProgrammatically = true;
+    var next = viewport.scrollLeft + (speed * dt) / 1000;
+    if (next >= loopAt) next -= loopAt;
+    viewport.scrollLeft = next;
+    // Allow the browser to apply scroll before clearing the flag.
+    requestAnimationFrame(function () {
+      scrollingProgrammatically = false;
+    });
   }
 
   homeChangesAutoScrollState = {
     viewport: viewport,
     onInteract: onInteract,
-    raf: requestAnimationFrame(tick)
+    raf: requestAnimationFrame(tick),
+    retryTimer: 0
   };
+
+  // Keep a no-op reference so linters/minifiers don't drop the flag.
+  void scrollingProgrammatically;
 }
 
 async function loadValueChanges() {
@@ -5490,8 +5531,11 @@ async function loadValueChanges() {
       var stripHtml = filtered.map(function (r) { return buildValueChangeItemHtml(r, "strip"); }).join("");
       homeMainListEl.innerHTML =
         '<div class="home-changes-strip__list" role="list">' + stripHtml + "</div>";
+      // Double-rAF so flex/card widths are measured before auto-scroll starts.
       requestAnimationFrame(function () {
-        initHomeChangesStripAutoScroll(homeMainListEl);
+        requestAnimationFrame(function () {
+          initHomeChangesStripAutoScroll(homeMainListEl);
+        });
       });
     }
   } catch (err) {

@@ -3764,8 +3764,9 @@ background-attachment: fixed;
   -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 4%, #000 92%, transparent 100%);
 }
 .home-changes-strip__viewport.is-auto-scrolling {
-  scroll-snap-type: none;
-  scroll-behavior: auto;
+  scroll-snap-type: none !important;
+  scroll-behavior: auto !important;
+  overflow-x: scroll;
 }
 .home-changes-strip__viewport::-webkit-scrollbar {
   height: 4px;
