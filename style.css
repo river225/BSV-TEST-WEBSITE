@@ -4457,11 +4457,7 @@ body.home-changelog-open {
   font: inherit;
   transition: filter 0.15s ease, transform 0.15s ease;
   box-sizing: border-box;
-  background: linear-gradient(
-    180deg,
-    hsl(var(--bsv-hue) var(--bsv-s-raised) 15%) 0%,
-    hsl(var(--bsv-hue) var(--bsv-s-deep) 11%) 100%
-  );
+  background: hsl(var(--bsv-hue) var(--bsv-s-raised) 13%);
 }
 .home-extra-banner:hover {
   filter: brightness(1.05);
@@ -4474,18 +4470,10 @@ body.home-changelog-open {
   display: none;
 }
 .home-extra-banner--guide {
-  background: linear-gradient(
-    180deg,
-    hsl(152 28% 16%) 0%,
-    hsl(var(--bsv-hue) var(--bsv-s-deep) 11%) 100%
-  );
+  background: hsl(152 22% 13%);
 }
 .home-extra-banner--richest {
-  background: linear-gradient(
-    180deg,
-    hsl(42 36% 16%) 0%,
-    hsl(var(--bsv-hue) var(--bsv-s-deep) 11%) 100%
-  );
+  background: hsl(42 28% 13%);
 }
 .home-extra-banner__icon {
   position: relative;
