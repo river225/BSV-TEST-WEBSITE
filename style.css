@@ -3435,14 +3435,16 @@ background-attachment: fixed;
   box-shadow: none;
   box-sizing: border-box;
 }.home-discord-promo__flash-logo {
-  width: 52px;
-  height: 52px;
-  padding: 9px;
-  border-radius: 14px;
-  background: rgba(15, 23, 42, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  width: 76px;
+  height: 76px;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  object-fit: contain;
   animation: none;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35));
 }.home-discord-promo__flash-title {
   margin: 0;
   font-size: clamp(1.35rem, 3vw, 1.7rem);
@@ -3460,16 +3462,26 @@ background-attachment: fixed;
   max-width: 40ch;
 }.home-discord-promo__flash-stat {
   display: inline-flex;
-  align-items: baseline;
-  gap: 6px;
-  margin: 4px 0 0;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(8, 12, 28, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  box-shadow: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 118px;
+  height: 118px;
+  margin: 6px 0 2px;
+  padding: 10px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(125, 211, 252, 0.22), transparent 55%),
+    rgba(8, 12, 28, 0.62);
+  border: 3px solid rgba(125, 211, 252, 0.55);
+  box-shadow:
+    0 0 0 6px rgba(125, 211, 252, 0.12),
+    0 8px 22px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  box-sizing: border-box;
 }.home-discord-promo__flash-stat-num {
-  font-size: clamp(1.25rem, 3vw, 1.7rem);
+  font-size: clamp(1.15rem, 2.6vw, 1.45rem);
   font-weight: 800;
   line-height: 1;
   color: #fff;
@@ -3490,11 +3502,11 @@ background-attachment: fixed;
 }.home-discord-promo__flash-stat-num .discord-member-count {
   color: #fff;
 }.home-discord-promo__flash-stat-label {
-  font-size: 0.75rem;
+  font-size: 0.62rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #ffffff;
+  color: rgba(226, 232, 240, 0.95);
   text-shadow: 0 1px 0 #000;
 }.home-discord-promo__flash-perks {
   display: grid;
@@ -3505,78 +3517,108 @@ background-attachment: fixed;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 12px 8px 11px;
-  border-radius: 12px;
-  border: 2px solid rgba(0, 0, 0, 0.35);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  gap: 5px;
+  padding: 13px 8px 12px;
+  border-radius: 14px;
+  border: 2px solid #000;
+  box-shadow: 0 3px 0 #000, inset 0 1px 0 rgba(255, 255, 255, 0.16);
   text-align: center;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: filter 0.15s ease;
 }.home-discord-promo__flash-perk:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  filter: brightness(1.06);
 }.home-discord-promo__flash-perk--trading,
 .home-discord-promo__flash-perk--values {
-  background: linear-gradient(160deg, #e0f2fe 0%, #7dd3fc 45%, #38bdf8 100%);
+  background: linear-gradient(165deg, rgba(56, 189, 248, 0.38) 0%, rgba(14, 116, 144, 0.55) 100%);
+  color: #e0f2fe;
 }.home-discord-promo__flash-perk--middleman {
-  background: linear-gradient(160deg, #d1fae5 0%, #6ee7b7 45%, #34d399 100%);
+  background: linear-gradient(165deg, rgba(52, 211, 153, 0.38) 0%, rgba(6, 95, 70, 0.55) 100%);
+  color: #d1fae5;
 }.home-discord-promo__flash-perk--giveaways {
-  background: linear-gradient(160deg, #fef3c7 0%, #fcd34d 45%, #fbbf24 100%);
+  background: linear-gradient(165deg, rgba(251, 191, 36, 0.4) 0%, rgba(146, 64, 14, 0.55) 100%);
+  color: #fef3c7;
 }.home-discord-promo__flash-perk-icon {
-  font-size: 1.35rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  font-size: 1.05rem;
   line-height: 1;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+  color: #fff;
+  filter: none;
+}.home-discord-promo__flash-perk-icon svg,
+.home-discord-promo__flash-perk-icon .middleman-shield-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}.home-discord-promo__flash-perk--values .home-discord-promo__flash-perk-icon {
+  color: #7dd3fc;
+  box-shadow: 0 0 0 1px rgba(125, 211, 252, 0.25);
+}.home-discord-promo__flash-perk--middleman .home-discord-promo__flash-perk-icon {
+  color: #6ee7b7;
+  box-shadow: 0 0 0 1px rgba(110, 231, 183, 0.25);
+}.home-discord-promo__flash-perk--giveaways .home-discord-promo__flash-perk-icon {
+  color: #fcd34d;
+  box-shadow: 0 0 0 1px rgba(252, 211, 77, 0.25);
 }.home-discord-promo__flash-perk-title {
   font-size: 0.84rem;
   font-weight: 800;
   line-height: 1.2;
-  color: #0b1220;
-  text-shadow: none;
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.55);
 }.home-discord-promo__flash-perk-tag {
   font-size: 0.7rem;
   font-weight: 700;
   line-height: 1.25;
-  color: #1e293b;
+  color: rgba(241, 245, 249, 0.88);
 }.home-discord-promo__flash-actions {
   display: flex;
   flex-direction: row;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
 }.home-discord-promo--home .home-discord-promo__btn {
   flex: 1 1 0;
   min-width: 0;
-  padding: 10px 14px;
-  font-size: 0.9rem;
+  padding: 14px 16px;
+  font-size: 1.08rem;
   font-weight: 800;
+  letter-spacing: 0.01em;
   border-width: 2px;
   border-radius: 12px;
   box-shadow: 0 3px 0 #000;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  transition: filter 0.15s ease, background-color 0.15s ease;
 }.home-discord-promo--home .home-discord-promo__btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 0 #000;
+  transform: none;
+  box-shadow: 0 3px 0 #000;
+  filter: brightness(1.06);
 }.home-discord-promo__btn--flash-join {
   flex: 1.35 1 0 !important;
-  padding: 11px 14px !important;
-  font-size: 0.95rem !important;
+  padding: 14px 16px !important;
+  font-size: 1.1rem !important;
   border-radius: 12px !important;
   border: 2px solid #000 !important;
   box-shadow: 0 3px 0 #000 !important;
   background: linear-gradient(180deg, #fff 0%, #e8ecff 100%) !important;
   color: #1d4ed8 !important;
 }.home-discord-promo__btn--flash-join:hover {
-  background: #fff !important;
+  background: linear-gradient(180deg, #fff 0%, #e8ecff 100%) !important;
+  filter: brightness(1.04);
 }.home-discord-promo--home .home-discord-promo__btn--secondary {
   background: rgba(15, 23, 42, 0.55);
   color: #fff;
   border-color: rgba(255, 255, 255, 0.4);
   box-shadow: 0 3px 0 rgba(0, 0, 0, 0.45);
+  font-size: 1.08rem;
 }.home-discord-promo--home .home-discord-promo__btn--secondary:hover {
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(15, 23, 42, 0.72);
   color: #fff;
+  filter: brightness(1.08);
 }.home-hero-stack {
   display: flex;
   flex-direction: column;
@@ -7036,27 +7078,32 @@ body.home-changelog-open {
   left: 50%;
   transform: translateX(-50%);
   z-index: 1200;
-  min-width: 220px;
+  min-width: 228px;
   max-height: min(70vh, 460px);
   overflow: auto;
   padding: 10px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: linear-gradient(165deg, rgba(30, 41, 59, 0.72) 0%, rgba(15, 23, 42, 0.78) 100%);
-  backdrop-filter: blur(18px) saturate(1.2);
-  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  border-radius: 14px;
+  border: 2px solid #000;
+  background: linear-gradient(
+    180deg,
+    hsl(var(--bsv-hue) var(--bsv-s-card) 14% / 0.97) 0%,
+    hsl(var(--bsv-hue) var(--bsv-s-deep) 10% / 0.96) 100%
+  );
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
   box-shadow:
-    0 16px 40px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    0 14px 36px rgba(0, 0, 0, 0.5),
+    0 3px 0 #000,
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }.nav-icon-menu__panel[hidden] {
   display: none !important;
 }.nav-icon-menu__group {
   margin: 8px 4px 2px;
   padding: 0 8px;
-  color: rgba(147, 197, 253, 0.9);
+  color: var(--bsv-accent-bright);
   font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -7068,16 +7115,18 @@ body.home-changelog-open {
   width: 100%;
   text-align: left;
   padding: 10px 12px;
-  border: 0;
+  border: 2px solid #000;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.04);
-  color: #fff;
+  background: var(--bsv-surface-raised);
+  color: #e8eef4;
   font: 600 0.9rem/1.2 system-ui, sans-serif;
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.15s ease;
+  box-shadow: 0 2px 0 #000;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }.nav-icon-menu__item:hover {
-  background: rgba(147, 197, 253, 0.2);
-  transform: translateX(2px);
+  background: var(--bsv-surface-hover);
+  color: #fff;
+  border-color: #000;
 }.header-subnav__btn {
   appearance: none;
   border: 0;
@@ -15888,10 +15937,13 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   }
 
   .home-discord-promo__flash-logo {
-    width: 40px;
-    height: 40px;
-    padding: 6px;
-    border-radius: 10px;
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    border: 0;
+    box-shadow: none;
   }
 
   .home-discord-promo__flash-title {
@@ -15914,7 +15966,9 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   }
 
   .home-discord-promo__flash-stat {
-    padding: 4px 8px;
+    width: 88px;
+    height: 88px;
+    padding: 8px;
     margin-top: 0;
   }
 
@@ -15923,7 +15977,7 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   }
 
   .home-discord-promo__flash-stat-label {
-    font-size: 0.68rem;
+    font-size: 0.55rem;
   }
 
   .home-discord-promo__flash-perks {
@@ -15978,8 +16032,8 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     min-width: 0;
     justify-content: center;
     box-sizing: border-box;
-    padding: 7px 6px;
-    font-size: 0.65rem;
+    padding: 11px 8px;
+    font-size: 0.88rem;
     border-width: 2px;
     min-height: 0;
   }

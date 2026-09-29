@@ -301,9 +301,28 @@ function buildMiddlemanShieldIconHtml(size) {
   var px = size || 26;
   return (
     '<svg class="middleman-shield-icon" viewBox="0 0 24 24" width="' + px + '" height="' + px + '" aria-hidden="true">' +
-      '<path fill="#ffffff" stroke="#000000" stroke-width="1.65" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>' +
-      '<path fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 12.5l2 2.5 4.5-5"></path>' +
+      '<path fill="currentColor" fill-opacity="0.22" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>' +
+      '<path fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" d="M9 12.5l2 2.5 4.5-5"></path>' +
     '</svg>'
+  );
+}
+
+function buildValueListPerkIconHtml() {
+  return (
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/>' +
+      '<path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/>' +
+    "</svg>"
+  );
+}
+
+function buildGiveawayPerkIconHtml() {
+  return (
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/>' +
+      '<path d="M12 7H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7z"/>' +
+      '<path d="M12 7h4.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7z"/>' +
+    "</svg>"
   );
 }
 
@@ -449,7 +468,7 @@ function buildDiscordPromoBannerHtml(inCards) {
     '<div class="home-discord-promo home-discord-promo--home home-discord-promo--home-flash" role="complementary" aria-label="Join BlockSpin Discord">' +
       '<div class="home-discord-promo__inner">' +
         '<div class="home-discord-promo__flash-hero">' +
-          '<img src="https://i.ibb.co/Tq7DLCJt/dsfbvbvxcxbvn.png" alt="" width="52" height="52" class="home-discord-promo__logo home-discord-promo__flash-logo">' +
+          '<img src="https://i.ibb.co/Tq7DLCJt/dsfbvbvxcxbvn.png" alt="" width="76" height="76" class="home-discord-promo__logo home-discord-promo__flash-logo">' +
           '<p class="home-discord-promo__title home-discord-promo__flash-title">' + escapeHtml(i18n("discord.home.title")) + "</p>" +
           '<p class="home-discord-promo__hook home-discord-promo__flash-hook">' + escapeHtml(i18n("discord.home.hook")) + "</p>" +
           '<p class="home-discord-promo__flash-stat">' +
@@ -458,9 +477,9 @@ function buildDiscordPromoBannerHtml(inCards) {
           "</p>" +
         "</div>" +
         '<div class="home-discord-promo__flash-perks">' +
-          buildHomeFlashPerkHtml("values", "📋", "discord.home.badgeValueList", "discord.home.tradingTag1") +
-          buildHomeFlashPerkHtml("middleman", buildMiddlemanShieldIconHtml(22), "discord.home.badgeMiddleman", "discord.card.middlemanStep1") +
-          buildHomeFlashPerkHtml("giveaways", "🎁", "discord.home.badgeGiveaways", "discord.card.giveawaysTag2") +
+          buildHomeFlashPerkHtml("values", buildValueListPerkIconHtml(), "discord.home.badgeValueList", "discord.home.tradingTag1") +
+          buildHomeFlashPerkHtml("middleman", buildMiddlemanShieldIconHtml(18), "discord.home.badgeMiddleman", "discord.card.middlemanStep1") +
+          buildHomeFlashPerkHtml("giveaways", buildGiveawayPerkIconHtml(), "discord.home.badgeGiveaways", "discord.card.giveawaysTag2") +
         "</div>" +
         '<div class="home-discord-promo__actions home-discord-promo__actions--home home-discord-promo__flash-actions">' +
           '<a href="' + BSV_DISCORD_INVITE_URL + '" target="_blank" rel="noopener noreferrer" class="home-discord-promo__btn home-discord-promo__btn--primary home-discord-promo__btn--flash-join">' +
