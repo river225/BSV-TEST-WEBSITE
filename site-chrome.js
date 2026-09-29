@@ -753,6 +753,12 @@
     return null;
   }
 
+  var LT_PROMO_HIDDEN_SECTION_IDS = {
+    "untradeable-items": true,
+    "richest-players": true,
+    "crew-logos": true
+  };
+
   function getActiveItemSection() {
     var active = null;
     document.querySelectorAll("#sections > .section").forEach(function (sec) {
@@ -769,10 +775,15 @@
     return active;
   }
 
+  function shouldShowLiveTradingSectionPromo(active) {
+    if (!active || !active.id) return false;
+    return !LT_PROMO_HIDDEN_SECTION_IDS[active.id];
+  }
+
   function placeLiveTradingPromoAtSectionTop(ltPromo) {
     if (!ltPromo) return;
     var active = getActiveItemSection();
-    if (!active) return;
+    if (!active || !shouldShowLiveTradingSectionPromo(active)) return;
     var heading = null;
     for (var i = 0; i < active.children.length; i++) {
       if (active.children[i].tagName === "H2") {
@@ -824,8 +835,10 @@
     }
 
     setPromoVisible(promo, false);
-    setPromoVisible(ltPromo, true);
-    placeLiveTradingPromoAtSectionTop(ltPromo);
+    var active = getActiveItemSection();
+    var showLt = shouldShowLiveTradingSectionPromo(active);
+    setPromoVisible(ltPromo, showLt);
+    if (showLt) placeLiveTradingPromoAtSectionTop(ltPromo);
   }
 
   function placeSponsorBanner(activePage) {
