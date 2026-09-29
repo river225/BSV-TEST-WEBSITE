@@ -518,9 +518,11 @@ function mountHomeDiscordPromo() {
   slot.outerHTML =
     '<div class="home-hero-stack">' +
       '<div id="home-site-stats-slot"></div>' +
-      buildHomeLiveTradingBarHtml() +
-      '<div class="home-hero-row">' +
-        '<div class="home-hero-row__banner">' +
+      '<div class="home-hero-row home-hero-row--promo-pair">' +
+        '<div class="home-hero-row__banner home-hero-row__banner--lt">' +
+          buildHomeLiveTradingBarHtml() +
+        "</div>" +
+        '<div class="home-hero-row__banner home-hero-row__banner--discord">' +
           buildDiscordPromoBannerHtml(false) +
         "</div>" +
       "</div>" +
@@ -550,7 +552,7 @@ function buildHomeSiteStatsHtml(extraClass) {
       '<span class="home-stats-strip__rule" aria-hidden="true"></span>' +
       '<div class="home-stats-strip__item">' +
         '<span class="home-stats-strip__value" data-home-stat="changes">0</span>' +
-        '<span class="home-stats-strip__label">' + escapeHtml(i18n("home.stats.cellEdits")) + "</span>" +
+        '<span class="home-stats-strip__label">' + escapeHtml(i18n("home.stats.totalChanges")) + "</span>" +
       "</div>" +
     "</aside>"
   );

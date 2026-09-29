@@ -3712,7 +3712,109 @@ background-attachment: fixed;
   padding: 0;
   box-sizing: border-box;
   overflow: visible;
-}.home-hero-row__banner {
+}
+.home-hero-row--promo-pair {
+  gap: 12px;
+  align-items: stretch;
+}
+.home-hero-row--promo-pair .home-hero-row__banner {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: none;
+  width: auto;
+}
+.home-hero-row--promo-pair .home-lt-bar {
+  width: 100%;
+  height: 100%;
+  padding: 16px 14px 14px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+.home-hero-row--promo-pair .home-lt-bar__new {
+  margin-bottom: 6px;
+  padding: 3px 8px;
+  font-size: 0.62rem;
+}
+.home-hero-row--promo-pair .home-lt-bar h3 {
+  margin: 0 0 4px;
+  font-size: clamp(1.15rem, 2.2vw, 1.45rem);
+  line-height: 1.15;
+}
+.home-hero-row--promo-pair .home-lt-bar p {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  max-width: 28ch;
+}
+.home-hero-row--promo-pair .home-lt-bar__btn {
+  padding: 9px 14px;
+  font-size: 0.85rem;
+}
+.home-hero-row--promo-pair .home-discord-promo--home {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+}
+.home-hero-row--promo-pair .home-discord-promo--home .home-discord-promo__inner {
+  padding: 14px 12px 12px;
+  gap: 10px;
+  height: 100%;
+  box-sizing: border-box;
+}
+.home-hero-row--promo-pair .home-discord-promo__flash-logo {
+  width: 40px;
+  height: 40px;
+  padding: 7px;
+  border-radius: 12px;
+}
+.home-hero-row--promo-pair .home-discord-promo__flash-title {
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+}
+.home-hero-row--promo-pair .home-discord-promo__flash-hook {
+  font-size: 0.82rem;
+  max-width: 28ch;
+}
+.home-hero-row--promo-pair .home-discord-promo__flash-stat {
+  margin-top: 2px;
+  padding: 4px 10px;
+}
+.home-hero-row--promo-pair .home-discord-promo__flash-stat-num {
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
+}
+.home-hero-row--promo-pair .home-discord-promo__flash-perks {
+  gap: 6px;
+}
+.home-hero-row--promo-pair .home-discord-promo__flash-perk {
+  padding: 8px 4px 7px;
+  border-radius: 10px;
+  gap: 2px;
+}
+.home-hero-row--promo-pair .home-discord-promo__flash-perk-icon {
+  font-size: 1.05rem;
+}
+.home-hero-row--promo-pair .home-discord-promo__flash-perk-title {
+  font-size: 0.72rem;
+}
+.home-hero-row--promo-pair .home-discord-promo__flash-perk-tag {
+  font-size: 0.62rem;
+}
+.home-hero-row--promo-pair .home-discord-promo__flash-actions {
+  max-width: none;
+  gap: 6px;
+}
+.home-hero-row--promo-pair .home-discord-promo--home .home-discord-promo__btn {
+  padding: 8px 10px;
+  font-size: 0.8rem;
+}
+.home-hero-row--promo-pair .home-discord-promo__btn--flash-join {
+  padding: 8px 10px !important;
+  font-size: 0.82rem !important;
+}
+.home-hero-row__banner {
   flex: 1 1 auto;
   width: 100%;
   max-width: none;
@@ -15125,6 +15227,16 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     padding: 0;
     margin-bottom: 20px;
     gap: 12px;
+  }
+
+  .home-hero-row--promo-pair {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .home-hero-row--promo-pair .home-hero-row__banner {
+    width: 100%;
+    flex: 1 1 auto;
   }
 
   .home-lt-bar {
