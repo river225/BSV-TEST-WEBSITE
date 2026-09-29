@@ -3583,17 +3583,27 @@ background-attachment: fixed;
   align-items: stretch;
   gap: 22px;
   width: 100%;
-  max-width: 1180px;
-  margin: 8px auto 28px;
+  max-width: 1280px;
+  margin: 28px auto 28px;
   padding: 0 12px;
   box-sizing: border-box;
 }
 .home-hero-top {
+  --home-hero-scale: 1.14;
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(300px, 1fr);
   align-items: stretch;
   gap: 20px 36px;
   width: 100%;
+  /* Scale Discord + stats + Recent Changes together; keeps relative positioning */
+  zoom: var(--home-hero-scale);
+}
+@supports not (zoom: 1) {
+  .home-hero-top {
+    transform: scale(var(--home-hero-scale));
+    transform-origin: top center;
+    margin-bottom: calc((var(--home-hero-scale) - 1) * 12%);
+  }
 }
 .home-hero-top__discord {
   width: 100%;
