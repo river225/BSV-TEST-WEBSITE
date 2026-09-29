@@ -3473,11 +3473,12 @@ background-attachment: fixed;
   flex-direction: row;
   align-items: baseline;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   width: auto;
+  min-width: 210px;
   height: auto;
   margin: 4px 0 0;
-  padding: 8px 18px;
+  padding: 10px 28px;
   border-radius: 999px;
   background: linear-gradient(180deg, rgba(15, 23, 42, 0.55) 0%, rgba(8, 12, 28, 0.7) 100%);
   border: 2px solid rgba(125, 211, 252, 0.45);
@@ -3507,7 +3508,7 @@ background-attachment: fixed;
 }.home-discord-promo__flash-stat-num .discord-member-count {
   color: #fff;
 }.home-discord-promo__flash-stat-label {
-  font-size: 0.78rem;
+  font-size: 1rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -15978,10 +15979,11 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
 
   .home-discord-promo__flash-stat {
     width: auto;
+    min-width: 0;
     height: auto;
-    padding: 5px 12px;
+    padding: 6px 16px;
     margin-top: 0;
-    gap: 6px;
+    gap: 7px;
   }
 
   .home-discord-promo__flash-stat-num {
@@ -15989,7 +15991,7 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   }
 
   .home-discord-promo__flash-stat-label {
-    font-size: 0.65rem;
+    font-size: 0.8rem;
   }
 
   .home-discord-promo__flash-perks {

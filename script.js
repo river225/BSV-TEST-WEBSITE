@@ -319,10 +319,10 @@ function buildValueListPerkIconHtml() {
 function buildCommunityPerkIconHtml() {
   return (
     '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-      '<circle cx="8" cy="8" r="2.4"/>' +
-      '<path d="M3.5 17.5c.35-2.1 2.15-3.4 4.5-3.4s4.15 1.3 4.5 3.4"/>' +
-      '<path d="M15.5 10.2h4.2c.7 0 1.3.6 1.3 1.3v2.7c0 .7-.6 1.3-1.3 1.3H19l-1.6 1.5v-1.5h-1.9c-.7 0-1.3-.6-1.3-1.3v-2.7c0-.7.6-1.3 1.3-1.3z"/>' +
-      '<circle cx="14.2" cy="7.2" r="1.7"/>' +
+      '<circle cx="9" cy="8" r="3"/>' +
+      '<circle cx="17" cy="9.5" r="2.2"/>' +
+      '<path d="M3.5 19c.5-2.6 2.8-4.2 5.5-4.2S14 16.4 14.5 19"/>' +
+      '<path d="M15.2 15.2c1.7-.35 3.5.2 4.8 1.55V19"/>' +
     "</svg>"
   );
 }
