@@ -4474,12 +4474,14 @@ body.home-changelog-open {
   flex-direction: column;
   gap: 10px;
   width: 100%;
-  max-height: 360px;
+  /* Tall enough to show ~2 updates + a peek of the next; short enough that 3 items always scroll */
+  max-height: min(260px, 42vh);
   overflow-x: hidden;
   overflow-y: auto;
   padding-right: 6px;
   box-sizing: border-box;
   overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   scrollbar-width: thin;
   scrollbar-color: rgba(125, 211, 252, 0.75) rgba(0, 0, 0, 0.35);
 }
