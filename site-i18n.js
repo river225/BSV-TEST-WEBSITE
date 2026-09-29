@@ -122,13 +122,13 @@
         "BlockSpin Values is the trusted value list for all items in the Roblox game BlockSpin. Our dedicated team of top traders keeps values updated daily to help you make fair trades and avoid scams. Whether you're looking for weapon values, checking crew logos, or calculating taxes, we've got everything you need to trade with confidence.",
       "announce.1.date": "April 17, 2026",
       "announce.1.text":
-        "Website Update is now live! The Tax Calculator is finally back and more advanced 🔥 It shows exactly how much to trade and in what order to avoid overpaying. New Recent Changes box lets you track all value list updates. (On mobile click blue arrow in a gun section to access tax calculator.)",
+        "Website update is now live! The Tax Calculator is back and more advanced — it shows exactly how much to trade and in what order to avoid overpaying. The new Recent Changes box lets you track all value list updates. (On mobile, tap the blue arrow in a gun section to open the tax calculator.)",
       "announce.2.date": "Dec 3, 2025",
       "announce.2.text":
-        "BlockSpin recently changed how many is dropped in-game, thus we have removed the tax calculator as its not accurate anymore. we will adapt to new changes shortly.",
+        "BlockSpin recently changed how money is dropped in-game, so we removed the tax calculator because it wasn't accurate anymore. We'll adapt to the new changes shortly.",
       "announce.3.date": "Dec 2, 2025",
       "announce.3.text":
-        "Our richest player sections search bar now works for mobile, check out your rank!",
+        "The Richest Players search bar now works on mobile — check out your rank!",
       "announce.4.date": "Nov 29, 2025",
       "announce.4.text":
         "Our latest website update is now live! We've launched a complete site redesign, and items will now display both their repair prices and pawn values across all durability levels. This update is designed to give you clearer, more detailed information and an overall better user experience.",

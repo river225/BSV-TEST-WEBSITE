@@ -4438,6 +4438,57 @@ body.home-changelog-open {
   pointer-events: none;
   user-select: none;
 }
+.home-announce-feed {
+  width: 100%;
+  max-width: 1100px;
+  margin: clamp(28px, 4vw, 48px) auto 8px;
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+.home-announce-feed__heading {
+  margin: 0 0 14px;
+  text-align: center;
+  font-size: clamp(1.35rem, 2.6vw, 1.75rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  color: #fff;
+  text-shadow:
+    -1.5px -1.5px 0 #000,
+    1.5px -1.5px 0 #000,
+    -1.5px 1.5px 0 #000,
+    1.5px 1.5px 0 #000;
+}
+.home-announce-feed__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+.home-announce-feed__item {
+  margin: 0;
+  padding: 16px 18px;
+  border: 2px solid #000;
+  border-radius: 16px;
+  background: var(--bsv-surface-raised);
+  box-shadow: 0 3px 0 #000;
+  box-sizing: border-box;
+}
+.home-announce-feed__date {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #7dd3fc;
+}
+.home-announce-feed__text {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: rgba(226, 232, 240, 0.88);
+}
 .home-extra-banners-wrap {
   display: flex;
   flex-direction: column;
