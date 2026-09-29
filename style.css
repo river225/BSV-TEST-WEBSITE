@@ -4464,7 +4464,7 @@ body.home-changelog-open {
   flex-direction: column;
   gap: 10px;
   width: 100%;
-  max-height: 220px;
+  max-height: 360px;
   overflow-x: hidden;
   overflow-y: auto;
   padding-right: 6px;
