@@ -638,6 +638,18 @@ function applyCachedHomeStatValues(root) {
   }
 }
 
+function markHomeStatGrown(key) {
+  var els = document.querySelectorAll('[data-home-stat="' + key + '"]');
+  var wraps =
+    key === "traders"
+      ? document.querySelectorAll(".home-discord-promo__flash-stat-num")
+      : els;
+  wraps.forEach(function (wrap) {
+    wrap.classList.remove("is-counting");
+    wrap.classList.add("is-grown");
+  });
+}
+
 function setHomeStatValue(key, value, animate) {
   if (typeof value !== "number" || isNaN(value)) return;
   homeStatValueCache[key] = value;
@@ -649,6 +661,10 @@ function setHomeStatValue(key, value, animate) {
   document.querySelectorAll('[data-home-stat="' + key + '"]').forEach(function (el) {
     el.textContent = value.toLocaleString();
   });
+  // Instant updates (incl. reduced-motion) still get the finished gold look.
+  if (key === "items" || key === "online" || key === "changes") {
+    markHomeStatGrown(key);
+  }
 }
 
 function animateHomeStatValue(key, targetValue, durationMs) {

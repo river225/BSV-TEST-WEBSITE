@@ -3591,7 +3591,7 @@ background-attachment: fixed;
 .home-hero-top {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(300px, 1fr);
-  align-items: end;
+  align-items: start;
   gap: 20px 36px;
   width: 100%;
 }
@@ -3599,7 +3599,7 @@ background-attachment: fixed;
   width: 100%;
   min-width: 0;
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: flex-start;
 }
 .home-hero-top__discord .home-discord-promo--home {
@@ -3611,15 +3611,16 @@ background-attachment: fixed;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  justify-content: flex-end;
-  gap: 14px;
+  justify-content: flex-start;
+  gap: 16px;
   min-width: 0;
   width: 100%;
   max-width: 480px;
   justify-self: end;
-  align-self: end;
-  /* Match Discord promo inner bottom padding so strip lines up with Join/Learn buttons */
-  padding-bottom: 18px;
+  align-self: start;
+  /* Drop past Discord logo so Items tracked lines up with "Join Our Discord Server" */
+  padding-top: 58px;
+  padding-bottom: 0;
   box-sizing: border-box;
 }
 .home-right-rail {
@@ -3653,19 +3654,19 @@ background-attachment: fixed;
   white-space: normal;
 }
 .home-stats-strip--rail .home-stats-strip__value {
-  font-size: clamp(1.55rem, 1.9vw, 2.15rem);
+  font-size: clamp(2.15rem, 2.8vw, 2.9rem);
 }
 .home-stats-strip--rail .home-stats-strip__label {
-  font-size: 0.62rem;
-  letter-spacing: 0.04em;
+  font-size: 0.74rem;
+  letter-spacing: 0.045em;
   line-height: 1.15;
 }
 .home-stats-strip--rail .home-stats-strip__icon {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
 }
 .home-stats-strip--rail .home-stats-strip__rule {
-  height: 36px;
+  height: 44px;
 }
 .home-hero-top__stats .home-changes-strip {
   max-width: none;
@@ -3700,11 +3701,28 @@ background-attachment: fixed;
   letter-spacing: -0.03em;
   color: #ffffff;
   transform-origin: center bottom;
+  transition: color 0.35s ease, text-shadow 0.35s ease;
 }
 .home-stats-strip__value.is-counting {
   animation: home-discord-stat-count 1.4s ease-out both;
+  color: #ffffff;
+  text-shadow: none;
 }
 .home-stats-strip__value.is-grown {
+  color: #ffd34d;
+  text-shadow:
+    -1.5px -1.5px 0 #000,
+     1.5px -1.5px 0 #000,
+    -1.5px  1.5px 0 #000,
+     1.5px  1.5px 0 #000,
+     0    -1.5px 0 #000,
+     0     1.5px 0 #000,
+    -1.5px  0    0 #000,
+     1.5px  0    0 #000,
+    -2px 0 0 #000,
+     2px 0 0 #000,
+     0 -2px 0 #000,
+     0  2px 0 #000;
   animation: home-discord-stat-pop 0.45s ease-out both;
 }
 .home-stats-strip__label {
