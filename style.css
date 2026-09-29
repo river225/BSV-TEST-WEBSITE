@@ -3774,6 +3774,9 @@ background-attachment: fixed;
   font-size: 0.85rem;
   color: rgba(226, 232, 240, 0.75);
 }
+.home-hero-stack .home-lt-bar {
+  margin-top: 220px;
+}
 .home-lt-bar {
   position: relative;
   width: 100%;
