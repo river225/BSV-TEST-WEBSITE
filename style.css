@@ -361,7 +361,10 @@ background-attachment: fixed;
   flex-wrap: wrap;
   gap: 16px;
   width: 100%;
-  overflow: hidden;
+  /* Room for card hover lift so the top row isn't clipped */
+  padding-top: 12px;
+  margin-top: -2px;
+  overflow: visible;
 }.card {
   flex: 1 1 calc(50% - 16px);
   display: flex;
@@ -702,9 +705,9 @@ background-attachment: fixed;
 }.guide-fast-nav {
   display: none;
   background: var(--bsv-surface-card);
-  border: 1px solid var(--bsv-surface-soft);
+  border: 2px solid #000;
   border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 4px 0 #000, 0 6px 18px rgba(0, 0, 0, 0.28);
   padding: 8px 9px;
   margin-top: 0;
   margin-bottom: 10px;
@@ -751,12 +754,13 @@ background-attachment: fixed;
   padding: 6px 8px;
   background: var(--bsv-surface-hover);
   color: #cfe6ff;
-  border: 1px solid var(--bsv-accent-dim);
+  border: 2px solid #000;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 700;
   font-size: 0.75rem;
   font-family: inherit;
+  box-shadow: 0 2px 0 #000;
 }.guide-fast-nav__top:hover {
   background: var(--bsv-surface-soft);
 }.tax-calculator {
@@ -893,9 +897,9 @@ background-attachment: fixed;
   line-height: 1.4;
   font-weight: 600;
   color: #ffffff;
-  background: rgba(31, 41, 55, 0.96);
+  background: linear-gradient(160deg, rgba(161, 98, 7, 0.96) 0%, rgba(120, 53, 15, 0.96) 100%);
   border-radius: 6px;
-  border: 1px solid rgba(251, 191, 36, 0.55);
+  border: 1px solid rgba(251, 191, 36, 0.75);
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.55);
   opacity: 0;
   pointer-events: none;
@@ -906,7 +910,8 @@ background-attachment: fixed;
 }
 
 .card-exclusive-badge-wrapper--very .card-exclusive-badge-tooltip {
-  border-color: rgba(248, 113, 113, 0.65);
+  background: linear-gradient(160deg, rgba(159, 18, 57, 0.96) 0%, rgba(127, 29, 29, 0.96) 100%);
+  border-color: rgba(248, 113, 113, 0.8);
 }
 
 .card-exclusive-badge:hover,
@@ -1046,7 +1051,7 @@ background-attachment: fixed;
   display: inline-block;
 }.section {
   margin-bottom: 40px;
-  overflow: hidden;
+  overflow: visible;
   position: relative;
   display: none;
 }.sections > .section:not(#home) > h2:first-of-type {
