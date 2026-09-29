@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  var SPREADSHEET_ID = "1vAm9x7c5JPxpHxDHVcDgQifXsAvW9iW2wPVuQLENiYs";
+  var SPREADSHEET_ID = "18s5ZK-b256navTEfZQFF1TxICwQ3xLjhiSJH4X97Ji4";
   var POSTS_KEY = "bsv-live-trades-v1";
   var EMPTY_SLOT_COUNT = 8;
   var postsCache = [];
