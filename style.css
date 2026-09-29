@@ -3731,7 +3731,7 @@ background-attachment: fixed;
   justify-self: end;
   align-self: stretch;
   /* Drop past Discord logo / traders pill so Items tracked sits a bit lower */
-  padding-top: 108px;
+  padding-top: 88px;
   /* Match Discord promo inner bottom padding so Recent Changes lines up with Join/Learn */
   padding-bottom: 18px;
   box-sizing: border-box;
