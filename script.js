@@ -573,7 +573,8 @@ function buildHomeFeatureShowcaseHtml() {
         '<div class="home-feature-showcase__copy">' +
           '<h2 class="home-feature-showcase__title">Value List</h2>' +
           '<p class="home-feature-showcase__text">' +
-            "BlockSpin Values is the largest and most trusted value list for Roblox BlockSpin. " +
+            'BlockSpin Values is the largest and most trusted value list for ' +
+            '<a class="home-feature-showcase__link" href="https://www.roblox.com/games/104715542330896/BlockSpin" target="_blank" rel="noopener noreferrer">Roblox BlockSpin</a>. ' +
             "Built by top traders, we keep accurate values updated daily for the whole community." +
           "</p>" +
           '<ul class="home-feature-showcase__bullets">' +
@@ -590,9 +591,10 @@ function buildHomeFeatureShowcaseHtml() {
           '<h2 class="home-feature-showcase__title">Live Trading</h2>' +
           '<p class="home-feature-showcase__text">' +
             "Find the best deals as soon as they go up. Post offers, browse other traders, and message them in seconds. " +
-            'You can also use our <a class="home-feature-showcase__link" href="' +
+            'You can also use our middleman service in ' +
+            '<a class="home-feature-showcase__link" href="' +
             discordInvite +
-            '" target="_blank" rel="noopener noreferrer">middleman service in our Discord server</a> to keep trades scam free.' +
+            '" target="_blank" rel="noopener noreferrer">Our Discord Server</a> to keep trades scam free.' +
           "</p>" +
           '<ul class="home-feature-showcase__bullets">' +
             "<li>Easy to use</li>" +
@@ -668,7 +670,7 @@ function initHomeFeatureTilt(root) {
     if (!tilt) return;
     if (reduceMotion) return;
 
-    var max = 11;
+    var max = 4.5;
     function setTilt(clientX, clientY) {
       var rect = wrap.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
@@ -679,15 +681,15 @@ function initHomeFeatureTilt(root) {
       var rotY = (0.5 - x) * max * 2;
       var rotX = (y - 0.5) * max * 2;
       tilt.style.transform =
-        "perspective(900px) rotateX(" +
+        "perspective(1200px) rotateX(" +
         rotX.toFixed(2) +
         "deg) rotateY(" +
         rotY.toFixed(2) +
-        "deg) scale3d(1.015, 1.015, 1.015)";
+        "deg)";
     }
     function resetTilt() {
       tilt.style.transform =
-        "perspective(900px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)";
+        "perspective(1200px) rotateX(0deg) rotateY(0deg)";
     }
 
     wrap.addEventListener(

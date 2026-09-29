@@ -4343,13 +4343,15 @@ body.home-changelog-open {
   max-width: 44ch;
 }
 .home-feature-showcase__link {
-  color: #7dd3fc;
-  font-weight: 800;
+  color: inherit;
+  font-weight: inherit;
   text-decoration: underline;
+  text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
 .home-feature-showcase__link:hover {
-  color: #bae6fd;
+  color: inherit;
+  text-decoration-thickness: 2px;
 }
 .home-feature-showcase__bullets {
   list-style: none;
@@ -4416,7 +4418,7 @@ body.home-changelog-open {
   background: hsl(var(--bsv-hue) var(--bsv-s-deep) 8%);
   transform-style: preserve-3d;
   will-change: transform;
-  transition: transform 0.12s ease-out;
+  transition: transform 0.2s ease-out;
 }
 .home-feature-showcase__img {
   display: block;
