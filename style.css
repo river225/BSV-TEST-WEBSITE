@@ -14029,8 +14029,36 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     grid-column: 1;
     order: -1;
   }
+
+  /* Narrow main column: stack stats under Discord instead of hiding them */
+  .home-hero-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .home-hero-row__banner {
+    width: 100%;
+    max-width: none;
+    flex: 1 1 auto;
+  }
   .home-hero-row__stats {
-    display: none !important;
+    display: block;
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+  }
+  .home-site-stats--beside {
+    flex-direction: row;
+    height: auto;
+    min-height: 0;
+  }
+  .home-site-stats--beside .home-site-stats__item {
+    flex: 1 1 0;
+    padding: 14px 10px;
+  }
+  .home-site-stats--beside .home-site-stats__item:not(:last-child) {
+    border-bottom: none;
+    border-right: 1px solid color-mix(in srgb, var(--bsv-muted) 16%, transparent);
   }
 }
 
@@ -15134,8 +15162,33 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     font-size: clamp(1.4rem, 6vw, 1.9rem);
   }
 
+  .home-hero-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .home-hero-row__stats {
-    display: none !important;
+    display: block !important;
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+  }
+
+  .home-site-stats--beside {
+    flex-direction: row;
+    height: auto;
+    min-height: 0;
+  }
+
+  .home-site-stats--beside .home-site-stats__item {
+    flex: 1 1 0;
+    padding: 14px 10px;
+  }
+
+  .home-site-stats--beside .home-site-stats__item:not(:last-child) {
+    border-bottom: none;
+    border-right: 1px solid color-mix(in srgb, var(--bsv-muted) 16%, transparent);
   }
 
   .home-hero-row__banner {

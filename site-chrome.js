@@ -692,22 +692,19 @@
     var style = document.createElement("style");
     style.id = "bsv-section-lt-promo-styles";
     style.textContent =
-      ".bsv-section-lt-promo{flex:0 0 auto;width:100%;max-width:100%;margin:-10px 0 16px;padding:28px 24px;border-radius:20px;text-align:center;box-sizing:border-box;" +
-      "background:linear-gradient(180deg,rgba(225,29,46,.18),transparent 55%),#090b11;border:1px solid rgba(225,29,46,.35)}" +
-      ".bsv-section-lt-promo[hidden],.bsv-section-lt-promo.is-hidden{display:none!important}" +
-      ".bsv-section-lt-promo h3{margin:0 0 16px;font-family:'Paytone One',system-ui,sans-serif;font-size:clamp(1.8rem,4vw,2.6rem);color:#fff;line-height:1.15}" +
-      ".bsv-section-lt-promo__actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:0}" +
-      ".bsv-section-lt-promo .hv2-btn,.bsv-section-lt-promo__btn{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 20px;border-radius:12px;font:800 .95rem/1.1 system-ui,sans-serif;text-decoration:none;cursor:pointer;border:1px solid rgba(225,29,46,.75);background:rgba(225,29,46,.12);color:#fff;transition:transform .15s ease,background .15s ease}" +
-      ".bsv-section-lt-promo .hv2-btn:hover,.bsv-section-lt-promo__btn:hover{transform:translateY(-1px);background:rgba(225,29,46,.22);border-color:#ef4444}";
+      ".bsv-section-lt-promo{flex:0 0 auto;width:100%;max-width:min(1080px,100%);margin:0 auto 20px;box-sizing:border-box}" +
+      ".bsv-section-lt-promo[hidden],.bsv-section-lt-promo.is-hidden{display:none!important}";
     document.head.appendChild(style);
   }
 
   function renderLiveTradingSectionPromo() {
     return (
-      '<aside class="hv2-lt-c bsv-section-lt-promo" aria-label="Live Trading">' +
-        "<h3>Live Trading is open</h3>" +
-        '<div class="hv2-hero__actions bsv-section-lt-promo__actions">' +
-          '<a class="hv2-btn hv2-btn--primary bsv-section-lt-promo__btn" href="' +
+      '<aside class="home-lt-bar bsv-section-lt-promo" aria-label="Live Trading">' +
+        '<span class="home-lt-bar__new">NEW</span>' +
+        "<h3>BlockSpin Live Trading</h3>" +
+        "<p>Post offers, browse live deals, and message traders instantly.</p>" +
+        '<div class="home-lt-bar__actions">' +
+          '<a class="home-lt-bar__btn" href="' +
           sitePath("live-trading.html") +
           '">Start Trading →</a>' +
         "</div>" +
@@ -718,6 +715,11 @@
   function ensureLiveTradingSectionPromo() {
     ensureSectionLtPromoStyles();
     var existing = document.querySelector(".bsv-section-lt-promo");
+    // Refresh older Alt-C markup so sections use the home Live Trading banner.
+    if (existing && !existing.classList.contains("home-lt-bar")) {
+      existing.remove();
+      existing = null;
+    }
     if (existing) return existing;
     var wrap = document.createElement("div");
     wrap.innerHTML = renderLiveTradingSectionPromo();

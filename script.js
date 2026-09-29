@@ -539,6 +539,7 @@ function mountHomeDiscordPromo() {
 function mountHomeSiteStats() {
   var slot = document.getElementById("home-site-stats-slot");
   if (slot) slot.innerHTML = buildHomeSiteStatsHtml("home-site-stats--beside");
+  applyCachedHomeStatValues(slot || document);
 }
 
 var HOME_SITE_STATS_ICONS = {
@@ -630,6 +631,7 @@ function animateHomeStatValue(key, targetValue, durationMs) {
   }
 
   var els = document.querySelectorAll('[data-home-stat="' + key + '"]');
+  // Cache is already set — if the DOM isn't mounted yet, apply later via applyCachedHomeStatValues.
   if (!els.length) return;
 
   if (key === "traders") {
@@ -738,6 +740,7 @@ async function updateHomeSiteStatsFromResults(results) {
     console.warn("Failed to load guide item counts for home stats:", err);
   }
   setHomeStatValue("items", total, true);
+  applyCachedHomeStatValues(document);
 }
 
 function buildRobuxGiveawayBannerHtml(bannerId) {
@@ -3271,7 +3274,10 @@ function renderVehiclesSectionWithBanner(items) {
 
 function fetchDiscordMemberCount() {
   fetch("https://discord.com/api/v10/invites/QbapryYUUx?with_counts=true")
-    .then(function (res) { return res.json(); })
+    .then(function (res) {
+      if (!res.ok) throw new Error("invite " + res.status);
+      return res.json();
+    })
     .then(function (data) {
       var n = data.approximate_member_count;
       var online = data.approximate_presence_count;
@@ -3285,8 +3291,11 @@ function fetchDiscordMemberCount() {
           el.textContent = online.toLocaleString();
         });
       }
+      applyCachedHomeStatValues(document);
     })
-    .catch(function () {});
+    .catch(function () {
+      applyCachedHomeStatValues(document);
+    });
 }
 
 function createFooterBoosterCard(booster) {

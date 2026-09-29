@@ -20,6 +20,22 @@
     { sheet: "Misc", rarity: "Misc", color: "#ec407a" },
     { sheet: "Vehicles", rarity: "Vehicles", color: "#718096" }
   ];
+  var FISH_TRADE_NAMES = {
+    tuna: true,
+    sailfish: true,
+    marlin: true
+  };
+  var FISH_WEIGHT_MAX = 3.6;
+  var FISH_WEIGHT_STEP = 0.1;
+  var FISH_SHEET_NAME = "Fishing Types of fishing ";
+  var FISH_RARITY_COLORS = {
+    common: "#4caf50",
+    uncommon: "#66bb6a",
+    rare: "#4a90e2",
+    epic: "#8e63ce",
+    legendary: "#f39c12",
+    omega: "#e74c3c"
+  };
 
   var catalog = [];
   var catalogReady = false;
@@ -116,8 +132,52 @@
             return obj;
           })
           .filter(function (x) {
-            return String(x.Name || "").trim().length > 0;
+            return (
+              String(
+                x.Name ||
+                  x["Fishing Item Name"] ||
+                  x["Item Name"] ||
+                  x["Fishing Name"] ||
+                  ""
+              ).trim().length > 0
+            );
           });
+      })
+      .catch(function () {
+        return [];
+      });
+  }
+
+  function loadFishCatalog() {
+    return fetchSheet(FISH_SHEET_NAME)
+      .then(function (rows) {
+        var out = [];
+        (rows || []).forEach(function (row) {
+          var name = String(
+            row["Fishing Item Name"] || row["Item Name"] || row.Name || ""
+          ).trim();
+          if (!name || !FISH_TRADE_NAMES[name.toLowerCase()]) return;
+          var rarity = String(row["Fishing Rarity"] || row.Rarity || "Misc").trim();
+          var color =
+            FISH_RARITY_COLORS[rarity.toLowerCase()] || FISH_RARITY_COLORS.epic;
+          out.push({
+            id: "fish::" + name.toLowerCase(),
+            name: name,
+            image: String(
+              row["Fishing Image"] || row["Image URL"] || row.Image || ""
+            ).trim(),
+            rarity: rarity,
+            sheet: "Fish",
+            color: color,
+            value: "",
+            maxDurability: 0,
+            internalValue: 0,
+            metric: "weight",
+            maxWeight: FISH_WEIGHT_MAX,
+            weightStep: FISH_WEIGHT_STEP
+          });
+        });
+        return out;
       })
       .catch(function () {
         return [];
@@ -157,7 +217,7 @@
             };
           });
         });
-      })
+      }).concat([loadFishCatalog()])
     ).then(function (groups) {
       catalog = [];
       groups.forEach(function (g) {
@@ -795,7 +855,43 @@
   }
 
   function itemHasDurability(entry) {
+    if (itemHasWeight(entry)) return false;
     return Math.max(0, Number(entry && entry.maxDurability) || 0) > 0;
+  }
+
+  function itemHasWeight(entry) {
+    if (!entry) return false;
+    if (entry.metric === "weight") return true;
+    if (String(entry.id || "").indexOf("fish::") === 0) return true;
+    return Math.max(0, Number(entry.maxWeight) || 0) > 0;
+  }
+
+  function roundFishWeight(n) {
+    var step = FISH_WEIGHT_STEP;
+    var max = FISH_WEIGHT_MAX;
+    var raw = Number(n);
+    if (!Number.isFinite(raw)) raw = max;
+    var stepped = Math.round(raw / step) * step;
+    return Math.max(0, Math.min(max, Math.round(stepped * 10) / 10));
+  }
+
+  function formatWeight(entry) {
+    if (!itemHasWeight(entry)) return "";
+    var max = roundFishWeight(entry.maxWeight || FISH_WEIGHT_MAX);
+    var cur = roundFishWeight(
+      entry.weight != null ? entry.weight : max
+    );
+    return cur.toFixed(1) + "/" + max.toFixed(1);
+  }
+
+  function formatWeightForSummary(entry) {
+    if (!itemHasWeight(entry)) return "";
+    var max = roundFishWeight(entry.maxWeight || FISH_WEIGHT_MAX);
+    var cur = roundFishWeight(
+      entry.weight != null ? entry.weight : max
+    );
+    if (cur >= max) return "";
+    return cur.toFixed(1) + "/" + max.toFixed(1);
   }
 
   function formatDurability(entry) {
@@ -814,17 +910,68 @@
     return cur + "/" + max;
   }
 
+  function formatMetricLabel(entry) {
+    return formatWeightForSummary(entry) || formatDurabilityForSummary(entry);
+  }
+
+  function formatMetricFull(entry) {
+    return formatWeight(entry) || formatDurability(entry);
+  }
+
   var MAX_DRAFT_QTY = 99;
 
   function itemSlotHtml(entry, side, index) {
     var qty = Math.max(1, Math.min(MAX_DRAFT_QTY, Number(entry.qty) || 1));
     var hasDura = itemHasDurability(entry);
-    var duraLabel = formatDurability(entry);
+    var hasWeight = itemHasWeight(entry);
+    var metricLabel = formatMetricFull(entry);
     var idx = escapeAttr(String(index));
     var sideAttr = escapeAttr(side);
+    var metricControls = "";
+    if (hasWeight) {
+      metricControls =
+        '<div class="lt-slot__dura lt-slot__weight" role="group" aria-label="Weight">' +
+        '<span class="lt-slot__dura-label">Weight</span>' +
+        '<div class="lt-slot__dura-row">' +
+        '<button type="button" class="lt-slot__dura-btn lt-slot__weight-btn" data-side="' +
+        sideAttr +
+        '" data-index="' +
+        idx +
+        '" data-delta="-0.1" aria-label="Lower weight">−</button>' +
+        '<span class="lt-slot__dura-val lt-slot__weight-val">' +
+        escapeHtml(metricLabel) +
+        "</span>" +
+        '<button type="button" class="lt-slot__dura-btn lt-slot__weight-btn" data-side="' +
+        sideAttr +
+        '" data-index="' +
+        idx +
+        '" data-delta="0.1" aria-label="Raise weight">+</button>' +
+        "</div>" +
+        "</div>";
+    } else if (hasDura) {
+      metricControls =
+        '<div class="lt-slot__dura" role="group" aria-label="Durability">' +
+        '<span class="lt-slot__dura-label">Durability</span>' +
+        '<div class="lt-slot__dura-row">' +
+        '<button type="button" class="lt-slot__dura-btn" data-side="' +
+        sideAttr +
+        '" data-index="' +
+        idx +
+        '" data-delta="-1" aria-label="Lower durability">−</button>' +
+        '<span class="lt-slot__dura-val">' +
+        escapeHtml(metricLabel) +
+        "</span>" +
+        '<button type="button" class="lt-slot__dura-btn" data-side="' +
+        sideAttr +
+        '" data-index="' +
+        idx +
+        '" data-delta="1" aria-label="Raise durability">+</button>' +
+        "</div>" +
+        "</div>";
+    }
     return (
       '<div class="lt-slot lt-slot--item lt-slot--qty' +
-      (hasDura ? " lt-slot--dura" : "") +
+      (hasDura || hasWeight ? " lt-slot--dura" : "") +
       '" data-id="' +
       escapeAttr(entry.id) +
       '" data-lt-tip="' +
@@ -832,7 +979,7 @@
         entry.name +
           " · Qty " +
           qty +
-          (duraLabel ? " · " + duraLabel : "")
+          (metricLabel ? " · " + metricLabel : "")
       ) +
       '">' +
       '<button type="button" class="lt-slot__remove" data-side="' +
@@ -846,26 +993,7 @@
           '" alt="" width="56" height="56" loading="lazy" decoding="async">'
         : '<span class="lt-slot__ph" aria-hidden="true"></span>') +
       '<div class="lt-slot__meta">' +
-      (hasDura
-        ? '<div class="lt-slot__dura" role="group" aria-label="Durability">' +
-          '<span class="lt-slot__dura-label">Durability</span>' +
-          '<div class="lt-slot__dura-row">' +
-          '<button type="button" class="lt-slot__dura-btn" data-side="' +
-          sideAttr +
-          '" data-index="' +
-          idx +
-          '" data-delta="-1" aria-label="Lower durability">−</button>' +
-          '<span class="lt-slot__dura-val">' +
-          escapeHtml(duraLabel) +
-          "</span>" +
-          '<button type="button" class="lt-slot__dura-btn" data-side="' +
-          sideAttr +
-          '" data-index="' +
-          idx +
-          '" data-delta="1" aria-label="Raise durability">+</button>' +
-          "</div>" +
-          "</div>"
-        : "") +
+      metricControls +
       '<div class="lt-slot__qty-ctrl" role="group" aria-label="Quantity">' +
       '<span class="lt-slot__qty-label">Quantity</span>' +
       '<div class="lt-slot__qty-row">' +
@@ -948,7 +1076,7 @@
     if (!slot) return;
     var entry = list[i];
     var qty = Math.max(1, Math.min(MAX_DRAFT_QTY, Number(entry.qty) || 1));
-    var label = formatDurability(entry);
+    var label = formatMetricFull(entry);
     slot.setAttribute(
       "data-lt-tip",
       entry.name + " · Qty " + qty + (label ? " · " + label : "")
@@ -961,7 +1089,7 @@
     if (!Number.isFinite(i) || i < 0 || i >= list.length) return;
     var slot = draftSlotEl(side, i);
     if (!slot) return;
-    var label = formatDurability(list[i]);
+    var label = formatMetricFull(list[i]);
     var val = slot.querySelector(".lt-slot__dura-val");
     if (val) val.textContent = label;
     syncDraftSlotTitle(side, i);
@@ -1011,6 +1139,25 @@
     return true;
   }
 
+  function adjustDraftWeight(side, index, delta, soft) {
+    var list = draft[side] || [];
+    var i = Number(index);
+    if (!Number.isFinite(i) || i < 0 || i >= list.length) return false;
+    var entry = list[i];
+    if (!itemHasWeight(entry)) return false;
+    var max = roundFishWeight(entry.maxWeight || FISH_WEIGHT_MAX);
+    var cur = roundFishWeight(entry.weight != null ? entry.weight : max);
+    var next = roundFishWeight(cur + (Number(delta) || 0));
+    if (next === cur) return false;
+    entry.weight = next;
+    entry.maxWeight = max;
+    entry.metric = "weight";
+    draft[side] = list;
+    if (soft) syncDraftDuraLabel(side, i);
+    else renderDraftGrids();
+    return true;
+  }
+
   var slotHoldTimer = null;
   var slotHoldInterval = null;
 
@@ -1032,10 +1179,11 @@
     var index = btn.getAttribute("data-index");
     var delta = btn.getAttribute("data-delta");
     var isQty = btn.classList.contains("lt-slot__qty-btn");
+    var isWeight = btn.classList.contains("lt-slot__weight-btn");
     var tick = function () {
-      return isQty
-        ? adjustDraftQty(side, index, delta, true)
-        : adjustDraftDurability(side, index, delta, true);
+      if (isQty) return adjustDraftQty(side, index, delta, true);
+      if (isWeight) return adjustDraftWeight(side, index, delta, true);
+      return adjustDraftDurability(side, index, delta, true);
     };
     tick();
     slotHoldTimer = window.setTimeout(function () {
@@ -1047,16 +1195,26 @@
 
   function addDraftItem(side, item) {
     var list = draft[side] || [];
-    var maxDura = Math.max(0, Number(item.maxDurability) || 0);
+    var hasWeight = itemHasWeight(item);
+    var maxDura = hasWeight ? 0 : Math.max(0, Number(item.maxDurability) || 0);
     var defaultDura = maxDura > 0 ? maxDura : null;
+    var defaultWeight = hasWeight
+      ? roundFishWeight(item.maxWeight || FISH_WEIGHT_MAX)
+      : null;
     var existing = null;
     for (var i = 0; i < list.length; i++) {
       if (list[i].id !== item.id) continue;
-      var sameDura =
-        maxDura <= 0
-          ? !itemHasDurability(list[i])
-          : Number(list[i].durability) === defaultDura;
-      if (sameDura) {
+      var sameMetric = false;
+      if (hasWeight) {
+        sameMetric =
+          itemHasWeight(list[i]) &&
+          roundFishWeight(list[i].weight) === defaultWeight;
+      } else if (maxDura <= 0) {
+        sameMetric = !itemHasDurability(list[i]) && !itemHasWeight(list[i]);
+      } else {
+        sameMetric = Number(list[i].durability) === defaultDura;
+      }
+      if (sameMetric) {
         existing = list[i];
         break;
       }
@@ -1075,7 +1233,11 @@
         image: item.image || "",
         qty: 1
       };
-      if (maxDura > 0) {
+      if (hasWeight) {
+        entry.metric = "weight";
+        entry.maxWeight = roundFishWeight(item.maxWeight || FISH_WEIGHT_MAX);
+        entry.weight = defaultWeight;
+      } else if (maxDura > 0) {
         entry.maxDurability = maxDura;
         entry.durability = defaultDura;
       }
@@ -1136,7 +1298,13 @@
         image: it.image || "",
         qty: Math.max(1, Math.min(MAX_DRAFT_QTY, Number(it.qty) || 1))
       };
-      if (itemHasDurability(it)) {
+      if (itemHasWeight(it)) {
+        entry.metric = "weight";
+        entry.maxWeight = roundFishWeight(it.maxWeight || FISH_WEIGHT_MAX);
+        entry.weight = roundFishWeight(
+          it.weight != null ? it.weight : entry.maxWeight
+        );
+      } else if (itemHasDurability(it)) {
         var max = Math.max(1, Number(it.maxDurability) || 1);
         entry.maxDurability = max;
         entry.durability = Math.max(
@@ -1388,7 +1556,13 @@
         image: e.image || "",
         qty: Math.max(1, Number(e.qty) || 1)
       };
-      if (itemHasDurability(e)) {
+      if (itemHasWeight(e)) {
+        out.metric = "weight";
+        out.maxWeight = roundFishWeight(e.maxWeight || FISH_WEIGHT_MAX);
+        out.weight = roundFishWeight(
+          e.weight != null ? e.weight : out.maxWeight
+        );
+      } else if (itemHasDurability(e)) {
         var max = Math.max(1, Number(e.maxDurability) || 1);
         out.maxDurability = max;
         out.durability = Math.max(0, Math.min(max, Number(e.durability) || max));
@@ -1618,8 +1792,8 @@
   function itemPhrase(item) {
     var qty = Math.max(1, Number(item.qty) || 1);
     var name = String(item.name || "Item");
-    var dura = formatDurabilityForSummary(item);
-    if (dura) name += " (" + dura + ")";
+    var metric = formatMetricLabel(item);
+    if (metric) name += " (" + metric + ")";
     if (qty > 1) return qty + "× " + name;
     return name;
   }
@@ -1649,8 +1823,8 @@
     for (i = 0; i < items.length; i++) {
       var it = items[i];
       var label = String((it && it.name) || "Item").trim() || "Item";
-      var dura = formatDurabilityForSummary(it);
-      if (dura) label += " (" + dura + ")";
+      var metric = formatMetricLabel(it);
+      if (metric) label += " (" + metric + ")";
       var qty = Math.max(1, Number(it && it.qty) || 1);
       parts.push(qty > 1 ? qty + "× " + label : label);
     }
@@ -1673,9 +1847,10 @@
 
   function resolveItemDisplay(item) {
     var cat = findCatalogItem(item.id);
+    var isWeight = itemHasWeight(item) || itemHasWeight(cat);
     var maxFromItem = Math.max(0, Number(item.maxDurability) || 0);
     var maxFromCat = Math.max(0, Number(cat && cat.maxDurability) || 0);
-    var maxDurability = maxFromItem || maxFromCat;
+    var maxDurability = isWeight ? 0 : maxFromItem || maxFromCat;
     var durability = null;
     if (maxDurability > 0) {
       durability = Math.max(
@@ -1683,6 +1858,14 @@
         Math.min(maxDurability, Number(item.durability) || maxDurability)
       );
     }
+    var maxWeight = isWeight
+      ? roundFishWeight(
+          item.maxWeight || (cat && cat.maxWeight) || FISH_WEIGHT_MAX
+        )
+      : 0;
+    var weight = isWeight
+      ? roundFishWeight(item.weight != null ? item.weight : maxWeight)
+      : null;
     return {
       id: item.id,
       name: item.name || (cat && cat.name) || "Item",
@@ -1693,6 +1876,9 @@
       qty: Math.max(1, Number(item.qty) || 1),
       durability: durability,
       maxDurability: maxDurability,
+      metric: isWeight ? "weight" : "",
+      weight: weight,
+      maxWeight: maxWeight,
       internalValue: Math.max(
         0,
         Number(item.internalValue) || Number(cat && cat.internalValue) || 0
@@ -1714,11 +1900,11 @@
 
   function itemCardHtml(item) {
     var d = resolveItemDisplay(item);
-    var duraLabel = formatDurability(d);
+    var metricLabel = formatMetricFull(d);
     var repair = repairPriceFor(d);
     return (
       '<button type="button" class="lt-icard' +
-      (duraLabel ? " lt-icard--dura" : "") +
+      (metricLabel ? " lt-icard--dura" : "") +
       '" style="--lt-card:' +
       escapeAttr(d.color) +
       ";background:radial-gradient(120% 90% at 50% 18%," +
@@ -1732,11 +1918,11 @@
       '" data-color="' +
       escapeAttr(d.color) +
       '" data-dura="' +
-      escapeAttr(duraLabel) +
+      escapeAttr(metricLabel) +
       '" data-repair="' +
       escapeAttr(repair == null ? "" : String(repair)) +
       '" data-lt-tip="' +
-      escapeAttr(d.name + (duraLabel ? " · " + duraLabel : "")) +
+      escapeAttr(d.name + (metricLabel ? " · " + metricLabel : "")) +
       '">' +
       (d.qty > 1
         ? '<span class="lt-icard__qty">' + escapeHtml(String(d.qty) + "×") + "</span>"
@@ -1751,8 +1937,8 @@
         : '<span class="lt-icard__ph" aria-hidden="true"></span>') +
       "</div>" +
       '<div class="lt-icard__bar">' +
-      (duraLabel
-        ? '<span class="lt-icard__dura">' + escapeHtml(duraLabel) + "</span>"
+      (metricLabel
+        ? '<span class="lt-icard__dura">' + escapeHtml(metricLabel) + "</span>"
         : "") +
       '<span class="lt-icard__name">' +
       escapeHtml(d.name) +
