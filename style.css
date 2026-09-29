@@ -3478,8 +3478,33 @@ background-attachment: fixed;
   transform-origin: center bottom;
 }.home-discord-promo__flash-stat-num.is-counting {
   animation: home-discord-stat-count 1.4s ease-out both;
+  color: #fff;
+  background: none;
+  -webkit-text-fill-color: #fff;
+  filter: none;
+  text-shadow: 2px 2px 0 #000;
 }.home-discord-promo__flash-stat-num.is-grown {
   animation: home-discord-stat-pop 0.45s ease-out both;
+}.home-discord-promo__flash-stat-num.is-grown,
+.home-discord-promo__flash-stat-num.is-grown .discord-member-count {
+  background-image: linear-gradient(
+    165deg,
+    #f0d78a 0%,
+    #c9a227 32%,
+    #8f6d12 58%,
+    #b8922a 82%,
+    #e0c56a 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+  filter:
+    drop-shadow(-1.25px 0 0 #000)
+    drop-shadow(1.25px 0 0 #000)
+    drop-shadow(0 -1.25px 0 #000)
+    drop-shadow(0 1.25px 0 #000);
 }@keyframes home-discord-stat-count {
   0% { transform: scale(0.72); opacity: 0.55; }
   100% { transform: scale(1); opacity: 1; }
@@ -3488,7 +3513,11 @@ background-attachment: fixed;
   40% { transform: scale(1.18); }
   100% { transform: scale(1); }
 }.home-discord-promo__flash-stat-num .discord-member-count {
-  color: #fff;
+  color: inherit;
+  -webkit-text-fill-color: inherit;
+  background: inherit;
+  -webkit-background-clip: inherit;
+  background-clip: inherit;
 }.home-discord-promo__flash-stat-label {
   font-size: 0.75rem;
   font-weight: 800;
@@ -3707,44 +3736,31 @@ background-attachment: fixed;
 .home-stats-strip__value.is-counting {
   animation: home-discord-stat-count 1.4s ease-out both;
   color: #ffffff;
+  background: none;
+  -webkit-text-fill-color: #fff;
+  filter: none;
   text-shadow: none;
 }
 .home-stats-strip__value.is-grown {
-  color: #ffe566;
-  text-shadow:
-    -1.5px -1.5px 0 #000,
-     1.5px -1.5px 0 #000,
-    -1.5px  1.5px 0 #000,
-     1.5px  1.5px 0 #000,
-     0    -1.5px 0 #000,
-     0     1.5px 0 #000,
-    -1.5px  0    0 #000,
-     1.5px  0    0 #000,
-    -2px 0 0 #000,
-     2px 0 0 #000,
-     0 -2px 0 #000,
-     0  2px 0 #000,
-     0 0 6px rgba(255, 220, 90, 0.95),
-     0 0 14px rgba(255, 190, 40, 0.7),
-     0 0 22px rgba(255, 170, 0, 0.4),
-     0 1px 0 rgba(255, 248, 200, 0.9);
-  animation:
-    home-discord-stat-pop 0.45s ease-out both,
-    home-stat-gold-shine 2.6s ease-in-out infinite;
-}
-@keyframes home-stat-gold-shine {
-  0%, 100% {
-    color: #ffd034;
-    filter: brightness(1) saturate(1.05);
-  }
-  40% {
-    color: #fff3a8;
-    filter: brightness(1.22) saturate(1.2);
-  }
-  70% {
-    color: #ffcc33;
-    filter: brightness(1.08) saturate(1.12);
-  }
+  background-image: linear-gradient(
+    165deg,
+    #f0d78a 0%,
+    #c9a227 32%,
+    #8f6d12 58%,
+    #b8922a 82%,
+    #e0c56a 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+  filter:
+    drop-shadow(-1.5px 0 0 #000)
+    drop-shadow(1.5px 0 0 #000)
+    drop-shadow(0 -1.5px 0 #000)
+    drop-shadow(0 1.5px 0 #000);
+  animation: home-discord-stat-pop 0.45s ease-out both;
 }
 .home-stats-strip__label {
   display: inline-flex;

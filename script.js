@@ -664,7 +664,7 @@ function setHomeStatValue(key, value, animate) {
     el.textContent = value.toLocaleString();
   });
   // Instant updates (incl. reduced-motion) still get the finished gold look.
-  if (key === "items" || key === "online" || key === "changes") {
+  if (key === "items" || key === "online" || key === "changes" || key === "traders") {
     markHomeStatGrown(key);
   }
 }
