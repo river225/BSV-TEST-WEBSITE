@@ -532,31 +532,26 @@ function mountHomeDiscordPromo() {
         '<div class="home-hero-top__discord">' +
           buildDiscordPromoBannerHtml(false) +
         "</div>" +
-        '<div class="home-hero-top__stats home-hero-top__stats--mobile">' +
-          '<div id="home-site-stats-slot-mobile"></div>' +
-          buildHomeChangesStripHtml("home-mobile-value-changes-list") +
+        '<div class="home-hero-top__stats">' +
+          '<div id="home-site-stats-slot"></div>' +
+          buildHomeChangesStripHtml("home-main-value-changes-list") +
         "</div>" +
       "</div>" +
       buildHomeLiveTradingBarHtml() +
     "</div>";
-  mountHomeRightRail();
+  // Keep tax-column home rail empty; stats sit in-line with Discord.
+  var rail = document.getElementById("home-right-rail");
+  if (rail) {
+    rail.innerHTML = "";
+    rail.hidden = true;
+    rail.style.display = "none";
+  }
   mountHomeSiteStats();
 }
 
-function mountHomeRightRail() {
-  var rail = document.getElementById("home-right-rail");
-  if (!rail) return;
-  rail.innerHTML =
-    '<div id="home-site-stats-slot"></div>' +
-    buildHomeChangesStripHtml("home-main-value-changes-list");
-  rail.hidden = false;
-}
-
 function mountHomeSiteStats() {
-  var desktopSlot = document.getElementById("home-site-stats-slot");
-  var mobileSlot = document.getElementById("home-site-stats-slot-mobile");
-  if (desktopSlot) desktopSlot.outerHTML = buildHomeSiteStatsHtml("home-stats-strip--rail", "home-site-stats-rail");
-  if (mobileSlot) mobileSlot.outerHTML = buildHomeSiteStatsHtml("", "home-site-stats-mobile");
+  var slot = document.getElementById("home-site-stats-slot");
+  if (slot) slot.outerHTML = buildHomeSiteStatsHtml("home-stats-strip--rail", "home-site-stats-rail");
   applyCachedHomeStatValues(document);
 }
 
@@ -4308,31 +4303,29 @@ function showSectionDeferred(name, cfg, isHome) {
   const middlemanPromo = taxSidebarColumn ? taxSidebarColumn.querySelector(".discord-mm-promo--sidebar") : null;
 
   if (taxSidebarColumn) {
+    taxSidebarColumn.classList.remove("tax-sidebar-column--home-rail");
     if (isHome) {
-      // Home: show the tax-column rail with Items tracked / Recent Changes (not the calculator).
-      taxSidebarColumn.style.display = "flex";
-      taxSidebarColumn.style.visibility = "visible";
-      taxSidebarColumn.style.opacity = "1";
-      taxSidebarColumn.style.pointerEvents = "auto";
-      taxSidebarColumn.classList.add("tax-sidebar-column--home-rail");
+      // Free the tax-column width on Home so Discord + stats can share one aligned row.
+      taxSidebarColumn.style.display = "none";
+      taxSidebarColumn.style.visibility = "hidden";
+      taxSidebarColumn.style.opacity = "0";
+      taxSidebarColumn.style.pointerEvents = "none";
     } else if (cfg.sidebarColumn === "hide") {
       taxSidebarColumn.style.display = "flex";
       taxSidebarColumn.style.visibility = "hidden";
       taxSidebarColumn.style.opacity = "0";
       taxSidebarColumn.style.pointerEvents = "none";
-      taxSidebarColumn.classList.remove("tax-sidebar-column--home-rail");
     } else {
       taxSidebarColumn.style.visibility = "visible";
       taxSidebarColumn.style.opacity = "1";
       taxSidebarColumn.style.display = "flex";
       taxSidebarColumn.style.pointerEvents = "auto";
-      taxSidebarColumn.classList.remove("tax-sidebar-column--home-rail");
     }
   }
 
   if (homeRightRail) {
-    homeRightRail.hidden = !isHome;
-    homeRightRail.style.display = isHome ? "flex" : "none";
+    homeRightRail.hidden = true;
+    homeRightRail.style.display = "none";
   }
 
   if (typeof applyVisibilityMode === "function") {
@@ -5356,41 +5349,39 @@ function buildValueChangeItemHtml(r, useTimeline) {
 async function loadValueChanges() {
   var listEl = document.getElementById('value-changes-list');
   var homeMainListEl = document.getElementById('home-main-value-changes-list');
-  var homeMobileListEl = document.getElementById('home-mobile-value-changes-list');
   function setSidebarValueChangesHtml(html) {
     if (listEl) listEl.innerHTML = html;
-  }
-  function setHomeStripLists(html) {
-    if (homeMainListEl) homeMainListEl.innerHTML = html;
-    if (homeMobileListEl) homeMobileListEl.innerHTML = html;
   }
   try {
     var rows = await fetchSheet("Website Configs");
     setHomeStatValue("changes", resolveCellEditsCount(rows || []), true);
     applyCachedHomeStatValues(document);
-    if (!listEl && !homeMainListEl && !homeMobileListEl) return;
+    if (!listEl && !homeMainListEl) return;
     if (!rows || rows.length === 0) {
       var emptyHtml = '<div class="value-changes-loading">' + escapeHtml(i18n("changes.none")) + '</div>';
       setSidebarValueChangesHtml(emptyHtml);
-      setHomeStripLists(emptyHtml);
+      if (homeMainListEl) homeMainListEl.innerHTML = emptyHtml;
       return;
     }
     var filtered = filterValueChangeRows(rows);
     if (filtered.length === 0) {
       var noneHtml = '<div class="value-changes-loading">' + escapeHtml(i18n("changes.none")) + '</div>';
       setSidebarValueChangesHtml(noneHtml);
-      setHomeStripLists(noneHtml);
+      if (homeMainListEl) homeMainListEl.innerHTML = noneHtml;
       return;
     }
     var classicHtml = filtered.map(function (r) { return buildValueChangeItemHtml(r, false); }).join("");
     setSidebarValueChangesHtml(classicHtml);
-    var stripHtml = filtered.map(function (r) { return buildValueChangeItemHtml(r, "strip"); }).join("");
-    setHomeStripLists('<div class="home-changes-strip__list" role="list">' + stripHtml + "</div>");
+    if (homeMainListEl) {
+      var stripHtml = filtered.map(function (r) { return buildValueChangeItemHtml(r, "strip"); }).join("");
+      homeMainListEl.innerHTML =
+        '<div class="home-changes-strip__list" role="list">' + stripHtml + "</div>";
+    }
   } catch (err) {
     console.error('Error loading value changes:', err);
     var failHtml = '<div class="value-changes-loading">' + escapeHtml(i18n("changes.failed")) + '</div>';
     setSidebarValueChangesHtml(failHtml);
-    setHomeStripLists(failHtml);
+    if (homeMainListEl) homeMainListEl.innerHTML = failHtml;
   }
 }
 
