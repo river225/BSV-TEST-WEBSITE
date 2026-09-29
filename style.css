@@ -3648,7 +3648,7 @@ background-attachment: fixed;
   width: 100%;
   max-width: 720px;
   margin: 4px auto 8px;
-  padding: 4px 12px 8px;
+  padding: 4px 0 8px;
   box-sizing: border-box;
   background: none;
   border: 0;
@@ -3657,6 +3657,7 @@ background-attachment: fixed;
 }
 .home-changes-strip__heading {
   margin: 0 0 10px;
+  padding: 0 12px;
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -3664,21 +3665,19 @@ background-attachment: fixed;
   color: #7dd3fc;
 }
 .home-changes-strip__viewport {
-  --home-change-row: 58px;
-  height: calc(var(--home-change-row) * 3);
-  overflow-x: hidden;
-  overflow-y: auto;
-  scroll-snap-type: y mandatory;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
+  overscroll-behavior-x: contain;
   scrollbar-width: thin;
   scrollbar-color: rgba(125, 211, 252, 0.45) transparent;
-  mask-image: linear-gradient(180deg, #000 0%, #000 78%, transparent 100%);
-  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 78%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 4%, #000 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 4%, #000 92%, transparent 100%);
 }
 .home-changes-strip__viewport::-webkit-scrollbar {
-  width: 4px;
+  height: 4px;
 }
 .home-changes-strip__viewport::-webkit-scrollbar-thumb {
   background: rgba(125, 211, 252, 0.4);
@@ -3686,24 +3685,34 @@ background-attachment: fixed;
 }
 .home-changes-strip__list {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 10px;
   margin: 0;
-  padding: 0;
+  padding: 0 12px 6px;
+  width: max-content;
+  min-width: 100%;
+  box-sizing: border-box;
 }
 .home-changes-strip__item {
+  --home-change-card: 220px;
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  min-height: var(--home-change-row);
-  height: var(--home-change-row);
-  padding: 8px 6px;
+  gap: 8px;
+  flex: 0 0 var(--home-change-card);
+  width: var(--home-change-card);
+  min-width: var(--home-change-card);
+  max-width: var(--home-change-card);
+  min-height: 64px;
+  padding: 10px 10px 9px;
   box-sizing: border-box;
   scroll-snap-align: start;
-  border-bottom: 1px solid rgba(125, 211, 252, 0.16);
+  border: 0;
+  border-right: 1px solid rgba(125, 211, 252, 0.18);
   text-align: left;
 }
 .home-changes-strip__item:last-child {
-  border-bottom: 0;
+  border-right: 0;
 }
 .home-changes-strip__dot {
   flex: 0 0 8px;
@@ -3724,23 +3733,24 @@ background-attachment: fixed;
 }
 .home-changes-strip__top {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-  margin: 0 0 2px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  margin: 0 0 4px;
 }
 .home-changes-strip__title {
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-weight: 800;
   color: #fff;
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%;
 }
 .home-changes-strip__date {
   flex-shrink: 0;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -3749,13 +3759,14 @@ background-attachment: fixed;
 }
 .home-changes-strip__text {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.3;
   color: rgba(226, 232, 240, 0.88);
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 .home-changes-strip .value-changes-loading {
   margin: 0;
@@ -15565,11 +15576,11 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   }
 
   .home-changes-strip {
-    padding: 2px 4px 6px;
+    padding: 2px 0 6px;
   }
 
-  .home-changes-strip__viewport {
-    --home-change-row: 54px;
+  .home-changes-strip__item {
+    --home-change-card: min(200px, 70vw);
   }
 
   .home-changes-strip__title {
@@ -15577,7 +15588,7 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   }
 
   .home-changes-strip__text {
-    font-size: 0.74rem;
+    font-size: 0.72rem;
   }
 
   .home-announcements-box__title-row {
