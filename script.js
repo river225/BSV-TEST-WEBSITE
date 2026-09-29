@@ -367,36 +367,16 @@ function buildDiscordCardExplainerSlideHtml(kind) {
 
 function buildDiscordPromoCardSlotHtml(sectionTitle) {
   var copy = getDiscordPromoSectionCopy(sectionTitle);
-  var joinSlide =
-    '<div class="home-discord-promo__carousel-slide is-active" data-slide="join" aria-hidden="false">' +
-      '<img src="https://i.ibb.co/Tq7DLCJt/dsfbvbvxcxbvn.png" alt="" width="48" height="48" class="home-discord-promo__card-logo">' +
-      '<p class="home-discord-promo__card-title">Join Our Discord Server</p>' +
-      '<p class="home-discord-promo__card-stat"><span class="discord-member-count" data-home-stat="traders">0</span>+ traders</p>' +
-      '<p class="home-discord-promo__card-tags">' + escapeHtml(copy.tags) + '</p>' +
-      '<div class="home-discord-promo__card-actions">' +
-        '<a href="' + BSV_DISCORD_INVITE_URL + '" target="_blank" rel="noopener noreferrer" class="home-discord-promo__card-btn home-discord-promo__card-btn--join">' + escapeHtml(i18n("discord.card.joinNow")) + '</a>' +
-        '<button type="button" class="home-discord-promo__card-btn home-discord-promo__card-btn--more home-discord-promo__card-btn--show-offers">' + escapeHtml(i18n("discord.card.whatWeOffer")) + '</button>' +
-      '</div>' +
-    '</div>';
-
   return (
     '<div class="home-discord-promo home-discord-promo--card-slot" role="complementary" aria-label="Join BlockSpin Discord">' +
       '<div class="home-discord-promo__card-inner">' +
-        '<div class="home-discord-promo__carousel" data-rotate="1" aria-live="polite">' +
-          '<div class="home-discord-promo__carousel-viewport">' +
-            joinSlide +
-            '<div class="home-discord-promo__carousel-slide" data-slide="giveaways" aria-hidden="true">' +
-              buildDiscordCardExplainerSlideHtml("giveaways") +
-            '</div>' +
-            '<div class="home-discord-promo__carousel-slide" data-slide="middleman" aria-hidden="true">' +
-              buildDiscordCardExplainerSlideHtml("middleman") +
-            '</div>' +
-          '</div>' +
-          '<div class="home-discord-promo__carousel-dots" aria-hidden="true">' +
-            '<span class="home-discord-promo__carousel-dot is-active"></span>' +
-            '<span class="home-discord-promo__carousel-dot"></span>' +
-            '<span class="home-discord-promo__carousel-dot"></span>' +
-          '</div>' +
+        '<img src="https://i.ibb.co/Tq7DLCJt/dsfbvbvxcxbvn.png" alt="" width="48" height="48" class="home-discord-promo__card-logo">' +
+        '<p class="home-discord-promo__card-title">Join Our Discord Server</p>' +
+        '<p class="home-discord-promo__card-stat"><span class="discord-member-count" data-home-stat="traders">0</span>+ traders</p>' +
+        '<p class="home-discord-promo__card-tags">' + escapeHtml(copy.tags) + '</p>' +
+        '<div class="home-discord-promo__card-actions">' +
+          '<a href="' + BSV_DISCORD_INVITE_URL + '" target="_blank" rel="noopener noreferrer" class="home-discord-promo__card-btn home-discord-promo__card-btn--join">' + escapeHtml(i18n("discord.card.joinNow")) + '</a>' +
+          '<a href="blockspin-discord-server.html" class="home-discord-promo__card-btn home-discord-promo__card-btn--more">' + escapeHtml(i18n("discord.card.whatWeOffer")) + '</a>' +
         '</div>' +
       '</div>' +
     '</div>'
@@ -422,44 +402,13 @@ function goToDiscordCardCarouselSlide(carousel, targetIndex) {
 }
 
 function initDiscordPromoCardCarousels(root) {
+  // Card slots are static join CTAs now — clear any leftover carousel timers.
   var scope = root || document;
-  scope.querySelectorAll(".home-discord-promo__carousel[data-rotate='1']").forEach(function (carousel) {
+  scope.querySelectorAll(".home-discord-promo__carousel").forEach(function (carousel) {
     if (carousel._discordCarouselTimer) {
       clearInterval(carousel._discordCarouselTimer);
       carousel._discordCarouselTimer = null;
     }
-    var slides = carousel.querySelectorAll(".home-discord-promo__carousel-slide");
-    if (slides.length < 2) return;
-
-    var dots = carousel.querySelectorAll(".home-discord-promo__carousel-dot");
-    var activeIdx = 0;
-    slides.forEach(function (slide, i) {
-      if (slide.classList.contains("is-active")) activeIdx = i;
-    });
-    carousel.dataset.activeIndex = String(activeIdx);
-
-    function advance() {
-      var idx = Number(carousel.dataset.activeIndex || "0");
-      goToDiscordCardCarouselSlide(carousel, idx + 1);
-    }
-
-    dots.forEach(function (dot, i) {
-      dot.onclick = function () {
-        goToDiscordCardCarouselSlide(carousel, i);
-      };
-    });
-
-    var card = carousel.closest(".home-discord-promo--card-slot");
-    if (card) {
-      card.querySelectorAll(".home-discord-promo__card-btn--show-offers").forEach(function (btn) {
-        btn.onclick = function (e) {
-          e.preventDefault();
-          goToDiscordCardCarouselSlide(carousel, 1);
-        };
-      });
-    }
-
-    carousel._discordCarouselTimer = setInterval(advance, DISCORD_CARD_CAROUSEL_INTERVAL_MS);
   });
 }
 
@@ -3710,6 +3659,7 @@ var sitePresenceVisitorId = "";
 var sitePresenceTimer = 0;
 var discordOnlineCache = null;
 var siteOnlineCache = null;
+var discordOnlineReady = false;
 
 function getSitePresenceVisitorId() {
   if (sitePresenceVisitorId) return sitePresenceVisitorId;
@@ -3732,6 +3682,9 @@ function getSitePresenceVisitorId() {
 }
 
 function publishCombinedOnlineCount(animate) {
+  // Wait for Discord presence so Members Online doesn't flash a small site-only
+  // number, then jump to thousands when Discord counts arrive.
+  if (!discordOnlineReady) return;
   var discord = typeof discordOnlineCache === "number" ? discordOnlineCache : 0;
   var site = typeof siteOnlineCache === "number" ? siteOnlineCache : 0;
   var total = discord + site;
@@ -3763,9 +3716,10 @@ function sendSitePresenceHeartbeat() {
         } catch (e) {}
       }
       if (data && typeof data.online === "number" && !isNaN(data.online)) {
-        var first = siteOnlineCache == null;
+        var firstSite = siteOnlineCache == null;
         siteOnlineCache = data.online;
-        publishCombinedOnlineCount(first);
+        // Only publish once Discord is ready; otherwise just cache site presence.
+        publishCombinedOnlineCount(firstSite && discordOnlineReady);
       }
       return data;
     })
@@ -3803,13 +3757,23 @@ function fetchDiscordMemberCount() {
         syncDiscordMemberCountElements(n);
       }
       if (typeof online === "number" && !isNaN(online)) {
-        var firstDiscord = discordOnlineCache == null;
+        var firstDiscord = !discordOnlineReady;
         discordOnlineCache = online;
+        discordOnlineReady = true;
         publishCombinedOnlineCount(firstDiscord);
+      } else if (!discordOnlineReady) {
+        discordOnlineCache = 0;
+        discordOnlineReady = true;
+        publishCombinedOnlineCount(true);
       }
       applyCachedHomeStatValues(document);
     })
     .catch(function () {
+      if (!discordOnlineReady) {
+        discordOnlineCache = 0;
+        discordOnlineReady = true;
+        publishCombinedOnlineCount(true);
+      }
       applyCachedHomeStatValues(document);
     });
 }
