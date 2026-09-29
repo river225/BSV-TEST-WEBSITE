@@ -284,10 +284,12 @@
       "tax.howLabel": "For {want} after tax, you lose {lost} once dropped",
       "promo.middleman":
         "Tired of getting scammed during trades?<br>Our Middleman service can help you never get scammed again!<br>Join our discord server and get a Middleman today!<br><span class=\"discord-mm-promo-cta\">Click here to join our Discord</span>",
+      "giveaway.modalEyebrow": "Discord Giveaway",
       "giveaway.modalTitle": "Giveaway Active!",
       "giveaway.modalBody":
-        "We are currently doing a giveaway for this item in our Discord server, Join Now!",
-      "giveaway.modalBtn": "Enter this Giveaway",
+        "We're running a giveaway for {item} in our Discord. Join the server now to enter.",
+      "giveaway.modalBtn": "Join Discord & Enter",
+      "giveaway.thisItem": "this item",
       "giveaway.close": "Close giveaway info",
       "changes.none": "No value changes yet.",
       "changes.failed": "Failed to load value changes.",
@@ -624,10 +626,12 @@
       "tax.howLabel": "Pour {want} après taxe, vous perdez {lost} une fois lâché",
       "promo.middleman":
         "Marre de vous faire arnaquer lors des échanges ?<br>Notre service Middleman peut vous aider à ne plus jamais vous faire arnaquer !<br>Rejoignez notre serveur Discord et obtenez un Middleman dès aujourd'hui !<br><span class=\"discord-mm-promo-cta\">Cliquez ici pour rejoindre notre Discord</span>",
+      "giveaway.modalEyebrow": "Giveaway Discord",
       "giveaway.modalTitle": "Giveaway actif !",
       "giveaway.modalBody":
-        "Nous organisons actuellement un giveaway pour cet objet sur notre serveur Discord — rejoignez-nous !",
-      "giveaway.modalBtn": "Participer au giveaway",
+        "Nous organisons un giveaway pour {item} sur notre Discord. Rejoignez le serveur maintenant pour participer.",
+      "giveaway.modalBtn": "Rejoindre Discord et participer",
+      "giveaway.thisItem": "cet objet",
       "giveaway.close": "Fermer les infos du giveaway",
       "changes.none": "Aucun changement de valeur pour le moment.",
       "changes.failed": "Échec du chargement des changements de valeur.",
@@ -964,10 +968,12 @@
       "tax.howLabel": "Para {want} después de impuestos, pierdes {lost} una vez soltado",
       "promo.middleman":
         "¿Cansado de estafas en los intercambios?<br>¡Nuestro servicio Middleman puede ayudarte a no volver a ser estafado!<br>¡Únete a nuestro servidor de Discord y consigue un Middleman hoy!<br><span class=\"discord-mm-promo-cta\">Haz clic aquí para unirte a nuestro Discord</span>",
+      "giveaway.modalEyebrow": "Sorteo de Discord",
       "giveaway.modalTitle": "¡Sorteo activo!",
       "giveaway.modalBody":
-        "Actualmente estamos haciendo un sorteo de este objeto en nuestro servidor de Discord. ¡Únete ahora!",
-      "giveaway.modalBtn": "Participar en el sorteo",
+        "Estamos haciendo un sorteo de {item} en nuestro Discord. Únete al servidor ahora para participar.",
+      "giveaway.modalBtn": "Unirse a Discord y participar",
+      "giveaway.thisItem": "este objeto",
       "giveaway.close": "Cerrar info del sorteo",
       "changes.none": "Aún no hay cambios de valor.",
       "changes.failed": "Error al cargar los cambios de valor.",
