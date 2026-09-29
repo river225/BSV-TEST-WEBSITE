@@ -556,7 +556,7 @@ function mountHomeSiteStats() {
   var desktopSlot = document.getElementById("home-site-stats-slot");
   var mobileSlot = document.getElementById("home-site-stats-slot-mobile");
   if (desktopSlot) desktopSlot.outerHTML = buildHomeSiteStatsHtml("home-stats-strip--rail", "home-site-stats-rail");
-  if (mobileSlot) mobileSlot.outerHTML = buildHomeSiteStatsHtml("home-stats-strip--mobile", "home-site-stats-mobile");
+  if (mobileSlot) mobileSlot.outerHTML = buildHomeSiteStatsHtml("", "home-site-stats-mobile");
   applyCachedHomeStatValues(document);
 }
 
@@ -3746,17 +3746,25 @@ function renderMoneyGuideFastNav() {
 
 function renderAccessoriesFastNav(navData) {
   accessoriesFastNavData = navData;
-  renderGuideFastNav(navData, {
-    sectionId: slugify(ACCESSORIES_SECTION_NAME)
-  });
-  renderAccessoriesMobileFastNav(navData);
+  var cfg = typeof getSectionConfig === "function" ? getSectionConfig(_activeSectionName) : null;
+  if (cfg && cfg.accessoriesFastNav) {
+    renderGuideFastNav(navData, {
+      sectionId: slugify(ACCESSORIES_SECTION_NAME)
+    });
+    renderAccessoriesMobileFastNav(navData);
+    setGuideFastNavVisible(true);
+  }
 }
 
 function renderCrewFastNav(navData) {
   crewFastNavData = navData;
-  renderGuideFastNav(navData, {
-    sectionId: slugify("Crew Logos")
-  });
+  var cfg = typeof getSectionConfig === "function" ? getSectionConfig(_activeSectionName) : null;
+  if (cfg && cfg.crewFastNav) {
+    renderGuideFastNav(navData, {
+      sectionId: slugify("Crew Logos")
+    });
+    setGuideFastNavVisible(true);
+  }
 }
 
 
@@ -4355,6 +4363,9 @@ function showSectionDeferred(name, cfg, isHome) {
     removeEmbeddedMoneyGuideFastNav();
     setGuideFastNavVisible(false);
   }
+
+  // Never let guide / crew fast-nav sit on Home (or leak into the home right rail).
+  if (isHome) setGuideFastNavVisible(false);
 
   if (homeValueChanges) {
     homeValueChanges.style.visibility = cfg.homeValueChanges ? "visible" : "hidden";
