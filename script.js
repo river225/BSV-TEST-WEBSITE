@@ -5347,35 +5347,51 @@ function openRiverLinks(e) {
   document.body.appendChild(modal);
 }
 
-// Fetch and display recent value changes from spreadsheet (sheet: "Website Configs", columns: Title, Date, Text, Color)
+function resolveValueChangeImageUrl(row) {
+  var raw = String(
+    (row && (row.Link || row["Item Link"] || row.Image || row["Image URL"] || row["Image Link"])) || ""
+  ).trim();
+  if (!/^https?:\/\//i.test(raw)) return "";
+  return raw;
+}
+
+// Website Configs columns: Title, Date, Text, Color, Link (item image URL)
 function buildValueChangeItemHtml(r, useTimeline) {
   var colorMap = { green: "green", orange: "orange", red: "red", blue: "blue" };
   var title = (r.Title || "").toString().trim();
   var date = (r.Date || "").toString().trim();
   var text = (r.Text || "").toString().trim();
   var color = (r.Color || "").toString().trim().toLowerCase();
+  var imageUrl = resolveValueChangeImageUrl(r);
   var colorKey = colorMap[color] ? color : "";
   var colorClass = colorKey ? " value-change-item--" + colorKey : "";
-  var timelineClass = useTimeline ? " value-change-item--timeline" : "";
-  var titleEsc = title.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-  var dateEsc = date.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-  var textEsc = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/\n/g, "<br>");
+  var titleEsc = escapeHtml(title);
+  var dateEsc = escapeHtml(date);
+  var textEsc = escapeHtml(text).replace(/\n/g, "<br>");
+  var imageAttr = imageUrl ? escapeAttr(imageUrl) : "";
 
   if (useTimeline === "strip") {
     var stripMod = colorKey ? " home-changes-strip__item--" + colorKey : "";
+    var mediaHtml = imageAttr
+      ? '<div class="home-changes-strip__media">' +
+          '<img class="home-changes-strip__img" src="' + imageAttr + '" alt="" width="72" height="72" loading="lazy" decoding="async" onerror="this.parentElement.classList.add(\'is-empty\');this.remove();">' +
+        "</div>"
+      : '<div class="home-changes-strip__media is-empty" aria-hidden="true"></div>';
     return (
       '<div class="home-changes-strip__item' + stripMod + '" role="listitem">' +
-        '<span class="home-changes-strip__dot" aria-hidden="true"></span>' +
+        mediaHtml +
         '<div class="home-changes-strip__body">' +
-          '<div class="home-changes-strip__top">' +
-            (titleEsc ? '<span class="home-changes-strip__title">' + titleEsc + "</span>" : "") +
-            (dateEsc ? '<span class="home-changes-strip__date">' + dateEsc + "</span>" : "") +
-          "</div>" +
+          (titleEsc ? '<span class="home-changes-strip__title">' + titleEsc + "</span>" : "") +
+          (dateEsc ? '<span class="home-changes-strip__date">' + dateEsc + "</span>" : "") +
           (textEsc ? '<p class="home-changes-strip__text">' + textEsc + "</p>" : "") +
         "</div>" +
       "</div>"
     );
   }
+
+  var classicMedia = imageAttr
+    ? '<div class="value-change-thumb"><img src="' + imageAttr + '" alt="" width="48" height="48" loading="lazy" decoding="async" onerror="this.parentElement.style.display=\'none\'"></div>'
+    : '<div class="value-change-icon' + colorClass + '"></div>';
 
   if (useTimeline) {
     return (
@@ -5385,14 +5401,14 @@ function buildValueChangeItemHtml(r, useTimeline) {
         (dateEsc ? '<p class="value-change-date">' + dateEsc + "</p>" : "") +
         (textEsc ? '<p class="value-change-text">' + textEsc + "</p>" : "") +
         "</div>" +
-        '<div class="value-change-icon' + colorClass + '" aria-hidden="true"></div>' +
+        classicMedia +
       "</div>"
     );
   }
 
   return (
     '<div class="value-change-item' + colorClass + '">' +
-      '<div class="value-change-icon' + colorClass + '"></div>' +
+      classicMedia +
       (titleEsc ? '<p class="value-change-title">' + titleEsc + "</p>" : "") +
       (dateEsc ? '<p class="value-change-date">' + dateEsc + "</p>" : "") +
       (textEsc ? '<p class="value-change-text">' + textEsc + "</p>" : "") +
