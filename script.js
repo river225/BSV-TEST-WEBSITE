@@ -4820,6 +4820,33 @@ function showSectionDeferred(name, cfg, isHome) {
 
   trackSectionPageView(name);
   syncMobileTaxPanel(cfg);
+
+  // Home is long — leaving it mid-scroll used to land inside the middle/bottom of
+  // the next section. Always snap to the top of the newly shown section.
+  scrollActiveSectionToTop(cfg);
+}
+
+function scrollActiveSectionToTop(cfg) {
+  function snap() {
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    } catch (e) {
+      window.scrollTo(0, 0);
+    }
+    if (!cfg || !cfg.id || cfg.id === "home") return;
+    var el = document.getElementById(cfg.id);
+    if (!el) return;
+    var y = el.getBoundingClientRect().top + (window.pageYOffset || window.scrollY || 0);
+    if (y > 4) {
+      try {
+        window.scrollTo({ top: Math.max(0, y - 8), left: 0, behavior: "auto" });
+      } catch (e2) {
+        window.scrollTo(0, Math.max(0, y - 8));
+      }
+    }
+  }
+  snap();
+  requestAnimationFrame(snap);
 }
 
 window.showSection = showSection;
