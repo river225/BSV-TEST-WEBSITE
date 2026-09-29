@@ -316,6 +316,17 @@ function buildValueListPerkIconHtml() {
   );
 }
 
+function buildCommunityPerkIconHtml() {
+  return (
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<circle cx="8" cy="8" r="2.4"/>' +
+      '<path d="M3.5 17.5c.35-2.1 2.15-3.4 4.5-3.4s4.15 1.3 4.5 3.4"/>' +
+      '<path d="M15.5 10.2h4.2c.7 0 1.3.6 1.3 1.3v2.7c0 .7-.6 1.3-1.3 1.3H19l-1.6 1.5v-1.5h-1.9c-.7 0-1.3-.6-1.3-1.3v-2.7c0-.7.6-1.3 1.3-1.3z"/>' +
+      '<circle cx="14.2" cy="7.2" r="1.7"/>' +
+    "</svg>"
+  );
+}
+
 function buildGiveawayPerkIconHtml() {
   return (
     '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
@@ -481,7 +492,7 @@ function buildDiscordPromoBannerHtml(inCards) {
           "</p>" +
         "</div>" +
         '<div class="home-discord-promo__flash-perks">' +
-          buildHomeFlashPerkHtml("values", buildValueListPerkIconHtml(), "discord.home.badgeValueList", "discord.home.tradingTag1") +
+          buildHomeFlashPerkHtml("community", buildCommunityPerkIconHtml(), "discord.home.badgeCommunity", "discord.home.communityTag") +
           buildHomeFlashPerkHtml("middleman", buildMiddlemanShieldIconHtml(18), "discord.home.badgeMiddleman", "discord.card.middlemanStep1") +
           buildHomeFlashPerkHtml("giveaways", buildGiveawayPerkIconHtml(), "discord.home.badgeGiveaways", "discord.card.giveawaysTag2") +
         "</div>" +

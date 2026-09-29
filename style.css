@@ -3534,7 +3534,8 @@ background-attachment: fixed;
 }.home-discord-promo__flash-perk:hover {
   filter: brightness(1.05);
 }.home-discord-promo__flash-perk--trading,
-.home-discord-promo__flash-perk--values {
+.home-discord-promo__flash-perk--values,
+.home-discord-promo__flash-perk--community {
   background: linear-gradient(160deg, #e0f2fe 0%, #7dd3fc 42%, #38bdf8 100%);
   color: #0c4a6e;
 }.home-discord-promo__flash-perk--middleman {
@@ -3562,7 +3563,8 @@ background-attachment: fixed;
   width: 18px;
   height: 18px;
   display: block;
-}.home-discord-promo__flash-perk--values .home-discord-promo__flash-perk-icon {
+}.home-discord-promo__flash-perk--values .home-discord-promo__flash-perk-icon,
+.home-discord-promo__flash-perk--community .home-discord-promo__flash-perk-icon {
   color: #0284c7;
 }.home-discord-promo__flash-perk--middleman .home-discord-promo__flash-perk-icon {
   color: #059669;
