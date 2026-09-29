@@ -459,8 +459,8 @@ function buildDiscordPromoBannerHtml(inCards) {
         "</div>" +
         '<div class="home-discord-promo__flash-perks">' +
           buildHomeFlashPerkHtml("values", "📋", "discord.home.badgeValueList", "discord.home.tradingTag1") +
-          buildHomeFlashPerkHtml("middleman", buildMiddlemanShieldIconHtml(22), "discord.card.middlemanTitle", "discord.card.middlemanStep1") +
-          buildHomeFlashPerkHtml("giveaways", "🎁", "discord.card.giveawaysTitle", "discord.card.giveawaysTag2") +
+          buildHomeFlashPerkHtml("middleman", buildMiddlemanShieldIconHtml(22), "discord.home.badgeMiddleman", "discord.card.middlemanStep1") +
+          buildHomeFlashPerkHtml("giveaways", "🎁", "discord.home.badgeGiveaways", "discord.card.giveawaysTag2") +
         "</div>" +
         '<div class="home-discord-promo__actions home-discord-promo__actions--home home-discord-promo__flash-actions">' +
           '<a href="' + BSV_DISCORD_INVITE_URL + '" target="_blank" rel="noopener noreferrer" class="home-discord-promo__btn home-discord-promo__btn--primary home-discord-promo__btn--flash-join">' +
