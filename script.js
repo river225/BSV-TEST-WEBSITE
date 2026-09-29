@@ -512,6 +512,17 @@ function buildHomeLiveTradingBarHtml() {
   );
 }
 
+function buildHomeChangesStripHtml(listId) {
+  return (
+    '<aside class="home-changes-strip" aria-label="' + escapeHtml(i18n("home.recentChanges")) + '">' +
+      '<p class="home-changes-strip__heading">' + escapeHtml(i18n("home.recentChanges")) + "</p>" +
+      '<div class="home-changes-strip__viewport" id="' + listId + '">' +
+        '<div class="value-changes-loading" data-i18n="loading.changes">' + escapeHtml(i18n("loading.changes")) + "</div>" +
+      "</div>" +
+    "</aside>"
+  );
+}
+
 function mountHomeDiscordPromo() {
   var slot = document.getElementById("home-discord-promo-slot");
   if (!slot) return;
@@ -521,31 +532,39 @@ function mountHomeDiscordPromo() {
         '<div class="home-hero-top__discord">' +
           buildDiscordPromoBannerHtml(false) +
         "</div>" +
-        '<div class="home-hero-top__stats">' +
-          '<div id="home-site-stats-slot"></div>' +
-          '<aside class="home-changes-strip" aria-label="' + escapeHtml(i18n("home.recentChanges")) + '">' +
-            '<p class="home-changes-strip__heading">' + escapeHtml(i18n("home.recentChanges")) + "</p>" +
-            '<div class="home-changes-strip__viewport" id="home-main-value-changes-list">' +
-              '<div class="value-changes-loading" data-i18n="loading.changes">' + escapeHtml(i18n("loading.changes")) + "</div>" +
-            "</div>" +
-          "</aside>" +
+        '<div class="home-hero-top__stats home-hero-top__stats--mobile">' +
+          '<div id="home-site-stats-slot-mobile"></div>' +
+          buildHomeChangesStripHtml("home-mobile-value-changes-list") +
         "</div>" +
       "</div>" +
       buildHomeLiveTradingBarHtml() +
     "</div>";
+  mountHomeRightRail();
   mountHomeSiteStats();
 }
 
+function mountHomeRightRail() {
+  var rail = document.getElementById("home-right-rail");
+  if (!rail) return;
+  rail.innerHTML =
+    '<div id="home-site-stats-slot"></div>' +
+    buildHomeChangesStripHtml("home-main-value-changes-list");
+  rail.hidden = false;
+}
+
 function mountHomeSiteStats() {
-  var slot = document.getElementById("home-site-stats-slot");
-  if (slot) slot.outerHTML = buildHomeSiteStatsHtml("home-stats-strip");
+  var desktopSlot = document.getElementById("home-site-stats-slot");
+  var mobileSlot = document.getElementById("home-site-stats-slot-mobile");
+  if (desktopSlot) desktopSlot.outerHTML = buildHomeSiteStatsHtml("home-stats-strip--rail", "home-site-stats-rail");
+  if (mobileSlot) mobileSlot.outerHTML = buildHomeSiteStatsHtml("home-stats-strip--mobile", "home-site-stats-mobile");
   applyCachedHomeStatValues(document);
 }
 
-function buildHomeSiteStatsHtml(extraClass) {
+function buildHomeSiteStatsHtml(extraClass, elementId) {
   var statsClass = "home-stats-strip" + (extraClass && extraClass !== "home-stats-strip" ? " " + extraClass : "");
+  var idAttr = elementId ? ' id="' + elementId + '"' : "";
   return (
-    '<aside class="' + statsClass + '" id="home-site-stats-slot" aria-label="' + escapeHtml(i18n("home.stats.aria")) + '">' +
+    '<aside class="' + statsClass + '"' + idAttr + ' aria-label="' + escapeHtml(i18n("home.stats.aria")) + '">' +
       '<div class="home-stats-strip__item">' +
         '<span class="home-stats-strip__value" data-home-stat="items">0</span>' +
         '<span class="home-stats-strip__label">' + escapeHtml(i18n("home.stats.itemsTracked")) + "</span>" +
@@ -4276,21 +4295,36 @@ function showSectionDeferred(name, cfg, isHome) {
 
   const taxSidebarColumn = document.getElementById("tax-sidebar-column");
   const homeValueChanges = document.getElementById("home-value-changes");
+  const homeRightRail = document.getElementById("home-right-rail");
   const taxCalc = taxSidebarColumn ? taxSidebarColumn.querySelector(".tax-calculator") : null;
   const middlemanPromo = taxSidebarColumn ? taxSidebarColumn.querySelector(".discord-mm-promo--sidebar") : null;
 
   if (taxSidebarColumn) {
-    if (isHome || cfg.sidebarColumn === "hide") {
+    if (isHome) {
+      // Home: show the tax-column rail with Items tracked / Recent Changes (not the calculator).
+      taxSidebarColumn.style.display = "flex";
+      taxSidebarColumn.style.visibility = "visible";
+      taxSidebarColumn.style.opacity = "1";
+      taxSidebarColumn.style.pointerEvents = "auto";
+      taxSidebarColumn.classList.add("tax-sidebar-column--home-rail");
+    } else if (cfg.sidebarColumn === "hide") {
       taxSidebarColumn.style.display = "flex";
       taxSidebarColumn.style.visibility = "hidden";
       taxSidebarColumn.style.opacity = "0";
       taxSidebarColumn.style.pointerEvents = "none";
+      taxSidebarColumn.classList.remove("tax-sidebar-column--home-rail");
     } else {
       taxSidebarColumn.style.visibility = "visible";
       taxSidebarColumn.style.opacity = "1";
       taxSidebarColumn.style.display = "flex";
       taxSidebarColumn.style.pointerEvents = "auto";
+      taxSidebarColumn.classList.remove("tax-sidebar-column--home-rail");
     }
+  }
+
+  if (homeRightRail) {
+    homeRightRail.hidden = !isHome;
+    homeRightRail.style.display = isHome ? "flex" : "none";
   }
 
   if (typeof applyVisibilityMode === "function") {
@@ -5311,39 +5345,41 @@ function buildValueChangeItemHtml(r, useTimeline) {
 async function loadValueChanges() {
   var listEl = document.getElementById('value-changes-list');
   var homeMainListEl = document.getElementById('home-main-value-changes-list');
+  var homeMobileListEl = document.getElementById('home-mobile-value-changes-list');
   function setSidebarValueChangesHtml(html) {
     if (listEl) listEl.innerHTML = html;
+  }
+  function setHomeStripLists(html) {
+    if (homeMainListEl) homeMainListEl.innerHTML = html;
+    if (homeMobileListEl) homeMobileListEl.innerHTML = html;
   }
   try {
     var rows = await fetchSheet("Website Configs");
     setHomeStatValue("changes", resolveCellEditsCount(rows || []), true);
     applyCachedHomeStatValues(document);
-    if (!listEl && !homeMainListEl) return;
+    if (!listEl && !homeMainListEl && !homeMobileListEl) return;
     if (!rows || rows.length === 0) {
       var emptyHtml = '<div class="value-changes-loading">' + escapeHtml(i18n("changes.none")) + '</div>';
       setSidebarValueChangesHtml(emptyHtml);
-      if (homeMainListEl) homeMainListEl.innerHTML = emptyHtml;
+      setHomeStripLists(emptyHtml);
       return;
     }
     var filtered = filterValueChangeRows(rows);
     if (filtered.length === 0) {
       var noneHtml = '<div class="value-changes-loading">' + escapeHtml(i18n("changes.none")) + '</div>';
       setSidebarValueChangesHtml(noneHtml);
-      if (homeMainListEl) homeMainListEl.innerHTML = noneHtml;
+      setHomeStripLists(noneHtml);
       return;
     }
     var classicHtml = filtered.map(function (r) { return buildValueChangeItemHtml(r, false); }).join("");
     setSidebarValueChangesHtml(classicHtml);
-    if (homeMainListEl) {
-      var stripHtml = filtered.map(function (r) { return buildValueChangeItemHtml(r, "strip"); }).join("");
-      homeMainListEl.innerHTML =
-        '<div class="home-changes-strip__list" role="list">' + stripHtml + "</div>";
-    }
+    var stripHtml = filtered.map(function (r) { return buildValueChangeItemHtml(r, "strip"); }).join("");
+    setHomeStripLists('<div class="home-changes-strip__list" role="list">' + stripHtml + "</div>");
   } catch (err) {
     console.error('Error loading value changes:', err);
     var failHtml = '<div class="value-changes-loading">' + escapeHtml(i18n("changes.failed")) + '</div>';
     setSidebarValueChangesHtml(failHtml);
-    if (homeMainListEl) homeMainListEl.innerHTML = failHtml;
+    setHomeStripLists(failHtml);
   }
 }
 
