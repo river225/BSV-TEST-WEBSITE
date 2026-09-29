@@ -3844,7 +3844,7 @@ background-attachment: fixed;
   color: rgba(226, 232, 240, 0.75);
 }
 .home-hero-stack .home-lt-bar {
-  margin-top: 8px;
+  margin-top: min(72vh, 780px);
 }
 .home-lt-bar {
   position: relative;
