@@ -1060,8 +1060,9 @@ background-attachment: fixed;
   color: #fff;
   text-shadow: 2px 2px 0 #000, -2px 2px 0 #000, 2px -2px 0 #000, -2px -2px 0 #000;
 }
-.sections > .section:not(#home) > h2:first-of-type:has(+ .bsv-section-lt-promo) {
-  margin-bottom: 10px;
+.sections > .section:not(#home) > .bsv-section-lt-promo + h2 {
+  margin-top: 8px;
+  margin-bottom: 18px;
 }
 .sections > .section:not(#home) > .bsv-section-lt-promo + .cards {
   margin-top: 0;
@@ -4777,41 +4778,22 @@ body.home-changelog-open {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #3b0764;
-  background:
-    linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.85) 45%, transparent 70%) 0 0 / 200% 100%,
-    linear-gradient(180deg, #fef08a 0%, #facc15 42%, #f59e0b 100%);
-  background-repeat: no-repeat, no-repeat;
+  background: linear-gradient(180deg, #fef08a 0%, #facc15 42%, #f59e0b 100%);
   border: 2px solid #fff7ad;
   box-shadow:
     0 0 0 2px #7c2d12,
-    0 4px 0 #9a3412,
-    0 0 18px rgba(250, 204, 21, 0.85),
-    0 0 34px rgba(249, 115, 22, 0.55);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+    0 3px 0 #9a3412;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
   transform: rotate(16deg);
   transform-origin: center;
-  animation: home-lt-new-shine 2.4s ease-in-out infinite;
+  animation: home-lt-new-heartbeat 4.8s ease-in-out infinite;
 }
-@keyframes home-lt-new-shine {
+@keyframes home-lt-new-heartbeat {
   0%, 100% {
-    background-position: 120% 0, 0 0;
-    filter: brightness(1);
-    transform: rotate(16deg);
-    box-shadow:
-      0 0 0 2px #7c2d12,
-      0 4px 0 #9a3412,
-      0 0 14px rgba(250, 204, 21, 0.7),
-      0 0 28px rgba(249, 115, 22, 0.4);
+    transform: rotate(16deg) scale(1);
   }
   50% {
-    background-position: -50% 0, 0 0;
-    filter: brightness(1.12);
-    transform: rotate(16deg);
-    box-shadow:
-      0 0 0 2px #7c2d12,
-      0 4px 0 #9a3412,
-      0 0 22px rgba(250, 204, 21, 0.95),
-      0 0 40px rgba(249, 115, 22, 0.65);
+    transform: rotate(16deg) scale(1.055);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -8843,11 +8825,11 @@ body.bsv-login-open {
 }.tax-reminders {
   font-size: 0.75rem;
   line-height: 1.6;
-  color: #dbe7f2;
+  color: var(--bsv-text-soft);
   margin-top: 10px;
   padding: 0;
-  background: linear-gradient(180deg, #152232 0%, #101a28 100%);
-  border: 1px solid #2a3d55;
+  background: linear-gradient(180deg, var(--bsv-surface-raised) 0%, var(--bsv-surface-card) 100%);
+  border: 1px solid color-mix(in srgb, var(--bsv-accent) 35%, #000);
   border-radius: 8px;
   overflow: hidden;
 }.tax-reminders__toggle {
@@ -8859,7 +8841,7 @@ body.bsv-login-open {
   padding: 9px 10px;
   border: 0;
   background: transparent;
-  color: #e8f1fa;
+  color: #fff;
   cursor: pointer;
   text-align: left;
   font: inherit;
@@ -8868,7 +8850,7 @@ body.bsv-login-open {
   letter-spacing: 0.01em;
   transition: background 0.15s ease, color 0.15s ease;
 }.tax-reminders__toggle:hover {
-  background: rgba(90, 160, 220, 0.12);
+  background: hsl(var(--bsv-accent-hue) 76% 55% / 0.12);
   color: #fff;
 }.tax-reminders__toggle-icon {
   flex: 0 0 auto;
@@ -8878,8 +8860,8 @@ body.bsv-login-open {
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  color: #0b1220;
-  background: #7ec8ff;
+  color: #041018;
+  background: var(--bsv-accent);
   box-shadow: inset 0 0 0 1px #000;
 }.tax-reminders__toggle-icon svg {
   display: block;
@@ -8889,17 +8871,17 @@ body.bsv-login-open {
 }.tax-reminders__chevron {
   flex: 0 0 auto;
   display: inline-flex;
-  color: #9eb6cc;
+  color: var(--bsv-muted);
   transition: transform 0.18s ease, color 0.15s ease;
 }.tax-reminders.is-open .tax-reminders__chevron {
   transform: rotate(180deg);
-  color: #7ec8ff;
+  color: var(--bsv-accent-bright);
 }.tax-reminders__toggle[aria-expanded="true"] .tax-reminders__toggle-icon {
-  background: #5eb0f0;
+  background: var(--bsv-accent-bright);
 }.tax-reminders__body {
   padding: 0 10px 10px;
-  border-top: 1px solid #2a3d55;
-  background: rgba(0, 0, 0, 0.18);
+  border-top: 1px solid color-mix(in srgb, var(--bsv-accent) 28%, #000);
+  background: hsl(var(--bsv-hue) var(--bsv-s-deep) 8% / 0.55);
 }.tax-reminders__body[hidden] {
   display: none !important;
 }.tax-reminders-heading {
@@ -8908,18 +8890,18 @@ body.bsv-login-open {
   font-size: 0.82rem;
   font-weight: 700;
   text-align: center;
-  color: #7ec8ff;
+  color: var(--bsv-accent);
   letter-spacing: 0.02em;
 }.tax-reminders-intro {
   margin: 8px 0 10px 0;
   font-size: 0.74rem;
   line-height: 1.55;
-  color: #c5d4e4;
+  color: var(--bsv-text-soft);
 }.tax-reminders-bullets {
   margin: 0;
-  color: #d7e4f2;
+  color: var(--bsv-text-soft);
 }.tax-reminders strong {
-  color: #9fd3ff;
+  color: var(--bsv-accent-bright);
 }body[data-theme="red"] {
   background: linear-gradient(180deg, #2c1616 0%, #3d1f1f 50%, #2c1616 100%) !important;
   background-attachment: fixed !important;

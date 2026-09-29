@@ -701,11 +701,12 @@
         "padding:8px 15px 7px;border-radius:8px;" +
         "letter-spacing:.16em;font-size:.78rem;" +
         "transform:rotate(16deg);transform-origin:center;" +
-        "animation:bsv-lt-new-glow 2.4s ease-in-out infinite" +
+        "box-shadow:0 0 0 2px #7c2d12,0 3px 0 #9a3412;" +
+        "animation:bsv-lt-new-heartbeat 4.8s ease-in-out infinite" +
       "}" +
-      "@keyframes bsv-lt-new-glow{" +
-        "0%,100%{background-position:120% 0,0 0;filter:brightness(1);transform:rotate(16deg);box-shadow:0 0 0 2px #7c2d12,0 4px 0 #9a3412,0 0 14px rgba(250,204,21,.7),0 0 28px rgba(249,115,22,.4)}" +
-        "50%{background-position:-50% 0,0 0;filter:brightness(1.12);transform:rotate(16deg);box-shadow:0 0 0 2px #7c2d12,0 4px 0 #9a3412,0 0 22px rgba(250,204,21,.95),0 0 40px rgba(249,115,22,.65)}" +
+      "@keyframes bsv-lt-new-heartbeat{" +
+        "0%,100%{transform:rotate(16deg) scale(1)}" +
+        "50%{transform:rotate(16deg) scale(1.055)}" +
       "}" +
       "@media (prefers-reduced-motion:reduce){.bsv-section-lt-promo .home-lt-bar__new{animation:none;transform:rotate(16deg)}}";
     document.head.appendChild(style);
@@ -779,9 +780,10 @@
         break;
       }
     }
+    // Always sit above the section title (first child, or immediately before h2).
     if (heading) {
-      if (heading.nextElementSibling !== ltPromo) {
-        heading.insertAdjacentElement("afterend", ltPromo);
+      if (ltPromo.parentElement !== active || heading.previousElementSibling !== ltPromo) {
+        active.insertBefore(ltPromo, heading);
       }
       return;
     }

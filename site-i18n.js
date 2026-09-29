@@ -262,12 +262,12 @@
       "tax.title": "Tax Calculator",
       "tax.tooltip":
         "Our Tax Calculator has been carefully tested to ensure accuracy. If you find an issue, please let us know.",
-      "tax.placeholder": "Enter amount you want after tax",
+      "tax.placeholder": "Enter amount",
       "tax.howTitle": "How does it work?",
       "tax.howIntro":
-        "Tax Calculator shows exactly how much cash to drop and in what order to avoid losing money to the game's cash tax system.",
+        "The Tax Calculator shows exactly how much cash to drop and in what order, so you avoid losing money to the game's cash tax system.",
       "tax.bullets":
-        "- <strong>You NEED BlockSpin Plus</strong> for this Calculator<br>- <span class=\"tax-warning-line\">Never reset with more than 60,000 cash on you</span><br>- <strong>NEVER</strong> leave the game in combat after resetting<br>- Wait 1 min in between cash drops",
+        "- <strong>You need BlockSpin Plus</strong> for this calculator<br>- <span class=\"tax-warning-line\">Never reset with more than 60,000 cash on you</span><br>- <strong>Never</strong> leave the game in combat after resetting<br>- Wait 1 minute between cash drops",
       "tax.openMobile": "Open tax calculator",
       "tax.closeMobile": "Close tax calculator",
       "tax.afterLabel": "To Drop",
@@ -602,12 +602,12 @@
       "tax.title": "Calculateur de taxe",
       "tax.tooltip":
         "Notre calculateur de taxe a été testé avec soin pour garantir sa précision. Si vous trouvez un problème, faites-le nous savoir.",
-      "tax.placeholder": "Entrez le montant voulu après taxe",
+      "tax.placeholder": "Entrez le montant",
       "tax.howTitle": "Comment ça marche ?",
       "tax.howIntro":
-        "Le calculateur de taxe indique exactement combien d'argent lâcher et dans quel ordre pour éviter de perdre de l'argent à cause du système de taxe du jeu.",
+        "Le calculateur de taxe indique exactement combien d'argent lâcher et dans quel ordre, pour éviter de perdre de l'argent à cause du système de taxe du jeu.",
       "tax.bullets":
-        "- <strong>Vous avez BESOIN de BlockSpin Plus</strong> pour ce calculateur<br>- <span class=\"tax-warning-line\">Ne reset jamais avec plus de 60 000 d'argent sur toi</span><br>- <strong>NE JAMAIS</strong> quitter le jeu en combat après un reset<br>- Attendre 1 min entre chaque lâcher d'argent",
+        "- <strong>Vous avez besoin de BlockSpin Plus</strong> pour ce calculateur<br>- <span class=\"tax-warning-line\">Ne resettez jamais avec plus de 60 000 d'argent sur vous</span><br>- <strong>Ne quittez jamais</strong> le jeu en combat après un reset<br>- Attendez 1 minute entre chaque lâcher d'argent",
       "tax.openMobile": "Ouvrir le calculateur de taxe",
       "tax.closeMobile": "Fermer le calculateur de taxe",
       "tax.afterLabel": "À lâcher",
@@ -942,12 +942,12 @@
       "tax.title": "Calculadora de impuestos",
       "tax.tooltip":
         "Nuestra calculadora de impuestos ha sido probada cuidadosamente para garantizar precisión. Si encuentras un problema, avísanos.",
-      "tax.placeholder": "Ingresa el monto que quieres después de impuestos",
+      "tax.placeholder": "Ingresa el monto",
       "tax.howTitle": "¿Cómo funciona?",
       "tax.howIntro":
-        "La calculadora muestra exactamente cuánto dinero soltar y en qué orden para no perder dinero por el sistema de impuestos del juego.",
+        "La calculadora muestra exactamente cuánto dinero soltar y en qué orden, para no perder dinero por el sistema de impuestos del juego.",
       "tax.bullets":
-        "- <strong>NECESITAS BlockSpin Plus</strong> para esta calculadora<br>- <span class=\"tax-warning-line\">Nunca reinicies con más de 60.000 de dinero encima</span><br>- <strong>NUNCA</strong> salgas del juego en combate después de reiniciar<br>- Espera 1 min entre cada soltado de dinero",
+        "- <strong>Necesitas BlockSpin Plus</strong> para esta calculadora<br>- <span class=\"tax-warning-line\">Nunca reinicies con más de 60.000 de dinero encima</span><br>- <strong>Nunca</strong> salgas del juego en combate después de reiniciar<br>- Espera 1 minuto entre cada soltado de dinero",
       "tax.openMobile": "Abrir calculadora de impuestos",
       "tax.closeMobile": "Cerrar calculadora de impuestos",
       "tax.afterLabel": "A soltar",
