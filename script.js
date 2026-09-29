@@ -557,12 +557,13 @@ function mountHomeSiteStats() {
 
 function homeStatsLabelIcon(kind) {
   if (kind === "items") {
-    // Stacked cards / inventory stack
+    // Clear faceted diamond / gem
     return (
-      '<svg class="home-stats-strip__icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false">' +
-        '<rect x="5" y="8" width="12" height="12" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.7"/>' +
-        '<path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M8 5.8h10.2a2 2 0 0 1 2 2V16"/>' +
-        '<path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M8.8 12.2h4.6M8.8 15.2h6.2"/>' +
+      '<svg class="home-stats-strip__icon home-stats-strip__icon--items" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false">' +
+        '<path fill="none" stroke="currentColor" stroke-width="1.85" stroke-linejoin="round" d="M7.1 4.6h9.8L21 9.2 12 20.4 3 9.2z"/>' +
+        '<path fill="none" stroke="currentColor" stroke-width="1.85" stroke-linejoin="round" d="M3.4 9.2h17.2"/>' +
+        '<path fill="none" stroke="currentColor" stroke-width="1.85" stroke-linejoin="round" d="M9.1 4.6 12 9.2l2.9-4.6"/>' +
+        '<path fill="none" stroke="currentColor" stroke-width="1.85" stroke-linejoin="round" d="M7.1 9.2 12 20.4l4.9-11.2"/>' +
       "</svg>"
     );
   }
@@ -641,18 +642,20 @@ function applyCachedHomeStatValues(root) {
 }
 
 function markHomeStatGrown(key) {
+  // Discord traders stay white — gold is only for the home stats strip.
+  if (key === "traders") {
+    document.querySelectorAll(".home-discord-promo__flash-stat-num").forEach(function (wrap) {
+      wrap.classList.remove("is-counting", "is-grown");
+    });
+    document.querySelectorAll(".home-discord-promo__flash-stat").forEach(function (pill) {
+      pill.classList.remove("is-grown");
+    });
+    return;
+  }
   var els = document.querySelectorAll('[data-home-stat="' + key + '"]');
-  var wraps =
-    key === "traders"
-      ? document.querySelectorAll(".home-discord-promo__flash-stat-num")
-      : els;
-  wraps.forEach(function (wrap) {
+  els.forEach(function (wrap) {
     wrap.classList.remove("is-counting");
     wrap.classList.add("is-grown");
-    if (key === "traders") {
-      var pill = wrap.closest(".home-discord-promo__flash-stat");
-      if (pill) pill.classList.add("is-grown");
-    }
   });
 }
 
@@ -668,7 +671,7 @@ function setHomeStatValue(key, value, animate) {
     el.textContent = value.toLocaleString();
   });
   // Instant updates (incl. reduced-motion) still get the finished gold look.
-  if (key === "items" || key === "online" || key === "changes" || key === "traders") {
+  if (key === "items" || key === "online" || key === "changes") {
     markHomeStatGrown(key);
   }
 }
@@ -688,38 +691,50 @@ function animateHomeStatValue(key, targetValue, durationMs) {
 
   var els = document.querySelectorAll('[data-home-stat="' + key + '"]');
   // Cache is already set — if the DOM isn't mounted yet, apply later via applyCachedHomeStatValues.
-  if (!els.length) return;
+  if (!els.length && key !== "traders") return;
 
   var animWraps =
     key === "traders"
       ? document.querySelectorAll(".home-discord-promo__flash-stat-num")
       : els;
+  if (!animWraps.length && !els.length) return;
+
   animWraps.forEach(function (wrap) {
     wrap.classList.remove("is-grown");
-    if (key === "traders") {
-      var pill = wrap.closest(".home-discord-promo__flash-stat");
-      if (pill) pill.classList.remove("is-grown");
-    }
     void wrap.offsetWidth;
     wrap.classList.add("is-counting");
   });
 
+  var countTargets = els.length ? els : animWraps;
   var start = performance.now();
   function frame(now) {
     var progress = Math.min(1, (now - start) / durationMs);
     var eased = 1 - Math.pow(1 - progress, 3);
     var current = Math.round(targetValue * eased);
-    els.forEach(function (el) {
-      el.textContent = current.toLocaleString();
+    countTargets.forEach(function (el) {
+      if (el.classList && el.classList.contains("home-discord-promo__flash-stat-num")) {
+        var inner = el.querySelector(".discord-member-count") || el;
+        inner.textContent = current.toLocaleString();
+      } else {
+        el.textContent = current.toLocaleString();
+      }
     });
+    if (key === "traders") syncDiscordMemberCountElements(current);
     if (progress < 1) {
       homeStatAnimFrames[key] = requestAnimationFrame(frame);
     } else {
       homeStatAnimFrames[key] = null;
-      els.forEach(function (el) {
-        el.textContent = targetValue.toLocaleString();
-      });
-      markHomeStatGrown(key);
+      if (key === "traders") {
+        syncDiscordMemberCountElements(targetValue);
+        animWraps.forEach(function (wrap) {
+          wrap.classList.remove("is-counting", "is-grown");
+        });
+      } else {
+        els.forEach(function (el) {
+          el.textContent = targetValue.toLocaleString();
+        });
+        markHomeStatGrown(key);
+      }
     }
   }
   homeStatAnimFrames[key] = requestAnimationFrame(frame);

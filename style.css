@@ -3478,41 +3478,8 @@ background-attachment: fixed;
   transform-origin: center bottom;
 }.home-discord-promo__flash-stat-num.is-counting {
   animation: home-discord-stat-count 1.4s ease-out both;
-  color: #fff;
-  background: none;
-  -webkit-text-fill-color: #fff;
-  filter: none;
-  text-shadow: 2px 2px 0 #000;
 }.home-discord-promo__flash-stat-num.is-grown {
   animation: home-discord-stat-pop 0.45s ease-out both;
-}.home-discord-promo__flash-stat-num.is-grown,
-.home-discord-promo__flash-stat-num.is-grown .discord-member-count,
-.home-discord-promo__flash-stat.is-grown .home-discord-promo__flash-stat-label {
-  background-image: linear-gradient(
-    165deg,
-    #fff0b0 0%,
-    #f0d060 28%,
-    #d4a824 55%,
-    #e8c44a 78%,
-    #ffe08a 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  text-shadow: none;
-  filter:
-    drop-shadow(-1.25px 0 0 #000)
-    drop-shadow(1.25px 0 0 #000)
-    drop-shadow(0 -1.25px 0 #000)
-    drop-shadow(0 1.25px 0 #000);
-}
-.home-discord-promo__flash-stat.is-grown .home-discord-promo__flash-stat-label {
-  filter:
-    drop-shadow(-1px 0 0 #000)
-    drop-shadow(1px 0 0 #000)
-    drop-shadow(0 -1px 0 #000)
-    drop-shadow(0 1px 0 #000);
 }@keyframes home-discord-stat-count {
   0% { transform: scale(0.72); opacity: 0.55; }
   100% { transform: scale(1); opacity: 1; }
@@ -3521,11 +3488,7 @@ background-attachment: fixed;
   40% { transform: scale(1.18); }
   100% { transform: scale(1); }
 }.home-discord-promo__flash-stat-num .discord-member-count {
-  color: inherit;
-  -webkit-text-fill-color: inherit;
-  background: inherit;
-  -webkit-background-clip: inherit;
-  background-clip: inherit;
+  color: #fff;
 }.home-discord-promo__flash-stat-label {
   font-size: 0.75rem;
   font-weight: 800;
@@ -3702,6 +3665,10 @@ background-attachment: fixed;
 .home-stats-strip--rail .home-stats-strip__icon {
   width: 14px;
   height: 14px;
+}
+.home-stats-strip--rail .home-stats-strip__icon--items {
+  width: 15px;
+  height: 15px;
 }
 .home-stats-strip--rail .home-stats-strip__rule {
   height: 44px;
