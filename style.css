@@ -281,10 +281,23 @@ background-attachment: fixed;
   opacity: 0.92;
   filter: drop-shadow(1px 1px 0 #000);
 }
+.sections-nav .nav-section-icon--lg {
+  width: 26px;
+  height: 26px;
+  margin-right: 2px;
+}
 .sections-nav .nav-section-icon__svg {
   display: block;
   width: 18px;
   height: 18px;
+}
+.sections-nav .nav-section-icon__svg--lg {
+  width: 22px;
+  height: 22px;
+}
+#sections-nav button.nav-live-trading,
+#sections-nav button[data-section="Live Trading"] {
+  gap: 12px;
 }
 .sections-nav .nav-section-label {
   flex: 1 1 auto;

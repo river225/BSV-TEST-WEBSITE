@@ -4267,25 +4267,32 @@ function getSectionNavIconSvg(name) {
     Legendary:
       '<path d="M5 9.5 7.5 7l2.2 2.2L12 5.5l2.3 3.7L16.5 7 19 9.5l-1 8H6z"/><path d="M8 17.5h8"/>',
     Omega:
-      '<path d="M7.5 8.5A5.5 5.5 0 0 1 17 12c0 3.2-2.2 5.5-5 5.5S7 15.2 7 12"/><path d="M7.5 17.5 5 20h5"/><path d="M16.5 17.5 19 20h-5"/>',
+      '<path d="M12 3.5 19 8v8l-7 4.5L5 16V8z"/><path d="M12 8v8"/><path d="M8.8 10.2 12 12l3.2-1.8"/>',
     Misc:
       '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
     Vehicles:
       '<path d="M4 14h16l-1.4-4.2A2 2 0 0 0 16.7 8H7.3a2 2 0 0 0-1.9 1.8z"/><path d="M6.5 17.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path d="M17.5 17.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path d="M8 14.5h8"/>',
     "Live Trading":
-      '<path d="M7 8h9.5l-2.2-2.2"/><path d="M17 16H7.5l2.2 2.2"/><path d="M16.5 8v2.5A3.5 3.5 0 0 1 13 14H7"/><path d="M7.5 16v-2.5A3.5 3.5 0 0 1 11 10h6"/>',
+      '<path d="M5.5 8h11l-2.5-2.5"/><path d="M18.5 16h-11l2.5 2.5"/><path d="M16.5 8v3A3.5 3.5 0 0 1 13 14.5H5.5"/><path d="M7.5 16v-3A3.5 3.5 0 0 1 11 9.5h7.5"/>',
     "Money & Game Guide":
       '<path d="M6 5.5h9.5A2.5 2.5 0 0 1 18 8v11.5H8A2 2 0 0 1 6 17.5z"/><path d="M6 5.5V17.5"/><path d="M10 10h5M10 13.5h4"/>',
     "Untradeable Items":
       '<rect x="6" y="10" width="12" height="9" rx="1.5"/><path d="M8.5 10V8a3.5 3.5 0 0 1 7 0v2"/><path d="M12 13.5v2.5"/>',
     "Richest Players":
-      '<path d="M7 9.5h10v2.2c0 2.4-1.8 4.3-4.2 4.8L12 20l-.8-3.5C8.8 16 7 14.1 7 11.7z"/><path d="M9 9.5V7.8A3 3 0 0 1 12 5a3 3 0 0 1 3 2.8v1.7"/>',
+      '<path d="M12 4v16"/><path d="M16 8c0-1.8-1.8-3-4-3s-4 1.2-4 3 1.6 2.6 4 3.2 4 1.5 4 3.3-1.8 3.5-4 3.5-4-1.3-4-3.2"/>',
     "Crew Logos":
       '<circle cx="9" cy="9" r="2.4"/><circle cx="16" cy="10" r="2.1"/><path d="M4.8 17.5c.6-2.2 2.4-3.5 4.2-3.5s3.6 1.3 4.2 3.5"/><path d="M13.2 17.5c.4-1.4 1.5-2.4 2.8-2.4 1.2 0 2.2.8 2.7 2"/>'
   };
   var inner = paths[name] || paths.Misc;
+  var sizeClass =
+    name === "Live Trading" || name === "Crew Logos" ? " nav-section-icon__svg--lg" : "";
+  var stroke = name === "Live Trading" || name === "Crew Logos" ? "1.85" : "1.9";
   return (
-    '<svg class="nav-section-icon__svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<svg class="nav-section-icon__svg' +
+      sizeClass +
+      '" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="' +
+      stroke +
+      '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
       inner +
     "</svg>"
   );
@@ -4317,6 +4324,9 @@ function initSectionsNav() {
 
     var icon = document.createElement("span");
     icon.className = "nav-section-icon";
+    if (name === "Live Trading" || name === "Crew Logos") {
+      icon.classList.add("nav-section-icon--lg");
+    }
     icon.setAttribute("aria-hidden", "true");
     icon.innerHTML = getSectionNavIconSvg(name);
     btn.appendChild(icon);
