@@ -3591,7 +3591,7 @@ background-attachment: fixed;
 .home-hero-top {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(300px, 1fr);
-  align-items: start;
+  align-items: stretch;
   gap: 20px 36px;
   width: 100%;
 }
@@ -3617,10 +3617,11 @@ background-attachment: fixed;
   width: 100%;
   max-width: 480px;
   justify-self: end;
-  align-self: start;
+  align-self: stretch;
   /* Drop past Discord logo so Items tracked lines up with "Join Our Discord Server" */
   padding-top: 58px;
-  padding-bottom: 0;
+  /* Match Discord promo inner bottom padding so Recent Changes lines up with Join/Learn */
+  padding-bottom: 18px;
   box-sizing: border-box;
 }
 .home-right-rail {
@@ -3670,7 +3671,7 @@ background-attachment: fixed;
 }
 .home-hero-top__stats .home-changes-strip {
   max-width: none;
-  margin: 0;
+  margin: auto 0 0;
   text-align: center;
 }
 .home-hero-top__stats .home-changes-strip__heading {
@@ -3709,7 +3710,7 @@ background-attachment: fixed;
   text-shadow: none;
 }
 .home-stats-strip__value.is-grown {
-  color: #ffd34d;
+  color: #ffe566;
   text-shadow:
     -1.5px -1.5px 0 #000,
      1.5px -1.5px 0 #000,
@@ -3722,8 +3723,28 @@ background-attachment: fixed;
     -2px 0 0 #000,
      2px 0 0 #000,
      0 -2px 0 #000,
-     0  2px 0 #000;
-  animation: home-discord-stat-pop 0.45s ease-out both;
+     0  2px 0 #000,
+     0 0 6px rgba(255, 220, 90, 0.95),
+     0 0 14px rgba(255, 190, 40, 0.7),
+     0 0 22px rgba(255, 170, 0, 0.4),
+     0 1px 0 rgba(255, 248, 200, 0.9);
+  animation:
+    home-discord-stat-pop 0.45s ease-out both,
+    home-stat-gold-shine 2.6s ease-in-out infinite;
+}
+@keyframes home-stat-gold-shine {
+  0%, 100% {
+    color: #ffd034;
+    filter: brightness(1) saturate(1.05);
+  }
+  40% {
+    color: #fff3a8;
+    filter: brightness(1.22) saturate(1.2);
+  }
+  70% {
+    color: #ffcc33;
+    filter: brightness(1.08) saturate(1.12);
+  }
 }
 .home-stats-strip__label {
   display: inline-flex;

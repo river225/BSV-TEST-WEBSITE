@@ -557,11 +557,12 @@ function mountHomeSiteStats() {
 
 function homeStatsLabelIcon(kind) {
   if (kind === "items") {
-    // Diamond / gem (matches jbvalues-style items mark)
+    // Stacked cards / inventory stack
     return (
       '<svg class="home-stats-strip__icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false">' +
-        '<path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M6.2 9.2 12 3.8l5.8 5.4L12 20.2 6.2 9.2z"/>' +
-        '<path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M6.2 9.2h11.6M9.1 9.2 12 20.2l2.9-11"/>' +
+        '<rect x="5" y="8" width="12" height="12" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.7"/>' +
+        '<path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M8 5.8h10.2a2 2 0 0 1 2 2V16"/>' +
+        '<path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M8.8 12.2h4.6M8.8 15.2h6.2"/>' +
       "</svg>"
     );
   }
@@ -575,10 +576,11 @@ function homeStatsLabelIcon(kind) {
       "</svg>"
     );
   }
-  // Total changes — activity / pulse
+  // Total changes — circular history / refresh arrows
   return (
     '<svg class="home-stats-strip__icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false">' +
-      '<path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M4 13h3.2l2.2-5.5L13.2 18l2.4-5H20"/>' +
+      '<path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M20 6.5v4.2h-4.2"/>' +
+      '<path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M19.1 10.6A7.2 7.2 0 1 0 18 16.2"/>' +
     "</svg>"
   );
 }
