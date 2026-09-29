@@ -521,7 +521,7 @@ function buildHomeChangesStripHtml(listId) {
       "</div>" +
       '<button type="button" class="home-changes-changelog-link" id="home-changelog-open" data-changelog-open>' +
         '<span>' + escapeHtml(i18n("home.readFullChangelog")) + "</span>" +
-        '<svg class="home-changes-changelog-link__icon" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true" focusable="false">' +
+        '<svg class="home-changes-changelog-link__icon" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true" focusable="false">' +
           '<path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M9 5h10M9 12h10M9 19h10M5 5h.01M5 12h.01M5 19h.01"/>' +
         "</svg>" +
       "</button>" +
@@ -830,21 +830,58 @@ function filterValueChangeRows(rows) {
   });
 }
 
-/** Measured from Sheets Version history (cell-level edits); override via Website Configs Title "Cell Edits". */
-var HOME_STATS_CELL_EDITS_FALLBACK = 239;
+/**
+ * Spreadsheet Version history cell-level edits (legitimately thousands over the sheet's life).
+ * Override via Website Configs Title: "Cell Edits" / "Total Cell Edits" / "Spreadsheet Edits".
+ * Full "Total changes" override: Title "Total Changes".
+ */
+var HOME_STATS_CELL_EDITS_FALLBACK = 3184;
 
-function resolveCellEditsCount(rows) {
+var homeStatsTrackedItems = 0;
+var homeStatsChangeRows = null;
+
+function resolveNamedConfigCount(rows, names) {
+  var wanted = {};
+  (names || []).forEach(function (n) {
+    wanted[String(n).toLowerCase()] = true;
+  });
   var list = rows || [];
   for (var i = 0; i < list.length; i++) {
     var name = String((list[i] && (list[i].Title || list[i].Name)) || "")
       .trim()
       .toLowerCase();
-    if (name !== "cell edits" && name !== "total cell edits" && name !== "spreadsheet edits") continue;
+    if (!wanted[name]) continue;
     var raw = String((list[i] && (list[i].Text || list[i].Date)) || "").replace(/,/g, "").trim();
     var n = parseInt(raw, 10);
     if (!isNaN(n) && n > 0) return n;
   }
+  return null;
+}
+
+function resolveCellEditsCount(rows) {
+  var n = resolveNamedConfigCount(rows, [
+    "cell edits",
+    "total cell edits",
+    "spreadsheet edits"
+  ]);
+  // Ignore stale sub-thousand measurements (old ~239 Version history sample).
+  if (n != null && n >= 1000) return n;
   return HOME_STATS_CELL_EDITS_FALLBACK;
+}
+
+/** Total changes = sheet cell edits + changelog events + every tracked item (each was added). */
+function computeHomeTotalChanges(rows, trackedItems) {
+  var override = resolveNamedConfigCount(rows, ["total changes", "total edits"]);
+  if (override != null) return override;
+  var cellEdits = resolveCellEditsCount(rows);
+  var changelogEvents = countValueChangesFromRows(rows);
+  var items = typeof trackedItems === "number" && trackedItems > 0 ? trackedItems : 0;
+  return cellEdits + changelogEvents + items;
+}
+
+function publishTotalChangesStat(animate) {
+  var total = computeHomeTotalChanges(homeStatsChangeRows || [], homeStatsTrackedItems);
+  setHomeStatValue("changes", total, Boolean(animate));
 }
 
 /** Count individual spreadsheet changelog rows (adds, removes, value/demand edits, etc.). */
@@ -938,7 +975,9 @@ async function updateHomeSiteStatsFromResults(results) {
   } catch (err) {
     console.warn("Failed to load guide item counts for home stats:", err);
   }
+  homeStatsTrackedItems = total;
   setHomeStatValue("items", total, true);
+  publishTotalChangesStat(true);
   applyCachedHomeStatValues(document);
 }
 
@@ -5788,7 +5827,8 @@ async function loadValueChanges() {
   }
   try {
     var rows = await fetchSheet("Website Configs");
-    setHomeStatValue("changes", resolveCellEditsCount(rows || []), true);
+    homeStatsChangeRows = rows || [];
+    publishTotalChangesStat(true);
     applyCachedHomeStatValues(document);
     if (!listEl && !homeMainListEl) return;
     if (!rows || rows.length === 0) {
