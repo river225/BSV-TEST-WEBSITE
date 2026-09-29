@@ -3455,11 +3455,16 @@ background-attachment: fixed;
   display: block;
 }.home-discord-promo__flash-title {
   margin: 0;
-  font-size: clamp(1.35rem, 3vw, 1.7rem);
+  font-size: clamp(1.55rem, 3.4vw, 2rem);
   font-weight: 800;
   line-height: 1.15;
   color: #ffffff;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  text-shadow:
+    -1.5px -1.5px 0 #000,
+    1.5px -1.5px 0 #000,
+    -1.5px 1.5px 0 #000,
+    1.5px 1.5px 0 #000,
+    0 2px 8px rgba(0, 0, 0, 0.35);
 }.home-discord-promo__flash-hook {
   margin: 0;
   font-size: clamp(0.95rem, 2.1vw, 1.05rem);
@@ -3726,7 +3731,7 @@ background-attachment: fixed;
   justify-self: end;
   align-self: stretch;
   /* Drop past Discord logo / traders pill so Items tracked sits a bit lower */
-  padding-top: 74px;
+  padding-top: 108px;
   /* Match Discord promo inner bottom padding so Recent Changes lines up with Join/Learn */
   padding-bottom: 18px;
   box-sizing: border-box;
@@ -3795,6 +3800,7 @@ background-attachment: fixed;
   width: 100%;
   padding: 0;
   margin: 0 0 10px;
+  font-size: 1.12rem;
 }
 .home-changes-changelog-link {
   display: inline-flex;
@@ -4101,12 +4107,17 @@ body.home-changelog-open {
 .home-changes-strip__heading {
   margin: 0 0 8px;
   padding: 0 2px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #7dd3fc;
   text-align: center;
+  text-shadow:
+    -1.25px -1.25px 0 #000,
+    1.25px -1.25px 0 #000,
+    -1.25px 1.25px 0 #000,
+    1.25px 1.25px 0 #000;
 }
 .home-changes-strip__viewport {
   overflow-x: auto;
