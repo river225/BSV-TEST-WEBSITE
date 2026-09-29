@@ -517,19 +517,21 @@ function mountHomeDiscordPromo() {
   if (!slot) return;
   slot.outerHTML =
     '<div class="home-hero-stack">' +
-      '<div class="home-hero-row">' +
-        '<div class="home-hero-row__banner">' +
+      '<div class="home-hero-top">' +
+        '<div class="home-hero-top__left">' +
+          '<div id="home-site-stats-slot"></div>' +
+          '<aside class="home-changes-strip" aria-label="' + escapeHtml(i18n("home.recentChanges")) + '">' +
+            '<p class="home-changes-strip__heading">' + escapeHtml(i18n("home.recentChanges")) + "</p>" +
+            '<div class="home-changes-strip__viewport" id="home-main-value-changes-list">' +
+              '<div class="value-changes-loading" data-i18n="loading.changes">' + escapeHtml(i18n("loading.changes")) + "</div>" +
+            "</div>" +
+          "</aside>" +
+        "</div>" +
+        '<div class="home-hero-top__right">' +
           buildDiscordPromoBannerHtml(false) +
         "</div>" +
       "</div>" +
       buildHomeLiveTradingBarHtml() +
-      '<div id="home-site-stats-slot"></div>' +
-      '<aside class="home-changes-strip" aria-label="' + escapeHtml(i18n("home.recentChanges")) + '">' +
-        '<p class="home-changes-strip__heading">' + escapeHtml(i18n("home.recentChanges")) + "</p>" +
-        '<div class="home-changes-strip__viewport" id="home-main-value-changes-list">' +
-          '<div class="value-changes-loading" data-i18n="loading.changes">' + escapeHtml(i18n("loading.changes")) + "</div>" +
-        "</div>" +
-      "</aside>" +
     "</div>";
   mountHomeSiteStats();
 }
