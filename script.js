@@ -594,7 +594,7 @@ function buildHomeFeatureShowcaseHtml() {
             'You can also use our middleman service in ' +
             '<a class="home-feature-showcase__link" href="' +
             discordInvite +
-            '" target="_blank" rel="noopener noreferrer">Our Discord Server</a> to keep trades scam free.' +
+            '" target="_blank" rel="noopener noreferrer">Our Discord Server</a> to keep trades safe.' +
           "</p>" +
           '<ul class="home-feature-showcase__bullets">' +
             "<li>Easy to use</li>" +
