@@ -3435,16 +3435,24 @@ background-attachment: fixed;
   box-shadow: none;
   box-sizing: border-box;
 }.home-discord-promo__flash-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 76px;
   height: 76px;
   padding: 0;
   border-radius: 0;
-  background: none;
-  border: 0;
-  box-shadow: none;
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
   object-fit: contain;
   animation: none;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.4));
+}
+.home-discord-promo__flash-logo svg {
+  width: 76px;
+  height: 76px;
+  display: block;
 }.home-discord-promo__flash-title {
   margin: 0;
   font-size: clamp(1.35rem, 3vw, 1.7rem);
@@ -3585,8 +3593,8 @@ background-attachment: fixed;
 }.home-discord-promo--home .home-discord-promo__btn {
   flex: 1 1 0;
   min-width: 0;
-  padding: 14px 16px;
-  font-size: 1.08rem;
+  padding: 15px 18px;
+  font-size: 1.18rem;
   font-weight: 800;
   letter-spacing: 0.01em;
   border-width: 2px;
@@ -3599,8 +3607,8 @@ background-attachment: fixed;
   filter: brightness(1.06);
 }.home-discord-promo__btn--flash-join {
   flex: 1.35 1 0 !important;
-  padding: 14px 16px !important;
-  font-size: 1.1rem !important;
+  padding: 15px 18px !important;
+  font-size: 1.2rem !important;
   border-radius: 12px !important;
   border: 2px solid #000 !important;
   box-shadow: 0 3px 0 #000 !important;
@@ -15941,9 +15949,13 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     height: 56px;
     padding: 0;
     border-radius: 0;
-    background: none;
-    border: 0;
-    box-shadow: none;
+    background: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+  .home-discord-promo__flash-logo svg {
+    width: 56px;
+    height: 56px;
   }
 
   .home-discord-promo__flash-title {
