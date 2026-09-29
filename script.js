@@ -5381,13 +5381,19 @@ var homeChangesAutoScrollState = null;
 
 function stopHomeChangesStripAutoScroll() {
   if (!homeChangesAutoScrollState) return;
-  if (homeChangesAutoScrollState.raf) cancelAnimationFrame(homeChangesAutoScrollState.raf);
-  if (homeChangesAutoScrollState.retryTimer) clearTimeout(homeChangesAutoScrollState.retryTimer);
-  var vp = homeChangesAutoScrollState.viewport;
-  if (vp && homeChangesAutoScrollState.onInteract) {
-    ["wheel", "pointerdown", "touchstart", "keydown"].forEach(function (type) {
-      vp.removeEventListener(type, homeChangesAutoScrollState.onInteract);
+  var state = homeChangesAutoScrollState;
+  if (state.raf) cancelAnimationFrame(state.raf);
+  if (state.retryTimer) clearTimeout(state.retryTimer);
+  var vp = state.viewport;
+  var list = state.list;
+  if (vp && state.handlers) {
+    Object.keys(state.handlers).forEach(function (type) {
+      vp.removeEventListener(type, state.handlers[type]);
     });
+  }
+  if (list) {
+    list.style.transform = "";
+    list.classList.remove("is-marquee");
   }
   if (vp) vp.classList.remove("is-auto-scrolling");
   homeChangesAutoScrollState = null;
@@ -5396,7 +5402,6 @@ function stopHomeChangesStripAutoScroll() {
 function initHomeChangesStripAutoScroll(viewport, attempt) {
   attempt = attempt || 0;
   if (!viewport || !viewport.isConnected) return;
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
   var list = viewport.querySelector(".home-changes-strip__list");
   if (!list || list.children.length < 2) {
@@ -5411,7 +5416,7 @@ function initHomeChangesStripAutoScroll(viewport, attempt) {
     return;
   }
 
-  // Ensure a duplicated sequence exists for a seamless rightward loop.
+  // Duplicate once for a seamless loop (transform-based; works on iOS/Safari).
   if (list.dataset.autoDup !== "1") {
     var originalCount = list.children.length;
     var clone = list.cloneNode(true);
@@ -5420,8 +5425,9 @@ function initHomeChangesStripAutoScroll(viewport, attempt) {
     list.dataset.autoDupCount = String(originalCount);
   }
 
-  // Wait until layout has real overflow (fonts / flex can be late).
-  if (viewport.scrollWidth <= viewport.clientWidth + 8) {
+  // Need laid-out width before measuring loop distance.
+  var loopAt = list.scrollWidth / 2;
+  if (!(loopAt > viewport.clientWidth + 8)) {
     if (attempt < 12) {
       homeChangesAutoScrollState = {
         viewport: viewport,
@@ -5436,22 +5442,90 @@ function initHomeChangesStripAutoScroll(viewport, attempt) {
   stopHomeChangesStripAutoScroll();
 
   viewport.classList.add("is-auto-scrolling");
-  try {
-    viewport.scrollLeft = 0;
-  } catch (e) {}
+  list.classList.add("is-marquee");
+  viewport.scrollLeft = 0;
 
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var speed = reduceMotion ? 28 : 56; // px / second
+  var offset = 0;
   var pauseUntil = 0;
   var lastTs = 0;
-  var speed = 56; // px / second — readable but clearly moving
-  var scrollingProgrammatically = false;
+  var dragging = false;
+  var dragStartX = 0;
+  var dragStartOffset = 0;
 
-  function onInteract() {
-    pauseUntil = performance.now() + 1800;
+  function applyOffset() {
+    if (offset < 0) offset = ((offset % loopAt) + loopAt) % loopAt;
+    if (offset >= loopAt) offset = offset % loopAt;
+    list.style.transform = "translate3d(" + (-offset) + "px,0,0)";
+    // Keep native scrollbar thumb roughly in sync for manual scrubbing.
+    try {
+      viewport.scrollLeft = offset;
+    } catch (e) {}
   }
 
-  ["wheel", "pointerdown", "touchstart", "keydown"].forEach(function (type) {
-    viewport.addEventListener(type, onInteract, { passive: true });
-  });
+  function pauseFor(ms) {
+    pauseUntil = performance.now() + ms;
+  }
+
+  function onPointerDown(e) {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    dragging = true;
+    dragStartX = e.clientX;
+    dragStartOffset = offset;
+    pauseFor(999999);
+    try {
+      viewport.setPointerCapture(e.pointerId);
+    } catch (err) {}
+  }
+
+  function onPointerMove(e) {
+    if (!dragging) return;
+    offset = dragStartOffset - (e.clientX - dragStartX);
+    applyOffset();
+  }
+
+  function onPointerUp() {
+    if (!dragging) return;
+    dragging = false;
+    pauseFor(1800);
+  }
+
+  function onWheel(e) {
+    // Convert vertical/horizontal wheel into horizontal scrub.
+    var dx = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    if (!dx) return;
+    offset += dx;
+    applyOffset();
+    pauseFor(1800);
+  }
+
+  function onScroll() {
+    // User dragged the native scrollbar.
+    if (dragging) return;
+    if (Math.abs(viewport.scrollLeft - offset) < 1) return;
+    offset = viewport.scrollLeft;
+    if (offset >= loopAt) offset = offset % loopAt;
+    list.style.transform = "translate3d(" + (-offset) + "px,0,0)";
+    pauseFor(1800);
+  }
+
+  var handlers = {
+    pointerdown: onPointerDown,
+    pointermove: onPointerMove,
+    pointerup: onPointerUp,
+    pointercancel: onPointerUp,
+    wheel: onWheel,
+    scroll: onScroll
+  };
+  viewport.addEventListener("pointerdown", onPointerDown, { passive: true });
+  viewport.addEventListener("pointermove", onPointerMove, { passive: true });
+  viewport.addEventListener("pointerup", onPointerUp, { passive: true });
+  viewport.addEventListener("pointercancel", onPointerUp, { passive: true });
+  viewport.addEventListener("wheel", onWheel, { passive: true });
+  viewport.addEventListener("scroll", onScroll, { passive: true });
+
+  applyOffset();
 
   function tick(ts) {
     var state = homeChangesAutoScrollState;
@@ -5466,7 +5540,7 @@ function initHomeChangesStripAutoScroll(viewport, attempt) {
       lastTs = ts;
       return;
     }
-    if (ts < pauseUntil) {
+    if (dragging || ts < pauseUntil) {
       lastTs = ts;
       return;
     }
@@ -5475,28 +5549,21 @@ function initHomeChangesStripAutoScroll(viewport, attempt) {
     var dt = Math.min(48, ts - lastTs);
     lastTs = ts;
 
-    var loopAt = list.scrollWidth / 2;
+    // Re-measure in case fonts/layout shifted.
+    loopAt = list.scrollWidth / 2;
     if (!(loopAt > viewport.clientWidth)) return;
 
-    scrollingProgrammatically = true;
-    var next = viewport.scrollLeft + (speed * dt) / 1000;
-    if (next >= loopAt) next -= loopAt;
-    viewport.scrollLeft = next;
-    // Allow the browser to apply scroll before clearing the flag.
-    requestAnimationFrame(function () {
-      scrollingProgrammatically = false;
-    });
+    offset += (speed * dt) / 1000;
+    applyOffset();
   }
 
   homeChangesAutoScrollState = {
     viewport: viewport,
-    onInteract: onInteract,
+    list: list,
+    handlers: handlers,
     raf: requestAnimationFrame(tick),
     retryTimer: 0
   };
-
-  // Keep a no-op reference so linters/minifiers don't drop the flag.
-  void scrollingProgrammatically;
 }
 
 async function loadValueChanges() {

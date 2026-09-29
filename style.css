@@ -3767,6 +3767,18 @@ background-attachment: fixed;
   scroll-snap-type: none !important;
   scroll-behavior: auto !important;
   overflow-x: scroll;
+  /* mask-image breaks programmatic motion on some Safari / iOS WebKits */
+  mask-image: none;
+  -webkit-mask-image: none;
+  touch-action: pan-x;
+  cursor: grab;
+}
+.home-changes-strip__viewport.is-auto-scrolling:active {
+  cursor: grabbing;
+}
+.home-changes-strip__viewport.is-auto-scrolling .home-changes-strip__list.is-marquee {
+  will-change: transform;
+  backface-visibility: hidden;
 }
 .home-changes-strip__viewport::-webkit-scrollbar {
   height: 4px;
