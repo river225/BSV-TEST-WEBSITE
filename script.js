@@ -612,35 +612,38 @@ function buildHomeFeatureShowcaseHtml() {
 
 function buildHomeExtraBannersHtml() {
   return (
-    '<div class="home-extra-banners" aria-label="More sections">' +
-      '<button type="button" class="home-extra-banner home-extra-banner--guide" data-home-feature-section="Money & Game Guide">' +
-        '<span class="home-extra-banner__glow" aria-hidden="true"></span>' +
-        '<span class="home-extra-banner__icon" aria-hidden="true">' +
-          '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-            '<path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>' +
-          "</svg>" +
-        "</span>" +
-        '<span class="home-extra-banner__body">' +
-          '<span class="home-extra-banner__eyebrow">Guides</span>' +
-          '<span class="home-extra-banner__title">Money & Game Guide</span>' +
-          '<span class="home-extra-banner__text">Fishing, farming, and the best ways to make cash in BlockSpin.</span>' +
-        "</span>" +
-        '<span class="home-extra-banner__cta" aria-hidden="true">Open <span>→</span></span>' +
-      "</button>" +
-      '<button type="button" class="home-extra-banner home-extra-banner--richest" data-home-feature-section="Richest Players">' +
-        '<span class="home-extra-banner__glow" aria-hidden="true"></span>' +
-        '<span class="home-extra-banner__icon" aria-hidden="true">' +
-          '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-            '<path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10l-1 7a4 4 0 0 1-8 0L7 4z"/><path d="M5 4h14"/>' +
-          "</svg>" +
-        "</span>" +
-        '<span class="home-extra-banner__body">' +
-          '<span class="home-extra-banner__eyebrow">Leaderboard</span>' +
-          '<span class="home-extra-banner__title">Richest Players</span>' +
-          '<span class="home-extra-banner__text">See who tops the BlockSpin net worth list and where you rank.</span>' +
-        "</span>" +
-        '<span class="home-extra-banner__cta" aria-hidden="true">Open <span>→</span></span>' +
-      "</button>" +
+    '<div class="home-extra-banners-wrap" aria-label="More sections">' +
+      '<h2 class="home-extra-banners__heading">And More...</h2>' +
+      '<div class="home-extra-banners">' +
+        '<button type="button" class="home-extra-banner home-extra-banner--guide" data-home-feature-section="Money & Game Guide">' +
+          '<span class="home-extra-banner__glow" aria-hidden="true"></span>' +
+          '<span class="home-extra-banner__icon" aria-hidden="true">' +
+            '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+              '<path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>' +
+            "</svg>" +
+          "</span>" +
+          '<span class="home-extra-banner__body">' +
+            '<span class="home-extra-banner__eyebrow">Guides</span>' +
+            '<span class="home-extra-banner__title">Money & Game Guide</span>' +
+            '<span class="home-extra-banner__text">Fishing, farming, and the best ways to make cash in BlockSpin.</span>' +
+          "</span>" +
+          '<span class="home-extra-banner__cta" aria-hidden="true">Open <span>→</span></span>' +
+        "</button>" +
+        '<button type="button" class="home-extra-banner home-extra-banner--richest" data-home-feature-section="Richest Players">' +
+          '<span class="home-extra-banner__glow" aria-hidden="true"></span>' +
+          '<span class="home-extra-banner__icon" aria-hidden="true">' +
+            '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+              '<path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10l-1 7a4 4 0 0 1-8 0L7 4z"/><path d="M5 4h14"/>' +
+            "</svg>" +
+          "</span>" +
+          '<span class="home-extra-banner__body">' +
+            '<span class="home-extra-banner__eyebrow">Leaderboard</span>' +
+            '<span class="home-extra-banner__title">Richest Players</span>' +
+            '<span class="home-extra-banner__text">See who tops the BlockSpin net worth list and where you rank.</span>' +
+          "</span>" +
+          '<span class="home-extra-banner__cta" aria-hidden="true">Open <span>→</span></span>' +
+        "</button>" +
+      "</div>" +
     "</div>"
   );
 }

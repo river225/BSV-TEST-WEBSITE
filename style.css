@@ -4438,12 +4438,34 @@ body.home-changelog-open {
   pointer-events: none;
   user-select: none;
 }
+.home-extra-banners-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+  width: 100%;
+  margin-top: clamp(14px, 2.4vw, 26px);
+}
+.home-extra-banners__heading {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(1.35rem, 2.6vw, 1.75rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  color: #fff;
+  text-shadow:
+    -1.5px -1.5px 0 #000,
+    1.5px -1.5px 0 #000,
+    -1.5px 1.5px 0 #000,
+    1.5px 1.5px 0 #000;
+}
 .home-extra-banners {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
   width: 100%;
-  margin-top: clamp(10px, 2vw, 20px);
+  margin: 0;
 }
 .home-extra-banner {
   position: relative;
@@ -4465,10 +4487,10 @@ body.home-changelog-open {
   font: inherit;
   transition: filter 0.15s ease, transform 0.15s ease;
   box-sizing: border-box;
-  background: hsl(var(--bsv-hue) var(--bsv-s-raised) 13%);
+  background: #152a4a;
 }
 .home-extra-banner:hover {
-  filter: brightness(1.05);
+  filter: brightness(1.08);
   transform: translateY(-2px);
 }
 .home-extra-banner:active {
@@ -4477,11 +4499,9 @@ body.home-changelog-open {
 .home-extra-banner__glow {
   display: none;
 }
-.home-extra-banner--guide {
-  background: hsl(152 22% 13%);
-}
+.home-extra-banner--guide,
 .home-extra-banner--richest {
-  background: hsl(42 28% 13%);
+  background: #152a4a;
 }
 .home-extra-banner__icon {
   position: relative;
@@ -4493,25 +4513,19 @@ body.home-changelog-open {
   width: 56px;
   height: 56px;
   border-radius: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.92);
+  border: 2px solid rgba(125, 211, 252, 0.28);
+  background: rgba(56, 189, 248, 0.12);
+  color: #bae6fd;
 }
-.home-extra-banner--guide .home-extra-banner__icon {
-  color: #a7f3d0;
-  background: rgba(52, 211, 153, 0.12);
-  border-color: rgba(52, 211, 153, 0.28);
-}
+.home-extra-banner--guide .home-extra-banner__icon,
 .home-extra-banner--richest .home-extra-banner__icon {
-  color: #fde68a;
-  background: rgba(251, 191, 36, 0.12);
-  border-color: rgba(251, 191, 36, 0.28);
+  color: #bae6fd;
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(125, 211, 252, 0.28);
 }
-.home-extra-banner--guide .home-extra-banner__eyebrow {
-  color: #6ee7b7;
-}
+.home-extra-banner--guide .home-extra-banner__eyebrow,
 .home-extra-banner--richest .home-extra-banner__eyebrow {
-  color: #fbbf24;
+  color: #7dd3fc;
 }
 .home-extra-banner__body {
   position: relative;
