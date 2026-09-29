@@ -578,10 +578,13 @@
       var btn = document.createElement("button");
       btn.type = "button";
       btn.dataset.section = cfg.title;
+      if (typeof appendSectionNavIcon === "function") {
+        appendSectionNavIcon(btn, cfg.title);
+      }
       if (cfg.id === "live-trading") {
         btn.classList.add("nav-live-trading", "active");
         var ltLabel = document.createElement("span");
-        ltLabel.className = "nav-live-trading__label";
+        ltLabel.className = "nav-section-label nav-live-trading__label";
         ltLabel.textContent = i18nSection(cfg.title);
         var ltNew = document.createElement("span");
         ltNew.className = "nav-live-trading__new";
@@ -590,7 +593,10 @@
         btn.appendChild(ltLabel);
         btn.appendChild(ltNew);
       } else {
-        btn.textContent = i18nSection(cfg.title);
+        var label = document.createElement("span");
+        label.className = "nav-section-label";
+        label.textContent = i18nSection(cfg.title);
+        btn.appendChild(label);
       }
       btn.addEventListener("click", function () {
         closeSectionsMenu();

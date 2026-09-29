@@ -4430,7 +4430,7 @@ body.home-changelog-open {
   width: 56px;
   height: 20px;
   right: 3px;
-  bottom: 3px;
+  bottom: 7px;
 }
 .home-changes-strip__media.is-empty {
   background:
@@ -4500,7 +4500,7 @@ body.home-changelog-open {
   content: '';
   position: absolute;
   right: 2px;
-  bottom: 2px;
+  bottom: 6px;
   left: auto;
   top: auto;
   width: 42px;
@@ -6568,8 +6568,9 @@ body.home-changelog-open {
   flex-wrap: wrap;
   justify-content: flex-start;
   gap: 14px;
-  width: 100%;
-  margin-bottom: 28px;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto 28px;
 }.money-game-guide-section .guide-vcard {
   flex: 0 0 auto;
   width: 168px;
@@ -16261,6 +16262,9 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
     justify-content: stretch;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
     padding: 0 4px;
     box-sizing: border-box;
   }
