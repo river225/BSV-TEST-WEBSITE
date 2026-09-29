@@ -19,7 +19,7 @@
 
 <script>
 /* Asset build id (no auto-reload). Bump via tools/bump-build.py */
-window.BSV_BUILD = "20260929-discord-learn-revamp";
+window.BSV_BUILD = "20260929-discord-learn-flatten";
 </script>
 
 <meta charset="UTF-8">
@@ -65,7 +65,7 @@ window.BSV_BUILD = "20260929-discord-learn-revamp";
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="style.css?v=20260929-discord-learn-revamp">
+<link rel="stylesheet" href="style.css?v=20260929-discord-learn-flatten">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -86,10 +86,11 @@ window.BSV_BUILD = "20260929-discord-learn-revamp";
 <div id="bsv-site-header"></div>
 
 <main class="discord-learn">
+  <div class="discord-learn__page-bg" aria-hidden="true"></div>
+
   <a class="discord-learn__back" href="index.html" id="discord-learn-back">← Back to Home</a>
 
   <section class="discord-learn__hero" aria-labelledby="discord-learn-title">
-    <div class="discord-learn__hero-bg" aria-hidden="true"></div>
     <div class="discord-learn__hero-inner">
       <span class="discord-learn__logo" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="72" height="72" focusable="false">
@@ -98,19 +99,19 @@ window.BSV_BUILD = "20260929-discord-learn-revamp";
       </span>
       <p class="discord-learn__eyebrow">BlockSpin Values</p>
       <h1 id="discord-learn-title">Join Our Discord Server</h1>
-      <p class="discord-learn__lead">Trade smarter. Never get scammed. Live values, free middleman service, daily item prizes, and thousands of active traders.</p>
+      <p class="discord-learn__lead">Live values, free middleman, daily item prizes, and a big trader community in one place.</p>
       <div class="discord-learn__actions">
         <a class="discord-learn__btn discord-learn__btn--join" href="https://discord.gg/QbapryYUUx" target="_blank" rel="noopener noreferrer">Join now <span aria-hidden="true">→</span></a>
         <a class="discord-learn__btn discord-learn__btn--ghost" href="#discord-learn-offer">What we offer</a>
       </div>
       <div class="discord-learn__live" aria-label="Server stats">
         <div class="discord-learn__pill">
-          <span class="discord-learn__pill-num" id="join-member-count">—</span>
+          <span class="discord-learn__pill-num" id="join-member-count">...</span>
           <span class="discord-learn__pill-label">Traders</span>
         </div>
         <div class="discord-learn__pill discord-learn__pill--online">
           <span class="discord-learn__dot" aria-hidden="true"></span>
-          <span class="discord-learn__pill-num" id="join-online-count">—</span>
+          <span class="discord-learn__pill-num" id="join-online-count">...</span>
           <span class="discord-learn__pill-label">Online now</span>
         </div>
       </div>
@@ -120,7 +121,7 @@ window.BSV_BUILD = "20260929-discord-learn-revamp";
   <section class="discord-learn__section" id="discord-learn-offer" aria-labelledby="discord-learn-offer-title">
     <header class="discord-learn__section-head">
       <h2 id="discord-learn-offer-title">What we offer</h2>
-      <p>Everything a BlockSpin trader needs — safer deals, better info, and real prizes.</p>
+      <p>Safer trades, live values, and giveaways for BlockSpin players.</p>
     </header>
     <div class="discord-learn__features">
       <article class="discord-learn__feature discord-learn__feature--community">
@@ -133,7 +134,7 @@ window.BSV_BUILD = "20260929-discord-learn-revamp";
           </svg>
         </span>
         <h3>Active Community</h3>
-        <p>Thousands of traders chatting deals, asking questions, and helping each other every day.</p>
+        <p>Thousands of traders online talking deals and answering questions every day.</p>
         <span class="discord-learn__feature-tag">Always online</span>
       </article>
       <article class="discord-learn__feature discord-learn__feature--middleman">
@@ -144,8 +145,8 @@ window.BSV_BUILD = "20260929-discord-learn-revamp";
           </svg>
         </span>
         <h3>Free Middleman Service</h3>
-        <p>Staff hold items during trades so buyers and sellers don’t get scammed. Free for members.</p>
-        <span class="discord-learn__feature-tag">Scam-free trades</span>
+        <p>Staff hold items during trades so neither side gets scammed. Free for members.</p>
+        <span class="discord-learn__feature-tag">Scam free trades</span>
       </article>
       <article class="discord-learn__feature discord-learn__feature--giveaways">
         <span class="discord-learn__feature-icon" aria-hidden="true">
@@ -156,59 +157,29 @@ window.BSV_BUILD = "20260929-discord-learn-revamp";
           </svg>
         </span>
         <h3>Daily Item Prizes</h3>
-        <p>Members-only giveaways for in-game items and rare drops — enter prizes you won’t find elsewhere.</p>
+        <p>Members only giveaways for in game items and rare drops you will not find elsewhere.</p>
         <span class="discord-learn__feature-tag">Members only</span>
       </article>
     </div>
   </section>
 
-  <section class="discord-learn__section discord-learn__section--steps" aria-labelledby="discord-learn-steps-title">
-    <header class="discord-learn__section-head">
-      <h2 id="discord-learn-steps-title">How to get started</h2>
-      <p>Three quick steps — you’re in and trading safer in minutes.</p>
-    </header>
-    <ol class="discord-learn__steps">
-      <li class="discord-learn__step">
-        <span class="discord-learn__step-num" aria-hidden="true">1</span>
-        <div>
-          <h3>Join the server</h3>
-          <p>Hit Join now and accept the Discord invite. It’s free.</p>
-        </div>
-      </li>
-      <li class="discord-learn__step">
-        <span class="discord-learn__step-num" aria-hidden="true">2</span>
-        <div>
-          <h3>Pick your roles</h3>
-          <p>Get trading, giveaway, and update pings so you never miss a drop.</p>
-        </div>
-      </li>
-      <li class="discord-learn__step">
-        <span class="discord-learn__step-num" aria-hidden="true">3</span>
-        <div>
-          <h3>Trade with confidence</h3>
-          <p>Use Live Trading, open a middleman ticket, or jump into chat.</p>
-        </div>
-      </li>
-    </ol>
-  </section>
-
   <section class="discord-learn__section" aria-labelledby="discord-learn-more-title">
     <header class="discord-learn__section-head">
       <h2 id="discord-learn-more-title">Also in the server</h2>
-      <p>Extras that keep the value list sharp and the community useful.</p>
+      <p>More tools that keep trading simple.</p>
     </header>
     <ul class="discord-learn__extras">
       <li>
         <strong>Value list updates</strong>
-        <span>Changes are discussed and announced in Discord first, then pushed to the site.</span>
+        <span>Value changes get talked about in Discord first, then go live on the site.</span>
       </li>
       <li>
         <strong>Value suggestions</strong>
-        <span>Submit ideas and vote — help shape the BlockSpin value list.</span>
+        <span>Post your own ideas and vote on what other people want changed.</span>
       </li>
       <li>
-        <strong>Trader help</strong>
-        <span>Ask about deals, WFL checks, and market moves anytime.</span>
+        <strong>Active trading channels</strong>
+        <span>Post offers, find deals, and talk WFL with other traders in real time.</span>
       </li>
     </ul>
   </section>
@@ -220,33 +191,31 @@ window.BSV_BUILD = "20260929-discord-learn-revamp";
     <div class="discord-learn__faq-list">
       <details>
         <summary>What is BlockSpin Values?</summary>
-        <p>A community-driven value list for BlockSpin on Roblox — accurate trading values, a tax calculator, and the trading Discord run by traders.</p>
+        <p>We run the BlockSpin value list, tax calculator, and the Discord where traders hang out.</p>
       </details>
       <details>
         <summary>How do I get a middleman for my trade?</summary>
-        <p>Join the server and press <strong>Get a Middleman</strong> to open a ticket. Our MM team walks you through a safe trade.</p>
+        <p>Join the server and press <strong>Get a Middleman</strong> to open a ticket. Staff will walk you through it.</p>
       </details>
       <details>
         <summary>How can I suggest a value change?</summary>
-        <p>After joining, go to Value Suggestions in the Website Portal category. Submit ideas and vote on others.</p>
+        <p>After you join, open Value Suggestions under Website Portal. Post there and vote on other posts.</p>
       </details>
       <details>
         <summary>Are there giveaways?</summary>
-        <p>Yes — regular members-only giveaways for in-game items. Watch the giveaway channels for active prizes.</p>
+        <p>Yes. Members only item giveaways run often. Check the giveaway channels for what is live.</p>
       </details>
       <details>
         <summary>Is the Discord free to join?</summary>
-        <p>Yes. Click Join now, open the invite, and accept it in Discord.</p>
+        <p>Yes. Hit Join now, open the invite, and accept it in Discord.</p>
       </details>
     </div>
   </section>
 
-  <section class="discord-learn__cta-band" aria-label="Join Discord">
-    <div class="discord-learn__cta-band-inner">
-      <p class="discord-learn__cta-band-title">Ready to join?</p>
-      <p class="discord-learn__cta-band-text">Thousands of BlockSpin traders. Free middleman. Daily item prizes.</p>
-      <a class="discord-learn__btn discord-learn__btn--join" href="https://discord.gg/QbapryYUUx" target="_blank" rel="noopener noreferrer">Join Discord Server <span aria-hidden="true">→</span></a>
-    </div>
+  <section class="discord-learn__cta" aria-label="Join Discord">
+    <p class="discord-learn__cta-title">Want in?</p>
+    <p class="discord-learn__cta-text">Free middleman, daily item prizes, and thousands of traders already here.</p>
+    <a class="discord-learn__btn discord-learn__btn--join" href="https://discord.gg/QbapryYUUx" target="_blank" rel="noopener noreferrer">Join Discord Server <span aria-hidden="true">→</span></a>
   </section>
 </main>
 
@@ -254,7 +223,7 @@ window.BSV_BUILD = "20260929-discord-learn-revamp";
 <div id="bsv-sponsor-banner-slot" class="bsv-sponsor-banner-slot"></div>
 <div id="bsv-site-footer"></div>
 
-<script src="site-chrome.js?v=20260929-discord-learn-revamp"></script>
+<script src="site-chrome.js?v=20260929-discord-learn-flatten"></script>
 <script defer>
 (function () {
   try {
