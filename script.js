@@ -5346,6 +5346,87 @@ function buildValueChangeItemHtml(r, useTimeline) {
   );
 }
 
+var homeChangesAutoScrollState = null;
+
+function stopHomeChangesStripAutoScroll() {
+  if (!homeChangesAutoScrollState) return;
+  if (homeChangesAutoScrollState.raf) cancelAnimationFrame(homeChangesAutoScrollState.raf);
+  var vp = homeChangesAutoScrollState.viewport;
+  if (vp && homeChangesAutoScrollState.onInteract) {
+    ["wheel", "pointerdown", "touchstart", "keydown"].forEach(function (type) {
+      vp.removeEventListener(type, homeChangesAutoScrollState.onInteract);
+    });
+  }
+  homeChangesAutoScrollState = null;
+}
+
+function initHomeChangesStripAutoScroll(viewport) {
+  stopHomeChangesStripAutoScroll();
+  if (!viewport) return;
+  var list = viewport.querySelector(".home-changes-strip__list");
+  if (!list || list.children.length < 2) return;
+  if (viewport.scrollWidth <= viewport.clientWidth + 8) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  // Duplicate items so the strip can loop seamlessly while scrolling right.
+  var clone = list.cloneNode(true);
+  clone.removeAttribute("role");
+  clone.setAttribute("aria-hidden", "true");
+  while (clone.firstChild) list.appendChild(clone.firstChild);
+
+  viewport.classList.add("is-auto-scrolling");
+  viewport.scrollLeft = 0;
+
+  var pauseUntil = 0;
+  var lastTs = 0;
+  var speed = 32; // px / second
+
+  function onInteract() {
+    pauseUntil = performance.now() + 1600;
+  }
+
+  ["wheel", "pointerdown", "touchstart", "keydown"].forEach(function (type) {
+    viewport.addEventListener(type, onInteract, { passive: true });
+  });
+
+  function tick(ts) {
+    var state = homeChangesAutoScrollState;
+    if (!state || state.viewport !== viewport) return;
+    state.raf = requestAnimationFrame(tick);
+
+    if (document.hidden) {
+      lastTs = ts;
+      return;
+    }
+    if (!document.body.classList.contains("is-home")) {
+      lastTs = ts;
+      return;
+    }
+    if (ts < pauseUntil) {
+      lastTs = ts;
+      return;
+    }
+
+    if (!lastTs) lastTs = ts;
+    var dt = Math.min(40, ts - lastTs);
+    lastTs = ts;
+
+    var loopAt = list.scrollWidth / 2;
+    if (loopAt <= viewport.clientWidth) return;
+
+    viewport.scrollLeft += (speed * dt) / 1000;
+    if (viewport.scrollLeft >= loopAt) {
+      viewport.scrollLeft -= loopAt;
+    }
+  }
+
+  homeChangesAutoScrollState = {
+    viewport: viewport,
+    onInteract: onInteract,
+    raf: requestAnimationFrame(tick)
+  };
+}
+
 async function loadValueChanges() {
   var listEl = document.getElementById('value-changes-list');
   var homeMainListEl = document.getElementById('home-main-value-changes-list');
@@ -5361,6 +5442,7 @@ async function loadValueChanges() {
       var emptyHtml = '<div class="value-changes-loading">' + escapeHtml(i18n("changes.none")) + '</div>';
       setSidebarValueChangesHtml(emptyHtml);
       if (homeMainListEl) homeMainListEl.innerHTML = emptyHtml;
+      stopHomeChangesStripAutoScroll();
       return;
     }
     var filtered = filterValueChangeRows(rows);
@@ -5368,6 +5450,7 @@ async function loadValueChanges() {
       var noneHtml = '<div class="value-changes-loading">' + escapeHtml(i18n("changes.none")) + '</div>';
       setSidebarValueChangesHtml(noneHtml);
       if (homeMainListEl) homeMainListEl.innerHTML = noneHtml;
+      stopHomeChangesStripAutoScroll();
       return;
     }
     var classicHtml = filtered.map(function (r) { return buildValueChangeItemHtml(r, false); }).join("");
@@ -5376,12 +5459,16 @@ async function loadValueChanges() {
       var stripHtml = filtered.map(function (r) { return buildValueChangeItemHtml(r, "strip"); }).join("");
       homeMainListEl.innerHTML =
         '<div class="home-changes-strip__list" role="list">' + stripHtml + "</div>";
+      requestAnimationFrame(function () {
+        initHomeChangesStripAutoScroll(homeMainListEl);
+      });
     }
   } catch (err) {
     console.error('Error loading value changes:', err);
     var failHtml = '<div class="value-changes-loading">' + escapeHtml(i18n("changes.failed")) + '</div>';
     setSidebarValueChangesHtml(failHtml);
     if (homeMainListEl) homeMainListEl.innerHTML = failHtml;
+    stopHomeChangesStripAutoScroll();
   }
 }
 
