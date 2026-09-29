@@ -3590,6 +3590,7 @@ background-attachment: fixed;
   width: 100%;
   max-width: 420px;
 }.home-discord-promo--home .home-discord-promo__btn {
+  position: relative;
   flex: 1 1 0;
   min-width: 0;
   padding: 15px 18px;
@@ -3599,11 +3600,13 @@ background-attachment: fixed;
   border-width: 2px;
   border-radius: 12px;
   box-shadow: 0 3px 0 #000;
+  overflow: hidden;
   transition: filter 0.15s ease, background-color 0.15s ease;
 }.home-discord-promo--home .home-discord-promo__btn:hover {
   transform: none;
   box-shadow: 0 3px 0 #000;
   filter: brightness(1.06);
+  animation-play-state: paused;
 }.home-discord-promo__btn--flash-join {
   flex: 1.35 1 0 !important;
   padding: 15px 18px !important;
@@ -3614,6 +3617,22 @@ background-attachment: fixed;
   background: linear-gradient(180deg, #7dd3fc 0%, #38bdf8 48%, #0ea5e9 100%) !important;
   color: #082f49 !important;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+  animation: home-discord-join-pulse 2.6s ease-in-out infinite;
+}.home-discord-promo__btn--flash-join::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 0%,
+    transparent 40%,
+    rgba(255, 255, 255, 0.38) 50%,
+    transparent 60%,
+    transparent 100%
+  );
+  transform: translateX(-120%);
+  animation: home-discord-btn-shine 3.2s ease-in-out infinite;
+  pointer-events: none;
 }.home-discord-promo__btn--flash-join:hover {
   background: linear-gradient(180deg, #bae6fd 0%, #7dd3fc 48%, #38bdf8 100%) !important;
   filter: none;
@@ -3623,10 +3642,41 @@ background-attachment: fixed;
   border-color: rgba(255, 255, 255, 0.4);
   box-shadow: 0 3px 0 rgba(0, 0, 0, 0.45);
   font-size: 1.08rem;
+  animation: home-discord-learn-glow 2.8s ease-in-out infinite;
+  animation-delay: 0.4s;
 }.home-discord-promo--home .home-discord-promo__btn--secondary:hover {
   background: rgba(15, 23, 42, 0.72);
   color: #fff;
   filter: brightness(1.08);
+}
+@keyframes home-discord-join-pulse {
+  0%, 100% {
+    box-shadow: 0 3px 0 #000, 0 0 0 0 rgba(56, 189, 248, 0);
+  }
+  50% {
+    box-shadow: 0 3px 0 #000, 0 0 18px 2px rgba(56, 189, 248, 0.45);
+  }
+}
+@keyframes home-discord-learn-glow {
+  0%, 100% {
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.45), 0 0 0 0 rgba(255, 255, 255, 0);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+  50% {
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.45), 0 0 14px 1px rgba(125, 211, 252, 0.28);
+    border-color: rgba(186, 230, 253, 0.7);
+  }
+}
+@keyframes home-discord-btn-shine {
+  0%, 55% { transform: translateX(-120%); }
+  75%, 100% { transform: translateX(120%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-discord-promo__btn--flash-join,
+  .home-discord-promo__btn--flash-join::after,
+  .home-discord-promo--home .home-discord-promo__btn--secondary {
+    animation: none !important;
+  }
 }.home-hero-stack {
   display: flex;
   flex-direction: column;
@@ -16674,33 +16724,44 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
 /* ========== Discord Learn More page ========== */
 body[data-bsv-page="discord"] {
   position: relative;
-  isolation: isolate;
+  min-height: 100%;
 }
-body[data-bsv-page="discord"] .discord-learn__page-bg {
+body[data-bsv-page="discord"]::before {
+  content: "";
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   pointer-events: none;
   background:
     radial-gradient(ellipse 80% 70% at 15% 10%, hsl(var(--bsv-accent-hue) 80% 55% / 0.35), transparent 55%),
     radial-gradient(ellipse 70% 60% at 90% 80%, hsl(var(--bsv-hue) 55% 40% / 0.45), transparent 50%),
     linear-gradient(160deg, hsl(var(--bsv-hue) var(--bsv-s-card) 16%) 0%, hsl(var(--bsv-hue) var(--bsv-s-deep) 9%) 100%);
 }
-body[data-bsv-page="discord"] .discord-learn__page-bg::after {
+body[data-bsv-page="discord"]::after {
   content: "";
-  position: absolute;
+  position: fixed;
   inset: 0;
+  z-index: 0;
+  pointer-events: none;
   background-image:
     linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
   background-size: 28px 28px;
   mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, #000 15%, transparent 78%);
   opacity: 0.7;
-  pointer-events: none;
 }
-body[data-bsv-page="discord"] .discord-learn {
+body[data-bsv-page="discord"] .discord-learn__page-bg {
+  display: none !important;
+}
+body[data-bsv-page="discord"] #bsv-site-header,
+body[data-bsv-page="discord"] .discord-learn,
+body[data-bsv-page="discord"] .join-boosters-slot,
+body[data-bsv-page="discord"] #bsv-sponsor-banner-slot,
+body[data-bsv-page="discord"] #bsv-site-footer {
   position: relative;
   z-index: 1;
+}
+body[data-bsv-page="discord"] .discord-learn {
   max-width: 980px;
   margin: 0 auto 56px;
   padding: 0 16px;
@@ -17103,11 +17164,23 @@ body[data-bsv-page="discord"] .join-boosters-slot .footer-boosters {
   z-index: auto;
 }
 body[data-bsv-page="discord"] .site-footer {
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: end;
+  column-gap: 24px;
+  row-gap: 16px;
   min-height: auto;
-  margin-top: 0;
+  margin-top: 28px;
+  background: var(--bsv-surface-chrome);
+  border-top: 2px solid #000;
+}
+body[data-bsv-page="discord"] .site-footer .footer-content {
+  grid-column: 2;
+  justify-self: center;
+}
+body[data-bsv-page="discord"] .site-footer .footer-side-nav {
+  grid-column: 1;
+  justify-self: start;
 }
 @media (max-width: 900px) {
   body[data-bsv-page="discord"] .join-boosters-slot {
@@ -17115,7 +17188,22 @@ body[data-bsv-page="discord"] .site-footer {
     padding: 0 12px;
   }
   body[data-bsv-page="discord"] .site-footer {
-    margin-top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    margin-top: 24px;
+    padding: 24px 16px 28px;
+  }
+  body[data-bsv-page="discord"] .site-footer .footer-content,
+  body[data-bsv-page="discord"] .site-footer .footer-side-nav {
+    grid-column: auto;
+    justify-self: center;
+    width: 100%;
+    max-width: 420px;
+  }
+  body[data-bsv-page="discord"] .site-footer .footer-side-nav {
+    justify-content: space-between;
   }
 }
 
