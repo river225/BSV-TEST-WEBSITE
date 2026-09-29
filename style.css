@@ -3722,7 +3722,7 @@ background-attachment: fixed;
 .home-hero-top__stats {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  align-items: center;
   justify-content: flex-start;
   gap: 16px;
   min-width: 0;
@@ -3756,15 +3756,23 @@ background-attachment: fixed;
 }
 .home-stats-strip--rail {
   max-width: none;
-  margin: 0;
+  width: 100%;
+  margin: 0 auto;
   padding: 4px 0;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
+}
+.home-hero-top__stats .home-stats-strip--rail {
+  justify-content: center;
+  text-align: center;
 }
 .home-stats-strip--rail .home-stats-strip__item {
   flex: 1 1 0;
   min-width: 0;
   padding: 4px 6px;
   white-space: nowrap;
+  text-align: center;
+  align-items: center;
 }
 .home-stats-strip--rail .home-stats-strip__value {
   font-size: clamp(2.15rem, 2.8vw, 2.9rem);
@@ -3791,9 +3799,11 @@ background-attachment: fixed;
   height: 44px;
 }
 .home-hero-top__stats .home-changes-strip {
+  width: 100%;
   max-width: none;
   margin: auto 0 0;
   text-align: center;
+  align-self: stretch;
 }
 .home-hero-top__stats .home-changes-strip__heading {
   text-align: center;

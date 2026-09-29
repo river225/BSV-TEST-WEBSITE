@@ -643,19 +643,20 @@
     if (old) old.remove();
     var old3 = document.getElementById("bsv-sponsor-banner-styles-v3");
     if (old3) old3.remove();
-    if (document.getElementById("bsv-sponsor-banner-styles-v4")) return;
+    var old4 = document.getElementById("bsv-sponsor-banner-styles-v4");
+    if (old4) old4.remove();
+    if (document.getElementById("bsv-sponsor-banner-styles-v5")) return;
     var style = document.createElement("style");
-    style.id = "bsv-sponsor-banner-styles-v4";
+    style.id = "bsv-sponsor-banner-styles-v5";
     style.textContent =
-      /* Sit in the content column; match .what-is-section width so it lines up with section content */
       ".bsv-sponsor-promo{display:flex;justify-content:center;width:100%;margin:12px 0 8px;padding:0;box-sizing:border-box;position:relative;left:auto!important;transform:none!important}" +
       ".bsv-sponsor-promo[hidden],.bsv-sponsor-promo.is-hidden{display:none!important}" +
       ".bsv-sponsor-promo__shell{position:relative;display:block;width:100%;max-width:800px;margin:0 auto;padding:12px 0 8px;box-sizing:border-box}" +
-      ".bsv-sponsor-promo__shell::before{content:'';position:absolute;pointer-events:none;z-index:0;inset:-8% -6% -10%;border-radius:50%;background:radial-gradient(ellipse 55% 50% at 50% 45%,rgba(155,45,220,.28),rgba(155,45,220,.08) 45%,transparent 70%);filter:blur(22px);opacity:.9}" +
-      "@media (prefers-reduced-motion:reduce){.bsv-sponsor-promo__shell::before{opacity:.8}}" +
-      ".bsv-sponsor-promo__frame{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;margin:0 auto;padding:22px 20px 18px;border-radius:16px;background:linear-gradient(165deg,#16111f 0%,#120e1a 100%);border:1px solid rgba(155,45,220,.32);box-shadow:0 0 0 1px rgba(155,45,220,.08),0 14px 32px rgba(0,0,0,.4);overflow:hidden;text-align:center;box-sizing:border-box}" +
-      ".bsv-sponsor-promo__frame::before,.bsv-sponsor-promo__frame::after{content:'';position:absolute;width:42%;height:1px;pointer-events:none;opacity:.35}" +
-      ".bsv-sponsor-promo__frame::before{top:18px;left:-6%;background:linear-gradient(90deg,transparent,rgba(155,45,220,.75),transparent);transform:rotate(-28deg)}" +
+      ".bsv-sponsor-promo__shell::before{content:'';position:absolute;pointer-events:none;z-index:0;inset:-10% -8% -12%;border-radius:50%;background:radial-gradient(ellipse 58% 52% at 50% 42%,rgba(124,58,237,.22),rgba(91,33,182,.1) 42%,transparent 72%);filter:blur(26px);opacity:.95}" +
+      "@media (prefers-reduced-motion:reduce){.bsv-sponsor-promo__shell::before{opacity:.85}}" +
+      ".bsv-sponsor-promo__frame{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;margin:0 auto;padding:22px 20px 18px;border-radius:18px;background:linear-gradient(165deg,#1a1630 0%,#12101f 55%,#0e0c18 100%);border:1px solid rgba(167,139,250,.28);box-shadow:0 0 0 1px rgba(124,58,237,.08),0 14px 32px rgba(0,0,0,.42);overflow:hidden;text-align:center;box-sizing:border-box}" +
+      ".bsv-sponsor-promo__frame::before,.bsv-sponsor-promo__frame::after{content:'';position:absolute;width:42%;height:1px;pointer-events:none;opacity:.4}" +
+      ".bsv-sponsor-promo__frame::before{top:18px;left:-6%;background:linear-gradient(90deg,transparent,rgba(167,139,250,.8),transparent);transform:rotate(-28deg)}" +
       ".bsv-sponsor-promo__frame::after{bottom:22px;right:-6%;background:linear-gradient(90deg,transparent,rgba(76,175,30,.65),transparent);transform:rotate(-28deg)}" +
       ".bsv-sponsor-promo__logo{position:relative;z-index:1;width:72px;height:72px;object-fit:contain;display:block;margin:0 auto;image-rendering:-webkit-optimize-contrast}" +
       ".bsv-sponsor-promo__title{position:relative;z-index:1;margin:2px 0 0;font:800 clamp(1.55rem,4.5vw,2.05rem)/1.1 Poppins,system-ui,sans-serif;letter-spacing:-.02em;color:#fff}" +
@@ -663,9 +664,8 @@
       ".bsv-sponsor-promo__sub{position:relative;z-index:1;margin:0;max-width:34rem;font:500 0.92rem/1.45 Poppins,system-ui,sans-serif;color:#c7cce0}" +
       ".bsv-sponsor-promo__cta{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;margin-top:6px;padding:11px 26px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:linear-gradient(180deg,#62d12f 0%,#3fad1a 100%);color:#fff;font:700 0.95rem/1 Poppins,system-ui,sans-serif;letter-spacing:.03em;text-decoration:none;text-shadow:0 1px 0 rgba(0,0,0,.28);transition:transform .2s ease,filter .2s ease,border-color .2s ease;white-space:nowrap}" +
       ".bsv-sponsor-promo__cta:hover{transform:translateY(-1px);filter:brightness(1.06);border-color:rgba(255,255,255,.3)}" +
-      ".bsv-sponsor-promo__cta:focus-visible{outline:2px solid #9B2DDC;outline-offset:3px}" +
+      ".bsv-sponsor-promo__cta:focus-visible{outline:2px solid #a78bfa;outline-offset:3px}" +
       ".bsv-sponsor-banner-slot{display:block;width:100%;max-width:1800px;margin:0 auto;padding:0 20px;box-sizing:border-box}" +
-      /* Values-list: banner lives inside #sections so it shares the content column */
       "#sections > .bsv-sponsor-promo{flex:0 0 auto;width:100%;max-width:100%;padding:0;margin:8px 0 12px}" +
       ".bsv-sponsor-banner-slot:empty{display:none}";
     document.head.appendChild(style);
