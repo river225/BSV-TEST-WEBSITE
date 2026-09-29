@@ -4464,6 +4464,30 @@ body.home-changelog-open {
   flex-direction: column;
   gap: 10px;
   width: 100%;
+  max-height: 220px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 6px;
+  box-sizing: border-box;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(125, 211, 252, 0.75) rgba(0, 0, 0, 0.35);
+}
+.home-announce-feed__list::-webkit-scrollbar {
+  width: 8px;
+}
+.home-announce-feed__list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 999px;
+  border: 1px solid #000;
+}
+.home-announce-feed__list::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #7dd3fc, #38bdf8);
+  border-radius: 999px;
+  border: 1px solid #000;
+}
+.home-announce-feed__list::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #bae6fd, #7dd3fc);
 }
 .home-announce-feed__item {
   margin: 0;
@@ -4473,6 +4497,7 @@ body.home-changelog-open {
   background: var(--bsv-surface-raised);
   box-shadow: 0 3px 0 #000;
   box-sizing: border-box;
+  flex: 0 0 auto;
 }
 .home-announce-feed__date {
   margin: 0 0 6px;
