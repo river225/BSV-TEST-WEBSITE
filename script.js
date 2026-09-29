@@ -546,6 +546,126 @@ function buildHomeLiveTradingBarHtml() {
   );
 }
 
+var HOME_FEATURE_VALUE_LIST_IMG =
+  "https://i.ibb.co/dRWzVWd/Screenshot-2026-09-29-at-09-52-56.png";
+var HOME_FEATURE_LIVE_TRADING_IMG =
+  "https://i.ibb.co/nqg9PzFQ/Screenshot-2026-09-29-at-11-23-38.png";
+
+function buildHomeFeatureMediaHtml(src, alt) {
+  return (
+    '<div class="home-feature-showcase__media" data-home-tilt>' +
+      '<div class="home-feature-showcase__tilt">' +
+        '<img class="home-feature-showcase__img" src="' +
+        src +
+        '" alt="' +
+        escapeAttr(alt) +
+        '" width="960" height="540" loading="lazy" decoding="async">' +
+      "</div>" +
+    "</div>"
+  );
+}
+
+function buildHomeFeatureShowcaseHtml() {
+  var discordInvite = BSV_DISCORD_INVITE_URL || "https://discord.gg/QbapryYUUx";
+  return (
+    '<section class="home-feature-showcase" aria-label="Value List and Live Trading">' +
+      '<article class="home-feature-showcase__row">' +
+        '<div class="home-feature-showcase__copy">' +
+          '<h2 class="home-feature-showcase__title">Value List</h2>' +
+          '<p class="home-feature-showcase__text">' +
+            "BlockSpin Values is the largest and most trusted value list for Roblox BlockSpin. " +
+            "Built by top traders, we keep accurate values updated daily for the whole community." +
+          "</p>" +
+          '<ul class="home-feature-showcase__bullets">' +
+            "<li>Trusted and transparent</li>" +
+            "<li>Daily updates plus extra tools</li>" +
+          "</ul>" +
+          '<button type="button" class="home-feature-showcase__cta" data-home-feature-section="Common / Uncommon">Browse values <span aria-hidden="true">→</span></button>' +
+        "</div>" +
+        buildHomeFeatureMediaHtml(HOME_FEATURE_VALUE_LIST_IMG, "BlockSpin Values value list preview") +
+      "</article>" +
+      '<article class="home-feature-showcase__row home-feature-showcase__row--flip">' +
+        buildHomeFeatureMediaHtml(HOME_FEATURE_LIVE_TRADING_IMG, "BlockSpin Live Trading preview") +
+        '<div class="home-feature-showcase__copy">' +
+          '<h2 class="home-feature-showcase__title">Live Trading</h2>' +
+          '<p class="home-feature-showcase__text">' +
+            "Find the best deals as soon as they go up. Post offers, browse other traders, and message them in seconds. " +
+            'You can also use our <a class="home-feature-showcase__link" href="' +
+            discordInvite +
+            '" target="_blank" rel="noopener noreferrer">middleman service in our Discord server</a> to keep trades scam free.' +
+          "</p>" +
+          '<ul class="home-feature-showcase__bullets">' +
+            "<li>Easy to use</li>" +
+            "<li>Find trades fast</li>" +
+          "</ul>" +
+          '<a class="home-feature-showcase__cta" href="' +
+          homeLiveTradingHref() +
+          '">Open Live Trading <span aria-hidden="true">→</span></a>' +
+        "</div>" +
+      "</article>" +
+    "</section>"
+  );
+}
+
+function initHomeFeatureShowcase(root) {
+  var scope = root || document;
+  scope.querySelectorAll("[data-home-feature-section]").forEach(function (btn) {
+    if (btn._homeFeatureSectionBound) return;
+    btn._homeFeatureSectionBound = true;
+    btn.addEventListener("click", function () {
+      var name = btn.getAttribute("data-home-feature-section");
+      if (name && typeof showSection === "function") showSection(name);
+    });
+  });
+  initHomeFeatureTilt(scope);
+}
+
+function initHomeFeatureTilt(root) {
+  var scope = root || document;
+  var reduceMotion =
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  scope.querySelectorAll("[data-home-tilt]").forEach(function (wrap) {
+    if (wrap._homeTiltBound) return;
+    wrap._homeTiltBound = true;
+    var tilt = wrap.querySelector(".home-feature-showcase__tilt");
+    if (!tilt) return;
+    if (reduceMotion) return;
+
+    var max = 11;
+    function setTilt(clientX, clientY) {
+      var rect = wrap.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      var x = (clientX - rect.left) / rect.width;
+      var y = (clientY - rect.top) / rect.height;
+      x = Math.max(0, Math.min(1, x));
+      y = Math.max(0, Math.min(1, y));
+      var rotY = (0.5 - x) * max * 2;
+      var rotX = (y - 0.5) * max * 2;
+      tilt.style.transform =
+        "perspective(900px) rotateX(" +
+        rotX.toFixed(2) +
+        "deg) rotateY(" +
+        rotY.toFixed(2) +
+        "deg) scale3d(1.015, 1.015, 1.015)";
+    }
+    function resetTilt() {
+      tilt.style.transform =
+        "perspective(900px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)";
+    }
+
+    wrap.addEventListener(
+      "pointermove",
+      function (e) {
+        setTilt(e.clientX, e.clientY);
+      },
+      { passive: true }
+    );
+    wrap.addEventListener("pointerleave", resetTilt);
+    wrap.addEventListener("pointercancel", resetTilt);
+  });
+}
+
 function buildHomeChangesStripHtml(listId) {
   return (
     '<aside class="home-changes-strip" aria-label="' + escapeHtml(i18n("home.recentChanges")) + '">' +
@@ -640,6 +760,7 @@ function mountHomeDiscordPromo() {
           buildHomeChangesStripHtml("home-main-value-changes-list") +
         "</div>" +
       "</div>" +
+      buildHomeFeatureShowcaseHtml() +
       buildHomeLiveTradingBarHtml() +
     "</div>";
   // Keep tax-column home rail empty; stats sit in-line with Discord.
@@ -650,6 +771,7 @@ function mountHomeDiscordPromo() {
     rail.style.display = "none";
   }
   mountHomeSiteStats();
+  initHomeFeatureShowcase(document.getElementById("home") || document);
 }
 
 function mountHomeSiteStats() {
