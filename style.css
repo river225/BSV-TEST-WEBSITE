@@ -3593,7 +3593,7 @@ background-attachment: fixed;
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(300px, 1fr);
   align-items: stretch;
-  gap: 20px 36px;
+  gap: 20px 64px;
   width: 100%;
   /* Scale Discord + stats + Recent Changes together; keeps relative positioning */
   zoom: var(--home-hero-scale);
@@ -3661,16 +3661,21 @@ background-attachment: fixed;
 .home-stats-strip--rail .home-stats-strip__item {
   flex: 1 1 0;
   min-width: 0;
-  padding: 4px 8px;
-  white-space: normal;
+  padding: 4px 6px;
+  white-space: nowrap;
 }
 .home-stats-strip--rail .home-stats-strip__value {
   font-size: clamp(2.15rem, 2.8vw, 2.9rem);
 }
 .home-stats-strip--rail .home-stats-strip__label {
-  font-size: 0.74rem;
-  letter-spacing: 0.045em;
-  line-height: 1.15;
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  line-height: 1.1;
+  white-space: nowrap;
+  flex-wrap: nowrap;
+}
+.home-stats-strip--rail .home-stats-strip__label-text {
+  white-space: nowrap;
 }
 .home-stats-strip--rail .home-stats-strip__icon {
   width: 14px;
