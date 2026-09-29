@@ -799,7 +799,6 @@ function mountHomeDiscordPromo() {
         "</div>" +
       "</div>" +
       buildHomeFeatureShowcaseHtml() +
-      buildHomeLiveTradingBarHtml() +
     "</div>";
   // Keep tax-column home rail empty; stats sit in-line with Discord.
   var rail = document.getElementById("home-right-rail");

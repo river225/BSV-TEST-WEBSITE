@@ -4473,11 +4473,17 @@ body.home-changelog-open {
 .home-extra-banner__glow {
   display: none;
 }
-.home-extra-banner--guide,
+.home-extra-banner--guide {
+  background: linear-gradient(
+    180deg,
+    hsl(152 28% 16%) 0%,
+    hsl(var(--bsv-hue) var(--bsv-s-deep) 11%) 100%
+  );
+}
 .home-extra-banner--richest {
   background: linear-gradient(
     180deg,
-    hsl(var(--bsv-hue) var(--bsv-s-raised) 15%) 0%,
+    hsl(42 36% 16%) 0%,
     hsl(var(--bsv-hue) var(--bsv-s-deep) 11%) 100%
   );
 }
@@ -4495,10 +4501,21 @@ body.home-changelog-open {
   background: rgba(255, 255, 255, 0.06);
   color: rgba(255, 255, 255, 0.92);
 }
-.home-extra-banner--guide .home-extra-banner__icon,
+.home-extra-banner--guide .home-extra-banner__icon {
+  color: #a7f3d0;
+  background: rgba(52, 211, 153, 0.12);
+  border-color: rgba(52, 211, 153, 0.28);
+}
 .home-extra-banner--richest .home-extra-banner__icon {
-  color: rgba(255, 255, 255, 0.92);
-  background: rgba(255, 255, 255, 0.06);
+  color: #fde68a;
+  background: rgba(251, 191, 36, 0.12);
+  border-color: rgba(251, 191, 36, 0.28);
+}
+.home-extra-banner--guide .home-extra-banner__eyebrow {
+  color: #6ee7b7;
+}
+.home-extra-banner--richest .home-extra-banner__eyebrow {
+  color: #fbbf24;
 }
 .home-extra-banner__body {
   position: relative;
