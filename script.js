@@ -4793,8 +4793,6 @@ function showSectionDeferred(name, cfg, isHome) {
   if (typeof window.bsvAlignSponsorBanner === "function") {
     window.bsvAlignSponsorBanner();
   }
-  syncTaxCalcTopWithCards();
-  requestAnimationFrame(syncTaxCalcTopWithCards);
 
   // Home is long — leaving it mid-scroll used to land inside the middle/bottom of
   // the next section. Always snap to the top of the newly shown section.
@@ -5067,67 +5065,6 @@ function initTaxRemindersCollapse() {
     toggle.setAttribute("aria-expanded", next ? "true" : "false");
     body.hidden = !next;
     wrap.classList.toggle("is-open", next);
-  });
-}
-
-function getVisibleItemSectionEl() {
-  var active = null;
-  document.querySelectorAll("#sections > .section").forEach(function (sec) {
-    if (!sec || sec.id === "home") return;
-    if (sec.style.display === "none" || sec.hidden) return;
-    try {
-      if (window.getComputedStyle(sec).display === "none") return;
-    } catch (e) {
-      return;
-    }
-    active = sec;
-  });
-  return active;
-}
-
-function syncTaxCalcTopWithCards() {
-  var col = document.getElementById("tax-sidebar-column");
-  var tax = col ? col.querySelector(".tax-calculator") : null;
-  if (!tax) return;
-
-  if (
-    document.body.classList.contains("is-home") ||
-    !col ||
-    col.style.visibility === "hidden" ||
-    col.style.display === "none" ||
-    tax.style.display === "none"
-  ) {
-    tax.style.marginTop = "";
-    return;
-  }
-
-  var section = getVisibleItemSectionEl();
-  if (!section) {
-    tax.style.marginTop = "";
-    return;
-  }
-
-  var anchor =
-    section.querySelector(".cards") ||
-    section.querySelector(".richest-players-list") ||
-    section.querySelector(".guide-vcards-grid") ||
-    section.querySelector(".money-guide-content") ||
-    section.querySelector("h2");
-  if (!anchor) {
-    tax.style.marginTop = "";
-    return;
-  }
-
-  var colTop = col.getBoundingClientRect().top;
-  var anchorTop = anchor.getBoundingClientRect().top;
-  var delta = Math.round(anchorTop - colTop);
-  tax.style.marginTop = (delta > 0 ? delta : 0) + "px";
-}
-
-if (!window.__bsvTaxAlignBound) {
-  window.__bsvTaxAlignBound = true;
-  window.addEventListener("resize", function () {
-    syncTaxCalcTopWithCards();
   });
 }
 
