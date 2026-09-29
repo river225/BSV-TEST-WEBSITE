@@ -7184,8 +7184,11 @@ body.bsv-login-open {
 }.site-mobile-below-header {
   display: none;
 }.welcome-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 18px;
 }.welcome-header h1 {
   display: flex;
   flex-direction: row;
@@ -7197,7 +7200,7 @@ body.bsv-login-open {
   text-align: center;
   box-sizing: border-box;
   font-size: clamp(4.35rem, 6.5vw, 5.5rem);
-  margin: 0 auto 8px;
+  margin: 0 auto;
   color: #fff;
   font-family: system-ui, -apple-system, 'Segoe UI', sans-serif, 'Paytone One';
   text-shadow: 3px 3px 0 #000, -3px 3px 0 #000, 3px -3px 0 #000, -3px -3px 0 #000;
@@ -7212,7 +7215,8 @@ body.bsv-login-open {
 }.welcome-header .subtitle {
   font-size: 1.3rem;
   color: rgba(255, 255, 255, 0.95);
-  margin: 0 0 8px 0;
+  margin: 22px auto 0;
+  text-align: center;
   text-shadow: 1.5px 1.5px 0 #000;
 }.welcome-header .founder-credit {
   font-size: 1.15rem;
@@ -7373,22 +7377,25 @@ body.bsv-login-open {
   text-shadow: 2px 2px 0 #000, -2px 2px 0 #000, 2px -2px 0 #000, -2px -2px 0 #000;
 }.welcome-subtitle-with-icon {
   position: relative;
-  display: inline-block;
-  padding-left: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  max-width: min(42ch, 100%);
+  padding: 0 12px;
+  box-sizing: border-box;
 }.welcome-subtitle-with-icon::before {
   content: "";
-  position: absolute;
-  left: -40px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 40px;
-  height: 40px;
+  position: static;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  transform: none;
   background-image: url("https://i.ibb.co/GBPrrD4/ffsdgfdghgfdgbn.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
   pointer-events: none;
-  z-index: 2;
 }.home-column:last-child h2,
 .home-column--value-changes .value-changes-heading {
   color: #e2e8f0;
@@ -15140,13 +15147,14 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   .welcome-header h1 {
     font-size: clamp(2.35rem, 11vw, 3.25rem);
     gap: 0.12em;
-    margin-bottom: 6px;
+    margin-bottom: 0;
   }
 
   .welcome-header .subtitle {
     font-size: 1rem;
     line-height: 1.35;
-    padding: 0 8px;
+    margin-top: 16px;
+    padding: 0 10px;
   }
 
   .welcome-header .founder-credit {
@@ -15154,11 +15162,13 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   }
 
   .welcome-subtitle-with-icon {
-    padding-left: 0;
+    gap: 8px;
   }
 
   .welcome-subtitle-with-icon::before {
-    display: none;
+    flex-basis: 28px;
+    width: 28px;
+    height: 28px;
   }
 
   .home-hero-mount {
