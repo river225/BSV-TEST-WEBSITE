@@ -4267,13 +4267,13 @@ function getSectionNavIconSvg(name) {
     Legendary:
       '<path d="M5 9.5 7.5 7l2.2 2.2L12 5.5l2.3 3.7L16.5 7 19 9.5l-1 8H6z"/><path d="M8 17.5h8"/>',
     Omega:
-      '<path d="M12 3.5 19 8v8l-7 4.5L5 16V8z"/><path d="M12 8v8"/><path d="M8.8 10.2 12 12l3.2-1.8"/>',
+      '<path d="M6.5 18.5V15.5c0-4.2 2.3-8 5.5-8s5.5 3.8 5.5 8v3"/><path d="M4 18.5h5.2"/><path d="M14.8 18.5H20"/>',
     Misc:
       '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
     Vehicles:
       '<path d="M4 14h16l-1.4-4.2A2 2 0 0 0 16.7 8H7.3a2 2 0 0 0-1.9 1.8z"/><path d="M6.5 17.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path d="M17.5 17.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path d="M8 14.5h8"/>',
     "Live Trading":
-      '<path d="M5.5 8h11l-2.5-2.5"/><path d="M18.5 16h-11l2.5 2.5"/><path d="M16.5 8v3A3.5 3.5 0 0 1 13 14.5H5.5"/><path d="M7.5 16v-3A3.5 3.5 0 0 1 11 9.5h7.5"/>',
+      '<path d="M6 8h12"/><path d="M15 5l3 3-3 3"/><path d="M18 16H6"/><path d="M9 13l-3 3 3 3"/>',
     "Money & Game Guide":
       '<path d="M6 5.5h9.5A2.5 2.5 0 0 1 18 8v11.5H8A2 2 0 0 1 6 17.5z"/><path d="M6 5.5V17.5"/><path d="M10 10h5M10 13.5h4"/>',
     "Untradeable Items":
