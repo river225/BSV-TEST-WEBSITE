@@ -5457,10 +5457,10 @@ function initHomeChangesStripAutoScroll(viewport, attempt) {
   function applyOffset() {
     if (offset < 0) offset = ((offset % loopAt) + loopAt) % loopAt;
     if (offset >= loopAt) offset = offset % loopAt;
+    // Transform-only motion — scrollLeft+transform together double-shifts on Safari.
     list.style.transform = "translate3d(" + (-offset) + "px,0,0)";
-    // Keep native scrollbar thumb roughly in sync for manual scrubbing.
     try {
-      viewport.scrollLeft = offset;
+      viewport.scrollLeft = 0;
     } catch (e) {}
   }
 
@@ -5500,30 +5500,18 @@ function initHomeChangesStripAutoScroll(viewport, attempt) {
     pauseFor(1800);
   }
 
-  function onScroll() {
-    // User dragged the native scrollbar.
-    if (dragging) return;
-    if (Math.abs(viewport.scrollLeft - offset) < 1) return;
-    offset = viewport.scrollLeft;
-    if (offset >= loopAt) offset = offset % loopAt;
-    list.style.transform = "translate3d(" + (-offset) + "px,0,0)";
-    pauseFor(1800);
-  }
-
   var handlers = {
     pointerdown: onPointerDown,
     pointermove: onPointerMove,
     pointerup: onPointerUp,
     pointercancel: onPointerUp,
-    wheel: onWheel,
-    scroll: onScroll
+    wheel: onWheel
   };
   viewport.addEventListener("pointerdown", onPointerDown, { passive: true });
   viewport.addEventListener("pointermove", onPointerMove, { passive: true });
   viewport.addEventListener("pointerup", onPointerUp, { passive: true });
   viewport.addEventListener("pointercancel", onPointerUp, { passive: true });
   viewport.addEventListener("wheel", onWheel, { passive: true });
-  viewport.addEventListener("scroll", onScroll, { passive: true });
 
   applyOffset();
 

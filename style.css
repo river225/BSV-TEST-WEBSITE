@@ -3766,7 +3766,8 @@ background-attachment: fixed;
 .home-changes-strip__viewport.is-auto-scrolling {
   scroll-snap-type: none !important;
   scroll-behavior: auto !important;
-  overflow-x: scroll;
+  /* Transform marquee — hide native scroll so iOS/Safari can't fight it */
+  overflow-x: hidden;
   /* mask-image breaks programmatic motion on some Safari / iOS WebKits */
   mask-image: none;
   -webkit-mask-image: none;
