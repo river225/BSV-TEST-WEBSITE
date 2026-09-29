@@ -555,6 +555,34 @@ function mountHomeSiteStats() {
   applyCachedHomeStatValues(document);
 }
 
+function homeStatsLabelIcon(kind) {
+  if (kind === "items") {
+    // Diamond / gem (matches jbvalues-style items mark)
+    return (
+      '<svg class="home-stats-strip__icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false">' +
+        '<path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M6.2 9.2 12 3.8l5.8 5.4L12 20.2 6.2 9.2z"/>' +
+        '<path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M6.2 9.2h11.6M9.1 9.2 12 20.2l2.9-11"/>' +
+      "</svg>"
+    );
+  }
+  if (kind === "online") {
+    // User in circle
+    return (
+      '<svg class="home-stats-strip__icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false">' +
+        '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.7"/>' +
+        '<circle cx="12" cy="10" r="3" fill="none" stroke="currentColor" stroke-width="1.7"/>' +
+        '<path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M7.4 18.2a5.2 5.2 0 0 1 9.2 0"/>' +
+      "</svg>"
+    );
+  }
+  // Total changes — activity / pulse
+  return (
+    '<svg class="home-stats-strip__icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false">' +
+      '<path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M4 13h3.2l2.2-5.5L13.2 18l2.4-5H20"/>' +
+    "</svg>"
+  );
+}
+
 function buildHomeSiteStatsHtml(extraClass, elementId) {
   var statsClass = "home-stats-strip" + (extraClass && extraClass !== "home-stats-strip" ? " " + extraClass : "");
   var idAttr = elementId ? ' id="' + elementId + '"' : "";
@@ -562,17 +590,20 @@ function buildHomeSiteStatsHtml(extraClass, elementId) {
     '<aside class="' + statsClass + '"' + idAttr + ' aria-label="' + escapeHtml(i18n("home.stats.aria")) + '">' +
       '<div class="home-stats-strip__item">' +
         '<span class="home-stats-strip__value" data-home-stat="items">0</span>' +
-        '<span class="home-stats-strip__label">' + escapeHtml(i18n("home.stats.itemsTracked")) + "</span>" +
+        '<span class="home-stats-strip__label">' + homeStatsLabelIcon("items") +
+          '<span class="home-stats-strip__label-text">' + escapeHtml(i18n("home.stats.itemsTracked")) + "</span></span>" +
       "</div>" +
       '<span class="home-stats-strip__rule" aria-hidden="true"></span>' +
       '<div class="home-stats-strip__item">' +
         '<span class="home-stats-strip__value" data-home-stat="online">0</span>' +
-        '<span class="home-stats-strip__label">' + escapeHtml(i18n("home.stats.onlineMembers")) + "</span>" +
+        '<span class="home-stats-strip__label">' + homeStatsLabelIcon("online") +
+          '<span class="home-stats-strip__label-text">' + escapeHtml(i18n("home.stats.onlineMembers")) + "</span></span>" +
       "</div>" +
       '<span class="home-stats-strip__rule" aria-hidden="true"></span>' +
       '<div class="home-stats-strip__item">' +
         '<span class="home-stats-strip__value" data-home-stat="changes">0</span>' +
-        '<span class="home-stats-strip__label">' + escapeHtml(i18n("home.stats.totalChanges")) + "</span>" +
+        '<span class="home-stats-strip__label">' + homeStatsLabelIcon("changes") +
+          '<span class="home-stats-strip__label-text">' + escapeHtml(i18n("home.stats.totalChanges")) + "</span></span>" +
       "</div>" +
     "</aside>"
   );
