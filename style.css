@@ -3590,37 +3590,39 @@ background-attachment: fixed;
 }
 .home-hero-top {
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
-  gap: 20px 28px;
+  gap: 20px 24px;
   width: 100%;
 }
-.home-hero-top__left {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 8px;
-  min-width: 0;
-}
-.home-hero-top__right {
+.home-hero-top__discord {
   min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.home-hero-top__right .home-discord-promo--home {
+.home-hero-top__discord .home-discord-promo--home {
   width: 100%;
   max-width: 480px;
+  margin: 0 auto;
+}
+.home-hero-top__stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 0;
 }
 .home-stats-strip {
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 0;
   width: 100%;
-  max-width: none;
-  margin: 0;
+  max-width: 420px;
+  margin: 0 auto;
   padding: 10px 4px 8px;
   background: none;
   border: 0;
@@ -3630,12 +3632,12 @@ background-attachment: fixed;
 .home-stats-strip__item {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   gap: 6px;
   margin: 0;
-  padding: 4px 18px 4px 0;
-  text-align: left;
+  padding: 4px 14px;
+  text-align: center;
   white-space: nowrap;
 }
 .home-stats-strip__value {
@@ -3665,20 +3667,20 @@ background-attachment: fixed;
   align-self: center;
   width: 1px;
   height: 40px;
-  margin: 0 10px 0 0;
+  margin: 0;
   background: rgba(125, 211, 252, 0.35);
   flex-shrink: 0;
 }
 .home-changes-strip {
   width: 100%;
-  max-width: none;
-  margin: 0;
+  max-width: 420px;
+  margin: 0 auto;
   padding: 2px 0 0;
   box-sizing: border-box;
   background: none;
   border: 0;
   box-shadow: none;
-  text-align: left;
+  text-align: center;
 }
 .home-changes-strip__heading {
   margin: 0 0 8px;
@@ -3688,7 +3690,7 @@ background-attachment: fixed;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #7dd3fc;
-  text-align: left;
+  text-align: center;
 }
 .home-changes-strip__viewport {
   overflow-x: auto;
@@ -15354,31 +15356,8 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     gap: 16px;
   }
 
-  .home-hero-top__left {
-    order: 2;
-  }
-
-  .home-hero-top__right {
-    order: 1;
-  }
-
-  .home-hero-top__right .home-discord-promo--home {
+  .home-hero-top__discord .home-discord-promo--home {
     max-width: none;
-  }
-
-  .home-stats-strip {
-    justify-content: center;
-  }
-
-  .home-stats-strip__item {
-    align-items: center;
-    text-align: center;
-    padding: 4px 14px;
-  }
-
-  .home-changes-strip,
-  .home-changes-strip__heading {
-    text-align: center;
   }
 
   .home-lt-bar {
