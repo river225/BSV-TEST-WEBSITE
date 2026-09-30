@@ -46,7 +46,7 @@
 
 <script>
 /* Asset build id (no auto-reload). Bump via tools/bump-build.py */
-window.BSV_BUILD = "20260930-lt-guidelines-ui";
+window.BSV_BUILD = "20260930-lt-msgcheck";
 </script>
 
 <meta charset="UTF-8" />
@@ -90,10 +90,10 @@ window.BSV_BUILD = "20260930-lt-guidelines-ui";
   window.addEventListener("pageshow", removeWrongSiteBanner);
 })();
 </script>
-<script defer src="auth-oauth-bounce.js?v=20260930-lt-guidelines-ui"></script>
+<script defer src="auth-oauth-bounce.js?v=20260930-lt-msgcheck"></script>
 <title>Live Trading — BlockSpin Values (Dev)</title>
 <meta name="description" content="Live Trading — development build of BlockSpin Values." />
-<link rel="stylesheet" href="style.css?v=20260930-lt-guidelines-ui" />
+<link rel="stylesheet" href="style.css?v=20260930-lt-msgcheck" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Paytone+One&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
@@ -202,7 +202,7 @@ window.BSV_BUILD = "20260930-lt-guidelines-ui";
               </button>
               <button type="button" class="lt-composer__submit" id="lt-submit-post">Post trade</button>
             </div>
-            <details class="lt-guide-panel">
+            <details class="lt-guide-panel" open>
               <summary class="lt-guide-panel__summary">
                 <svg class="lt-guide-panel__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M12 3l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V7z"></path>
@@ -301,6 +301,29 @@ window.BSV_BUILD = "20260930-lt-guidelines-ui";
           <p class="lt-join__body">Required to create and interact with trades.</p>
           <div class="lt-join__actions">
             <a class="lt-join__link" id="lt-join-discord-link" href="https://discord.gg/QbapryYUUx" target="_blank" rel="noopener noreferrer">Join Discord server</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="lt-msgcheck" id="lt-msgcheck-modal" hidden>
+        <div class="lt-msgcheck__backdrop" id="lt-msgcheck-backdrop"></div>
+        <div class="lt-msgcheck__box" role="dialog" aria-modal="true" aria-labelledby="lt-msgcheck-title">
+          <h2 class="lt-msgcheck__title" id="lt-msgcheck-title">Make sure traders can message you!</h2>
+          <p class="lt-msgcheck__body">
+            If your Discord settings block DMs or friend requests, other traders might not be able to reach you about your post.
+          </p>
+          <figure class="lt-msgcheck__figure">
+            <img
+              class="lt-msgcheck__img"
+              src="https://i.ibb.co/9kykhvcw/Screenshot-2026-09-30-072300.png"
+              alt="Example Discord privacy settings for messages and friend requests"
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
+          <div class="lt-msgcheck__actions">
+            <button type="button" class="lt-msgcheck__ok" id="lt-msgcheck-ok">Got it — post trade</button>
+            <button type="button" class="lt-msgcheck__cancel" id="lt-msgcheck-cancel">Go back</button>
           </div>
         </div>
       </div>
@@ -434,11 +457,11 @@ window.BSV_BUILD = "20260930-lt-guidelines-ui";
 <div id="bsv-sponsor-banner-slot" class="bsv-sponsor-banner-slot"></div>
 <div id="bsv-site-footer"></div>
 
-<script defer src="site-chrome.js?v=20260930-lt-guidelines-ui"></script>
-<script defer src="auth.js?v=20260930-lt-guidelines-ui"></script>
-<script defer src="site-i18n.js?v=20260930-lt-guidelines-ui"></script>
-<script defer src="site-settings.js?v=20260930-lt-guidelines-ui"></script>
-<script defer src="section-config.js?v=20260930-lt-guidelines-ui"></script>
-<script defer src="live-trading.js?v=20260930-lt-guidelines-ui"></script>
+<script defer src="site-chrome.js?v=20260930-lt-msgcheck"></script>
+<script defer src="auth.js?v=20260930-lt-msgcheck"></script>
+<script defer src="site-i18n.js?v=20260930-lt-msgcheck"></script>
+<script defer src="site-settings.js?v=20260930-lt-msgcheck"></script>
+<script defer src="section-config.js?v=20260930-lt-msgcheck"></script>
+<script defer src="live-trading.js?v=20260930-lt-msgcheck"></script>
 </body>
 </html>

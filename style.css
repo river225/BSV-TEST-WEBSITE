@@ -20567,6 +20567,100 @@ body.live-trading-page .live-trading-workspace {
   word-break: break-all;
 }
 
+.lt-msgcheck[hidden] {
+  display: none !important;
+}
+.lt-msgcheck {
+  position: fixed;
+  inset: 0;
+  z-index: 12200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(72px, 6vh) 16px 24px;
+  box-sizing: border-box;
+}
+.lt-msgcheck__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.68);
+}
+.lt-msgcheck__box {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 460px);
+  max-height: min(86vh, 720px);
+  overflow: auto;
+  padding: 26px 22px 18px;
+  border-radius: 18px;
+  border: 3px solid #000;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(96, 165, 250, 0.18), transparent 48%),
+    var(--bsv-surface-card, #141d28);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.5);
+  color: #fff;
+  text-align: center;
+}
+.lt-msgcheck__title {
+  margin: 0 0 10px;
+  font-size: clamp(1.25rem, 3.5vw, 1.5rem);
+  font-weight: 900;
+  line-height: 1.15;
+}
+.lt-msgcheck__body {
+  margin: 0 0 14px;
+  color: #c7cce0;
+  font-size: 0.95rem;
+  font-weight: 650;
+  line-height: 1.45;
+}
+.lt-msgcheck__figure {
+  margin: 0 0 16px;
+  padding: 0;
+  border-radius: 12px;
+  border: 2px solid #000;
+  overflow: hidden;
+  background: #0b1220;
+  box-shadow: 0 3px 0 #000;
+}
+.lt-msgcheck__img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.lt-msgcheck__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.lt-msgcheck__ok,
+.lt-msgcheck__cancel {
+  appearance: none;
+  width: 100%;
+  margin: 0;
+  padding: 12px 14px;
+  border: 2px solid #000;
+  border-radius: 12px;
+  font: 800 0.95rem/1 system-ui, sans-serif;
+  cursor: pointer;
+}
+.lt-msgcheck__ok {
+  background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%);
+  color: #fff;
+  box-shadow: 0 3px 0 #000;
+}
+.lt-msgcheck__ok:hover {
+  filter: brightness(1.05);
+}
+.lt-msgcheck__cancel {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.9);
+}
+.lt-msgcheck__cancel:hover {
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
 .lt-guidelines[hidden] {
   display: none !important;
 }
@@ -21242,6 +21336,7 @@ html[data-bsv-bg="colorized"] .lt-confirm__box,
 html[data-bsv-bg="colorized"] .lt-report__box,
 html[data-bsv-bg="colorized"] .lt-hidden__box,
 html[data-bsv-bg="colorized"] .lt-guidelines__box,
+html[data-bsv-bg="colorized"] .lt-msgcheck__box,
 html[data-bsv-bg="colorized"] .live-trading-gate__card,
 html[data-bsv-bg="dark"] .lt-picker__box,
 html[data-bsv-bg="dark"] .lt-join__box,
@@ -21249,6 +21344,7 @@ html[data-bsv-bg="dark"] .lt-confirm__box,
 html[data-bsv-bg="dark"] .lt-report__box,
 html[data-bsv-bg="dark"] .lt-hidden__box,
 html[data-bsv-bg="dark"] .lt-guidelines__box,
+html[data-bsv-bg="dark"] .lt-msgcheck__box,
 html[data-bsv-bg="dark"] .live-trading-gate__card {
   background-color: var(--bsv-surface-card) !important;
 }

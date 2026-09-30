@@ -552,6 +552,16 @@
     if (overlay) overlay.addEventListener("click", closeSectionsMenu);
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") {
+        var msgCheck = document.getElementById("lt-msgcheck-modal");
+        if (msgCheck && !msgCheck.hidden) {
+          if (msgCheckResolver) {
+            var resolveMsg = msgCheckResolver;
+            msgCheckResolver = null;
+            resolveMsg(false);
+          }
+          closeMessageCheckModal();
+          return;
+        }
         var guidelines = document.getElementById("lt-guidelines-modal");
         if (guidelines && !guidelines.hidden) {
           if (guidelinesAckResolver) {
@@ -1607,6 +1617,53 @@
     });
   }
 
+  var msgCheckResolver = null;
+
+  function closeMessageCheckModal() {
+    var modal = document.getElementById("lt-msgcheck-modal");
+    if (modal) modal.hidden = true;
+  }
+
+  function showMessageCheckModal() {
+    return new Promise(function (resolve) {
+      var modal = document.getElementById("lt-msgcheck-modal");
+      var okBtn = document.getElementById("lt-msgcheck-ok");
+      var cancelBtn = document.getElementById("lt-msgcheck-cancel");
+      var backdrop = document.getElementById("lt-msgcheck-backdrop");
+      if (!modal || !okBtn || !cancelBtn) {
+        resolve(true);
+        return;
+      }
+      if (msgCheckResolver) {
+        msgCheckResolver(false);
+        msgCheckResolver = null;
+      }
+      msgCheckResolver = resolve;
+      function finish(ok) {
+        closeMessageCheckModal();
+        okBtn.removeEventListener("click", onOk);
+        cancelBtn.removeEventListener("click", onCancel);
+        if (backdrop) backdrop.removeEventListener("click", onCancel);
+        if (msgCheckResolver === resolve) msgCheckResolver = null;
+        resolve(ok);
+      }
+      function onOk() {
+        finish(true);
+      }
+      function onCancel() {
+        finish(false);
+      }
+      okBtn.addEventListener("click", onOk);
+      cancelBtn.addEventListener("click", onCancel);
+      if (backdrop) backdrop.addEventListener("click", onCancel);
+      var submitBtn = document.getElementById("lt-submit-post");
+      if (submitBtn) {
+        okBtn.textContent = editingPostId ? "Got it — save changes" : "Got it — post trade";
+      }
+      modal.hidden = false;
+    });
+  }
+
   function submitPostAfterAuth() {
     clearComposerError();
     draft.givingCash = parseCash(
@@ -1663,6 +1720,13 @@
       }
     };
 
+    showMessageCheckModal().then(function (ok) {
+      if (!ok) return;
+      sendTradePost(payload);
+    });
+  }
+
+  function sendTradePost(payload) {
     var headers = authHeaders();
     headers["Content-Type"] = "application/json";
     var editingId = editingPostId ? String(editingPostId) : "";
