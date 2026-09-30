@@ -2894,8 +2894,11 @@
       issue: String(issueText || "").trim(),
       sheetId: LT_REPORT_SHEET_ID
     };
-    if (!payload.issue) throw new Error("Please describe the issue.");
-    if (!payload.discordId && !isLoggedIn()) throw new Error("Log in to submit a report.");
+    var unknownErr = new Error(
+      "Unknown Error, please report your issue in our discord"
+    );
+    if (!payload.issue) throw unknownErr;
+    if (!payload.discordId && !isLoggedIn()) throw unknownErr;
 
     var url = reportApiUrl();
     var headers = authHeaders();
@@ -2911,23 +2914,14 @@
         body: JSON.stringify(payload)
       });
     } catch (_) {
-      throw new Error("Couldn’t reach the report server. Check your connection and try again.");
+      throw unknownErr;
     }
     var data = null;
     try {
       data = await res.json();
     } catch (_) {}
     if (!res.ok || (data && data.ok === false)) {
-      var code = data && data.error ? String(data.error) : "";
-      var err =
-        code === "report_endpoint_not_configured" || res.status === 503
-          ? "Report inbox isn’t connected yet. Please use Discord for now."
-          : code === "sheet_write_failed" || res.status === 502
-            ? "Report inbox isn’t open yet. In Apps Script set Who has access to Anyone, then try again — or use Discord."
-            : code === "missing_issue"
-              ? "Please describe the issue."
-              : "Couldn’t send your report. Try again or use Discord.";
-      throw new Error(err);
+      throw unknownErr;
     }
   }
 
@@ -2968,9 +2962,9 @@
             setReportStatus("Thanks — your report was sent.", "ok");
             if (issueEl) issueEl.value = "";
           })
-          .catch(function (err) {
+          .catch(function () {
             setReportStatus(
-              (err && err.message) || "Couldn’t send your report.",
+              "Unknown Error, please report your issue in our discord",
               "err"
             );
           })
