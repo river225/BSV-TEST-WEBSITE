@@ -16726,7 +16726,7 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     align-items: center !important;
     justify-content: center !important;
     flex-wrap: nowrap !important;
-    font-size: clamp(2.55rem, 11.5vw, 3.35rem) !important;
+    font-size: clamp(3.6rem, 16vw, 4.75rem) !important;
     gap: 0 !important;
     row-gap: 0 !important;
     margin: 0 auto 2px !important;
@@ -17417,7 +17417,7 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   }
 
   .welcome-header h1 {
-    font-size: clamp(2.35rem, 11vw, 2.9rem) !important;
+    font-size: clamp(3.35rem, 15.5vw, 4.4rem) !important;
     line-height: 0.86 !important;
   }
 
