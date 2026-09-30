@@ -19689,10 +19689,11 @@ body.live-trading-page .live-trading-workspace {
 }
 .lt-search__scope-divider {
   display: inline-block;
-  width: 1px;
-  height: 22px;
-  margin: 0 2px;
-  background: rgba(255, 255, 255, 0.28);
+  width: 2px;
+  height: 18px;
+  margin: 0 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.42);
   align-self: center;
   flex: 0 0 auto;
 }
@@ -21622,8 +21623,18 @@ body.lt-picker-open {
 }
 
 @media (max-width: 900px) {
+  /* Let the document itself scroll (html/body are height:100% site-wide). */
+  html:has(body.live-trading-page),
+  body.live-trading-page {
+    height: auto !important;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
   body.live-trading-page .main-container {
     min-height: 0;
+    height: auto;
+    overflow: visible;
   }
   body.live-trading-page .sections-sidebar,
   body.live-trading-page .live-trading-main {
@@ -21633,7 +21644,14 @@ body.lt-picker-open {
   }
   body.live-trading-page .live-trading-main {
     min-height: 0;
+    height: auto !important;
     margin-right: 0 !important;
+    overflow: visible !important;
+  }
+  body.live-trading-page .live-trading-section {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
   }
   body.live-trading-page .live-trading-workspace {
     width: 100%;
@@ -21732,13 +21750,22 @@ body.lt-picker-open {
   }
   .lt-board__create-btn,
   .lt-board__report-btn {
+    position: relative;
     width: auto;
     flex: 0 0 auto;
     justify-content: center;
-    padding: 9px 14px;
+    padding: 9px 16px;
   }
   .lt-board__create-btn {
-    min-width: 0;
+    min-width: 148px;
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .lt-board__create-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
   }
   .lt-board__create-label {
     font-size: 0.88rem;
@@ -21790,11 +21817,6 @@ body.lt-picker-open {
   .lt-back-to-top__icon {
     display: block;
   }
-  html[data-bsv-bg="colorized"] .lt-feed-wrap,
-  html[data-bsv-bg="dark"] .lt-feed-wrap {
-    background: transparent !important;
-    border-color: transparent !important;
-  }
 }
 
 /* Live Trading — colorized / dark mode surfaces */
@@ -21806,6 +21828,16 @@ html[data-bsv-bg="dark"] .lt-search,
 html[data-bsv-bg="dark"] .lt-feed-wrap {
   background: hsl(var(--bsv-hue) var(--bsv-s-panel) 8% / 0.72) !important;
   border-color: color-mix(in srgb, var(--bsv-accent) 28%, transparent) !important;
+}
+/* Mobile: no outer feed box (must follow the colorized surface rules above). */
+@media (max-width: 900px) {
+  html[data-bsv-bg="colorized"] .lt-feed-wrap,
+  html[data-bsv-bg="dark"] .lt-feed-wrap,
+  body.live-trading-page .lt-feed-wrap {
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
 }
 html[data-bsv-bg="colorized"] .lt-search__input,
 html[data-bsv-bg="colorized"] .lt-cash input,

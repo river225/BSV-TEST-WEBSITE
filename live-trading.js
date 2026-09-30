@@ -2911,16 +2911,34 @@
     return !!(window.matchMedia && window.matchMedia("(max-width: 900px)").matches);
   }
 
+  function liveTradingScrollY() {
+    var se = document.scrollingElement;
+    return Math.max(
+      window.scrollY || 0,
+      (se && se.scrollTop) || 0,
+      document.documentElement.scrollTop || 0,
+      document.body.scrollTop || 0
+    );
+  }
+
+  function scrollLiveTradingPageTop(smooth) {
+    var behavior = smooth ? "smooth" : "auto";
+    try {
+      window.scrollTo({ top: 0, behavior: behavior });
+    } catch (e) {
+      window.scrollTo(0, 0);
+    }
+    try {
+      if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+    } catch (e2) {}
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }
+
   function scrollLiveTradingFeedTop() {
     var feed = document.getElementById("lt-feed");
     if (feed) feed.scrollTop = 0;
-    if (isLiveTradingMobile()) {
-      try {
-        window.scrollTo({ top: 0, behavior: "auto" });
-      } catch (e) {
-        window.scrollTo(0, 0);
-      }
-    }
+    if (isLiveTradingMobile()) scrollLiveTradingPageTop(false);
   }
 
   function bindBackToTop() {
@@ -2932,16 +2950,13 @@
         btn.hidden = true;
         return;
       }
-      btn.hidden = window.scrollY < 280;
+      btn.hidden = liveTradingScrollY() < 280;
     }
     btn.addEventListener("click", function () {
-      try {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } catch (e) {
-        window.scrollTo(0, 0);
-      }
+      scrollLiveTradingPageTop(true);
     });
     window.addEventListener("scroll", sync, { passive: true });
+    document.addEventListener("scroll", sync, { passive: true, capture: true });
     window.addEventListener("resize", sync);
     sync();
   }
