@@ -2895,16 +2895,21 @@
     if (!payload.discordId && !isLoggedIn()) throw new Error("Log in to submit a report.");
 
     var url = reportApiUrl();
-    var res = await fetch(url, {
-      method: "POST",
-      credentials: LT_REPORT_APPS_SCRIPT_URL ? "omit" : "include",
-      headers: {
-        "Content-Type": LT_REPORT_APPS_SCRIPT_URL
-          ? "text/plain;charset=utf-8"
-          : "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
+    var headers = authHeaders();
+    headers["Content-Type"] = LT_REPORT_APPS_SCRIPT_URL
+      ? "text/plain;charset=utf-8"
+      : "application/json";
+    var res;
+    try {
+      res = await fetch(url, {
+        method: "POST",
+        credentials: "omit",
+        headers: headers,
+        body: JSON.stringify(payload)
+      });
+    } catch (_) {
+      throw new Error("Couldn’t reach the report server. Check your connection and try again.");
+    }
     var data = null;
     try {
       data = await res.json();
@@ -2914,9 +2919,11 @@
       var err =
         code === "report_endpoint_not_configured" || res.status === 503
           ? "Report inbox isn’t connected yet. Please use Discord for now."
-          : code === "missing_issue"
-            ? "Please describe the issue."
-            : "Couldn’t send your report. Try again or use Discord.";
+          : code === "sheet_write_failed" || res.status === 502
+            ? "Report inbox isn’t open yet. In Apps Script set Who has access to Anyone, then try again — or use Discord."
+            : code === "missing_issue"
+              ? "Please describe the issue."
+              : "Couldn’t send your report. Try again or use Discord.";
       throw new Error(err);
     }
   }
