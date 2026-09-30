@@ -756,7 +756,8 @@
   var LT_PROMO_HIDDEN_SECTION_IDS = {
     "untradeable-items": true,
     "richest-players": true,
-    "crew-logos": true
+    "crew-logos": true,
+    "live-trading": true
   };
 
   function getActiveItemSection() {
@@ -777,6 +778,10 @@
 
   function shouldShowLiveTradingSectionPromo(active) {
     if (!active || !active.id) return false;
+    try {
+      var page = document.body && document.body.getAttribute("data-bsv-page");
+      if (page === "live-trading") return false;
+    } catch (e) {}
     return !LT_PROMO_HIDDEN_SECTION_IDS[active.id];
   }
 

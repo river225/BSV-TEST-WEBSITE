@@ -2891,7 +2891,7 @@
       return;
     }
     if (!opts.force && key === lastRenderedPostIds && feed.querySelector(".lt-post")) {
-      if (opts.preferTop) feed.scrollTop = 0;
+      if (opts.preferTop) scrollLiveTradingFeedTop();
       return;
     }
     var prevKey = lastRenderedPostIds || "";
@@ -2904,7 +2904,46 @@
         return postCardHtml(post, isNew);
       })
       .join("");
-    if (opts.preferTop) feed.scrollTop = 0;
+    if (opts.preferTop) scrollLiveTradingFeedTop();
+  }
+
+  function isLiveTradingMobile() {
+    return !!(window.matchMedia && window.matchMedia("(max-width: 900px)").matches);
+  }
+
+  function scrollLiveTradingFeedTop() {
+    var feed = document.getElementById("lt-feed");
+    if (feed) feed.scrollTop = 0;
+    if (isLiveTradingMobile()) {
+      try {
+        window.scrollTo({ top: 0, behavior: "auto" });
+      } catch (e) {
+        window.scrollTo(0, 0);
+      }
+    }
+  }
+
+  function bindBackToTop() {
+    var btn = document.getElementById("lt-back-to-top");
+    if (!btn || btn.dataset.bound === "1") return;
+    btn.dataset.bound = "1";
+    function sync() {
+      if (!isLiveTradingMobile()) {
+        btn.hidden = true;
+        return;
+      }
+      btn.hidden = window.scrollY < 280;
+    }
+    btn.addEventListener("click", function () {
+      try {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (e) {
+        window.scrollTo(0, 0);
+      }
+    });
+    window.addEventListener("scroll", sync, { passive: true });
+    window.addEventListener("resize", sync);
+    sync();
   }
 
   function ensureFloatTip() {
@@ -3437,6 +3476,7 @@
     bindLoginUi();
     bindBoardUi();
     bindReportUi();
+    bindBackToTop();
     lockLiveTradingSidebarWidths();
     window.addEventListener("resize", function () {
       lockLiveTradingSidebarWidths();
