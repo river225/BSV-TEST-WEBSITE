@@ -18430,10 +18430,21 @@ body.live-trading-page .live-trading-workspace {
   margin: 0 auto;
   box-sizing: border-box;
 }
-.lt-board__title {
+.lt-board__head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   margin: 4px 0 0;
   padding: 0 8px;
+  box-sizing: border-box;
+  min-height: 2.6rem;
+}
+.lt-board__title {
+  width: auto;
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
   text-align: center;
   font-size: clamp(1.9rem, 2.2vw + 1rem, 2.45rem);
@@ -18441,6 +18452,266 @@ body.live-trading-page .live-trading-workspace {
   line-height: 1.15;
   color: #fff;
   text-shadow: 2px 2px 0 #000, -2px 2px 0 #000, 2px -2px 0 #000, -2px -2px 0 #000;
+}
+.lt-board__report-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  padding: 8px 12px;
+  border: 2px solid #000;
+  border-radius: 11px;
+  background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 55%, #ea580c 100%);
+  color: #1c1004;
+  font: 800 0.82rem/1 system-ui, sans-serif;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #000;
+  white-space: nowrap;
+  z-index: 2;
+}
+.lt-board__report-btn:hover {
+  filter: brightness(1.05);
+}
+.lt-board__report-btn:active {
+  transform: translateY(calc(-50% + 1px));
+  box-shadow: 0 2px 0 #000;
+}
+.lt-board__report-icon {
+  display: block;
+  flex: 0 0 auto;
+}
+.lt-report[hidden] {
+  display: none !important;
+}
+.lt-report {
+  position: fixed;
+  inset: 0;
+  z-index: 3200;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 18px 14px 24px;
+  box-sizing: border-box;
+}
+.lt-report__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 8, 16, 0.72);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.lt-report__box {
+  position: relative;
+  z-index: 1;
+  width: min(92vw, 460px);
+  margin-top: 10px;
+  padding: 22px 20px 18px;
+  border-radius: 16px;
+  border: 2px solid #000;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(251, 191, 36, 0.22), transparent 42%),
+    linear-gradient(180deg, #1c2434 0%, #121824 100%);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 0 2px rgba(251, 191, 36, 0.2);
+  color: #fff;
+  text-align: center;
+  animation: lt-report-drop 0.22s ease-out;
+}
+@keyframes lt-report-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.lt-report__close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border: 2px solid #000;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.lt-report__eyebrow {
+  margin: 0 0 4px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fbbf24;
+}
+.lt-report__title {
+  margin: 0 0 8px;
+  font-family: "Paytone One", system-ui, sans-serif;
+  font-size: 1.55rem;
+  line-height: 1.15;
+  text-shadow: 2px 2px 0 #000;
+}
+.lt-report__lead {
+  margin: 0 0 14px;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+.lt-report__discord {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 2px solid #000;
+  background: linear-gradient(135deg, #5865f2 0%, #7289da 100%);
+  color: #fff;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 3px 0 #000;
+}
+.lt-report__discord:hover {
+  filter: brightness(1.06);
+}
+.lt-report__divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 12px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.lt-report__divider::before,
+.lt-report__divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.16);
+}
+.lt-report__form-title {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+.lt-report__form-note {
+  margin: 0 0 10px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+.lt-report__login-btn,
+.lt-report__submit {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 11px 14px;
+  border: 2px solid #000;
+  border-radius: 12px;
+  cursor: pointer;
+  font: 800 0.92rem/1 system-ui, sans-serif;
+  box-shadow: 0 3px 0 #000;
+}
+.lt-report__login-btn {
+  background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%);
+  color: #fff;
+}
+.lt-report__submit {
+  background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
+  color: #1c1004;
+}
+.lt-report__login-btn:hover,
+.lt-report__submit:hover {
+  filter: brightness(1.05);
+}
+.lt-report__submit:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+.lt-report__form {
+  text-align: left;
+}
+.lt-report__identity {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(251, 191, 36, 0.28);
+  background: rgba(0, 0, 0, 0.25);
+  color: #fde68a;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.lt-report__label {
+  display: block;
+  margin: 0 0 6px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.85);
+}
+.lt-report__textarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 110px;
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  border: 2px solid #000;
+  border-radius: 12px;
+  background: #0b1220;
+  color: #fff;
+  font: 600 0.92rem/1.4 system-ui, sans-serif;
+  resize: vertical;
+}
+.lt-report__textarea:focus {
+  outline: none;
+  border-color: #f59e0b;
+}
+.lt-report__status {
+  margin: 0 0 10px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #93c5fd;
+}
+.lt-report__status.is-ok {
+  color: #86efac;
+}
+.lt-report__status.is-err {
+  color: #fca5a5;
+}
+@media (max-width: 720px) {
+  .lt-board__head {
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
+  }
+  .lt-board__report-btn {
+    position: static;
+    transform: none;
+    width: 100%;
+    justify-content: center;
+  }
+  .lt-board__report-btn:active {
+    transform: translateY(1px);
+  }
 }
 .lt-toolbar {
   display: flex;

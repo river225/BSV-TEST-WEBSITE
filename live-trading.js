@@ -624,6 +624,9 @@
   }
 
   var DISCORD_INVITE_FALLBACK = "https://discord.gg/QbapryYUUx";
+  // Optional direct Apps Script URL. Prefer Railway env LT_REPORT_APPS_SCRIPT_URL via bot proxy.
+  var LT_REPORT_APPS_SCRIPT_URL = "";
+  var LT_REPORT_SHEET_ID = "1FEwl6yfOIVm79d1OlNMy8olYVngcdrVocWi462DXWRk";
   var guildMemberCache = {
     checkedAt: 0,
     inGuild: false,
@@ -762,6 +765,7 @@
     fetchPosts({ force: true });
     startPostsPolling();
     syncLiveTradingBoardHeight();
+    syncReportFormState();
     return currentSession;
   }
 
@@ -2816,11 +2820,167 @@
     syncLiveTradingBoardHeight();
   }
 
+  function reportApiUrl() {
+    if (LT_REPORT_APPS_SCRIPT_URL) return LT_REPORT_APPS_SCRIPT_URL;
+    return authApiUrl("api/live-trading/report");
+  }
+
+  function setReportStatus(message, kind) {
+    var el = document.getElementById("lt-report-status");
+    if (!el) return;
+    if (!message) {
+      el.hidden = true;
+      el.textContent = "";
+      el.className = "lt-report__status";
+      return;
+    }
+    el.hidden = false;
+    el.textContent = message;
+    el.className =
+      "lt-report__status" +
+      (kind === "ok" ? " is-ok" : kind === "err" ? " is-err" : "");
+  }
+
+  function syncReportFormState() {
+    var form = document.getElementById("lt-report-form");
+    var loginNote = document.getElementById("lt-report-login-note");
+    var loginBtn = document.getElementById("lt-report-login");
+    var identity = document.getElementById("lt-report-identity");
+    var loggedIn = isLoggedIn();
+    if (form) form.hidden = !loggedIn;
+    if (loginNote) loginNote.hidden = loggedIn;
+    if (loginBtn) loginBtn.hidden = loggedIn;
+    if (identity) {
+      if (!loggedIn) {
+        identity.textContent = "";
+      } else {
+        var a = authorFromSession();
+        identity.textContent =
+          "Reporting as " +
+          (a.discordDisplayName || a.discordUsername || "Discord user") +
+          (a.discordUsername ? " (@" + a.discordUsername + ")" : "") +
+          (a.discordId ? " · ID " + a.discordId : "");
+      }
+    }
+  }
+
+  function openReportModal() {
+    var modal = document.getElementById("lt-report-modal");
+    if (!modal) return;
+    setReportStatus("", "");
+    var issue = document.getElementById("lt-report-issue");
+    if (issue) issue.value = "";
+    syncReportFormState();
+    modal.hidden = false;
+    document.body.classList.add("lt-report-open");
+  }
+
+  function closeReportModal() {
+    var modal = document.getElementById("lt-report-modal");
+    if (modal) modal.hidden = true;
+    document.body.classList.remove("lt-report-open");
+    setReportStatus("", "");
+  }
+
+  async function submitReportIssue(issueText) {
+    var a = authorFromSession();
+    var payload = {
+      displayName: a.discordDisplayName || "",
+      username: a.discordUsername || "",
+      discordId: a.discordId || sessionDiscordId() || "",
+      issue: String(issueText || "").trim(),
+      sheetId: LT_REPORT_SHEET_ID
+    };
+    if (!payload.issue) throw new Error("Please describe the issue.");
+    if (!payload.discordId && !isLoggedIn()) throw new Error("Log in to submit a report.");
+
+    var url = reportApiUrl();
+    var res = await fetch(url, {
+      method: "POST",
+      credentials: LT_REPORT_APPS_SCRIPT_URL ? "omit" : "include",
+      headers: {
+        "Content-Type": LT_REPORT_APPS_SCRIPT_URL
+          ? "text/plain;charset=utf-8"
+          : "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+    var data = null;
+    try {
+      data = await res.json();
+    } catch (_) {}
+    if (!res.ok || (data && data.ok === false)) {
+      var code = data && data.error ? String(data.error) : "";
+      var err =
+        code === "report_endpoint_not_configured" || res.status === 503
+          ? "Report inbox isn’t connected yet. Please use Discord for now."
+          : code === "missing_issue"
+            ? "Please describe the issue."
+            : "Couldn’t send your report. Try again or use Discord.";
+      throw new Error(err);
+    }
+  }
+
+  function bindReportUi() {
+    var openBtn = document.getElementById("lt-open-report");
+    var closeBtn = document.getElementById("lt-report-close");
+    var backdrop = document.getElementById("lt-report-backdrop");
+    var loginBtn = document.getElementById("lt-report-login");
+    var form = document.getElementById("lt-report-form");
+    var submitBtn = document.getElementById("lt-report-submit");
+
+    if (openBtn) openBtn.addEventListener("click", openReportModal);
+    if (closeBtn) closeBtn.addEventListener("click", closeReportModal);
+    if (backdrop) backdrop.addEventListener("click", closeReportModal);
+    if (loginBtn) {
+      loginBtn.addEventListener("click", function () {
+        openSharedLogin();
+      });
+    }
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Escape") return;
+      var modal = document.getElementById("lt-report-modal");
+      if (modal && !modal.hidden) closeReportModal();
+    });
+
+    if (form) {
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var issueEl = document.getElementById("lt-report-issue");
+        var text = issueEl ? issueEl.value : "";
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Sending…";
+        }
+        setReportStatus("Sending your report…", "");
+        submitReportIssue(text)
+          .then(function () {
+            setReportStatus("Thanks — your report was sent.", "ok");
+            if (issueEl) issueEl.value = "";
+          })
+          .catch(function (err) {
+            setReportStatus(
+              (err && err.message) || "Couldn’t send your report.",
+              "err"
+            );
+          })
+          .finally(function () {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.textContent = "Send report";
+            }
+          });
+      });
+    }
+
+  }
+
   function init() {
     buildSectionsNav();
     initMobileSectionsMenu();
     bindLoginUi();
     bindBoardUi();
+    bindReportUi();
     lockLiveTradingSidebarWidths();
     window.addEventListener("resize", function () {
       lockLiveTradingSidebarWidths();
