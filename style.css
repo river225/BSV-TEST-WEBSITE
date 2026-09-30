@@ -20080,9 +20080,38 @@ body.live-trading-page .live-trading-workspace {
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
   margin-top: 10px;
   padding-top: 2px;
+}
+.lt-post__hide {
+  appearance: none;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 2px solid #000;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+  color: #e2e8f0;
+  font: 800 0.82rem/1 system-ui, sans-serif;
+  cursor: pointer;
+  box-shadow: 0 2px 0 #000;
+}
+.lt-post__hide:hover {
+  filter: brightness(1.08);
+  color: #fff;
+}
+.lt-post__hide:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 #000;
+}
+.lt-post__hide-icon {
+  display: block;
+  flex: 0 0 auto;
 }
 .lt-post__actions {
   flex: 0 0 auto;

@@ -2492,7 +2492,15 @@
   function postFootHtml(post) {
     var own = canEditPost(post);
     var canDel = canDeletePost(post);
-    if (!own && !canDel) return "";
+    var author = post.author || {};
+    var discordId = String(author.discordId || author.id || "").trim();
+    var ownId = sessionDiscordId();
+    var canHide =
+      !!discordId &&
+      /^\d{5,32}$/.test(discordId) &&
+      !isOwnPost(post) &&
+      (!ownId || discordId !== ownId);
+    if (!own && !canDel && !canHide) return "";
     return (
       '<div class="lt-post__foot">' +
       (own
@@ -2504,6 +2512,17 @@
         ? '<button type="button" class="lt-post__delete" data-delete="' +
           escapeAttr(post.id) +
           '">Delete</button>'
+        : "") +
+      (canHide
+        ? '<button type="button" class="lt-post__hide" data-lt-hide="' +
+          escapeAttr(discordId) +
+          '" aria-label="Hide posts from this person">' +
+          '<svg class="lt-post__hide-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+          '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path>' +
+          '<circle cx="12" cy="12" r="3"></circle>' +
+          "</svg>" +
+          "<span>Hide</span>" +
+          "</button>"
         : "") +
       "</div>"
     );
@@ -2958,22 +2977,16 @@
         renderPickerGrid();
         return;
       }
+      var hideBtn = e.target.closest && e.target.closest("[data-lt-hide]");
+      if (hideBtn) {
+        e.preventDefault();
+        requestHideAuthor(hideBtn.getAttribute("data-lt-hide"));
+        return;
+      }
       var unhideBtn = e.target.closest && e.target.closest("[data-lt-unhide]");
       if (unhideBtn) {
         e.preventDefault();
         requestUnhideAuthor(unhideBtn.getAttribute("data-lt-unhide"));
-        return;
-      }
-      var profileHideBtn =
-        e.target.closest && e.target.closest("#lt-profile-hide");
-      if (profileHideBtn) {
-        e.preventDefault();
-        if (!profileOpenDiscordId) return;
-        if (isAuthorHidden(profileOpenDiscordId)) {
-          requestUnhideAuthor(profileOpenDiscordId);
-        } else {
-          requestHideAuthor(profileOpenDiscordId);
-        }
         return;
       }
       var scope = e.target.closest && e.target.closest(".lt-search__scope");
