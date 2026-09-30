@@ -2014,13 +2014,17 @@
     return confirmTwice(
       {
         title: "Hide posts from " + name + "?",
-        body: "Their Live Trading posts will be hidden from your feed.",
+        body:
+          "Their Live Trading posts will be hidden from your feed. You can unhide them anytime from the Hidden tab.",
         okLabel: "Hide posts",
         danger: true
       },
       {
         title: "Are you sure?",
-        body: "Confirm you want to hide posts from " + name + ".",
+        body:
+          "Confirm you want to hide posts from " +
+          name +
+          ". You can unhide them anytime from the Hidden tab.",
         okLabel: "Yes, hide",
         danger: true
       }
