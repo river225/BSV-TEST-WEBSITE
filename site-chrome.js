@@ -42,16 +42,18 @@
     var root = siteRoot();
     if (root === "/") return;
     var scope = rootEl || document;
+    // Include plain "/" and "/#..." back-links — those break on GitHub project Pages.
     var nodes = scope.querySelectorAll(
-      '[src^="/assets/"], [href^="/assets/"], [href^="/favicon"], [href^="/apple-touch"], [href^="/x-"], [href^="/z-"], [href^="/sponsors"], [href^="/live-trading"]'
+      '[src^="/"], [href^="/"]'
     );
     for (var i = 0; i < nodes.length; i++) {
       var el = nodes[i];
       var attr = el.hasAttribute("src") ? "src" : "href";
       var val = el.getAttribute(attr);
-      if (!val || val.charAt(0) !== "/" || val.indexOf(root) === 0) continue;
+      if (!val || val.charAt(0) !== "/") continue;
       // Don't rewrite protocol-relative or already-prefixed paths.
       if (val.indexOf("//") === 0) continue;
+      if (val.indexOf(root) === 0) continue;
       el.setAttribute(attr, root + val.slice(1));
     }
   }
