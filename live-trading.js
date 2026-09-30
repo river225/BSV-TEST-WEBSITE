@@ -2849,7 +2849,10 @@
     var loggedIn = isLoggedIn();
     if (form) form.hidden = !loggedIn;
     if (loginNote) loginNote.hidden = loggedIn;
-    if (loginBtn) loginBtn.hidden = loggedIn;
+    if (loginBtn) {
+      loginBtn.hidden = loggedIn;
+      loginBtn.style.display = loggedIn ? "none" : "";
+    }
     if (identity) {
       if (!loggedIn) {
         identity.textContent = "";
