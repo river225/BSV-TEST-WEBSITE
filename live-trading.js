@@ -4,8 +4,11 @@
   var SPREADSHEET_ID = "18s5ZK-b256navTEfZQFF1TxICwQ3xLjhiSJH4X97Ji4";
   var POSTS_KEY = "bsv-live-trades-v1";
   var HIDDEN_AUTHORS_KEY = "bsv-lt-hidden-authors-v1";
+  var GUIDELINES_ACK_KEY = "bsv-lt-guidelines-ack-v1";
+  var GUIDELINES_ACK_MS = 24 * 60 * 60 * 1000;
   var EMPTY_SLOT_COUNT = 8;
   var profileOpenDiscordId = "";
+  var pendingOpenComposerAfterGuidelines = false;
   var postsCache = [];
   var postsFetchInFlight = null;
   var postsFetchGen = 0;
@@ -549,6 +552,16 @@
     if (overlay) overlay.addEventListener("click", closeSectionsMenu);
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") {
+        var guidelines = document.getElementById("lt-guidelines-modal");
+        if (guidelines && !guidelines.hidden) {
+          if (guidelinesAckResolver) {
+            var resolve = guidelinesAckResolver;
+            guidelinesAckResolver = null;
+            resolve(false);
+          }
+          closeTradeGuidelines();
+          return;
+        }
         closeSectionsMenu();
         closePicker();
         closeHiddenAuthorsModal();
@@ -737,6 +750,61 @@
       // Already logged in but not in server — reopen the trading login modal on step 2.
       openSharedLogin();
       return false;
+    });
+  }
+
+  function readGuidelinesAckAt() {
+    try {
+      var n = Number(localStorage.getItem(GUIDELINES_ACK_KEY) || 0);
+      return Number.isFinite(n) ? n : 0;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  function needsTradeGuidelines() {
+    var last = readGuidelinesAckAt();
+    if (!last) return true;
+    return Date.now() - last >= GUIDELINES_ACK_MS;
+  }
+
+  function closeTradeGuidelines() {
+    var modal = document.getElementById("lt-guidelines-modal");
+    if (modal) modal.hidden = true;
+    pendingOpenComposerAfterGuidelines = false;
+  }
+
+  var guidelinesAckResolver = null;
+
+  function acknowledgeTradeGuidelines() {
+    try {
+      localStorage.setItem(GUIDELINES_ACK_KEY, String(Date.now()));
+    } catch (_) {}
+    var modal = document.getElementById("lt-guidelines-modal");
+    if (modal) modal.hidden = true;
+    pendingOpenComposerAfterGuidelines = false;
+    if (guidelinesAckResolver) {
+      var resolve = guidelinesAckResolver;
+      guidelinesAckResolver = null;
+      resolve(true);
+    }
+  }
+
+  function ensureTradeGuidelines() {
+    if (!needsTradeGuidelines()) return Promise.resolve(true);
+    return new Promise(function (resolve) {
+      var modal = document.getElementById("lt-guidelines-modal");
+      if (!modal) {
+        resolve(true);
+        return;
+      }
+      if (guidelinesAckResolver) {
+        guidelinesAckResolver(false);
+        guidelinesAckResolver = null;
+      }
+      guidelinesAckResolver = resolve;
+      pendingOpenComposerAfterGuidelines = true;
+      modal.hidden = false;
     });
   }
 
@@ -2844,10 +2912,19 @@
       openCreate.addEventListener("click", function () {
         requireLoginForAction().then(function (ok) {
           if (!ok) return;
-          resetDraft();
-          setComposerOpen(true);
-          loadCatalog();
+          ensureTradeGuidelines().then(function (accepted) {
+            if (!accepted) return;
+            resetDraft();
+            setComposerOpen(true);
+            loadCatalog();
+          });
         });
+      });
+    }
+    var guidelinesOk = document.getElementById("lt-guidelines-ok");
+    if (guidelinesOk) {
+      guidelinesOk.addEventListener("click", function () {
+        acknowledgeTradeGuidelines();
       });
     }
     if (pastePrev) {
