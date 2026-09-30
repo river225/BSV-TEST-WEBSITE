@@ -423,10 +423,46 @@
       });
   }
 
+  function clearLoginMenuFixedPosition(menu) {
+    if (!menu) return;
+    menu.style.position = "";
+    menu.style.top = "";
+    menu.style.right = "";
+    menu.style.left = "";
+    menu.style.bottom = "";
+    menu.style.width = "";
+    menu.style.maxHeight = "";
+    menu.style.zIndex = "";
+  }
+
+  function positionLoginMenuFixed(menu, btn) {
+    if (!menu || !btn || typeof window.matchMedia !== "function") return;
+    if (!window.matchMedia("(max-width: 900px)").matches) {
+      clearLoginMenuFixedPosition(menu);
+      return;
+    }
+    var rect = btn.getBoundingClientRect();
+    var gutter = 10;
+    var width = Math.min(300, window.innerWidth - gutter * 2);
+    var top = Math.round(rect.bottom + 8);
+    var maxHeight = Math.max(160, Math.floor(window.innerHeight - top - gutter));
+    menu.style.position = "fixed";
+    menu.style.top = top + "px";
+    menu.style.right = gutter + "px";
+    menu.style.left = "auto";
+    menu.style.bottom = "auto";
+    menu.style.width = width + "px";
+    menu.style.maxHeight = maxHeight + "px";
+    menu.style.zIndex = "2000";
+  }
+
   function closeLoginMenu() {
     var menu = document.getElementById("nav-login-menu");
     var btn = document.getElementById("nav-login-btn");
-    if (menu) menu.hidden = true;
+    if (menu) {
+      menu.hidden = true;
+      clearLoginMenuFixedPosition(menu);
+    }
     if (btn) btn.setAttribute("aria-expanded", "false");
     logoutChoicesOpen = false;
     var choices = document.getElementById("nav-login-logout-choices");
@@ -698,6 +734,11 @@
         var open = menu.hidden;
         menu.hidden = !open;
         btn.setAttribute("aria-expanded", open ? "true" : "false");
+        if (open) {
+          positionLoginMenuFixed(menu, btn);
+        } else {
+          clearLoginMenuFixedPosition(menu);
+        }
       });
     }
 

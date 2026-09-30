@@ -15414,7 +15414,7 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
 
 @media (max-width: 900px) {
   body {
-    padding-top: 72px;
+    padding-top: 78px;
   }
 
   .site-header-shell {
@@ -15425,6 +15425,7 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     z-index: 1000;
     background: var(--bsv-surface-chrome);
     border-bottom: 2px solid #000;
+    overflow: visible;
   }
 
   .top-navbar {
@@ -15433,10 +15434,11 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     left: auto;
     width: 100%;
     display: block;
-    padding: 12px 0;
+    padding: 10px 0;
     background: transparent;
     border-bottom: none;
     z-index: auto;
+    overflow: visible;
   }
 
   .site-mobile-below-header {
@@ -15605,44 +15607,14 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     line-height: 1.4;
   }
 
+  /* Hide Value List / Live Trading / Giveaways next to saved (archives) toolbar */
   .header-subnav {
-    display: flex;
-    flex: 0 1 auto;
-    justify-content: flex-start;
-    align-items: center;
-    flex-wrap: nowrap;
-    gap: 6px 10px;
-    width: auto;
-    padding: 0;
-    margin: 0;
-    background: transparent;
-    border: none;
-    position: static;
-    text-align: left;
-    box-shadow: none;
-    box-sizing: border-box;
+    display: none !important;
   }
 
-  .header-subnav a {
-    color: #fff;
-    text-decoration: none;
-    font-size: 0.88rem;
-    font-weight: 600;
-    white-space: nowrap;
-    text-shadow: 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000;
-    transition: color 0.2s ease;
-  }
-
-  .header-subnav a:hover,
-  .header-subnav a.nav-link--active {
-    color: var(--bsv-accent);
-    text-decoration: underline;
-  }
-
+  .header-subnav a,
   .header-subnav__sep {
-    color: rgba(255, 255, 255, 0.45);
-    font-weight: 700;
-    user-select: none;
+    display: none !important;
   }
 
   .nav-mobile-toolbar {
@@ -15737,47 +15709,65 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
 
   .nav-right .nav-login {
     flex-shrink: 0;
+    position: relative;
+    z-index: 1900;
+    overflow: visible;
+  }
+
+  .nav-right .nav-login-user {
+    position: relative;
+    overflow: visible;
   }
 
   .nav-right .nav-login-btn--signin {
-    min-width: 96px;
-    height: 40px;
-    padding: 0 12px;
+    min-width: 108px;
+    height: 46px;
+    padding: 0 16px;
     border-width: 2px;
     box-shadow: 0 2px 0 #000;
+    border-radius: 12px;
   }
 
   .nav-right .nav-login-btn__label {
-    font-size: 0.92rem;
+    font-size: 1.05rem;
+    font-weight: 800;
   }
 
   .nav-right .nav-login-btn--signedin {
-    max-width: 200px;
-    gap: 10px;
+    max-width: 148px;
+    height: 46px;
+    gap: 8px;
+    padding: 0 10px 0 6px;
   }
 
   .nav-right .nav-login-btn__name {
-    font-size: 0.85rem;
-    max-width: 96px;
+    font-size: 0.82rem;
+    max-width: 72px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
   .nav-right .nav-login-btn__avatar-wrap {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
   }
 
   .nav-right .nav-login-btn__avatar {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
   }
 
   .nav-right .nav-login-menu {
     top: calc(100% + 8px);
     right: 0;
-    z-index: 1800;
+    left: auto;
+    width: min(300px, calc(100vw - 20px));
+    max-height: min(70vh, 520px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    z-index: 2000;
+    -webkit-overflow-scrolling: touch;
   }
 
   .nav-container-full {
@@ -15785,7 +15775,12 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     gap: 6px;
     align-items: center;
     min-width: 0;
-    overflow: hidden;
+    overflow: visible;
+  }
+
+  .site-header-shell,
+  .top-navbar {
+    overflow: visible;
   }
 
   .nav-left {
@@ -16268,20 +16263,53 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
 
   .sections-menu-toggle {
     display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
     position: fixed;
-    top: 86px;
-    left: 18px;
+    top: 78px;
+    left: 12px;
     z-index: 1200;
+    width: 46px;
+    height: 46px;
     margin: 0;
-    color: var(--bsv-accent);
-    background: hsl(var(--bsv-accent-hue) 76% 55% / 0.1);
-    border: 2px solid var(--bsv-accent);
-    box-shadow: 0 2px 0 #000;
-    transition: opacity 0.2s ease, visibility 0.2s ease;
+    padding: 0;
+    color: #fff;
+    background: linear-gradient(
+      180deg,
+      hsl(var(--bsv-accent-hue) 78% 48%) 0%,
+      hsl(var(--bsv-accent-hue) 78% 36%) 100%
+    );
+    border: 2px solid #000;
+    border-radius: 14px;
+    box-shadow: 0 3px 0 #000, 0 8px 18px rgba(0, 0, 0, 0.28);
+    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.15s ease,
+      filter 0.15s ease;
+  }
+
+  .sections-menu-toggle__bar {
+    width: 20px;
+    height: 2.5px;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
   }
 
   .sections-menu-toggle.is-open {
-    background: hsl(var(--bsv-accent-hue) 76% 55% / 0.18);
+    background: linear-gradient(
+      180deg,
+      hsl(var(--bsv-accent-hue) 78% 52%) 0%,
+      hsl(var(--bsv-accent-hue) 78% 40%) 100%
+    );
+  }
+
+  .sections-menu-toggle.is-open .sections-menu-toggle__bar:nth-child(1) {
+    transform: translateY(7.5px) rotate(45deg);
+  }
+
+  .sections-menu-toggle.is-open .sections-menu-toggle__bar:nth-child(3) {
+    transform: translateY(-7.5px) rotate(-45deg);
   }
 
   body.sections-menu-open .sections-menu-toggle {
@@ -16300,15 +16328,15 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   }
 
   .nav-logo-img {
-    height: 44px;
+    height: 54px;
     width: auto;
-    margin-left: 8px;
+    margin-left: 6px;
     flex-shrink: 0;
     display: block;
   }
 
   .nav-title {
-    font-size: clamp(1.1rem, 4.8vw, 1.75rem);
+    font-size: clamp(1.22rem, 5.2vw, 1.85rem);
     line-height: 1.02;
     flex: 1 1 auto;
     min-width: 0;
@@ -16454,34 +16482,46 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
 
   /* Home */
   body.is-home .main-container {
-    margin-top: 24px;
+    margin-top: 12px;
   }
 
   body.is-home .home-page-clean {
-    padding-top: 12px;
+    padding-top: 4px;
   }
 
   .home-page-clean {
     max-width: 100%;
     padding: 0 4px 28px;
     gap: 0;
+    /* Slightly zoomed-out mobile home composition */
+    zoom: 0.9;
   }
 
   .welcome-header {
-    margin-bottom: 14px;
+    margin-bottom: 8px;
     padding: 0 4px;
   }
 
   .welcome-header h1 {
-    font-size: clamp(3rem, 13vw, 4.25rem);
-    gap: 0.12em;
+    flex-direction: column;
+    align-items: center;
+    flex-wrap: nowrap;
+    font-size: clamp(2.35rem, 10.5vw, 3.1rem);
+    gap: 0;
+    row-gap: 0;
     margin-bottom: 0;
+    line-height: 0.88;
+  }
+
+  .welcome-header h1 .welcome-title-line {
+    display: block;
+    line-height: 0.88;
   }
 
   .welcome-header .subtitle {
-    font-size: clamp(1.05rem, 3.6vw, 1.25rem);
-    line-height: 1.35;
-    margin-top: 18px;
+    font-size: clamp(0.92rem, 3.2vw, 1.08rem);
+    line-height: 1.3;
+    margin-top: 6px;
     padding: 0 10px;
   }
 
@@ -16500,20 +16540,22 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   }
 
   .home-hero-mount {
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
 
   .home-hero-stack {
     padding: 0;
-    margin-bottom: 20px;
-    gap: 16px;
+    margin-bottom: 14px;
+    gap: 10px;
     max-width: none;
   }
 
   .home-hero-top {
+    --home-hero-scale: 1;
+    zoom: 1;
     grid-template-columns: 1fr;
     justify-items: center;
-    gap: 16px;
+    gap: 8px;
   }
 
   .home-hero-top__discord {
@@ -16528,6 +16570,32 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   .home-hero-top__stats {
     max-width: none;
     justify-self: stretch;
+    padding-top: 0;
+    padding-bottom: 0;
+    gap: 8px;
+    margin-top: -2px;
+  }
+
+  .home-changelog-modal {
+    padding: 12px 12px;
+    align-items: center;
+  }
+
+  .home-changelog-modal__panel {
+    max-height: min(58vh, 480px);
+    border-radius: 14px;
+  }
+
+  .home-changelog-modal__header {
+    padding: 12px 14px 10px;
+  }
+
+  .home-changelog-modal__title {
+    font-size: 1rem;
+  }
+
+  .home-changelog-modal__body {
+    padding: 8px 10px 12px;
   }
 
   .home-lt-bar {
@@ -16548,19 +16616,34 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
 
   .home-stats-strip {
     margin-top: 0;
-    padding: 8px 4px;
+    padding: 2px 2px;
   }
 
   .home-stats-strip__value {
-    font-size: clamp(1.7rem, 7vw, 2.2rem);
+    font-size: clamp(1.2rem, 5.2vw, 1.55rem);
   }
 
   .home-stats-strip__label {
-    font-size: 0.7rem;
+    font-size: 0.56rem;
+    letter-spacing: 0.04em;
+  }
+
+  .home-stats-strip__label-text {
+    font-size: inherit;
+  }
+
+  .home-stats-strip__icon {
+    width: 12px;
+    height: 12px;
   }
 
   .home-stats-strip__rule {
-    height: 40px;
+    height: 28px;
+  }
+
+  .home-hero-top__stats .home-changes-strip__heading {
+    font-size: 0.72rem;
+    margin-bottom: 6px;
   }
 
   .home-hero-row__banner {
@@ -17037,7 +17120,7 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   }
 
   .nav-logo-img {
-    height: 36px;
+    height: 50px;
     margin-left: 4px;
   }
 
@@ -17091,7 +17174,33 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   }
 
   .welcome-header h1 {
-    font-size: 2.15rem;
+    font-size: 2.05rem;
+    line-height: 0.86;
+  }
+
+  .welcome-header h1 .welcome-title-line {
+    line-height: 0.86;
+  }
+
+  .welcome-header .subtitle {
+    margin-top: 4px;
+    font-size: 0.88rem;
+  }
+
+  .home-page-clean {
+    zoom: 0.88;
+  }
+
+  .home-stats-strip__value {
+    font-size: 1.15rem;
+  }
+
+  .home-stats-strip__label {
+    font-size: 0.5rem;
+  }
+
+  .home-changelog-modal__panel {
+    max-height: min(54vh, 420px);
   }
 
   .home-discord-promo__flash-badges {
