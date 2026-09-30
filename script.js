@@ -4794,6 +4794,10 @@ function showSection(name) {
 
   closeSectionsMenu();
 
+  // Snap to top immediately so a deep scroll in the previous section
+  // cannot leave you stranded at the bottom of the next one.
+  scrollActiveSectionToTop(cfg);
+
   // Defer everything that is not needed for the tap paint.
   requestAnimationFrame(function () {
     showSectionDeferred(name, cfg, isHome);
@@ -4890,26 +4894,26 @@ function showSectionDeferred(name, cfg, isHome) {
 }
 
 function scrollActiveSectionToTop(cfg) {
+  // In-page sections use display toggling, so document top is always the
+  // start of the newly shown section. Do not measure element offsets while
+  // layout is settling — that was sending users to the bottom/mid of the next page.
   function snap() {
+    var se = document.scrollingElement || document.documentElement;
+    if (se) se.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
     try {
       window.scrollTo({ top: 0, left: 0, behavior: "auto" });
     } catch (e) {
       window.scrollTo(0, 0);
     }
-    if (!cfg || !cfg.id || cfg.id === "home") return;
-    var el = document.getElementById(cfg.id);
-    if (!el) return;
-    var y = el.getBoundingClientRect().top + (window.pageYOffset || window.scrollY || 0);
-    if (y > 4) {
-      try {
-        window.scrollTo({ top: Math.max(0, y - 8), left: 0, behavior: "auto" });
-      } catch (e2) {
-        window.scrollTo(0, Math.max(0, y - 8));
-      }
-    }
   }
   snap();
-  requestAnimationFrame(snap);
+  requestAnimationFrame(function () {
+    snap();
+    requestAnimationFrame(snap);
+  });
+  setTimeout(snap, 40);
+  setTimeout(snap, 120);
 }
 
 window.showSection = showSection;

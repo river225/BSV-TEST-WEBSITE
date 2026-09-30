@@ -16353,12 +16353,12 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   .money-game-guide-section .guide-vcards-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
+    gap: 6px;
     justify-content: stretch;
     width: 100%;
     margin-left: 0;
     margin-right: 0;
-    padding: 0 4px;
+    padding: 0 2px;
     box-sizing: border-box;
   }
 
@@ -16367,23 +16367,36 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     width: 100%;
     max-width: none;
     flex: none;
-    padding: 8px 6px 10px;
+    padding: 5px 4px 7px;
+    gap: 4px;
+    border-width: 2px;
+    border-radius: 9px;
+  }
+
+  .money-game-guide-section .guide-vcard__image,
+  .money-game-guide-section .guide-vcard__image img {
+    max-height: 56px;
   }
 
   .money-game-guide-section .guide-vcard__name {
-    font-size: 0.8rem;
+    font-size: 0.68rem;
   }
 
   .money-game-guide-section .guide-vcard__label {
-    font-size: 0.6rem;
+    font-size: 0.52rem;
   }
 
   .money-game-guide-section .guide-vcard__value {
-    font-size: 0.82rem;
+    font-size: 0.7rem;
   }
 
   .money-game-guide-section .guide-vcard__desc {
-    font-size: 0.68rem;
+    font-size: 0.58rem;
+    line-height: 1.25;
+  }
+
+  .money-game-guide-section .guide-vcard__rarity {
+    font-size: 0.55rem;
   }
 
   .sections-menu-toggle {
@@ -17312,10 +17325,13 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     left: auto;
     bottom: auto;
     width: 100%;
-    max-width: 380px;
-    justify-content: center;
-    gap: 28px;
+    max-width: 420px;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
     text-align: center;
+    padding: 0 8px;
+    box-sizing: border-box;
   }
 
   .footer-side-nav__group {
@@ -17324,6 +17340,7 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     align-items: center;
     flex: 1 1 0;
     min-width: 0;
+    max-width: 32%;
   }
 
   .footer-side-nav__title {
@@ -17334,17 +17351,35 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
 
   .footer-side-nav__list {
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    width: 100%;
   }
 
   .footer-side-nav__link {
-    font-size: 0.72rem;
-    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 4px;
+    width: 100%;
+    font-size: 0.68rem;
+    line-height: 1.2;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .footer-side-nav__link span {
+    display: block;
+    max-width: 100%;
+    text-align: center;
+    overflow-wrap: anywhere;
+    hyphens: auto;
   }
 
   .footer-side-nav__icon {
     width: 14px;
     height: 14px;
+    margin: 0 auto;
   }
 }
 
