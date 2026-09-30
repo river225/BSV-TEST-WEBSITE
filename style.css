@@ -16353,12 +16353,12 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   .money-game-guide-section .guide-vcards-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px;
+    gap: 8px;
     justify-content: stretch;
     width: 100%;
     margin-left: 0;
     margin-right: 0;
-    padding: 0 2px;
+    padding: 0 4px;
     box-sizing: border-box;
   }
 
@@ -16367,36 +16367,86 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     width: 100%;
     max-width: none;
     flex: none;
-    padding: 5px 4px 7px;
-    gap: 4px;
+    padding: 8px 8px 10px;
+    gap: 6px;
     border-width: 2px;
-    border-radius: 9px;
+    border-radius: 10px;
   }
 
-  .money-game-guide-section .guide-vcard__image,
-  .money-game-guide-section .guide-vcard__image img {
-    max-height: 56px;
+  /* Fish type cards stay compact; keep image constrained */
+  .money-game-guide-section .guide-fish-card .guide-vcard__image,
+  .money-game-guide-section .guide-fish-card .guide-vcard__image img {
+    max-height: 72px;
   }
 
-  .money-game-guide-section .guide-vcard__name {
-    font-size: 0.68rem;
+  .money-game-guide-section .guide-fish-card .guide-vcard__name {
+    font-size: 0.78rem;
   }
 
-  .money-game-guide-section .guide-vcard__label {
-    font-size: 0.52rem;
-  }
-
-  .money-game-guide-section .guide-vcard__value {
-    font-size: 0.7rem;
-  }
-
-  .money-game-guide-section .guide-vcard__desc {
+  .money-game-guide-section .guide-fish-card .guide-vcard__label {
     font-size: 0.58rem;
-    line-height: 1.25;
+  }
+
+  .money-game-guide-section .guide-fish-card .guide-vcard__value {
+    font-size: 0.78rem;
   }
 
   .money-game-guide-section .guide-vcard__rarity {
-    font-size: 0.55rem;
+    font-size: 0.6rem;
+  }
+
+  /*
+   * Fishing/farming ITEM cards: avoid wide “fat” square tiles with tiny type.
+   * Keep readable text and a shorter image band.
+   */
+  .money-game-guide-section .fishing-items-cards,
+  .money-game-guide-section .farming-items-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .money-game-guide-section .guide-item-card {
+    padding: 10px 9px 11px;
+    gap: 7px;
+  }
+
+  .money-game-guide-section .guide-item-card .guide-vcard__name {
+    font-size: 0.9rem;
+    line-height: 1.2;
+  }
+
+  .money-game-guide-section .guide-item-card .guide-vcard__image {
+    aspect-ratio: auto;
+    width: 100%;
+    height: 78px;
+    min-height: 78px;
+    max-height: 78px;
+    padding: 6px;
+  }
+
+  .money-game-guide-section .guide-item-card .guide-vcard__image img {
+    width: auto;
+    max-width: 100%;
+    height: 100%;
+    max-height: 66px;
+    margin: 0 auto;
+  }
+
+  .money-game-guide-section .guide-item-card .guide-vcard__price {
+    padding: 7px 8px;
+  }
+
+  .money-game-guide-section .guide-item-card .guide-vcard__label {
+    font-size: 0.66rem;
+  }
+
+  .money-game-guide-section .guide-item-card .guide-vcard__value {
+    font-size: 0.95rem;
+  }
+
+  .money-game-guide-section .guide-item-card .guide-vcard__desc {
+    font-size: 0.74rem;
+    line-height: 1.35;
   }
 
   .sections-menu-toggle {
@@ -17434,17 +17484,30 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   }
 
   .money-game-guide-section .guide-vcards-grid {
-    gap: 8px;
+    gap: 7px;
     padding: 0 2px;
   }
 
-  .money-game-guide-section .guide-vcard,
-  .money-game-guide-section .guide-vcard.card {
-    padding: 7px 5px 9px;
+  .money-game-guide-section .guide-item-card {
+    padding: 9px 8px 10px;
   }
 
-  .money-game-guide-section .guide-vcard__name {
-    font-size: 0.74rem;
+  .money-game-guide-section .guide-item-card .guide-vcard__name {
+    font-size: 0.86rem;
+  }
+
+  .money-game-guide-section .guide-item-card .guide-vcard__image {
+    height: 70px;
+    min-height: 70px;
+    max-height: 70px;
+  }
+
+  .money-game-guide-section .guide-item-card .guide-vcard__value {
+    font-size: 0.9rem;
+  }
+
+  .money-game-guide-section .guide-item-card .guide-vcard__desc {
+    font-size: 0.7rem;
   }
 
   .welcome-header {
