@@ -1023,7 +1023,9 @@
     });
   }
 
-  var CHROME_ASSET_V = "20260926-profile-ui2";
+  // Keep chrome-injected deps on the same cache-bust as the page build id.
+  var CHROME_ASSET_V =
+    (typeof window !== "undefined" && window.BSV_BUILD) || "20260930-sync";
 
   function ensureHomeHeaderDeps() {
     ensureSettingsModal();
