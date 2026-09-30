@@ -773,8 +773,9 @@
   }
 
   function needsTradeGuidelines() {
-    // Temporary: show on every Create post click.
-    return true;
+    var last = readGuidelinesAckAt();
+    if (!last) return true;
+    return Date.now() - last >= GUIDELINES_ACK_MS;
   }
 
   function closeTradeGuidelines() {
@@ -898,7 +899,10 @@
       syncComposerModeUi();
       syncPastePreviousButton();
     }
-    requestAnimationFrame(syncLiveTradingBoardHeight);
+    // Wait two frames so composer layout (incl. open guidelines) is measured correctly.
+    requestAnimationFrame(function () {
+      requestAnimationFrame(syncLiveTradingBoardHeight);
+    });
   }
 
   function clearComposerError() {
@@ -2990,6 +2994,14 @@
         acknowledgeTradeGuidelines();
       });
     }
+    var guidePanel = document.querySelector(".lt-guide-panel");
+    if (guidePanel) {
+      guidePanel.addEventListener("toggle", function () {
+        requestAnimationFrame(function () {
+          requestAnimationFrame(syncLiveTradingBoardHeight);
+        });
+      });
+    }
     if (pastePrev) {
       pastePrev.addEventListener("click", function () {
         pastePreviousPost();
@@ -3184,10 +3196,21 @@
       return;
     }
     // Stretch well past the sections column so the trade feed feels taller.
+    // When the create/edit composer is open it pushes the feed down — add that
+    // height back so the posts box stays the same size as before Create post.
     var EXTRA_BELOW_SECTIONS = 480;
     var navBottom = nav.getBoundingClientRect().bottom;
     var wrapTop = feedWrap.getBoundingClientRect().top;
-    var h = Math.round(navBottom - wrapTop + EXTRA_BELOW_SECTIONS);
+    var composer = document.getElementById("lt-composer");
+    var composerExtra = 0;
+    if (composer && !composer.hidden) {
+      var cStyle = window.getComputedStyle(composer);
+      composerExtra =
+        Math.ceil(composer.getBoundingClientRect().height) +
+        (parseFloat(cStyle.marginTop) || 0) +
+        (parseFloat(cStyle.marginBottom) || 0);
+    }
+    var h = Math.round(navBottom - wrapTop + EXTRA_BELOW_SECTIONS + composerExtra);
     if (h < 220) h = 220;
     feedWrap.style.setProperty("height", h + "px", "important");
     feedWrap.style.setProperty("min-height", h + "px", "important");
