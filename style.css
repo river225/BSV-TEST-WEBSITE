@@ -927,6 +927,8 @@ background-attachment: fixed;
 }
 
 .card-exclusive-badge {
+  appearance: none;
+  -webkit-appearance: none;
   width: 30px;
   height: 30px;
   display: flex;
@@ -937,6 +939,7 @@ background-attachment: fixed;
   background: transparent;
   box-shadow: none;
   padding: 0;
+  margin: 0;
   pointer-events: auto;
   cursor: help;
   opacity: 1;
@@ -1004,10 +1007,23 @@ background-attachment: fixed;
 
 .card-exclusive-badge:hover + .card-exclusive-badge-tooltip,
 .card-exclusive-badge:focus-visible + .card-exclusive-badge-tooltip,
-.card-exclusive-badge-tooltip:hover {
+.card-exclusive-badge-tooltip:hover,
+.card-exclusive-badge-wrapper.is-tip-open .card-exclusive-badge-tooltip {
   opacity: 1;
   transform: translateY(4px);
   pointer-events: auto;
+}
+
+.card-exclusive-badge-wrapper.is-tip-open .card-exclusive-badge {
+  transform: scale(1.1);
+}
+
+.card-exclusive-badge-wrapper--standard.is-tip-open .card-exclusive-badge__icon {
+  filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.75)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+.card-exclusive-badge-wrapper--very.is-tip-open .card-exclusive-badge__icon {
+  filter: drop-shadow(0 0 10px rgba(244, 63, 94, 0.75)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
 }
 
 @media (hover: none), (pointer: coarse) {
@@ -1022,7 +1038,7 @@ background-attachment: fixed;
   }
 
   .card-exclusive-badge {
-    cursor: default;
+    cursor: pointer;
   }
 
   .card-exclusive-badge:hover,
@@ -1032,15 +1048,6 @@ background-attachment: fixed;
     outline: none;
   }
 
-  .card-exclusive-badge-wrapper--standard .card-exclusive-badge:hover .card-exclusive-badge__icon,
-  .card-exclusive-badge-wrapper--standard .card-exclusive-badge:focus .card-exclusive-badge__icon,
-  .card-exclusive-badge-wrapper--standard .card-exclusive-badge:focus-visible .card-exclusive-badge__icon,
-  .card-exclusive-badge-wrapper--very .card-exclusive-badge:hover .card-exclusive-badge__icon,
-  .card-exclusive-badge-wrapper--very .card-exclusive-badge:focus .card-exclusive-badge__icon,
-  .card-exclusive-badge-wrapper--very .card-exclusive-badge:focus-visible .card-exclusive-badge__icon {
-    filter: none;
-  }
-
   .card-exclusive-badge:hover + .card-exclusive-badge-tooltip,
   .card-exclusive-badge:focus + .card-exclusive-badge-tooltip,
   .card-exclusive-badge:focus-visible + .card-exclusive-badge-tooltip,
@@ -1048,6 +1055,25 @@ background-attachment: fixed;
     opacity: 0;
     transform: none;
     pointer-events: none;
+  }
+
+  /* Tap star to show tip; tap outside clears (via .is-tip-open) */
+  .card-exclusive-badge-wrapper.is-tip-open .card-exclusive-badge-tooltip {
+    opacity: 1;
+    transform: translateY(4px);
+    pointer-events: auto;
+  }
+
+  .card-exclusive-badge-wrapper.is-tip-open .card-exclusive-badge {
+    transform: scale(1.1);
+  }
+
+  .card-exclusive-badge-wrapper--standard.is-tip-open .card-exclusive-badge__icon {
+    filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.75)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+  }
+
+  .card-exclusive-badge-wrapper--very.is-tip-open .card-exclusive-badge__icon {
+    filter: drop-shadow(0 0 10px rgba(244, 63, 94, 0.75)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
   }
 }
 
@@ -15185,12 +15211,15 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
 }
 
 .section-mobile-panel {
-  background: var(--bsv-surface-panel);
-  border: 3px solid #d4a027;
-  border-radius: 12px;
-  padding: 10px 12px 12px;
+  background:
+    radial-gradient(circle at 12% 0%, hsl(var(--bsv-accent-hue) 76% 55% / 0.16), transparent 42%),
+    linear-gradient(180deg, var(--bsv-surface-card) 0%, var(--bsv-surface-raised) 100%);
+  border: 3px solid #000;
+  border-radius: 14px;
+  padding: 12px 12px 12px;
   margin: 0 0 10px;
   box-sizing: border-box;
+  box-shadow: 0 4px 0 #000, 0 8px 18px rgba(0, 0, 0, 0.28);
 }
 
 .section-mobile-panel__header {
@@ -15199,14 +15228,16 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   justify-content: space-between;
   gap: 10px;
   width: 100%;
+  padding-bottom: 2px;
 }
 
 .section-mobile-panel__title {
   margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #ffa500;
-  text-shadow: 1px 1px 0 #000;
+  font-size: 0.98rem;
+  font-weight: 850;
+  letter-spacing: 0.02em;
+  color: #fff;
+  text-shadow: 1.5px 1.5px 0 #000, -1px 1px 0 #000;
 }
 
 .section-mobile-panel__toggle {
@@ -15214,16 +15245,26 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
   padding: 0;
   margin: 0;
-  border: 2px solid var(--bsv-accent);
-  border-radius: 10px;
-  background: linear-gradient(180deg, hsl(var(--bsv-accent-hue) 76% 55% / 0.22) 0%, hsl(var(--bsv-accent-hue) 76% 55% / 0.08) 100%);
-  color: var(--bsv-accent);
+  border: 2px solid #000;
+  border-radius: 12px;
+  background: linear-gradient(
+    180deg,
+    hsl(var(--bsv-accent-hue) 78% 48%) 0%,
+    hsl(var(--bsv-accent-hue) 78% 36%) 100%
+  );
+  color: #fff;
   cursor: pointer;
-  box-shadow: 0 2px 0 #000, 0 0 10px hsl(var(--bsv-accent-hue) 76% 55% / 0.2);
+  box-shadow: 0 3px 0 #000;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.section-mobile-panel__toggle:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 0 #000;
 }
 
 .section-mobile-panel__toggle-icon {
@@ -15807,7 +15848,7 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     display: flex;
     width: 40px;
     height: 40px;
-    border-radius: 11px;
+    border-radius: 12px;
   }
 
   .section-mobile-panel__toggle-icon {
@@ -15819,7 +15860,7 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     /* Tall enough for all Untradeable fast-nav rows (no inner scroll) */
     max-height: 2000px;
     opacity: 1;
-    margin-top: 8px;
+    margin-top: 10px;
     pointer-events: auto;
     overflow: visible;
   }
@@ -15836,17 +15877,85 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   }
 
   .guide-fast-nav--in-section {
-    display: block !important;
+    display: flex !important;
+    flex-direction: column;
+    gap: 4px;
     position: static;
     top: auto;
     max-height: none;
     margin: 0;
-    padding: 2px 0 0;
+    padding: 4px 0 0;
     border: none;
     border-radius: 0;
     box-shadow: none;
     background: transparent;
     overflow: visible;
+  }
+
+  .guide-fast-nav--in-section .guide-fast-nav__title {
+    display: none;
+  }
+
+  .guide-fast-nav--in-section .guide-fast-nav__btn--group {
+    margin: 0;
+    padding: 9px 12px;
+    border: 2px solid #000;
+    border-radius: 10px;
+    background: linear-gradient(180deg, var(--bsv-surface-soft) 0%, var(--bsv-surface-card) 100%);
+    color: #fff;
+    font-size: 0.84rem;
+    font-weight: 800;
+    box-shadow: 0 2px 0 #000;
+    text-shadow: 1px 1px 0 #000;
+  }
+
+  .guide-fast-nav--in-section .guide-fast-nav__btn--mini {
+    margin: 0 0 0 8px;
+    padding: 7px 10px;
+    border: 2px solid rgba(0, 0, 0, 0.85);
+    border-radius: 9px;
+    background: hsl(var(--bsv-accent-hue) 76% 55% / 0.1);
+    color: #dbeafe;
+    font-size: 0.78rem;
+    font-weight: 700;
+    box-shadow: 0 1px 0 #000;
+  }
+
+  .guide-fast-nav--in-section .guide-fast-nav__btn:hover,
+  .guide-fast-nav--in-section .guide-fast-nav__btn:active {
+    color: #fff;
+    background: linear-gradient(
+      180deg,
+      hsl(var(--bsv-accent-hue) 78% 46%) 0%,
+      hsl(var(--bsv-accent-hue) 78% 34%) 100%
+    );
+    border-color: #000;
+  }
+
+  .guide-fast-nav--in-section .guide-fast-nav__spacer {
+    height: 4px;
+  }
+
+  .guide-fast-nav--in-section .guide-fast-nav__top {
+    margin-top: 2px;
+    padding: 10px 12px;
+    border: 2px solid #000;
+    border-radius: 10px;
+    background: linear-gradient(
+      180deg,
+      hsl(var(--bsv-accent-hue) 78% 48%) 0%,
+      hsl(var(--bsv-accent-hue) 78% 36%) 100%
+    );
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 850;
+    box-shadow: 0 3px 0 #000;
+    text-shadow: 1px 1px 0 #000;
+  }
+
+  .guide-fast-nav--in-section .guide-fast-nav__top:hover,
+  .guide-fast-nav--in-section .guide-fast-nav__top:active {
+    filter: brightness(1.06);
   }
 
   #untradeable-items .search-container--in-section {
@@ -16414,12 +16523,14 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     flex: none;
     align-self: auto;
     margin: 0;
-    padding: 88px 0 20px;
+    padding: 72px 0 28px;
     border-right: 3px solid #000;
     border-bottom: none;
     background: var(--bsv-surface-chrome);
+    overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
     transform: translateX(-105%);
     transition: transform 0.25s ease;
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.45);
@@ -16427,7 +16538,7 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
 
   body.sections-menu-open .sections-sidebar {
     transform: translateX(0);
-    padding-top: 88px;
+    padding-top: 72px;
   }
 
   .sections-nav {
@@ -16435,28 +16546,86 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     flex-direction: column;
     align-items: stretch;
     gap: 0;
-    padding: 10px 12px 16px;
+    padding: 6px 10px 28px;
     overflow: visible;
   }
 
   .sections-nav button {
     width: 100%;
     min-width: 0;
-    min-height: 48px;
-    margin-bottom: 8px;
-    padding: 10px 12px;
+    min-height: 40px;
+    margin-bottom: 5px;
+    padding: 7px 10px;
     flex-shrink: 0;
     scroll-snap-align: none;
-    font-size: 0.92rem;
+    font-size: 0.84rem;
+    border-width: 2px;
+    border-radius: 8px;
+    gap: 8px;
+  }
+
+  .sections-nav .nav-section-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .sections-nav .nav-section-icon--lg {
+    width: 20px;
+    height: 20px;
+    margin-right: 0;
+  }
+
+  .sections-nav .nav-section-icon__svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .sections-nav .nav-section-icon__svg--lg {
+    width: 17px;
+    height: 17px;
   }
 
   .nav-gap {
     display: block;
-    height: 12px;
+    height: 6px;
   }
 
   .nav-extras-header {
     display: block;
+    font-size: 0.95rem;
+    margin: 4px 0 6px;
+    padding: 4px 0 6px;
+  }
+
+  /* Item value sections: zoom out card grids on mobile */
+  body.is-item-section .sections {
+    zoom: 0.88;
+  }
+
+  body.is-item-section .section > h2 {
+    font-size: clamp(1.35rem, 5.5vw, 1.75rem);
+    margin-bottom: 10px;
+  }
+
+  body.is-item-section .cards {
+    gap: 10px;
+    padding-top: 6px;
+  }
+
+  body.is-item-section .card {
+    gap: 10px;
+    padding: 10px;
+    padding-bottom: 52px;
+    border-width: 2px;
+    border-radius: 10px;
+  }
+
+  body.is-item-section .card-info h3 {
+    font-size: 0.95rem;
+  }
+
+  body.is-item-section .card-info .badge {
+    font-size: 0.72rem;
   }
 
   .sections-nav-suggest {

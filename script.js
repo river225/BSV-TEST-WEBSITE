@@ -2113,12 +2113,52 @@ function buildCardExclusiveBadgeHtml(tier) {
   var ariaKey = isVery ? "card.exclusiveVeryAria" : "card.exclusiveAria";
   return (
     '<div class="card-exclusive-badge-wrapper ' + modClass + '">' +
-      '<div class="card-exclusive-badge" role="img" aria-label="' + escapeAttr(i18n(ariaKey)) + '">' +
+      '<button type="button" class="card-exclusive-badge" aria-label="' +
+        escapeAttr(i18n(ariaKey)) +
+        '" aria-expanded="false">' +
         buildExclusiveBadgeIconSvg(tier) +
-      "</div>" +
+      "</button>" +
       '<div class="card-exclusive-badge-tooltip" role="tooltip">' + escapeHtml(i18n(tooltipKey)) + "</div>" +
     "</div>"
   );
+}
+
+function closeExclusiveBadgeTips(exceptWrap) {
+  document.querySelectorAll(".card-exclusive-badge-wrapper.is-tip-open").forEach(function (wrap) {
+    if (exceptWrap && wrap === exceptWrap) return;
+    wrap.classList.remove("is-tip-open");
+    var btn = wrap.querySelector(".card-exclusive-badge");
+    if (btn) btn.setAttribute("aria-expanded", "false");
+  });
+}
+
+function initExclusiveBadgeTips() {
+  if (document.documentElement.dataset.exclusiveTipsWired === "1") return;
+  document.documentElement.dataset.exclusiveTipsWired = "1";
+  document.addEventListener(
+    "click",
+    function (e) {
+      var badge = e.target.closest(".card-exclusive-badge");
+      if (badge) {
+        e.preventDefault();
+        e.stopPropagation();
+        var wrap = badge.closest(".card-exclusive-badge-wrapper");
+        if (!wrap) return;
+        var willOpen = !wrap.classList.contains("is-tip-open");
+        closeExclusiveBadgeTips(willOpen ? wrap : null);
+        wrap.classList.toggle("is-tip-open", willOpen);
+        badge.setAttribute("aria-expanded", willOpen ? "true" : "false");
+        return;
+      }
+      if (!e.target.closest(".card-exclusive-badge-wrapper.is-tip-open")) {
+        closeExclusiveBadgeTips();
+      }
+    },
+    true
+  );
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeExclusiveBadgeTips();
+  });
 }
 
 function buildCardBottomActionsHtml(exclusiveTier) {
@@ -4721,6 +4761,9 @@ function showSection(name) {
 
   const isHome = cfg.id === "home";
   document.body.classList.toggle("is-home", isHome);
+  // Value-list item sections (guns/vehicles/untradeable) — not guide/richest/LT/crew/home
+  var isItemSection = cfg.dataSource === "sheet" && cfg.id !== "crew-logos";
+  document.body.classList.toggle("is-item-section", isItemSection);
   if (name === RICHEST_SECTION_NAME) {
     showRichestLevelsNotice();
   }
@@ -5774,6 +5817,8 @@ document.addEventListener("bsv:languagechange", function () {
     initSectionsNav();
   }
 });
+
+initExclusiveBadgeTips();
 
 document.addEventListener("click", function (e) {
   var trigger = e.target.closest(".card-giveaway-trigger");
