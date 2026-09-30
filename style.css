@@ -18487,32 +18487,29 @@ body.live-trading-page .live-trading-workspace {
 .lt-report {
   position: fixed;
   inset: 0;
-  z-index: 3200;
+  z-index: 12000;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding: 18px 14px 24px;
+  padding: max(88px, 8vh) 16px 28px;
   box-sizing: border-box;
+  overflow-y: auto;
 }
 .lt-report__backdrop {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  background: rgba(4, 8, 16, 0.72);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
+  background: rgba(0, 0, 0, 0.62);
 }
 .lt-report__box {
   position: relative;
   z-index: 1;
-  width: min(92vw, 460px);
-  margin-top: 10px;
-  padding: 22px 20px 18px;
+  width: min(100%, 440px);
+  margin: auto;
+  padding: 28px 24px 22px;
   border-radius: 16px;
-  border: 2px solid #000;
-  background:
-    radial-gradient(circle at 12% 0%, rgba(251, 191, 36, 0.22), transparent 42%),
-    linear-gradient(180deg, #1c2434 0%, #121824 100%);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 0 2px rgba(251, 191, 36, 0.2);
+  border: 3px solid #000;
+  background: var(--bsv-surface-card, #141d28);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
   color: #fff;
   text-align: center;
   animation: lt-report-drop 0.22s ease-out;
@@ -18520,26 +18517,30 @@ body.live-trading-page .live-trading-workspace {
 @keyframes lt-report-drop {
   from {
     opacity: 0;
-    transform: translateY(-16px);
+    transform: translateY(10px) scale(0.98);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 .lt-report__close {
   position: absolute;
   top: 10px;
   right: 12px;
-  width: 32px;
-  height: 32px;
-  border: 2px solid #000;
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.35);
-  color: #fff;
-  font-size: 1.3rem;
+  appearance: none;
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.6rem;
   line-height: 1;
   cursor: pointer;
+}
+.lt-report__close:hover {
+  color: #fff;
 }
 .lt-report__eyebrow {
   margin: 0 0 4px;
@@ -18547,18 +18548,19 @@ body.live-trading-page .live-trading-workspace {
   font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #fbbf24;
+  color: #f59e0b;
 }
 .lt-report__title {
   margin: 0 0 8px;
-  font-family: "Paytone One", system-ui, sans-serif;
-  font-size: 1.55rem;
+  font-size: 1.35rem;
+  font-weight: 850;
   line-height: 1.15;
-  text-shadow: 2px 2px 0 #000;
+  color: #fff;
+  text-shadow: none;
 }
 .lt-report__lead {
   margin: 0 0 14px;
-  color: rgba(255, 255, 255, 0.88);
+  color: #c7cce0;
   font-size: 0.95rem;
   line-height: 1.45;
 }
@@ -18649,9 +18651,9 @@ body.live-trading-page .live-trading-workspace {
   margin: 0 0 10px;
   padding: 8px 10px;
   border-radius: 10px;
-  border: 1px solid rgba(251, 191, 36, 0.28);
-  background: rgba(0, 0, 0, 0.25);
-  color: #fde68a;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.28);
+  color: #e8eef8;
   font-size: 0.8rem;
   font-weight: 700;
   line-height: 1.35;
@@ -20874,10 +20876,12 @@ html[data-bsv-bg="dark"] .lt-post__summary-label {
 html[data-bsv-bg="colorized"] .lt-picker__box,
 html[data-bsv-bg="colorized"] .lt-join__box,
 html[data-bsv-bg="colorized"] .lt-confirm__box,
+html[data-bsv-bg="colorized"] .lt-report__box,
 html[data-bsv-bg="colorized"] .live-trading-gate__card,
 html[data-bsv-bg="dark"] .lt-picker__box,
 html[data-bsv-bg="dark"] .lt-join__box,
 html[data-bsv-bg="dark"] .lt-confirm__box,
+html[data-bsv-bg="dark"] .lt-report__box,
 html[data-bsv-bg="dark"] .live-trading-gate__card {
   background-color: var(--bsv-surface-card) !important;
 }
