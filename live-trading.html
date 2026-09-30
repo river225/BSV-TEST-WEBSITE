@@ -46,7 +46,7 @@
 
 <script>
 /* Asset build id (no auto-reload). Bump via tools/bump-build.py */
-window.BSV_BUILD = "20260930-lt-guidelines-copy";
+window.BSV_BUILD = "20260930-lt-guidelines-ui";
 </script>
 
 <meta charset="UTF-8" />
@@ -90,10 +90,10 @@ window.BSV_BUILD = "20260930-lt-guidelines-copy";
   window.addEventListener("pageshow", removeWrongSiteBanner);
 })();
 </script>
-<script defer src="auth-oauth-bounce.js?v=20260930-lt-guidelines-copy"></script>
+<script defer src="auth-oauth-bounce.js?v=20260930-lt-guidelines-ui"></script>
 <title>Live Trading — BlockSpin Values (Dev)</title>
 <meta name="description" content="Live Trading — development build of BlockSpin Values." />
-<link rel="stylesheet" href="style.css?v=20260930-lt-guidelines-copy" />
+<link rel="stylesheet" href="style.css?v=20260930-lt-guidelines-ui" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Paytone+One&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
@@ -202,6 +202,30 @@ window.BSV_BUILD = "20260930-lt-guidelines-copy";
               </button>
               <button type="button" class="lt-composer__submit" id="lt-submit-post">Post trade</button>
             </div>
+            <details class="lt-guide-panel">
+              <summary class="lt-guide-panel__summary">
+                <svg class="lt-guide-panel__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 3l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V7z"></path>
+                  <path d="M9 12l2 2 4-4"></path>
+                </svg>
+                <span>Guidelines</span>
+                <svg class="lt-guide-panel__chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M6 9l6 6 6-6"></path>
+                </svg>
+              </summary>
+              <div class="lt-guide-panel__body">
+                <div class="lt-guidelines__warn">
+                  <span class="lt-guidelines__dot" aria-hidden="true"></span>
+                  <p>Don’t click links, scan QR codes, or share passwords / login codes with anyone.</p>
+                </div>
+                <ul class="lt-guidelines__list">
+                  <li>No cross trading. In-game stuff only gets traded for other in-game stuff.</li>
+                  <li>Don’t use middlemen from random shady servers. Stick to middlemen from our Discord server.</li>
+                  <li>No troll posts, fake offers, or spam.</li>
+                  <li>If a trade feels weird, just stop.</li>
+                </ul>
+              </div>
+            </details>
           </section>
 
           <div class="lt-toolbar">
@@ -284,13 +308,20 @@ window.BSV_BUILD = "20260930-lt-guidelines-copy";
       <div class="lt-guidelines" id="lt-guidelines-modal" hidden>
         <div class="lt-guidelines__backdrop" id="lt-guidelines-backdrop"></div>
         <div class="lt-guidelines__box" role="dialog" aria-modal="true" aria-labelledby="lt-guidelines-title">
-          <p class="lt-guidelines__eyebrow">Hey, hold up</p>
-          <h2 class="lt-guidelines__title" id="lt-guidelines-title">Trading guidelines</h2>
-          <p class="lt-guidelines__lead">Quick rules before you post — read these so you don’t get scammed.</p>
+          <h2 class="lt-guidelines__title" id="lt-guidelines-title">
+            <svg class="lt-guidelines__title-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V7z"></path>
+              <path d="M9 12l2 2 4-4"></path>
+            </svg>
+            <span>Guidelines</span>
+          </h2>
+          <div class="lt-guidelines__warn">
+            <span class="lt-guidelines__dot" aria-hidden="true"></span>
+            <p>Don’t click links, scan QR codes, or share passwords / login codes with anyone.</p>
+          </div>
           <ul class="lt-guidelines__list">
             <li>No cross trading. In-game stuff only gets traded for other in-game stuff.</li>
-            <li class="lt-guidelines__warn">Don’t click links, scan QR codes, or share passwords / login codes with anyone.</li>
-            <li>Don’t grab middlemen from random shady servers. Stick to BSV Discord middlemen.</li>
+            <li>Don’t use middlemen from random shady servers. Stick to middlemen from our Discord server.</li>
             <li>No troll posts, fake offers, or spam.</li>
             <li>If a trade feels weird, just stop.</li>
           </ul>
@@ -324,6 +355,7 @@ window.BSV_BUILD = "20260930-lt-guidelines-copy";
               <p class="lt-report__identity" id="lt-report-identity"></p>
               <label class="lt-report__label" for="lt-report-issue">Describe the issue</label>
               <textarea class="lt-report__textarea" id="lt-report-issue" rows="4" maxlength="4000" placeholder="What went wrong? Include steps if you can…" required></textarea>
+              <p class="lt-report__scam-note">This is not for scammer reports, to report a scammer join our discord server</p>
               <p class="lt-report__status" id="lt-report-status" hidden></p>
               <button type="submit" class="lt-report__submit" id="lt-report-submit">Send report</button>
             </form>
@@ -402,11 +434,11 @@ window.BSV_BUILD = "20260930-lt-guidelines-copy";
 <div id="bsv-sponsor-banner-slot" class="bsv-sponsor-banner-slot"></div>
 <div id="bsv-site-footer"></div>
 
-<script defer src="site-chrome.js?v=20260930-lt-guidelines-copy"></script>
-<script defer src="auth.js?v=20260930-lt-guidelines-copy"></script>
-<script defer src="site-i18n.js?v=20260930-lt-guidelines-copy"></script>
-<script defer src="site-settings.js?v=20260930-lt-guidelines-copy"></script>
-<script defer src="section-config.js?v=20260930-lt-guidelines-copy"></script>
-<script defer src="live-trading.js?v=20260930-lt-guidelines-copy"></script>
+<script defer src="site-chrome.js?v=20260930-lt-guidelines-ui"></script>
+<script defer src="auth.js?v=20260930-lt-guidelines-ui"></script>
+<script defer src="site-i18n.js?v=20260930-lt-guidelines-ui"></script>
+<script defer src="site-settings.js?v=20260930-lt-guidelines-ui"></script>
+<script defer src="section-config.js?v=20260930-lt-guidelines-ui"></script>
+<script defer src="live-trading.js?v=20260930-lt-guidelines-ui"></script>
 </body>
 </html>
