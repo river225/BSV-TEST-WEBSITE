@@ -18910,36 +18910,42 @@ body.live-trading-page .live-trading-workspace {
   justify-content: flex-end;
   gap: 8px;
   align-self: flex-end;
-  min-width: 168px;
+  min-width: 150px;
 }
 .lt-board__report-btn {
   appearance: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  width: 100%;
+  gap: 5px;
+  width: auto;
   margin: 0;
-  padding: 9px 12px;
-  border: 2px solid #000;
-  border-radius: 12px;
+  padding: 6px 10px;
+  border: 1.5px solid #000;
+  border-radius: 10px;
   background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 55%, #ea580c 100%);
   color: #1c1004;
-  font: 800 0.8rem/1 system-ui, sans-serif;
+  font: 750 0.72rem/1 system-ui, sans-serif;
   cursor: pointer;
-  box-shadow: 0 3px 0 #000;
+  box-shadow: 0 2px 0 #000;
   white-space: nowrap;
+  flex: 0 0 auto;
 }
 .lt-board__report-btn:hover {
   filter: brightness(1.05);
 }
 .lt-board__report-btn:active {
   transform: translateY(1px);
-  box-shadow: 0 2px 0 #000;
+  box-shadow: 0 1px 0 #000;
 }
 .lt-board__report-icon {
   display: block;
   flex: 0 0 auto;
+  width: 13px;
+  height: 13px;
+}
+.lt-search__in .lt-board__report-btn {
+  margin-left: 2px;
 }
 .lt-report[hidden] {
   display: none !important;
@@ -19173,39 +19179,39 @@ body.live-trading-page .live-trading-workspace {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
   border: 2px solid #000;
-  border-radius: 14px;
-  padding: 11px 14px;
+  border-radius: 12px;
+  padding: 10px 14px;
   background:
     linear-gradient(120deg, rgba(255, 255, 255, 0.18), transparent 42%),
     linear-gradient(180deg, #38bdf8 0%, #2563eb 55%, #1d4ed8 100%);
   color: #fff;
-  font: 800 0.95rem/1 system-ui, sans-serif;
+  font: 800 0.9rem/1 system-ui, sans-serif;
   cursor: pointer;
-  box-shadow: 0 4px 0 #0b1f4a, 0 10px 22px rgba(37, 99, 235, 0.28);
+  box-shadow: 0 3px 0 #0b1f4a, 0 8px 16px rgba(37, 99, 235, 0.24);
   transition: filter 0.15s ease, transform 0.12s ease, box-shadow 0.12s ease;
   white-space: nowrap;
   text-align: center;
 }
 .lt-board__create-btn:hover {
   filter: brightness(1.06);
-  box-shadow: 0 4px 0 #0b1f4a, 0 12px 26px rgba(56, 189, 248, 0.35);
+  box-shadow: 0 3px 0 #0b1f4a, 0 10px 20px rgba(56, 189, 248, 0.3);
 }
 .lt-board__create-btn:active {
   transform: translateY(1px);
-  box-shadow: 0 2px 0 #0b1f4a, 0 6px 14px rgba(37, 99, 235, 0.24);
+  box-shadow: 0 2px 0 #0b1f4a, 0 5px 12px rgba(37, 99, 235, 0.22);
 }
 .lt-board__create-icon {
   flex: 0 0 auto;
-  width: 30px;
-  height: 30px;
+  width: 22px;
+  height: 22px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
-  border: 2px solid rgba(0, 0, 0, 0.35);
+  border-radius: 7px;
+  border: 1.5px solid rgba(0, 0, 0, 0.35);
   background: rgba(255, 255, 255, 0.18);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
@@ -19220,7 +19226,7 @@ body.live-trading-page .live-trading-workspace {
   min-width: 0;
 }
 .lt-board__create-label {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 900;
   letter-spacing: 0.01em;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
@@ -21740,48 +21746,51 @@ body.lt-picker-open {
   }
   .lt-toolbar {
     flex-direction: column-reverse;
-    align-items: center;
+    align-items: stretch;
+    gap: 10px;
   }
   .lt-search {
     max-width: none;
     width: 100%;
   }
   .lt-toolbar__actions {
-    width: auto;
-    max-width: 100%;
+    width: 100%;
+    max-width: none;
     min-width: 0;
-    align-self: center;
+    align-self: stretch;
     flex-direction: row;
-    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 8px;
-  }
-  .lt-board__create-btn,
-  .lt-board__report-btn {
-    position: relative;
-    width: auto;
-    flex: 0 0 auto;
-    justify-content: center;
-    padding: 9px 16px;
+    padding: 0 2px;
+    margin: 2px 0 0;
   }
   .lt-board__create-btn {
-    min-width: 148px;
-    padding-left: 40px;
-    padding-right: 40px;
+    width: 100%;
+    max-width: 280px;
+    min-width: 0;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 12px;
   }
   .lt-board__create-icon {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
+    position: static;
+    transform: none;
+    width: 22px;
+    height: 22px;
   }
   .lt-board__create-label {
     font-size: 0.88rem;
   }
-  .lt-board__report-btn {
-    font-size: 0.78rem;
-    padding: 9px 12px;
+  .lt-search__in .lt-board__report-btn {
+    padding: 5px 9px;
+    font-size: 0.68rem;
+    border-radius: 9px;
+    gap: 4px;
+  }
+  .lt-search__in .lt-board__report-icon {
+    width: 12px;
+    height: 12px;
   }
   /* Drop the outer feed box — page scrolls the trades. */
   .lt-feed-wrap {
