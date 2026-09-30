@@ -21792,6 +21792,21 @@ body.lt-picker-open {
     width: 12px;
     height: 12px;
   }
+  .lt-post__meta {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .lt-post__actions {
+    margin-left: 0;
+    width: 100%;
+    max-width: none;
+    align-items: center;
+  }
+  .lt-post__accept {
+    width: auto;
+    min-width: min(100%, 220px);
+    margin: 0 auto;
+  }
   /* Drop the outer feed box — page scrolls the trades. */
   .lt-feed-wrap {
     overflow: visible;
