@@ -763,9 +763,8 @@
   }
 
   function needsTradeGuidelines() {
-    var last = readGuidelinesAckAt();
-    if (!last) return true;
-    return Date.now() - last >= GUIDELINES_ACK_MS;
+    // Temporary: show on every Create post click.
+    return true;
   }
 
   function closeTradeGuidelines() {
