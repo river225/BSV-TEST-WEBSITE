@@ -429,32 +429,22 @@ background-attachment: fixed;
   z-index: 5;
   transform-origin: 50% 80%;
   animation: card-giveaway-gift 5.8s ease-in-out infinite;
-  will-change: transform, filter;
+  will-change: transform;
+  filter: none;
 }.card-giveaway-trigger:hover {
   animation-play-state: paused;
   transform: scale(1.1) translateY(-2px);
-  filter:
-    drop-shadow(0 0 6px rgba(255, 220, 110, 0.95))
-    drop-shadow(0 0 14px rgba(255, 120, 180, 0.8));
+  filter: none;
 }
 @keyframes card-giveaway-gift {
   0%, 66% {
     transform: translateY(0) rotate(0deg) scale(1);
-    filter:
-      drop-shadow(0 0 3px rgba(255, 214, 102, 0.45))
-      drop-shadow(0 0 8px rgba(255, 120, 180, 0.35));
   }
   33% {
     transform: translateY(0) rotate(0deg) scale(1.03);
-    filter:
-      drop-shadow(0 0 7px rgba(255, 224, 130, 0.85))
-      drop-shadow(0 0 16px rgba(255, 130, 190, 0.7));
   }
   70% {
     transform: translateY(-7px) rotate(-5deg) scale(1.06);
-    filter:
-      drop-shadow(0 0 8px rgba(255, 224, 130, 0.95))
-      drop-shadow(0 0 18px rgba(255, 120, 180, 0.8));
   }
   74% {
     transform: translateY(-2px) rotate(6deg) scale(1.04);
@@ -470,26 +460,11 @@ background-attachment: fixed;
   }
   90%, 100% {
     transform: translateY(0) rotate(0deg) scale(1);
-    filter:
-      drop-shadow(0 0 3px rgba(255, 214, 102, 0.45))
-      drop-shadow(0 0 8px rgba(255, 120, 180, 0.35));
   }
 }
 @media (prefers-reduced-motion: reduce) {
   .card-giveaway-trigger {
-    animation: card-giveaway-gift-glow 3.2s ease-in-out infinite;
-  }
-  @keyframes card-giveaway-gift-glow {
-    0%, 100% {
-      filter:
-        drop-shadow(0 0 3px rgba(255, 214, 102, 0.45))
-        drop-shadow(0 0 8px rgba(255, 120, 180, 0.35));
-    }
-    50% {
-      filter:
-        drop-shadow(0 0 7px rgba(255, 224, 130, 0.85))
-        drop-shadow(0 0 16px rgba(255, 130, 190, 0.7));
-    }
+    animation: none;
   }
 }.card-left {
   background: var(--bsv-surface-hover);
@@ -2439,9 +2414,7 @@ background-attachment: fixed;
   height: 56px;
   margin: 0 auto 12px;
   background: transparent url("https://i.ibb.co/WW79gbn7/edfedfv.png") center center / contain no-repeat;
-  filter:
-    drop-shadow(0 0 8px rgba(255, 220, 120, 0.75))
-    drop-shadow(0 0 16px rgba(255, 120, 180, 0.55));
+  filter: none;
   animation: card-giveaway-gift 5.8s ease-in-out infinite;
 }.giveaway-modal__eyebrow {
   margin: 0 0 6px;
