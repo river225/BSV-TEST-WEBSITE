@@ -3,7 +3,9 @@
 
   var SPREADSHEET_ID = "18s5ZK-b256navTEfZQFF1TxICwQ3xLjhiSJH4X97Ji4";
   var POSTS_KEY = "bsv-live-trades-v1";
+  var HIDDEN_AUTHORS_KEY = "bsv-lt-hidden-authors-v1";
   var EMPTY_SLOT_COUNT = 8;
+  var profileOpenDiscordId = "";
   var postsCache = [];
   var postsFetchInFlight = null;
   var postsFetchGen = 0;
@@ -549,6 +551,7 @@
       if (e.key === "Escape") {
         closeSectionsMenu();
         closePicker();
+        closeHiddenAuthorsModal();
         setComposerOpen(false);
       }
     });
@@ -1679,14 +1682,17 @@
       });
   }
 
-  function showDeleteConfirm(id) {
+  function showLtConfirm(opts) {
+    opts = opts || {};
     return new Promise(function (resolve) {
       var modal = document.getElementById("lt-delete-confirm");
+      var titleEl = document.getElementById("lt-delete-confirm-title");
+      var bodyEl = document.getElementById("lt-delete-confirm-body");
       var okBtn = document.getElementById("lt-delete-confirm-yes");
       var cancelBtn = document.getElementById("lt-delete-confirm-no");
       var backdrop = document.getElementById("lt-delete-confirm-backdrop");
       if (!modal || !okBtn || !cancelBtn) {
-        resolve(window.confirm("Delete this trade post?"));
+        resolve(window.confirm(opts.title || "Are you sure?"));
         return;
       }
       function finish(ok) {
@@ -1702,18 +1708,240 @@
       function onCancel() {
         finish(false);
       }
+      if (titleEl) titleEl.textContent = opts.title || "Are you sure?";
+      if (bodyEl) bodyEl.textContent = opts.body || "";
+      okBtn.textContent = opts.okLabel || "Confirm";
+      okBtn.className =
+        "lt-confirm__btn " +
+        (opts.danger === false
+          ? "lt-confirm__btn--primary"
+          : "lt-confirm__btn--danger");
+      cancelBtn.textContent = opts.cancelLabel || "Cancel";
+      cancelBtn.className = "lt-confirm__btn lt-confirm__btn--ghost";
       modal.hidden = false;
-      modal.setAttribute("data-post-id", String(id || ""));
       okBtn.addEventListener("click", onOk);
       cancelBtn.addEventListener("click", onCancel);
       if (backdrop) backdrop.addEventListener("click", onCancel);
     });
   }
 
+  function confirmTwice(first, second) {
+    return showLtConfirm(first).then(function (ok) {
+      if (!ok) return false;
+      return showLtConfirm(second);
+    });
+  }
+
+  function readHiddenAuthors() {
+    try {
+      var raw = localStorage.getItem(HIDDEN_AUTHORS_KEY);
+      var list = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(list)) return [];
+      return list
+        .map(function (entry) {
+          if (!entry || typeof entry !== "object") return null;
+          var id = String(entry.id || "").trim();
+          if (!id) return null;
+          return {
+            id: id,
+            name: String(entry.name || "Trader").trim() || "Trader",
+            handle: String(entry.handle || "").trim()
+          };
+        })
+        .filter(Boolean);
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function writeHiddenAuthors(list) {
+    try {
+      localStorage.setItem(HIDDEN_AUTHORS_KEY, JSON.stringify(list || []));
+    } catch (_) {}
+  }
+
+  function isAuthorHidden(discordId) {
+    var id = String(discordId || "").trim();
+    if (!id) return false;
+    return readHiddenAuthors().some(function (entry) {
+      return entry.id === id;
+    });
+  }
+
+  function hideAuthorEntry(entry) {
+    if (!entry || !entry.id) return;
+    var list = readHiddenAuthors().filter(function (e) {
+      return e.id !== entry.id;
+    });
+    list.push({
+      id: entry.id,
+      name: entry.name || "Trader",
+      handle: entry.handle || ""
+    });
+    writeHiddenAuthors(list);
+  }
+
+  function unhideAuthorEntry(discordId) {
+    var id = String(discordId || "").trim();
+    if (!id) return;
+    writeHiddenAuthors(
+      readHiddenAuthors().filter(function (entry) {
+        return entry.id !== id;
+      })
+    );
+  }
+
+  function hiddenAuthorsKey() {
+    return readHiddenAuthors()
+      .map(function (e) {
+        return e.id;
+      })
+      .sort()
+      .join(",");
+  }
+
+  function syncProfileHideButton() {
+    var btn = document.getElementById("lt-profile-hide");
+    if (!btn) return;
+    var id = profileOpenDiscordId;
+    var ownId = sessionDiscordId();
+    if (!id || (ownId && id === ownId)) {
+      btn.hidden = true;
+      return;
+    }
+    var hidden = isAuthorHidden(id);
+    btn.hidden = false;
+    btn.classList.toggle("is-hidden", hidden);
+    var tip = hidden
+      ? "Unhide posts from this person"
+      : "Hide posts from this person";
+    btn.setAttribute("data-lt-tip", tip);
+    btn.setAttribute("aria-label", tip);
+    btn.innerHTML = hidden
+      ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 10.6A3 3 0 0 0 12 15a3 3 0 0 0 2.4-4.4"/><path d="M9.4 5.1A10.8 10.8 0 0 1 12 5c6.5 0 10 7 10 7a18.4 18.4 0 0 1-4.2 4.8"/><path d="M6.1 6.1C3.7 7.9 2 12 2 12s3.5 7 10 7a10.5 10.5 0 0 0 4.4-.9"/></svg>'
+      : '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+  }
+
+  function renderHiddenAuthorsList() {
+    var listEl = document.getElementById("lt-hidden-list");
+    var emptyEl = document.getElementById("lt-hidden-empty");
+    if (!listEl) return;
+    var list = readHiddenAuthors().sort(function (a, b) {
+      return String(a.name || "").localeCompare(String(b.name || ""));
+    });
+    if (!list.length) {
+      listEl.innerHTML = "";
+      if (emptyEl) emptyEl.hidden = false;
+      return;
+    }
+    if (emptyEl) emptyEl.hidden = true;
+    listEl.innerHTML = list
+      .map(function (entry) {
+        return (
+          '<li class="lt-hidden__item" data-hidden-id="' +
+          escapeAttr(entry.id) +
+          '">' +
+          '<div class="lt-hidden__meta">' +
+          '<span class="lt-hidden__name">' +
+          escapeHtml(entry.name || "Trader") +
+          "</span>" +
+          (entry.handle
+            ? '<span class="lt-hidden__handle">' + escapeHtml(entry.handle) + "</span>"
+            : "") +
+          "</div>" +
+          '<button type="button" class="lt-hidden__unhide" data-lt-unhide="' +
+          escapeAttr(entry.id) +
+          '">Unhide</button>' +
+          "</li>"
+        );
+      })
+      .join("");
+  }
+
+  function openHiddenAuthorsModal() {
+    var modal = document.getElementById("lt-hidden-modal");
+    if (!modal) return;
+    renderHiddenAuthorsList();
+    modal.hidden = false;
+  }
+
+  function closeHiddenAuthorsModal() {
+    var modal = document.getElementById("lt-hidden-modal");
+    if (modal) modal.hidden = true;
+  }
+
+  function requestHideAuthor(discordId) {
+    var id = String(discordId || "").trim();
+    if (!id) return Promise.resolve(false);
+    var author = findAuthorByDiscordId(id) || {};
+    var name = authorDisplayName(author) || "this trader";
+    var handle = authorHandle(author) || "";
+    return confirmTwice(
+      {
+        title: "Hide posts from " + name + "?",
+        body: "Their Live Trading posts will be hidden from your feed.",
+        okLabel: "Hide posts",
+        danger: true
+      },
+      {
+        title: "Are you sure?",
+        body: "Confirm you want to hide posts from " + name + ".",
+        okLabel: "Yes, hide",
+        danger: true
+      }
+    ).then(function (ok) {
+      if (!ok) return false;
+      hideAuthorEntry({ id: id, name: name, handle: handle });
+      syncProfileHideButton();
+      lastRenderedPostIds = "";
+      renderFeed({ force: true });
+      return true;
+    });
+  }
+
+  function requestUnhideAuthor(discordId) {
+    var id = String(discordId || "").trim();
+    if (!id) return Promise.resolve(false);
+    var entry =
+      readHiddenAuthors().find(function (e) {
+        return e.id === id;
+      }) || {};
+    var author = findAuthorByDiscordId(id) || {};
+    var name =
+      entry.name || authorDisplayName(author) || "this trader";
+    return confirmTwice(
+      {
+        title: "Unhide posts from " + name + "?",
+        body: "Their Live Trading posts will show in your feed again.",
+        okLabel: "Unhide posts",
+        danger: false
+      },
+      {
+        title: "Are you sure?",
+        body: "Confirm you want to unhide posts from " + name + ".",
+        okLabel: "Yes, unhide",
+        danger: false
+      }
+    ).then(function (ok) {
+      if (!ok) return false;
+      unhideAuthorEntry(id);
+      syncProfileHideButton();
+      renderHiddenAuthorsList();
+      lastRenderedPostIds = "";
+      renderFeed({ force: true });
+      return true;
+    });
+  }
+
   function deletePost(id) {
     requireLoginForAction().then(function (ok) {
       if (!ok) return;
-      return showDeleteConfirm(id).then(function (confirmed) {
+      return showLtConfirm({
+        title: "Delete this post?",
+        body: "This can’t be undone.",
+        okLabel: "Delete",
+        danger: true
+      }).then(function (confirmed) {
         if (!confirmed) return;
         return fetch(authApiUrl("api/live-trading/posts/" + encodeURIComponent(id)), {
           method: "DELETE",
@@ -1777,6 +2005,11 @@
 
   function postMatchesFilters(post) {
     if (searchScope === "mine" && !isOwnPost(post)) return false;
+    var authorId =
+      post && post.author
+        ? String(post.author.discordId || post.author.id || "").trim()
+        : "";
+    if (authorId && isAuthorHidden(authorId) && !isOwnPost(post)) return false;
     var q = searchQuery.trim().toLowerCase();
     if (!q) return true;
     var offering = sideSearchTerms(post.giving);
@@ -2397,6 +2630,7 @@
     var createdEl = document.getElementById("lt-profile-created");
     var postsEl = document.getElementById("lt-profile-posts");
     if (!pop) return;
+    profileOpenDiscordId = id;
 
     if (avatarEl && avatarPh) {
       if (avatar) {
@@ -2441,12 +2675,14 @@
         : "—";
     }
     if (postsEl) postsEl.textContent = String(posts);
+    syncProfileHideButton();
     pop.hidden = false;
   }
 
   function closeAuthorProfile() {
     var pop = document.getElementById("lt-profile");
     if (pop) pop.hidden = true;
+    profileOpenDiscordId = "";
   }
 
   function feedRenderKey(posts) {
@@ -2467,6 +2703,8 @@
       "|" +
       (isLiveTradingAdmin() ? "a" : "") +
       (isCommunityStaffViewer() ? "s" : "") +
+      "|h:" +
+      hiddenAuthorsKey() +
       "|" +
       ids
     );
@@ -2720,15 +2958,49 @@
         renderPickerGrid();
         return;
       }
+      var unhideBtn = e.target.closest && e.target.closest("[data-lt-unhide]");
+      if (unhideBtn) {
+        e.preventDefault();
+        requestUnhideAuthor(unhideBtn.getAttribute("data-lt-unhide"));
+        return;
+      }
+      var profileHideBtn =
+        e.target.closest && e.target.closest("#lt-profile-hide");
+      if (profileHideBtn) {
+        e.preventDefault();
+        if (!profileOpenDiscordId) return;
+        if (isAuthorHidden(profileOpenDiscordId)) {
+          requestUnhideAuthor(profileOpenDiscordId);
+        } else {
+          requestHideAuthor(profileOpenDiscordId);
+        }
+        return;
+      }
       var scope = e.target.closest && e.target.closest(".lt-search__scope");
       if (scope) {
-        searchScope = scope.getAttribute("data-scope") || "all";
+        var nextScope = scope.getAttribute("data-scope") || "all";
+        if (nextScope === "hidden") {
+          e.preventDefault();
+          openHiddenAuthorsModal();
+          return;
+        }
+        searchScope = nextScope;
         document.querySelectorAll(".lt-search__scope").forEach(function (b) {
-          b.classList.toggle("is-active", b === scope);
+          b.classList.toggle(
+            "is-active",
+            b.getAttribute("data-scope") === searchScope
+          );
         });
         renderFeed();
       }
     });
+
+    var hiddenClose = document.getElementById("lt-hidden-close");
+    var hiddenBackdrop = document.getElementById("lt-hidden-backdrop");
+    if (hiddenClose) hiddenClose.addEventListener("click", closeHiddenAuthorsModal);
+    if (hiddenBackdrop) {
+      hiddenBackdrop.addEventListener("click", closeHiddenAuthorsModal);
+    }
 
     if (pickerClose) pickerClose.addEventListener("click", closePicker);
     if (pickerBackdrop) pickerBackdrop.addEventListener("click", closePicker);
