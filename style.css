@@ -15876,19 +15876,38 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     transform: rotate(180deg);
   }
 
+  /* Match desktop guide-fast-nav look inside Untradeable mobile chrome */
+  .section-mobile-panel {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0;
+    margin: 0 0 10px;
+  }
+
+  .section-mobile-panel__header {
+    margin-bottom: 8px;
+    padding: 0 2px;
+  }
+
+  .section-mobile-panel__title {
+    font-size: 0.9rem;
+    color: #dbeafe;
+    text-shadow: none;
+    font-weight: 700;
+  }
+
   .guide-fast-nav--in-section {
-    display: flex !important;
-    flex-direction: column;
-    gap: 4px;
+    display: block !important;
     position: static;
     top: auto;
     max-height: none;
     margin: 0;
-    padding: 4px 0 0;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
-    background: transparent;
+    padding: 8px 9px;
+    border: 2px solid #000;
+    border-radius: 12px;
+    box-shadow: 0 4px 0 #000, 0 6px 18px rgba(0, 0, 0, 0.28);
+    background: var(--bsv-surface-card);
     overflow: visible;
   }
 
@@ -15896,66 +15915,63 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     display: none;
   }
 
+  .guide-fast-nav--in-section .guide-fast-nav__btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    text-shadow: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
   .guide-fast-nav--in-section .guide-fast-nav__btn--group {
-    margin: 0;
-    padding: 9px 12px;
-    border: 2px solid #000;
-    border-radius: 10px;
-    background: linear-gradient(180deg, var(--bsv-surface-soft) 0%, var(--bsv-surface-card) 100%);
-    color: #fff;
-    font-size: 0.84rem;
-    font-weight: 800;
-    box-shadow: 0 2px 0 #000;
-    text-shadow: 1px 1px 0 #000;
+    margin: 0 0 2px;
+    padding: 5px 4px;
+    color: #e5efff;
+    font-size: 0.79rem;
+    font-weight: 700;
   }
 
   .guide-fast-nav--in-section .guide-fast-nav__btn--mini {
-    margin: 0 0 0 8px;
-    padding: 7px 10px;
-    border: 2px solid rgba(0, 0, 0, 0.85);
-    border-radius: 9px;
-    background: hsl(var(--bsv-accent-hue) 76% 55% / 0.1);
-    color: #dbeafe;
-    font-size: 0.78rem;
-    font-weight: 700;
-    box-shadow: 0 1px 0 #000;
+    margin: 0 0 1px;
+    padding: 4px 4px 4px 14px;
+    color: #9ec3dd;
+    font-size: 0.74rem;
+    font-weight: 600;
   }
 
   .guide-fast-nav--in-section .guide-fast-nav__btn:hover,
   .guide-fast-nav--in-section .guide-fast-nav__btn:active {
     color: #fff;
-    background: linear-gradient(
-      180deg,
-      hsl(var(--bsv-accent-hue) 78% 46%) 0%,
-      hsl(var(--bsv-accent-hue) 78% 34%) 100%
-    );
-    border-color: #000;
+    background: hsl(var(--bsv-accent-hue) 76% 55% / 0.08);
   }
 
   .guide-fast-nav--in-section .guide-fast-nav__spacer {
-    height: 4px;
+    height: 6px;
   }
 
   .guide-fast-nav--in-section .guide-fast-nav__top {
-    margin-top: 2px;
-    padding: 10px 12px;
+    width: 100%;
+    margin-top: 0;
+    padding: 6px 8px;
     border: 2px solid #000;
-    border-radius: 10px;
-    background: linear-gradient(
-      180deg,
-      hsl(var(--bsv-accent-hue) 78% 48%) 0%,
-      hsl(var(--bsv-accent-hue) 78% 36%) 100%
-    );
-    color: #fff;
-    font-size: 0.82rem;
-    font-weight: 850;
-    box-shadow: 0 3px 0 #000;
-    text-shadow: 1px 1px 0 #000;
+    border-radius: 8px;
+    background: var(--bsv-surface-hover);
+    color: #cfe6ff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    box-shadow: 0 2px 0 #000;
+    text-shadow: none;
   }
 
   .guide-fast-nav--in-section .guide-fast-nav__top:hover,
   .guide-fast-nav--in-section .guide-fast-nav__top:active {
-    filter: brightness(1.06);
+    background: var(--bsv-surface-soft);
+    filter: none;
   }
 
   #untradeable-items .search-container--in-section {
@@ -16523,7 +16539,8 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     flex: none;
     align-self: auto;
     margin: 0;
-    padding: 64px 0 max(36px, env(safe-area-inset-bottom, 0px) + 24px);
+    /* Clear fixed header so Home is never clipped */
+    padding: 96px 0 max(36px, env(safe-area-inset-bottom, 0px) + 24px);
     border-right: 3px solid #000;
     border-bottom: none;
     background: var(--bsv-surface-chrome);
@@ -16538,7 +16555,7 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
 
   body.sections-menu-open .sections-sidebar {
     transform: translateX(0);
-    padding-top: 64px;
+    padding-top: 96px;
   }
 
   .sections-nav {
@@ -16546,7 +16563,7 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     flex-direction: column;
     align-items: stretch;
     gap: 0;
-    padding: 4px 10px max(40px, env(safe-area-inset-bottom, 0px) + 28px);
+    padding: 10px 10px max(40px, env(safe-area-inset-bottom, 0px) + 28px);
     overflow: visible;
   }
 
@@ -16597,35 +16614,67 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     padding: 2px 0 4px;
   }
 
-  /* Item value sections: zoom out card grids on mobile */
-  body.is-item-section .sections {
-    zoom: 0.88;
+  /* Item value sections + crew logos: zoom out on mobile */
+  body.is-item-section .sections,
+  body.is-crew-section .sections {
+    zoom: 0.8;
   }
 
-  body.is-item-section .section > h2 {
-    font-size: clamp(1.35rem, 5.5vw, 1.75rem);
-    margin-bottom: 10px;
+  body.is-item-section .section > h2,
+  body.is-crew-section .section > h2 {
+    font-size: clamp(1.2rem, 5vw, 1.55rem);
+    margin-bottom: 8px;
   }
 
-  body.is-item-section .cards {
-    gap: 10px;
-    padding-top: 6px;
+  body.is-item-section .cards,
+  body.is-crew-section .cards,
+  body.is-crew-section .crew-logos-scroll {
+    gap: 8px;
+    padding-top: 4px;
   }
 
-  body.is-item-section .card {
-    gap: 10px;
-    padding: 10px;
-    padding-bottom: 52px;
+  body.is-item-section .card,
+  body.is-crew-section .card,
+  body.is-crew-section .crew-logo-card {
+    gap: 8px;
+    padding: 8px;
+    padding-bottom: 48px;
     border-width: 2px;
     border-radius: 10px;
   }
 
-  body.is-item-section .card-info h3 {
-    font-size: 0.95rem;
+  body.is-crew-section .crew-logo-card {
+    padding-bottom: 10px;
+  }
+
+  body.is-item-section .card-info h3,
+  body.is-crew-section .card-info h3,
+  body.is-crew-section .crew-logo-card h3 {
+    font-size: 0.88rem;
   }
 
   body.is-item-section .card-info .badge {
-    font-size: 0.72rem;
+    font-size: 0.66rem;
+  }
+
+  /* Live Trading top banner: give it and following content a little room */
+  .section > .bsv-section-lt-promo.home-lt-bar,
+  .sections > .section:not(#home) > .bsv-section-lt-promo {
+    margin-top: 14px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .sections > .section:not(#home) > .bsv-section-lt-promo + h2 {
+    margin-top: 10px;
+  }
+
+  .sections > .section:not(#home) > .bsv-section-lt-promo + .cards {
+    margin-top: 4px;
+    padding-top: 8px;
+  }
+
+  body:not(.is-home) .main-container {
+    margin-top: 16px;
   }
 
   .sections-nav-suggest {
@@ -16677,11 +16726,11 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     align-items: center !important;
     justify-content: center !important;
     flex-wrap: nowrap !important;
-    font-size: clamp(1.8rem, 8.2vw, 2.35rem) !important;
+    font-size: clamp(2.55rem, 11.5vw, 3.35rem) !important;
     gap: 0 !important;
     row-gap: 0 !important;
-    margin: 0 auto !important;
-    line-height: 0.84 !important;
+    margin: 0 auto 2px !important;
+    line-height: 0.86 !important;
     width: 100%;
     text-align: center !important;
   }
@@ -16691,7 +16740,7 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     width: 100% !important;
     max-width: 100%;
     text-align: center !important;
-    line-height: 0.84 !important;
+    line-height: 0.86 !important;
     margin: 0 auto !important;
     padding: 0 !important;
   }
@@ -16699,7 +16748,7 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   .welcome-header .subtitle {
     font-size: clamp(0.9rem, 3.1vw, 1.05rem);
     line-height: 1.25;
-    margin-top: 2px !important;
+    margin-top: 4px !important;
     margin-bottom: 0 !important;
     padding: 0 10px;
   }
@@ -17265,7 +17314,7 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
     width: 100%;
     max-width: 380px;
     justify-content: center;
-    gap: 36px;
+    gap: 28px;
     text-align: center;
   }
 
@@ -17278,23 +17327,24 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   }
 
   .footer-side-nav__title {
-    font-size: 0.85rem;
-    margin-bottom: 10px;
+    font-size: 0.68rem;
+    margin-bottom: 6px;
+    letter-spacing: 0.04em;
   }
 
   .footer-side-nav__list {
     align-items: center;
-    gap: 10px;
+    gap: 6px;
   }
 
   .footer-side-nav__link {
-    font-size: 0.95rem;
+    font-size: 0.72rem;
     justify-content: center;
   }
 
   .footer-side-nav__icon {
-    width: 20px;
-    height: 20px;
+    width: 14px;
+    height: 14px;
   }
 }
 
@@ -17367,14 +17417,14 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   }
 
   .welcome-header h1 {
-    font-size: 1.85rem;
-    line-height: 0.84;
+    font-size: clamp(2.35rem, 11vw, 2.9rem) !important;
+    line-height: 0.86 !important;
   }
 
   .welcome-header h1 .welcome-title-line {
     width: 100%;
     text-align: center;
-    line-height: 0.84;
+    line-height: 0.86 !important;
   }
 
   .welcome-header .subtitle {
@@ -18239,7 +18289,7 @@ html[data-bsv-bg="dark"][data-sidenav-style="glass"] .sections-sidebar {
   background: linear-gradient(180deg, var(--bsv-surface-card) 0%, var(--bsv-bg-deep) 100%) !important;
 }
 html[data-bsv-bg="dark"] .guide-fast-nav,
-html[data-bsv-bg="dark"] .section-mobile-panel {
+html[data-bsv-bg="dark"] .guide-fast-nav--in-section {
   background-color: var(--bsv-surface-panel) !important;
 }
 html[data-bsv-bg="colorized"] .home-divider,

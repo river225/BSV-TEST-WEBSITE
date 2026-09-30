@@ -4761,9 +4761,11 @@ function showSection(name) {
 
   const isHome = cfg.id === "home";
   document.body.classList.toggle("is-home", isHome);
-  // Value-list item sections (guns/vehicles/untradeable) — not guide/richest/LT/crew/home
+  // Value-list item sections + crew logos get compact mobile scaling
   var isItemSection = cfg.dataSource === "sheet" && cfg.id !== "crew-logos";
+  var isCrewSection = cfg.id === "crew-logos";
   document.body.classList.toggle("is-item-section", isItemSection);
+  document.body.classList.toggle("is-crew-section", isCrewSection);
   if (name === RICHEST_SECTION_NAME) {
     showRichestLevelsNotice();
   }
