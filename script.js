@@ -298,8 +298,11 @@ function buildHumveeGiveawayBannerHtml(bannerId) {
 }
 
 function mountHomeGiveawayCarousel() {
-  var homeHumveeWrap = document.querySelector(".home-humvee-banner-wrap");
-  if (homeHumveeWrap) homeHumveeWrap.innerHTML = "";
+  var homeHumveeWrap =
+    document.getElementById("home-anaconda-banner-slot") ||
+    document.querySelector(".home-humvee-banner-wrap");
+  if (!homeHumveeWrap) return;
+  homeHumveeWrap.innerHTML = buildHomeAnacondaBannerHtml();
 }
 
 function getDiscordPromoSectionCopy(sectionTitle) {
