@@ -5187,26 +5187,31 @@ body.home-changelog-open {
   min-height: 132px;
 }.home-anaconda-banner__urgency {
   position: absolute;
-  top: 10px;
-  left: 12px;
+  top: 6px;
+  right: 10px;
   z-index: 2;
   display: inline-flex;
   align-items: center;
-  padding: 5px 12px;
-  border-radius: 999px;
-  border: 2px solid #000;
-  background: linear-gradient(180deg, #fecaca 0%, #ef4444 45%, #991b1b 100%);
+  justify-content: center;
+  padding: 4px 9px;
+  border-radius: 5px;
+  border: 1.5px solid #000;
+  background: #e11d2e;
   color: #fff;
-  font-size: 0.68rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.15;
   text-transform: uppercase;
-  text-shadow: 1px 1px 0 #000;
-  box-shadow: 0 3px 0 #000, 0 0 14px rgba(239, 68, 68, 0.55);
-  animation: home-anaconda-urgency 1.15s ease-in-out infinite;
+  text-shadow: none;
+  box-shadow: 0 2px 0 #000, 0 0 12px rgba(225, 29, 46, 0.5);
+  transform: rotate(18deg);
+  transform-origin: center;
+  pointer-events: none;
+  animation: home-anaconda-urgency 2.8s ease-in-out infinite;
 }@keyframes home-anaconda-urgency {
-  0%, 100% { transform: scale(1); box-shadow: 0 3px 0 #000, 0 0 12px rgba(239, 68, 68, 0.4); }
-  50% { transform: scale(1.05); box-shadow: 0 4px 0 #000, 0 0 22px rgba(248, 113, 113, 0.75); }
+  0%, 100% { transform: rotate(18deg) scale(1); opacity: 1; box-shadow: 0 2px 0 #000, 0 0 10px rgba(225, 29, 46, 0.45); }
+  50% { transform: rotate(18deg) scale(1.06); opacity: 0.92; box-shadow: 0 2px 0 #000, 0 0 16px rgba(239, 68, 68, 0.65); }
 }.home-anaconda-banner__stage {
   position: relative;
   flex: 0 0 auto;
@@ -5260,36 +5265,38 @@ body.home-changelog-open {
 }.home-anaconda-banner__copy {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   flex: 1 1 auto;
   min-width: 0;
-  padding-top: 4px;
+  padding: 4px 8px 0;
+  text-align: center;
 }.home-anaconda-banner__eyebrow {
   margin: 0;
-  font-size: 0.72rem;
+  font-size: clamp(0.78rem, 1.5vw, 0.92rem);
   font-weight: 900;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #fff8d6;
+  color: #fecaca;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.55);
 }.home-anaconda-banner__title {
   margin: 0;
-  font-size: clamp(1.35rem, 2.8vw, 1.85rem);
+  font-size: clamp(1.7rem, 3.6vw, 2.35rem);
   font-weight: 900;
-  line-height: 1.05;
+  line-height: 1.02;
   color: #fff;
   text-shadow:
     3px 3px 0 #000,
     -1px -1px 0 #000,
-    0 0 18px rgba(255, 230, 90, 0.45);
+    0 0 18px rgba(239, 68, 68, 0.45);
 }.home-anaconda-banner__hook {
   margin: 0;
-  max-width: 40ch;
-  font-size: clamp(0.86rem, 1.7vw, 1rem);
-  font-weight: 700;
-  line-height: 1.3;
-  color: #fff4d8;
+  max-width: 36ch;
+  font-size: clamp(1rem, 2vw, 1.18rem);
+  font-weight: 800;
+  line-height: 1.25;
+  color: #fee2e2;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.45);
 }.home-anaconda-banner__cta {
   display: inline-flex;
@@ -5301,23 +5308,23 @@ body.home-changelog-open {
   padding: 14px 26px;
   border-radius: 14px;
   border: 2px solid #000;
-  background: linear-gradient(180deg, #fff59d 0%, #ffd54f 40%, #ffb300 100%);
-  color: #1a0a00;
+  background: linear-gradient(180deg, #fecaca 0%, #ef4444 40%, #b91c1c 100%);
+  color: #fff;
   font-size: 1.05rem;
   font-weight: 900;
   text-decoration: none;
-  text-shadow: none;
-  box-shadow: 0 4px 0 #000, 0 0 18px rgba(255, 210, 60, 0.55);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.45);
+  box-shadow: 0 4px 0 #000, 0 0 18px rgba(239, 68, 68, 0.55);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   animation: home-anaconda-cta-pulse 1.8s ease-in-out infinite;
   white-space: nowrap;
 }@keyframes home-anaconda-cta-pulse {
-  0%, 100% { box-shadow: 0 4px 0 #000, 0 0 16px rgba(255, 210, 60, 0.45); }
-  50% { box-shadow: 0 4px 0 #000, 0 0 28px rgba(255, 235, 120, 0.8); }
+  0%, 100% { box-shadow: 0 4px 0 #000, 0 0 16px rgba(239, 68, 68, 0.45); }
+  50% { box-shadow: 0 4px 0 #000, 0 0 28px rgba(248, 113, 113, 0.8); }
 }.home-anaconda-banner__cta:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 0 #000, 0 0 28px rgba(255, 235, 120, 0.85);
-  color: #1a0a00;
+  box-shadow: 0 6px 0 #000, 0 0 28px rgba(248, 113, 113, 0.85);
+  color: #fff;
   animation: none;
 }.home-anaconda-banner__cta:active {
   transform: translateY(1px);
@@ -17021,8 +17028,8 @@ body[data-theme="pink"] .faq-page--pills .faq-icon {
   }
 
   .home-anaconda-banner__urgency {
-    left: 50%;
-    transform: translateX(-50%);
+    top: 8px;
+    right: 8px;
   }
 
   .home-anaconda-banner__copy {
