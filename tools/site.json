@@ -1,4 +1,14 @@
 {
   "root": "/BSV-TEST-WEBSITE/",
-  "test": true
+  "test": true,
+  "extras": {
+    "live-trading.html": {
+      "scripts": [
+        "lt-share.js"
+      ],
+      "styles": [
+        "lt-share.css"
+      ]
+    }
+  }
 }
