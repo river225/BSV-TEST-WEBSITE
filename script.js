@@ -4093,11 +4093,6 @@ function renderSection(title, items) {
     _sectionsDomReady[title] = true;
     return;
   }
-  if (title === "Game Updates") {
-    renderGameUpdatesSection(items || []);
-    _sectionsDomReady[title] = true;
-    return;
-  }
   if (!items || items.length === 0) {
     _sectionsDomReady[title] = true;
     return;
@@ -4156,50 +4151,6 @@ function renderSection(title, items) {
   }
 }
 
-/* Game Updates — Sheet tab "Game Updates": Name, Date, Summary, Image URL, New Items, Hidden.
- * Newest first as listed in the sheet. Item names in "New Items" link to their item pages. */
-function bsvFindItemRouteByName(name) {
-  var base = bsvSlugifyItemName(name);
-  var hit = _bsvItemBySlug && _bsvItemBySlug[base];
-  return hit || null;
-}
-
-function renderGameUpdatesSection(items) {
-  var cards = items.map(function (it, i) {
-    var name = String(it["Name"] || "").trim();
-    var date = String(it["Date"] || "").trim();
-    var summary = String(it["Summary"] || it["Text"] || "").trim();
-    var img = String(it["Image URL"] || it["Image"] || "").trim();
-    var newItems = String(it["New Items"] || "").split(/[,\n]/).map(function (x) { return x.trim(); }).filter(Boolean);
-    var itemsHtml = newItems.length
-      ? '<ul class="bsv-update__items">' + newItems.map(function (n) {
-          var r = bsvFindItemRouteByName(n);
-          if (!r) return "<li>" + escapeHtml(n) + "</li>";
-          var href = bsvPathForRoute({ section: r.section, item: r.name }) || "#";
-          return '<li><a href="' + escapeAttr(href) + '" data-bsv-route-section="' + escapeAttr(r.section) +
-            '" data-bsv-route-item="' + escapeAttr(r.name) + '">' + escapeHtml(r.name) + "</a></li>";
-        }).join("") + "</ul>"
-      : "";
-    return (
-      '<article class="bsv-update" id="update-' + escapeAttr(bsvSlugifyItemName(name) || String(i)) + '">' +
-        (img && /^https:\/\//.test(img) ? '<img class="bsv-update__img" src="' + escapeAttr(img) + '" alt="' + escapeAttr(name) + '" loading="lazy" decoding="async">' : "") +
-        '<div class="bsv-update__body">' +
-          '<h3 class="bsv-update__title">' + escapeHtml(name) + "</h3>" +
-          (date ? '<p class="bsv-update__date">' + escapeHtml(date) + "</p>" : "") +
-          (summary ? '<p class="bsv-update__summary">' + escapeHtml(summary) + "</p>" : "") +
-          (newItems.length ? '<p class="bsv-update__items-label">New items</p>' + itemsHtml : "") +
-        "</div>" +
-      "</article>"
-    );
-  }).join("");
-  var html =
-    '<section class="section game-updates-section" id="game-updates">' +
-      "<h2>" + escapeHtml(i18nSection("Game Updates")) + "</h2>" +
-      '<p class="bsv-updates__intro">Every BlockSpin update, with the new items and their values.</p>' +
-      (cards || '<p class="bsv-updates__empty">No updates posted yet — check back after the next BlockSpin update.</p>') +
-    "</section>";
-  document.getElementById("sections").insertAdjacentHTML("beforeend", html);
-}
 
 function ensureSectionRendered(title) {
   if (!title || _sectionsDomReady[title]) return;
