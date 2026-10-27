@@ -157,7 +157,10 @@ function buildPage(template, page) {
   h = setTag(h, /<title>[\s\S]*?<\/title>/, `<title>${escHtml(page.title)}</title>`);
   h = setTag(h, /<meta name="description" content="[^"]*">/, `<meta name="description" content="${escHtml(page.description)}">`);
   h = setTag(h, /<meta property="og:description" content="[^"]*">/, `<meta property="og:description" content="${escHtml(page.description)}">`);
-  h = setTag(h, /<meta property="og:title" content="[^"]*">/, `<meta property="og:title" content="${escHtml(page.title)}">\n<meta property="og:url" content="${escHtml(url)}">`);
+  h = setTag(h, /<meta property="og:title" content="[^"]*">/, `<meta property="og:title" content="${escHtml(page.title)}">`);
+  h = /<meta property="og:url" content="[^"]*">/.test(h)
+    ? h.replace(/<meta property="og:url" content="[^"]*">/, `<meta property="og:url" content="${escHtml(url)}">`)
+    : h.replace("</title>", `</title>\n<meta property="og:url" content="${escHtml(url)}">`);
   h = setTag(h, /<link rel="canonical" href="[^"]*" \/>/, `<link rel="canonical" href="${escHtml(url)}" />`);
   if (page.image) {
     h = setTag(h, /<meta property="og:image" content="[^"]*">/, `<meta property="og:image" content="${escHtml(page.image)}">`);

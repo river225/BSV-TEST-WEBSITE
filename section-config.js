@@ -193,6 +193,24 @@
       moneyGuideFastNav: true,
     },
     {
+      title: "Game Updates",
+      id: "game-updates",
+      path: "updates/",
+      seoTitle: "BlockSpin Updates – Every New Item & Change | BlockSpin Values",
+      seoDescription: "Every BlockSpin update in one place: new items, their values and what changed, kept up to date by BlockSpin Values.",
+      navGroup: "extras",
+      dataSource: "sheet",
+      sheetName: "Game Updates",
+      search: "hide",
+      mobileSearchInSection: false,
+      sidebarColumn: "hide",
+      taxCalc: "hide",
+      middlemanPromo: "hide",
+      mobileTaxArrow: false,
+      homeValueChanges: false,
+      accessoriesFastNav: false,
+    },
+    {
       title: ACCESSORIES_SECTION_TITLE,
       id: "untradeable-items",
       path: "values/untradeable-items/",
@@ -322,6 +340,8 @@
         '<path d="M6 8h12"/><path d="M15 5l3 3-3 3"/><path d="M18 16H6"/><path d="M9 13l-3 3 3 3"/>',
       "Money & Game Guide":
         '<path d="M6 5.5h9.5A2.5 2.5 0 0 1 18 8v11.5H8A2 2 0 0 1 6 17.5z"/><path d="M6 5.5V17.5"/><path d="M10 10h5M10 13.5h4"/>',
+      "Game Updates":
+        '<path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4z"/><path d="M18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/>',
       "Untradeable Items":
         '<rect x="6" y="10" width="12" height="9" rx="1.5"/><path d="M8.5 10V8a3.5 3.5 0 0 1 7 0v2"/><path d="M12 13.5v2.5"/>',
       "Richest Players":
