@@ -56,8 +56,8 @@ const FISH_WEIGHT_STEP = 0.1;
 
 const GIVEAWAY_CAROUSEL_INTERVAL_MS = 10000;
 const DISCORD_CARD_CAROUSEL_INTERVAL_MS = 9000;
-const ANACONDA_GIVEAWAY_IMAGE_URL = "https://i.ibb.co/QqD6BSd/j-Sn2mv-Y-1-removebg-preview.png";
-const ANACONDA_GIVEAWAY_DISCORD_URL = "https://discord.gg/nKKkXyqCsv?utm_source=blockspinvalues&utm_medium=referral&utm_campaign=site&utm_content=anaconda";
+const ANACONDA_GIVEAWAY_IMAGE_URL = "https://i.postimg.cc/2bTWDD3D/Screenshot-2026-10-18-230555-removebg-preview.png";
+const ANACONDA_GIVEAWAY_DISCORD_URL = "https://discord.gg/nKKkXyqCsv?utm_source=blockspinvalues&utm_medium=referral&utm_campaign=site&utm_content=pumpkin-launcher";
 const BSV_LOGO_URL = "https://i.ibb.co/VYjk9L14/Block-Spin-Values-Logo.png";
 const ROBUX_GIVEAWAY_IMAGE_URL = "https://i.ibb.co/7fC16qY/Screenshot-2026-05-06-at-02-28-05-removebg-preview.png";
 const ROBUX_GIVEAWAY_DISCORD_URL = "https://discord.gg/GufVWmACAh?utm_source=blockspinvalues&utm_medium=referral&utm_campaign=site&utm_content=robux";
@@ -241,7 +241,7 @@ function buildHomeAnacondaBannerHtml() {
   var img = escapeAttr(ANACONDA_GIVEAWAY_IMAGE_URL);
   var href = escapeAttr(ANACONDA_GIVEAWAY_DISCORD_URL);
   return (
-    '<article class="home-anaconda-banner" role="complementary" aria-label="Anaconda Giveaway">' +
+    '<article class="home-anaconda-banner home-anaconda-banner--halloween" role="complementary" aria-label="Pumpkin Launcher Giveaway">' +
       '<div class="home-anaconda-banner__haze" aria-hidden="true"></div>' +
       '<div class="home-anaconda-banner__scan" aria-hidden="true"></div>' +
       '<div class="home-anaconda-banner__orb home-anaconda-banner__orb--a" aria-hidden="true"></div>' +
@@ -251,13 +251,16 @@ function buildHomeAnacondaBannerHtml() {
       "</div>" +
       '<div class="home-anaconda-banner__inner">' +
         '<div class="home-anaconda-banner__stage">' +
+          '<span class="home-anaconda-banner__shine" aria-hidden="true"></span>' +
+          '<span class="home-anaconda-banner__shine home-anaconda-banner__shine--burst" aria-hidden="true"></span>' +
           '<span class="home-anaconda-banner__ring" aria-hidden="true"></span>' +
           '<span class="home-anaconda-banner__pedestal" aria-hidden="true"></span>' +
-          '<img src="' + img + '" alt="Anaconda" class="home-anaconda-banner__gun" width="280" height="170" loading="lazy" decoding="async">' +
+          '<img src="' + img + '" alt="Pumpkin Launcher" class="home-anaconda-banner__gun" width="280" height="170" loading="lazy" decoding="async">' +
         "</div>" +
         '<div class="home-anaconda-banner__copy">' +
-          '<p class="home-anaconda-banner__eyebrow">Omega Giveaway</p>' +
-          '<h3 class="home-anaconda-banner__title">Anaconda Giveaway</h3>' +
+          '<p class="home-anaconda-banner__eyebrow">Halloween Giveaway</p>' +
+          '<h3 class="home-anaconda-banner__title">Pumpkin Launcher Giveaway</h3>' +
+          '<p class="home-anaconda-banner__hook">This gun will be unobtainable soon — enter our giveaway before it\'s too late!</p>' +
         "</div>" +
         '<a href="' + href + '" target="_blank" rel="noopener noreferrer" class="home-anaconda-banner__cta">Enter Now <span aria-hidden="true">→</span></a>' +
       "</div>" +
@@ -991,6 +994,9 @@ function filterValueChangeRows(rows) {
   return rows.filter(function (r) {
     var name = (r.Title || r.Name || "").toString().trim();
     if (isWebsiteConfigMetaRow(name)) return false;
+    // Sheet column "Hidden" = Yes → omit from recently updated lists.
+    // A missing Hidden header (or a blank cell) leaves the row visible.
+    if (isItemMarkedHidden(r)) return false;
     var t = (r.Title || r.Date || r.Text || "").toString().trim();
     return t.length > 0;
   });
@@ -1407,7 +1413,10 @@ function buildRichestPlayerCard(player, index) {
     ';">#' +
     p.rank +
     "</div>" +
+    '<div class="player-avatar-wrap">' +
     '<img class="player-avatar" alt="" width="56" height="56" decoding="async" />' +
+    '<button type="button" class="player-avatar-expand" hidden aria-expanded="false" aria-label="Show full avatar" title="Show full avatar">Full</button>' +
+    "</div>" +
     '<div class="player-info">' +
     '<div class="player-name">' +
     escapeHtml(p.playerName) +
@@ -1538,10 +1547,19 @@ async function loadRichestPlayerAvatars() {
     names.push(name);
   });
 
-  const apiUrl =
-    typeof window.bsvBotApiUrl === "function"
-      ? window.bsvBotApiUrl("api/roblox-avatars")
-      : `${BSV_BOT_PUBLIC_BASE}/api/roblox-avatars`;
+  // On local live-host (LAN IP / localhost), use the local avatar proxy so Full works
+  // before the production bot redeploy lands. Elsewhere keep the Railway bot API.
+  var host = (location && location.hostname) || "";
+  var localLive =
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    /^192\.168\.\d+\.\d+$/.test(host) ||
+    /^10\.\d+\.\d+\.\d+$/.test(host);
+  const apiUrl = localLive
+    ? (location.origin + "/api/roblox-avatars")
+    : (typeof window.bsvBotApiUrl === "function"
+        ? window.bsvBotApiUrl("api/roblox-avatars")
+        : `${BSV_BOT_PUBLIC_BASE}/api/roblox-avatars`);
 
   for (let i = 0; i < names.length; i += RICHEST_AVATAR_BATCH_SIZE) {
     const batch = names.slice(i, i + RICHEST_AVATAR_BATCH_SIZE);
@@ -1561,11 +1579,17 @@ async function loadRichestPlayerAvatars() {
         if (!entry || !entry.imageUrl) return;
 
         const img = card.querySelector(".player-avatar");
+        const expandBtn = card.querySelector(".player-avatar-expand");
         if (img) {
           img.loading = "lazy";
           img.decoding = "async";
           img.src = entry.imageUrl;
           img.alt = name;
+          img.dataset.headshotUrl = entry.imageUrl;
+          if (entry.fullImageUrl) img.dataset.fullUrl = entry.fullImageUrl;
+        }
+        if (expandBtn && entry.fullImageUrl) {
+          expandBtn.hidden = false;
         }
         if (entry.profileUrl) {
           const link = card.querySelector(".profile-link");
@@ -1576,6 +1600,37 @@ async function loadRichestPlayerAvatars() {
       console.warn("Failed to load richest player avatars:", err);
     }
   }
+
+  initRichestAvatarExpand(section);
+}
+
+function initRichestAvatarExpand(section) {
+  const root = section || document.querySelector(".richest-players-section");
+  if (!root || root.dataset.avatarExpandReady === "1") return;
+  root.dataset.avatarExpandReady = "1";
+
+  root.addEventListener("click", function (event) {
+    const btn = event.target.closest(".player-avatar-expand");
+    if (!btn || !root.contains(btn)) return;
+    const card = btn.closest(".richest-card");
+    const img = card && card.querySelector(".player-avatar");
+    if (!card || !img) return;
+
+    const fullUrl = img.dataset.fullUrl || "";
+    const headUrl = img.dataset.headshotUrl || img.src || "";
+    if (!fullUrl) return;
+
+    const expanding = !card.classList.contains("richest-card--avatar-full");
+    card.classList.toggle("richest-card--avatar-full", expanding);
+    img.src = expanding ? fullUrl : headUrl;
+    btn.setAttribute("aria-expanded", expanding ? "true" : "false");
+    btn.setAttribute(
+      "aria-label",
+      expanding ? "Show headshot avatar" : "Show full avatar"
+    );
+    btn.title = expanding ? "Collapse avatar" : "Show full avatar";
+    btn.textContent = expanding ? "Hide" : "Full";
+  });
 }
 
 async function fetchSheet(sheetName) {
@@ -1607,18 +1662,23 @@ async function fetchSheet(sheetName) {
     });
 
     if (sheetName === "Website Configs") {
+      // Title/Date/Text rows, not Name. Hidden is applied in filterValueChangeRows.
       return items;
     }
 
-    return items.filter(x =>
-      String(
+    return items.filter((x) => {
+      const hasLabel = String(
         x["Name"] ||
-        x["Header"] ||
-        x["Roblox Name"] ||
-        x["Player Name"] ||
-        ""
-      ).trim().length > 0
-    );
+          x["Header"] ||
+          x["Roblox Name"] ||
+          x["Player Name"] ||
+          ""
+      ).trim().length > 0;
+      if (!hasLabel) return false;
+      // Sheet column "Hidden" = Yes → omit from the website entirely.
+      if (isItemMarkedHidden(x)) return false;
+      return true;
+    });
   } catch (err) {
     console.error(`Failed to fetch sheet: ${sheetName}`, err);
     return [];
@@ -2180,11 +2240,11 @@ function initExclusiveBadgeTips() {
   });
 }
 
-function buildCardBottomActionsHtml(exclusiveTier) {
+function buildCardBottomActionsHtml(exclusiveTiers) {
   return (
     '<div class="card-bottom-actions">' +
       buildCardSaveButtonHtml() +
-      buildCardExclusiveBadgeHtml(exclusiveTier) +
+      buildCardExclusiveBadgeHtml(exclusiveTiers) +
     "</div>"
   );
 }
@@ -2225,8 +2285,11 @@ function createCard(item) {
   const isDurabilityInvisible =
     /^(yes|true|1|ticked|checked|on|y)$/i.test(durabilityInvisibleNormalized);
   const invisibleStyle = isDurabilityInvisible ? 'style="opacity: 0;"' : '';
-  const showPawn = !isMiscSection && durability && durability.includes('/') && hasInternalValue;
-  const showRepair = showPawn && !isDurabilityInvisible;
+  const pawnTextOverride = getPawnTextOverride(item);
+  const showPawnCalculated =
+    !isMiscSection && durability && durability.includes("/") && hasInternalValue && !pawnTextOverride;
+  const showPawn = Boolean(pawnTextOverride) || showPawnCalculated;
+  const showRepair = showPawnCalculated && !isDurabilityInvisible;
   const showNetworth = !isMiscSection || (internalRawDirect !== "" && internalRawDirect !== "-");
   
   if (durability && durability.includes('/')) {
@@ -2255,7 +2318,7 @@ function createCard(item) {
   }
 
 let repairPrice = 0;
-if (showPawn) {
+if (showPawnCalculated) {
   const [currentDurability, maxDurability] = durability.split('/').map(v => parseInt(v) || 0);
   const missingDurability = maxDurability - currentDurability;
   const internalVal = internalNum;
@@ -2264,8 +2327,10 @@ if (showPawn) {
   repairPrice = Math.round(rawRepair);
 }
 
-let pawnAmount = 0;
-if (showPawn) {
+let pawnAmount = "";
+if (pawnTextOverride) {
+  pawnAmount = pawnTextOverride;
+} else if (showPawnCalculated) {
   const [currentDurability, maxDurability] = durability.split('/').map(v => parseInt(v) || 0);
   const internalVal = internalNum;
 
@@ -2274,13 +2339,11 @@ if (showPawn) {
   const deduction = missingDurability * ((internalVal * 0.3) / maxDurability / 1.43);
   
   const rawPawn = baseValue - deduction;
-  pawnAmount = Math.round(rawPawn);
-
-  pawnAmount = `$${pawnAmount.toLocaleString()}`;
+  pawnAmount = `$${Math.round(rawPawn).toLocaleString()}`;
 }
   
   const hasGiveaway = (giveawayFlag && giveawayFlag.toString().trim().toLowerCase() === 'yes') || giveawayItems.has(normalizeItemName(name));
-  const exclusiveTier = getItemExclusiveTier(item);
+  const exclusiveTiers = getItemExclusiveTier(item);
   const sectionLabel = safe(item.__sheet || "Unknown");
   
   return `
@@ -2294,7 +2357,8 @@ if (showPawn) {
          data-avg="${escapeAttr(avg)}" 
          data-ranged="${escapeAttr(ranged)}" 
          data-max-durability="${durability ? durability.split('/')[1] : '100'}"
-         data-internal-value="${escapeAttr(internalValueForAttr)}">
+         data-internal-value="${escapeAttr(internalValueForAttr)}"
+         data-pawn-fixed="${pawnTextOverride ? "1" : ""}">
       <div class="card-left">
         ${imgTag ? `<div class="card-item-image-wrap">${imgTag}</div>` : ""}
         ${durabilityHTML}
@@ -2307,7 +2371,7 @@ if (showPawn) {
         <div class="card-value-separator"></div>
         <div class="card-secondary-values">
           ${showNetworth ? `<div class="card-networth">${escapeHtml(i18n("card.networth"))}: <span class="networth-value">${escapeHtml(String(networthDisplay))}</span></div>` : ""}
-          ${showPawn ? `<div class="card-pawn">${escapeHtml(i18n("card.pawn"))}: <span class="pawn-value">${pawnAmount}</span></div>` : ''}
+          ${showPawn ? `<div class="card-pawn">${escapeHtml(i18n("card.pawn"))}: <span class="pawn-value">${escapeHtml(String(pawnAmount))}</span></div>` : ''}
           ${showRepair ? `
             <div class="card-repair">
               ${escapeHtml(i18n("card.repair"))}: <span class="repair-value">$${repairPrice.toLocaleString()}</span>
@@ -2318,7 +2382,7 @@ if (showPawn) {
       ${hasGiveaway ? `
         <button class="card-giveaway-trigger" type="button" aria-label="${escapeAttr(i18n("card.giveawayAria"))}" data-item-name="${escapeAttr(name)}"></button>
       ` : ''}
-      ${buildCardBottomActionsHtml(exclusiveTier)}
+      ${buildCardBottomActionsHtml(exclusiveTiers)}
     </div>
   `;
 }
@@ -2450,15 +2514,19 @@ function createAccessoryCard(item) {
   const name = safe(item["Name"]);
   const img = safe(item["Image URL"] || item["Image"]);
   const rarity = safe(item["Rarity"]);
-  const networthValue = safe(item["Networth Value"]);
+  const networthValue = safe(
+    item["Networth Value"] || getSheetFieldByNormalizedKey(item, "networthvalue")
+  );
   const crate = safe(item["Crate"]);
   const networthNum = parseInternalValue(networthValue);
   const networthDisplay = networthNum > 0
     ? "$" + Math.round(networthNum).toLocaleString("en-US")
-    : "N/A";
-  const pawnDisplay = networthNum > 0
-    ? "$" + Math.round(networthNum * 0.3).toLocaleString("en-US")
-    : "N/A";
+    : networthValue && /[a-z]/i.test(networthValue)
+      ? networthValue
+      : "N/A";
+  // Pawn can be an explicit sheet label (e.g. "Cannot be pawned") even when networth is numeric.
+  const pawnDisplay = formatPawnDisplayFromSheet(item, networthNum);
+  const pawnFixed = getPawnTextOverride(item) ? "1" : "";
   const rarityNorm = String(rarity || "").trim().toLowerCase();
   const rarityClass =
     rarityNorm === "omega" ? "rarity-omega" :
@@ -2471,7 +2539,7 @@ function createAccessoryCard(item) {
   const imgTag = img
     ? `<img src="${img}" alt="${escapeAttr(name)}" width="140" height="140" loading="lazy" decoding="async" onerror="this.style.display='none'">`
     : "";
-  const exclusiveTier = getItemExclusiveTier(item);
+  const exclusiveTiers = getItemExclusiveTier(item);
 
   return `
     <div class="card" data-name="${escapeAttr(name)}"
@@ -2480,6 +2548,7 @@ function createAccessoryCard(item) {
          data-rarity="${escapeAttr(rarity)}"
          data-crate="${escapeAttr(crate)}"
          data-networth="${escapeAttr(networthDisplay)}"
+         data-pawn-fixed="${escapeAttr(pawnFixed)}"
          data-card-type="accessory"
          data-save-card>
       <div class="card-left">
@@ -2495,7 +2564,7 @@ function createAccessoryCard(item) {
           <div class="card-ranged">${escapeHtml(i18n("card.crate"))}: <span>${escapeHtml(crate || i18n("card.na"))}</span></div>
         </div>
       </div>
-      ${buildCardBottomActionsHtml(exclusiveTier)}
+      ${buildCardBottomActionsHtml(exclusiveTiers)}
     </div>
   `;
 }
@@ -3827,7 +3896,7 @@ function sendSitePresenceHeartbeat() {
 function startSitePresenceTracking() {
   if (sitePresenceTimer) return;
   sendSitePresenceHeartbeat();
-  sitePresenceTimer = setInterval(sendSitePresenceHeartbeat, 25000);
+  sitePresenceTimer = setInterval(sendSitePresenceHeartbeat, 45000);
   document.addEventListener("visibilitychange", function () {
     if (!document.hidden) sendSitePresenceHeartbeat();
   });
@@ -5410,7 +5479,8 @@ function updateCardValues(input) {
   
   const pawnValueElement = card.querySelector('.pawn-value');
   
-  if (pawnValueElement && internalValue) {
+  // Respect sheet overrides like "Cannot be pawned" — never overwrite with a calculated $.
+  if (pawnValueElement && internalValue && card.dataset.pawnFixed !== "1") {
     const missingDurability = maxDurability - currentDurability;
     const internalVal = parseInternalValue(internalValue);
     
@@ -5530,6 +5600,60 @@ function parseInternalValue(value) {
 }
 function normalizeHeaderKey(s) {
   return String(s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+/** Exact sheet header match after normalizing (e.g. "Hidden", "Pawn Value"). */
+function getSheetFieldByNormalizedKey(item, normalizedKey) {
+  if (!item || typeof item !== "object" || !normalizedKey) return "";
+  for (const key of Object.keys(item)) {
+    if (String(key).startsWith("__")) continue;
+    if (normalizeHeaderKey(key) === normalizedKey) {
+      const v = item[key];
+      if (v !== undefined && v !== null && String(v).trim() !== "") return v;
+    }
+  }
+  return "";
+}
+
+function isItemMarkedHidden(item) {
+  const raw = String(getSheetFieldByNormalizedKey(item, "hidden") || "").trim();
+  return TRUE_REGEX.test(raw);
+}
+
+/**
+ * Pawn display for cards. Sheet "Pawn Value" / "Pawn Amount" wins:
+ * - text like "Cannot be pawned" is shown as-is (even when Networth is a number)
+ * - numeric pawn values format as money
+ * - empty pawn cell falls back to 30% of networth when available
+ */
+function formatPawnDisplayFromSheet(item, fallbackNetworthNum) {
+  const raw = String(
+    getSheetFieldByNormalizedKey(item, "pawnvalue") ||
+      getSheetFieldByNormalizedKey(item, "pawnamount") ||
+      getSheetFieldByNormalizedKey(item, "pawn") ||
+      ""
+  ).trim();
+  if (raw) {
+    // Any letters → treat as an explicit label override (e.g. cannot be pawned).
+    if (/[a-z]/i.test(raw)) return raw;
+    const n = parseInternalValue(raw);
+    if (n > 0) return "$" + Math.round(n).toLocaleString("en-US");
+    return raw;
+  }
+  const nw = Number(fallbackNetworthNum) || 0;
+  if (nw > 0) return "$" + Math.round(nw * 0.3).toLocaleString("en-US");
+  return "N/A";
+}
+
+function getPawnTextOverride(item) {
+  const raw = String(
+    getSheetFieldByNormalizedKey(item, "pawnvalue") ||
+      getSheetFieldByNormalizedKey(item, "pawnamount") ||
+      getSheetFieldByNormalizedKey(item, "pawn") ||
+      ""
+  ).trim();
+  if (raw && /[a-z]/i.test(raw)) return raw;
+  return "";
 }
 function getInternalValueFromItem(item) {
   if (!item || typeof item !== "object") return "";
