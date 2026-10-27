@@ -1,13 +1,19 @@
-/* TEST SITE ONLY — Live Trading share button (see lt-share.js). */
-.lt-share {
-  display: inline-flex; align-items: center; gap: 6px;
-  margin-top: 8px; padding: 6px 12px;
-  border-radius: 999px; border: 1px solid color-mix(in srgb, var(--bsv-accent) 55%, transparent);
-  background: color-mix(in srgb, var(--bsv-accent) 12%, transparent);
-  color: #fff; font: inherit; font-weight: 700; font-size: .85rem; cursor: pointer;
+/* TEST SITE ONLY — Live Trading share button (see lt-share.js). Matches the Hide button. */
+.lt-post__foot .lt-share {
+  appearance: none;
+  margin-left: auto;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px 12px;
+  border: 2px solid #000; border-radius: 10px;
+  background: linear-gradient(180deg, #0e7490 0%, #155e75 100%);
+  color: #ecfeff;
+  font: 800 0.82rem/1 system-ui, sans-serif;
+  cursor: pointer;
+  box-shadow: 0 2px 0 #000;
 }
-.lt-share:hover { background: color-mix(in srgb, var(--bsv-accent) 24%, transparent); }
-.lt-share.is-done { border-color: #22c55e; background: rgba(34, 197, 94, .18); }
+.lt-post__foot .lt-share:hover { filter: brightness(1.12); }
+.lt-post__foot .lt-share + .lt-post__hide { margin-left: 8px; }
+.lt-post__foot .lt-share.is-done { background: linear-gradient(180deg, #16a34a 0%, #15803d 100%); }
 .lt-post--shared { outline: 3px solid var(--bsv-accent); outline-offset: 3px; animation: lt-shared-pulse 1.2s ease-in-out 2; }
 @keyframes lt-shared-pulse { 50% { outline-color: transparent; } }
 @media (prefers-reduced-motion: reduce) { .lt-post--shared { animation: none; } }

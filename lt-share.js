@@ -54,7 +54,13 @@
       if (post.querySelector(".lt-share")) return;
       var id = post.getAttribute("data-id");
       if (!id) return;
-      var host = post.querySelector(".lt-post__meta") || post;
+      // Sit right next to Hide in the post footer (create the footer if this post has none).
+      var foot = post.querySelector(".lt-post__foot");
+      if (!foot) {
+        foot = document.createElement("div");
+        foot.className = "lt-post__foot";
+        post.appendChild(foot);
+      }
       var btn = document.createElement("button");
       btn.type = "button";
       btn.className = "lt-share";
@@ -62,7 +68,9 @@
       btn.setAttribute("aria-label", "Share this trade");
       btn.innerHTML = ICON + '<span class="lt-share__label">Share</span>';
       btn.addEventListener("click", onShare);
-      host.appendChild(btn);
+      var hide = foot.querySelector(".lt-post__hide");
+      if (hide) foot.insertBefore(btn, hide);
+      else foot.appendChild(btn);
     });
   }
 
