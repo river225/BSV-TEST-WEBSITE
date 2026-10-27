@@ -7,7 +7,7 @@
 (function () {
   "use strict";
   // Short share links. Switch SHARE_HOST to "https://share.blockspinvalues.com" once its DNS is live.
-  var SHARE_HOST = "https://bsv-bot-production.up.railway.app";
+  var SHARE_HOST = "https://share.blockspinvalues.com";
   var SHARE_PATH = "/tt/"; // test site links (main site uses /t/)
 
   function shareUrl(id) {
