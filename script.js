@@ -283,6 +283,8 @@ function bsvPathForRoute(route) {
   if (route.guide && BSV_GUIDE_TABS[route.guide]) return root + BSV_GUIDE_TABS[route.guide].path;
   var cfg = typeof getSectionConfig === "function" ? getSectionConfig(route.section) : null;
   if (cfg && typeof cfg.path === "string") return root + cfg.path;
+  // Sections without their own page keep the old #sec= style address.
+  if (cfg && !cfg.pageHref) return root + "#sec=" + encodeURIComponent(route.section);
   return null;
 }
 
@@ -4090,6 +4092,13 @@ function renderSection(title, items) {
   }
   if (title === "Money & Game Guide") {
     renderMoneyGameGuideSection();
+    _sectionsDomReady[title] = true;
+    return;
+  }
+  // Sections drawn by an extra script (e.g. test-site-only experiments).
+  var customRenderer = window.BSV_CUSTOM_SECTION_RENDERERS && window.BSV_CUSTOM_SECTION_RENDERERS[title];
+  if (typeof customRenderer === "function") {
+    customRenderer({ results: _renderedSectionCache, container: document.getElementById("sections") });
     _sectionsDomReady[title] = true;
     return;
   }

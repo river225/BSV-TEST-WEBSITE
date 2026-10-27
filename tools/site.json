@@ -1,4 +1,10 @@
 {
   "root": "/BSV-TEST-WEBSITE/",
-  "test": true
+  "test": true,
+  "extraScripts": [
+    "card-lab.js"
+  ],
+  "extraStyles": [
+    "card-lab.css"
+  ]
 }
