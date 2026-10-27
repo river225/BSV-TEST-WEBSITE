@@ -6,11 +6,12 @@
  */
 (function () {
   "use strict";
-  var BOT = (window.BSV_BOT_PUBLIC_BASE || "https://bsv-bot-production.up.railway.app").replace(/\/$/, "");
-  var SHARE_SITE = "test";
+  // Short share links. Switch SHARE_HOST to "https://share.blockspinvalues.com" once its DNS is live.
+  var SHARE_HOST = "https://bsv-bot-production.up.railway.app";
+  var SHARE_PATH = "/tt/"; // test site links (main site uses /t/)
 
   function shareUrl(id) {
-    return BOT + "/api/live-trading/share/" + encodeURIComponent(id) + "?site=" + SHARE_SITE;
+    return SHARE_HOST + SHARE_PATH + String(id).replace(/-/g, "").slice(0, 10).toLowerCase();
   }
 
   function flash(btn, text) {
