@@ -25,7 +25,7 @@
     if (!card.querySelector(".card-vote")) {
       var vote = document.createElement("div");
       vote.className = "card-vote";
-      vote.innerHTML = '<span class="card-vote__q">Value accurate?</span>' +
+      vote.innerHTML = '<span class="card-vote__q">Accurate value?</span>' +
         '<span class="card-vote__btns">' +
           '<button type="button" class="card-vote__btn" data-vote="up" aria-label="Yes, this value is accurate">' + THUMB_UP + "</button>" +
           '<button type="button" class="card-vote__btn card-vote__btn--down" data-vote="down" aria-label="No, this value is not accurate">' + THUMB_UP + "</button>" +
@@ -34,49 +34,50 @@
     }
   }
 
-  /* ---------- value feedback ---------- */
+  /* ---------- value feedback (login + BSV server members, one vote per item) ---------- */
   var API = "https://bsv-bot-production.up.railway.app/api/value-feedback";
-  var VOTED_KEY = "bsv-value-votes";
-  function voted() { try { return JSON.parse(localStorage.getItem(VOTED_KEY) || "{}") || {}; } catch (_) { return {}; } }
-  function remember(name, v) { try { var m = voted(); m[name] = { v: v, t: Date.now() }; localStorage.setItem(VOTED_KEY, JSON.stringify(m)); } catch (_) {} }
+  var mine = null, mineLoading = false;
+  function token() { return typeof window.bsvGetAuthToken === "function" ? window.bsvGetAuthToken() : ""; }
   function cardInfo(card) {
     var link = card.querySelector("h3 a.card-item-link");
-    var name = (link ? link.getAttribute("data-bsv-route-item") : "") || (card.getAttribute("data-name") || "").trim() || (card.querySelector("h3") || {}).textContent || "";
-    var avg = card.querySelector(".avg-value");
-    return {
-      item: String(name).trim(),
-      section: link ? link.getAttribute("data-bsv-route-section") || "" : "",
-      value: avg ? avg.textContent.trim() : "",
-      url: link ? new URL(link.getAttribute("href"), location.href).href : location.href
-    };
+    var name = (link ? link.getAttribute("data-bsv-route-item") : "") || (card.getAttribute("data-name") || "").trim() || ((card.querySelector("h3") || {}).textContent || "");
+    return { item: String(name).trim(), section: link ? link.getAttribute("data-bsv-route-section") || "" : "", value: (card.getAttribute("data-avg") || "").trim() };
   }
-  function sendVote(data) {
-    data.site = document.documentElement.getAttribute("data-bsv-env") === "test" || /BSV-TEST-WEBSITE/i.test(location.pathname) ? "test" : "main";
-    return fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) })
-      .then(function (r) { return r.json().catch(function () { return {}; }); })
-      .catch(function () { return { ok: false }; });
+  function api(path, body) {
+    var t = token();
+    var opt = { method: body ? "POST" : "GET", headers: {} };
+    if (t) opt.headers.Authorization = "Bearer " + t;
+    if (body) { opt.headers["Content-Type"] = "application/json"; opt.body = JSON.stringify(body); }
+    return fetch(API + path, opt).then(function (r) { return r.json().catch(function () { return {}; }); }).catch(function () { return { ok: false }; });
   }
-  function markVoted(card, v) {
+  function paintCard(card) {
     var box = card.querySelector(".card-vote");
-    if (!box) return;
-    box.classList.add("is-voted");
-    box.querySelectorAll(".card-vote__btn").forEach(function (b) { b.classList.toggle("is-on", b.getAttribute("data-vote") === v); b.disabled = true; });
-    box.querySelector(".card-vote__q").textContent = "Thanks!";
+    if (!box || !mine) return;
+    var v = mine[cardInfo(card).item] || "";
+    box.querySelectorAll(".card-vote__btn").forEach(function (b) { b.classList.toggle("is-on", b.getAttribute("data-vote") === v); b.setAttribute("aria-pressed", String(b.getAttribute("data-vote") === v)); });
+  }
+  function loadMine() {
+    if (mineLoading || mine || !token()) return;
+    mineLoading = true;
+    api("/mine").then(function (r) { mine = (r && r.votes) || {}; mineLoading = false; document.querySelectorAll(".card").forEach(paintCard); });
+  }
+  function toast(card, text) {
+    var box = card.querySelector(".card-vote"); if (!box) return;
+    box.setAttribute("data-tip", text);
+    clearTimeout(box._t); box._t = setTimeout(function () { box.removeAttribute("data-tip"); }, 2200);
   }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
-  function openReport(card) {
-    var info = cardInfo(card);
+  function openReport(card, info) {
     var pop = document.createElement("div");
     pop.className = "vote-pop";
     pop.innerHTML =
       '<form class="vote-pop__box" role="dialog" aria-modal="true" aria-labelledby="vote-pop-t">' +
         '<button type="button" class="vote-pop__x" data-act="close" aria-label="Close">×</button>' +
-        '<h3 id="vote-pop-t">What\'s wrong with the value of ' + esc(info.item) + "?</h3>" +
-        '<p class="vote-pop__now">Current average value: <b>' + esc(info.value || "N/A") + "</b></p>" +
-        '<label class="vote-pop__lbl">What do you think it\'s worth? <span>(optional)</span><input type="text" name="suggested" maxlength="40" placeholder="e.g. 1.2M" autocomplete="off"></label>' +
-        '<label class="vote-pop__lbl">Why do you think the value isn\'t accurate?<textarea name="reason" maxlength="600" rows="4" required placeholder="e.g. People are only paying 900k for it in trades right now"></textarea></label>' +
-        '<p class="vote-pop__err" hidden></p>' +
-        '<button type="submit" class="vote-pop__send">Send feedback</button>' +
+        '<h3 id="vote-pop-t">Thanks — your thumbs down on ' + esc(info.item) + " counts.</h3>" +
+        '<p class="vote-pop__now">Want to tell us more? (optional)</p>' +
+        '<label class="vote-pop__lbl">Why do you think the value isn\'t accurate?<textarea name="reason" maxlength="600" rows="4" placeholder="e.g. People are only paying 900k for it in trades right now"></textarea></label>' +
+        '<label class="vote-pop__lbl">What do you think it\'s worth?<input type="text" name="suggested" maxlength="40" placeholder="e.g. 1.2M" autocomplete="off"></label>' +
+        '<button type="submit" class="vote-pop__send">Send</button>' +
       "</form>";
     document.body.appendChild(pop);
     var form = pop.querySelector("form");
@@ -87,41 +88,42 @@
     form.querySelector("textarea").focus();
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      var btn = form.querySelector(".vote-pop__send"), err = form.querySelector(".vote-pop__err");
-      var reason = form.reason.value.trim();
-      if (reason.length < 3) { err.hidden = false; err.textContent = "Please tell us a little about why."; return; }
-      btn.disabled = true; btn.textContent = "Sending…";
-      info.vote = "down"; info.reason = reason; info.suggested = form.suggested.value.trim();
-      sendVote(info).then(function (r) {
-        if (r && (r.ok || r.error === "already")) {
-          remember(info.item, "down"); markVoted(card, "down");
-          form.innerHTML = '<h3>Thanks for the feedback!</h3><p class="vote-pop__now">Our value team will look at ' + esc(info.item) + '.</p><button type="button" class="vote-pop__send" data-act="close">Close</button>';
-        } else {
-          btn.disabled = false; btn.textContent = "Send feedback";
-          err.hidden = false; err.textContent = r && r.error === "slow" ? "Too many votes — try again later." : "Couldn't send right now. Please try again.";
-        }
+      var reason = form.reason.value.trim(), suggested = form.suggested.value.trim();
+      if (!reason && !suggested) { close(); return; }
+      var btn = form.querySelector(".vote-pop__send"); btn.disabled = true; btn.textContent = "Sending…";
+      api("", { item: info.item, section: info.section, value: info.value, vote: "down", reason: reason, suggested: suggested }).then(function () {
+        form.innerHTML = '<h3>Thanks for the feedback!</h3><p class="vote-pop__now">Our value team will look at ' + esc(info.item) + '.</p><button type="button" class="vote-pop__send" data-act="close">Close</button>';
       });
     });
   }
   document.addEventListener("click", function (e) {
     var b = e.target.closest && e.target.closest(".card-vote__btn");
-    if (!b || b.disabled) return;
+    if (!b) return;
     e.preventDefault(); e.stopPropagation();
-    var card = b.closest(".card");
-    if (!card) return;
-    if (b.getAttribute("data-vote") === "down") { openReport(card); return; }
-    var info = cardInfo(card);
-    info.vote = "up";
-    markVoted(card, "up"); remember(info.item, "up");
-    sendVote(info);
+    var card = b.closest(".card"); if (!card) return;
+    if (!token()) {
+      toast(card, "Log in to vote");
+      if (typeof window.bsvOpenLoginModal === "function") window.bsvOpenLoginModal({ requireGuild: true });
+      return;
+    }
+    var info = cardInfo(card), want = b.getAttribute("data-vote");
+    mine = mine || {};
+    var prev = mine[info.item] || "";
+    var vote = prev === want ? "none" : want; // tap the same thumb again to take it back
+    if (vote === "none") delete mine[info.item]; else mine[info.item] = vote;
+    paintCard(card);
+    api("", { item: info.item, section: info.section, value: info.value, vote: vote }).then(function (r) {
+      if (r && r.ok) { if (vote === "down") openReport(card, info); return; }
+      if (prev) mine[info.item] = prev; else delete mine[info.item];
+      paintCard(card);
+      toast(card, r && r.error === "join_server" ? "Join our Discord server to vote" : r && r.error === "login" ? "Log in to vote" : r && r.error === "slow" ? "Slow down a little" : "Couldn't save your vote");
+    });
   }, true);
   function restoreVotes(root) {
-    var m = voted(), now = Date.now();
-    (root || document).querySelectorAll(".card .card-vote:not(.is-voted)").forEach(function (box) {
-      var card = box.closest(".card"), info = cardInfo(card), v = m[info.item];
-      if (v && now - v.t < 12 * 3600 * 1000) markVoted(card, v.v);
-    });
+    loadMine();
+    if (mine) (root || document).querySelectorAll(".card").forEach(paintCard);
   }
+
   function scan(root) { (root || document).querySelectorAll(".card").forEach(addTo); restoreVotes(root); }
 
   function copy(text) {
