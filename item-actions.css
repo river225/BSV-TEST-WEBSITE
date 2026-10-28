@@ -80,3 +80,5 @@
 .vote-pop__err { margin: -4px 0 10px; color: #f87171; font-size: .85rem; font-weight: 700; }
 .vote-pop__send { width: 100%; padding: 11px; border-radius: 10px; border: 2px solid #000; background: var(--bsv-accent); color: #001018; font: inherit; font-weight: 900; cursor: pointer; box-shadow: 0 3px 0 #000; }
 .vote-pop__send:disabled { opacity: .6; cursor: default; }
+
+.card-item-actions .card-giveaway-trigger { position: static; inset: auto; transform: none; margin: 0; flex: 0 0 auto; }

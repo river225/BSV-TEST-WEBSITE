@@ -20,6 +20,9 @@
     // Save sits first, then Item page and Share, along the bottom-left.
     var save = card.querySelector(".card-save-btn");
     if (save) box.insertBefore(save, box.firstChild);
+    // Giveaway gift sits after Share (it used to be under the vote thumbs).
+    var gift = card.querySelector(".card-giveaway-trigger");
+    if (gift) box.appendChild(gift);
     card.appendChild(box);
     // "Is this value accurate?" at the bottom-right.
     if (!card.querySelector(".card-vote")) {
