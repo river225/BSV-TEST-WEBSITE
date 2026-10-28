@@ -8,21 +8,14 @@
   var SHARE_ICON = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.3M8.3 13.2l7.4 4.3"/></svg>';
 
   function addTo(card) {
-    var row = card.querySelector(".card-bottom-actions");
     var link = card.querySelector("h3 a.card-item-link");
-    if (!row || !link || row.querySelector(".card-open-btn")) return;
-    var save = row.querySelector(".card-save-btn");
-    var open = document.createElement("button");
-    open.type = "button"; open.className = "card-action-btn card-open-btn";
-    open.setAttribute("aria-label", "Open item page"); open.title = "Open item page";
-    open.innerHTML = OPEN_ICON;
-    var share = document.createElement("button");
-    share.type = "button"; share.className = "card-action-btn card-share-btn";
-    share.setAttribute("aria-label", "Share item"); share.title = "Share item";
-    share.innerHTML = SHARE_ICON;
-    var after = save ? save.nextSibling : row.firstChild;
-    row.insertBefore(open, after);
-    row.insertBefore(share, open.nextSibling);
+    if (!link || card.querySelector(".card-item-actions")) return;
+    var box = document.createElement("div");
+    box.className = "card-item-actions";
+    box.innerHTML =
+      '<button type="button" class="card-action-btn card-open-btn" aria-label="Open item page">' + OPEN_ICON + "<span>Open item page</span></button>" +
+      '<button type="button" class="card-action-btn card-share-btn" aria-label="Share item">' + SHARE_ICON + "<span>Share</span></button>";
+    card.appendChild(box);
   }
   function scan(root) { (root || document).querySelectorAll(".card").forEach(addTo); }
 
