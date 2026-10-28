@@ -9,6 +9,12 @@
       "styles": [
         "lt-share.css"
       ]
+    },
+    "index.html": {
+      "scripts": [],
+      "styles": [
+        "item-focus.css"
+      ]
     }
   }
 }
