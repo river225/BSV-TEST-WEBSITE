@@ -1,4 +1,4 @@
-/* TEST SITE ONLY — "Open item page" / "Share" buttons on item cards (see item-actions.js).
+/* "Open item page" / "Share" buttons on item cards (see item-actions.js).
    Stacked at the card's bottom-right; own class so saved-cards never treats them as save buttons. */
 .card { position: relative; }
 .card-item-actions {

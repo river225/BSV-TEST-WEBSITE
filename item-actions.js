@@ -1,5 +1,5 @@
 /**
- * TEST SITE ONLY — Save / "Item page" / "Share" buttons along the bottom-left of item cards, and an
+ * Save / "Item page" / "Share" buttons along the bottom-left of item cards, and an
  * "Value accurate?" thumbs up/down at the bottom-right (feedback goes to the bot, staff read it on feedback.html).
  * Linked via tools/site.json "extras" (index.html, so every generated page gets it too).
  */
@@ -160,7 +160,7 @@
     }
     // Short branded share link (preview card + forwards to this item page on the test site).
     var slugMatch = /\/items\/([^/]+)\/?$/.exec(link.getAttribute("href") || "");
-    var url = slugMatch ? "https://share.blockspinvalues.com/ti/" + slugMatch[1] : new URL(link.getAttribute("href"), location.href).href;
+    var url = slugMatch ? "https://share.blockspinvalues.com/" + (document.documentElement.getAttribute("data-bsv-env") === "test" ? "ti/" : "i/") + slugMatch[1] : new URL(link.getAttribute("href"), location.href).href;
     var name = (card.getAttribute("data-name") || "").trim();
     if (window.matchMedia("(pointer: coarse)").matches && navigator.share) {
       navigator.share({ title: name + " value | BlockSpin Values", url: url }).catch(function () {});

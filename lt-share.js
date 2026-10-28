@@ -1,6 +1,5 @@
 /**
- * TEST SITE ONLY — Share button on Live Trading posts.
- * Linked into live-trading.html by tools/sync-test-site.mjs (tools/site.json "extras").
+ * Share button on Live Trading posts.
  * The link points at the bot's share page, which shows a rich preview (items, values, image)
  * in Discord/TikTok and then forwards to this post on the test site.
  */
@@ -8,7 +7,8 @@
   "use strict";
   // Short share links. Switch SHARE_HOST to "https://share.blockspinvalues.com" once its DNS is live.
   var SHARE_HOST = "https://share.blockspinvalues.com";
-  var SHARE_PATH = "/tt/"; // test site links (main site uses /t/)
+  var IS_TEST = document.documentElement.getAttribute("data-bsv-env") === "test";
+  var SHARE_PATH = IS_TEST ? "/tt/" : "/t/"; // test site links use /tt/
 
   function shareUrl(id) {
     return SHARE_HOST + SHARE_PATH + String(id).replace(/-/g, "").slice(0, 10).toLowerCase();

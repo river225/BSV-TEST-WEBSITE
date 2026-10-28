@@ -1,4 +1,4 @@
-/* TEST SITE ONLY — dedicated item page: on /items/<item>/ show just that item, big and centred,
+/* dedicated item page: on /items/<item>/ show just that item, big and centred,
    instead of the item highlighted above the whole list. Linked via tools/site.json "extras". */
 body.is-item-page #sections .section > *:not(.bsv-item-spotlight) { display: none !important; }
 body.is-item-page .tax-sidebar-column { display: none !important; }
