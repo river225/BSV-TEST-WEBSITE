@@ -48,7 +48,9 @@
       }
       return;
     }
-    var url = new URL(link.getAttribute("href"), location.href).href;
+    // Short branded share link (preview card + forwards to this item page on the test site).
+    var slugMatch = /\/items\/([^/]+)\/?$/.exec(link.getAttribute("href") || "");
+    var url = slugMatch ? "https://share.blockspinvalues.com/ti/" + slugMatch[1] : new URL(link.getAttribute("href"), location.href).href;
     var name = (card.getAttribute("data-name") || "").trim();
     if (window.matchMedia("(pointer: coarse)").matches && navigator.share) {
       navigator.share({ title: name + " value | BlockSpin Values", url: url }).catch(function () {});
