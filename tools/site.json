@@ -11,9 +11,12 @@
       ]
     },
     "index.html": {
-      "scripts": [],
+      "scripts": [
+        "item-actions.js"
+      ],
       "styles": [
-        "item-focus.css"
+        "item-focus.css",
+        "item-actions.css"
       ]
     }
   }
